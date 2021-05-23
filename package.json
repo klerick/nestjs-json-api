@@ -31,7 +31,8 @@
     "typeorm:revert": "npm run typeorm migration:revert",
     "db:seed": "ts-node -r tsconfig-paths/register --project libs/database/tsconfig.lib.json ./node_modules/typeorm-seeding/dist/cli.js seed -n libs/database/src/config.ts",
     "commit": "cz",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {
@@ -92,6 +93,7 @@
     "eslint": "7.22.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
+    "husky": "^6.0.0",
     "jest": "26.2.2",
     "jest-preset-angular": "8.4.0",
     "prettier": "2.2.1",
@@ -111,21 +113,9 @@
     "type": "git",
     "url": "https://github.com/ringcentral/nestjs-json-api.git"
   },
-  "release": {
-    "branches": [
-      "master",
-      "next"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/npm",
-      [
-        "@semantic-release/exec",
-        {
-          "publishCmd": "npm run nx affected -- --target=release --base=$BEFORE_SHA --args=\"--version=${nextRelease.version} --type=${nextRelease.type}\""
-        }
-      ]
-    ]
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
   }
 }
