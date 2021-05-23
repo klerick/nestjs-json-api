@@ -1,0 +1,24 @@
+{
+  "name": "nest-json-api-for-typeorm-tmp-2",
+  "version": "0.0.0-development",
+  "engines": {
+    "node": ">= 14.0.0"
+  },
+  "description": "JsonAPi Plugin for NestJs",
+  "contributors": [
+    {
+      "email": "klerick666@gmain.com",
+      "name": "Alex H"
+    },
+    {
+      "email": "Ruslan S",
+      "name": ""
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ringcentral/nestjs-json-api.git"
+  },
+  "private": false,
+  "license": "MIT"
+}
