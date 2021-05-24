@@ -94,6 +94,7 @@
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
     "husky": "^6.0.0",
+    "istanbul-api": "^3.0.0",
     "jest": "26.2.2",
     "jest-preset-angular": "8.4.0",
     "prettier": "2.2.1",

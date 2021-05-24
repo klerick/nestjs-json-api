@@ -20,6 +20,6 @@
 #      - name: Install and test
 #        run: |
 #          npm ci
-#          nx affected:test --coverage
+#          npm run nx affected:test --coverage --base=$BEFORE_SHA
 #        env:
 #          CI: true
