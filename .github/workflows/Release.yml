@@ -31,7 +31,7 @@ jobs:
       - name: Test
         run: |
           npm run nx run-many -- --target=test --all --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html,json
-          SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}'
+          SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}')
           echo "COVERAGE=$(echo ${SUMMARY})" >> $GITHUB_ENV
       - name: Cretae Badge
         uses: schneegans/dynamic-badges-action@v1.0.0
