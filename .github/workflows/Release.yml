@@ -36,8 +36,8 @@ jobs:
       - name: Cretae Badge
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
-          auth: ${{ secrets.GIST_ID }}
-          gistID: ${{ secrets.NPM_TOKEN }}
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ secrets.GIST_ID }}
           filename: coverage-json-api.json
           label: Test Coverage
           message: ${{ env.COVERAGE }}
