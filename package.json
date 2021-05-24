@@ -1,5 +1,5 @@
 {
-  "name": "nestjs-json-api",
+  "name": "json-api-nestjs",
   "version": "0.0.0-development",
   "license": "MIT",
   "scripts": {

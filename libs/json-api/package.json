@@ -20,5 +20,7 @@
     "url": "https://github.com/ringcentral/nestjs-json-api.git"
   },
   "private": false,
-  "license": "MIT"
+  "license": "MIT",
+  "files": ["lib/src"],
+  "keywords": ["nestjs", "nest", "jsonapi", "json-api", "typeorm"]
 }
