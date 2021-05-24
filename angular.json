@@ -102,7 +102,12 @@
           }
         },
         "deploy": {
-          "builder": "@ng-builders/semrel:release"
+          "builder": "@ng-builders/semrel:release",
+          "options": {
+            "npm": {
+              "pkgRoot": "./dist/libs/json-api"
+            }
+          }
         },
         "release": {
           "builder": "@nrwl/workspace:run-commands",
