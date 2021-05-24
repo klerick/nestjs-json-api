@@ -44,7 +44,8 @@ jobs:
           color: green
           namedLogo: jest
 
-      - name: Release
-#        run: npx semantic-release
+      - name: Create Release
         run: npm run nx affected -- --target=release --base=$BEFORE_SHA
+      - name: Deploy
+        run: npm run nx affected -- --target=deploy --base=$BEFORE_SHA
 

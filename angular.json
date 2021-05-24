@@ -117,11 +117,7 @@
                 "command": "npm run nx run json-api:build",
                 "forwardAllArgs": false
               },
-              "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api/.npmrc",
-              {
-                "command": "npm run nx run json-api:deploy",
-                "forwardAllArgs": false
-              }
+              "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api/.npmrc"
             ],
             "cwd": "./",
             "parallel": false
