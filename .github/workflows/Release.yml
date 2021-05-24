@@ -23,14 +23,14 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('./package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
         run: npm ci
       - name: Test
-        run:  |
-          npm run nx affected:test --base=a13e9ccf424b7f23eca8ee9a290f98a176a6912d --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html
+        run: |
+          nx run-many --target=test --all --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html,json
           SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}'
           echo "COVERAGE=$(echo ${SUMMARY})" >> $GITHUB_ENV
       - name: Cretae Badge
