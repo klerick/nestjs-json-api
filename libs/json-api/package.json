@@ -21,6 +21,6 @@
   },
   "private": false,
   "license": "MIT",
-  "files": ["lib/src"],
+  "files": ["src/**"],
   "keywords": ["nestjs", "nest", "jsonapi", "json-api", "typeorm", "CRUD"]
 }
