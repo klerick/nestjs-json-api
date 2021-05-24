@@ -1,5 +1,5 @@
 {
-  "name": "nest-json-api-for-typeorm-tmp-2",
+  "name": "json-api-nestjs",
   "version": "0.0.0-development",
   "engines": {
     "node": ">= 14.0.0"
