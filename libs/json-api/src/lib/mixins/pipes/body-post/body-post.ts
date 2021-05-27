@@ -21,10 +21,10 @@ import {
 } from '../../../types';
 
 
-export function bodyPostMixin(entity: Entity): PipeTransformMixin {
+export function bodyPostMixin(entity: Entity, connectionName: string): PipeTransformMixin {
   @Injectable()
   class BodyPostMixin implements PipeTransform {
-    @InjectRepository(entity) protected repository: RepositoryMixin;
+    @InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
 
     public async transform(value: any): Promise<RequestResourceData> {
       const resourceMetadata = this.repository.metadata;

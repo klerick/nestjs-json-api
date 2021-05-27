@@ -14,10 +14,10 @@ import {
 } from '../../../types';
 
 
-export function parseRelationshipNameMixin(entity: Entity): PipeTransformMixin {
+export function parseRelationshipNameMixin(entity: Entity, connectionName: string): PipeTransformMixin {
   @Injectable()
   class ParseRelationshipNameMixin implements PipeTransform {
-    @InjectRepository(entity) protected repository: RepositoryMixin;
+    @InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
 
     public async transform(value: string): Promise<string> {
       const generalErrors = await checkResourceRelationName(value, this.repository.metadata);

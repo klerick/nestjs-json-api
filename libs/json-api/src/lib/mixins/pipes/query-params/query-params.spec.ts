@@ -13,8 +13,9 @@ jest.mock('../../../helpers/validation');
 
 describe('QueryParams', () => {
   const entityMock = class SomeEntityMock {};
-  const repoToken = getRepositoryToken(entityMock);
-  const pipeMixin = queryParamsMixin(entityMock);
+  const mockConnectionName = 'mockConnectionName';
+  const repoToken = getRepositoryToken(entityMock, mockConnectionName);
+  const pipeMixin = queryParamsMixin(entityMock, mockConnectionName);
   let request;
   let repo: Repository<any>;
   let pipe: PipeTransform;

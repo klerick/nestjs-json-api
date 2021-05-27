@@ -9,7 +9,7 @@ import {
 } from '../types';
 
 
-export function props(controller: ControllerMixin, entity: Entity, config: Binding): void {
+export function props(controller: ControllerMixin, entity: Entity, config: Binding, connectionName: string): void {
   const entityName = entity instanceof Function ? entity.name : entity.options.name;
   const urlName = paramCase(entityName);
   const { name, path, parameters, method, implementation } = config;
@@ -45,7 +45,7 @@ export function props(controller: ControllerMixin, entity: Entity, config: Bindi
 
   parameters.forEach((parameter, key) => {
     const { property, decorator, mixins } = parameter;
-    decorator(property, ...(mixins.map(mixin => mixin(entity))))(
+    decorator(property, ...(mixins.map(mixin => mixin(entity, connectionName))))(
       controller.prototype,
       name,
       key,

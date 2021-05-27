@@ -12,8 +12,9 @@ jest.mock('../../../helpers/validation');
 
 describe('BodyPatchRelationship', () => {
   const entityMock = class SomeEntityMock {};
-  const repoToken = getRepositoryToken(entityMock);
-  const pipeMixin = bodyPatchRelationshipMixin(entityMock);
+  const mockConnectionName = 'mockConnectionName';
+  const repoToken = getRepositoryToken(entityMock, mockConnectionName);
+  const pipeMixin = bodyPatchRelationshipMixin(entityMock, mockConnectionName);
   let pipe: PipeTransform;
 
   beforeAll(async () => {

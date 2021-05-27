@@ -10,6 +10,7 @@ import { Bindings } from '../../config/bindings';
 
 jest.mock('../transform/transform.mixin');
 jest.mock('../service/service.mixin');
+const mockConnectionName = 'mockConnectionName';
 
 describe('ModuleMixin', () => {
   beforeEach(async () => {
@@ -17,12 +18,12 @@ describe('ModuleMixin', () => {
   });
 
   it('should return mixin', () => {
-    expect(moduleMixin('/api/v1', undefined, class Entity {})).toBeDefined();
+    expect(moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName)).toBeDefined();
   });
 
   it('should keep controller', () => {
     const controller = class Controller {};
-    const result = moduleMixin('/api/v1', controller, class Entity {});
+    const result = moduleMixin('/api/v1', controller, class Entity {}, mockConnectionName);
 
     expect(result.controller).toBe(controller);
   });
@@ -32,7 +33,7 @@ describe('ModuleMixin', () => {
     // @ts-ignore
     transformMixin.mockReturnValueOnce(transformMock);
 
-    const result = moduleMixin('/api/v1', undefined, class Entity {});
+    const result = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
     expect(result.providers).toContain(transformMock);
   });
 
@@ -40,13 +41,13 @@ describe('ModuleMixin', () => {
     const serviceMock = class Service {};
     // @ts-ignore
     serviceMixin.mockReturnValueOnce(serviceMock);
-    const result = moduleMixin('/api/v1', undefined, class Entity {});
+    const result = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
 
     expect(result.providers).toContain(serviceMock);
   });
 
   it('should use global prefix', () => {
-    const result = moduleMixin('/api/v1', undefined, class Entity {});
+    const result = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
     const { controller } = result;
     const metadata = Reflect.getMetadata(PATH_METADATA, controller);
 
@@ -56,7 +57,7 @@ describe('ModuleMixin', () => {
   it('should inject service', () => {
     // @ts-ignore
     serviceMixin.mockReturnValueOnce(mixin(class Service {}, 'Test'));
-    const result = moduleMixin('/api/v1', undefined, class Entity {});
+    const result = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
     const { controller } = result;
 
     const depsMetadata = Reflect.getMetadata(PROPERTY_DEPS_METADATA, controller);
@@ -70,7 +71,7 @@ describe('ModuleMixin', () => {
     }
     // @ts-ignore
     serviceMixin.mockReturnValueOnce(mixin(class Service {}, 'Test'));
-    const result = moduleMixin('/api/v1', Controller, class Entity {});
+    const result = moduleMixin('/api/v1', Controller, class Entity {}, mockConnectionName);
     const { controller } = result;
 
     const depsMetadata = Reflect.getMetadata(PROPERTY_DEPS_METADATA, controller);
@@ -79,7 +80,7 @@ describe('ModuleMixin', () => {
   });
 
   it('should add request handling methods', () => {
-    const { controller } = moduleMixin('/api/v1', undefined, class Entity {});
+    const { controller } = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
     Object.values(Bindings).forEach(binding => {
       const { name, path, method } = binding;
 

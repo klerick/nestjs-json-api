@@ -1,4 +1,4 @@
-import { HttpAdapterHost } from '@nestjs/core';
+import { HttpAdapterHost, ModuleRef } from '@nestjs/core';
 import { Connection } from 'typeorm';
 
 import { SwaggerService } from './services/swagger/swagger.service';
@@ -14,8 +14,8 @@ describe('JsonAPIModule', () => {
       prefix: 'example'
     });
     // @ts-ignore
-    const connectionMock: Connection = {
-      getRepository: jest.fn().mockReturnValue({
+    const moduleRefMock: ModuleRef = {
+      get: jest.fn().mockReturnValue({
         metadata: {}
       })
     };
@@ -27,7 +27,7 @@ describe('JsonAPIModule', () => {
       }
     };
 
-    const module = new JsonApiModule(connectionMock, adapterMock);
+    const module = new JsonApiModule(moduleRefMock, adapterMock);
     module.onModuleInit();
 
     expect(getEntitiesMock).toBeCalled();
@@ -38,8 +38,10 @@ describe('JsonAPIModule', () => {
 
   it('should add resource configs', () => {
     const entitiesMock = [
-      class FirstEntity {},
-      class SecondEntity {},
+      class FirstEntity {
+      },
+      class SecondEntity {
+      },
     ];
     const addResourceConfigMock = (SwaggerService.addResourceConfig as unknown as jest.Mock);
     const getEntitiesMock = (SwaggerService.getEntities as unknown as jest.Mock).mockReturnValue(entitiesMock);
@@ -47,8 +49,8 @@ describe('JsonAPIModule', () => {
       prefix: 'example'
     });
     // @ts-ignore
-    const connectionMock: Connection = {
-      getRepository: jest.fn().mockReturnValue({
+    const moduleRefMock: ModuleRef = {
+      get: jest.fn().mockReturnValue({
         metadata: {}
       })
     };
@@ -60,13 +62,15 @@ describe('JsonAPIModule', () => {
       }
     };
 
-    const module = new JsonApiModule(connectionMock, adapterMock);
+    const mockConnectionName = 'mockConnectionName';
+    // @ts-ignore
+    JsonApiModule.connectionName = mockConnectionName;
+    const module = new JsonApiModule(moduleRefMock, adapterMock);
     module.onModuleInit();
 
-
-    expect((connectionMock.getRepository as unknown as jest.Mock).mock.calls[0][0]).toBe(entitiesMock[0]);
-    expect((connectionMock.getRepository as unknown as jest.Mock).mock.calls[1][0]).toBe(entitiesMock[1]);
-    expect(connectionMock.getRepository).toBeCalledTimes(2);
+    expect((moduleRefMock.get as unknown as jest.Mock).mock.calls[0][0]).toBe(`${mockConnectionName}_${entitiesMock[0].name}Repository`);
+    expect((moduleRefMock.get as unknown as jest.Mock).mock.calls[1][0]).toBe(`${mockConnectionName}_${entitiesMock[1].name}Repository`);
+    expect(moduleRefMock.get).toBeCalledTimes(2);
     expect(addResourceConfigMock).toBeCalledTimes(2);
     expect(getEntitiesMock).toBeCalled();
   });

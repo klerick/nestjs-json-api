@@ -24,10 +24,10 @@ import {
 } from '../../../helpers';
 
 
-export function bodyPatchRelationshipMixin(entity: Entity): PipeTransformMixin {
+export function bodyPatchRelationshipMixin(entity: Entity, connectionName: string): PipeTransformMixin {
   @Injectable()
   class BodyPatchRelationshipMixin implements PipeTransform {
-    @InjectRepository(entity) protected repository: RepositoryMixin;
+    @InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
     @Inject(REQUEST) private request: Request;
 
     public async transform(value: any): Promise<RequestRelationshipsData> {

@@ -24,8 +24,9 @@ describe('ServiceMixin', () => {
     transformData: jest.fn(),
   } as any;
 
-  const repoToken = getRepositoryToken(entityMock);
-  const mixin = serviceMixin(entityMock, transformMock);
+  const mockConnectionName = 'mockConnectionName';
+  const repoToken = getRepositoryToken(entityMock, mockConnectionName);
+  const mixin = serviceMixin(entityMock, transformMock, mockConnectionName);
   let service: JsonApiService;
 
   beforeEach(async () => {

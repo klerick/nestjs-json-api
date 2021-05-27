@@ -15,10 +15,10 @@ import {
 } from '../../types';
 
 
-export function transformMixin(entity: Entity): TransformMixin {
+export function transformMixin(entity: Entity, connectionName: string): TransformMixin {
   @Injectable()
   class MixinTransform implements JsonApiTransform {
-    @InjectRepository(entity) protected repository: RepositoryMixin;
+    @InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
     @Inject(JSON_API_CONFIG) protected config: ModuleConfig;
 
     public transformData(data: ObjectLiteral): ResponseResourceData {

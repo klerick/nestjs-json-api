@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { JsonApiController, JsonApiTransform, JsonApiService, SwaggerConfig } from '.';
 
-export type PipeFabric = (entity: Entity) => PipeTransformMixin;
+export type PipeFabric = (entity: Entity, connectionName?: string) => PipeTransformMixin;
 export type PipeTransformMixin = Type<PipeTransform>;
 export type InterceptorMixin = Type<NestInterceptor>;
 export type RepositoryMixin = Repository<Entity>;
@@ -23,6 +23,7 @@ export interface ModuleOptions {
   entities: Entity[];
   swagger?: SwaggerConfig;
   providers?: NestProvider[];
+  connectionName?: string;
 }
 
 export interface ModuleConfig {

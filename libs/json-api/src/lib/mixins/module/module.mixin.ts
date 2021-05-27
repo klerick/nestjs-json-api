@@ -20,11 +20,12 @@ export function moduleMixin(
   globalPrefix: ModuleOptions['globalPrefix'],
   controller: NestController,
   entity: Entity,
+  connectionName: string,
 ) {
   const entityName = entity instanceof Function ? entity.name : entity.options.name;
   const builtController = controller || class ControllerMixin {};
-  const builtTransform = transformMixin(entity);
-  const builtService = serviceMixin(entity, builtTransform);
+  const builtTransform = transformMixin(entity, connectionName);
+  const builtService = serviceMixin(entity, builtTransform, connectionName);
 
   Controller(`${globalPrefix}/${paramCase(entityName)}`)(builtController);
   Inject(builtService)(builtController.prototype, 'serviceMixin');
@@ -40,7 +41,7 @@ export function moduleMixin(
   }
 
   Object.values(Bindings).forEach(config => {
-    props(builtController, entity, config);
+    props(builtController, entity, config, connectionName);
   });
 
   return {

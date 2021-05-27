@@ -10,8 +10,9 @@ describe('TransformMixin', () => {
   const entityMock = class SomeEntityMock {};
   let repoMock;
 
-  const repoToken = getRepositoryToken(entityMock);
-  const mixin = transformMixin(entityMock);
+  const mockConnectionName = 'mockConnectionName';
+  const repoToken = getRepositoryToken(entityMock, mockConnectionName);
+  const mixin = transformMixin(entityMock, mockConnectionName);
   let service: JsonApiTransform;
   let config: ModuleConfig;
 

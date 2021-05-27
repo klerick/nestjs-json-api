@@ -23,10 +23,10 @@ import {
 } from '../../types';
 
 
-export function serviceMixin(entity: Entity, transform: TransformMixin): ServiceMixin {
+export function serviceMixin(entity: Entity, transform: TransformMixin, connectionName: string): ServiceMixin {
   @Injectable()
   class MixinService implements JsonApiService {
-    @InjectRepository(entity) protected repository: RepositoryMixin;
+    @InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
     @Inject(transform) protected transform: JsonApiTransform;
 
     public async getRelationship(options: ServiceOptions<void>): Promise<ResponseRelationshipsObject> {
