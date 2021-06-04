@@ -9,3 +9,4 @@ export * from './validation.types';
 export * from './response.types';
 export * from './database.type';
 export * from './swagger.types';
+export * from './decorator-options.types';

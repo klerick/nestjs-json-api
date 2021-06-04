@@ -6,13 +6,23 @@ import {
   ControllerMixin,
   Binding,
   Entity,
+  DecoratorOptions
 } from '../types';
+import { JSON_API_OPTIONS } from '../constants';
 
 
 export function props(controller: ControllerMixin, entity: Entity, config: Binding, connectionName: string): void {
   const entityName = entity instanceof Function ? entity.name : entity.options.name;
   const urlName = paramCase(entityName);
   const { name, path, parameters, method, implementation } = config;
+
+  const decoratorOptions: DecoratorOptions = Reflect.getMetadata(JSON_API_OPTIONS, controller);
+  if (decoratorOptions) {
+    const {allowMethod = []} = decoratorOptions;
+    if (!allowMethod.includes(name)) {
+      return void(0);
+    }
+  }
 
   if (!controller.prototype[name]) {
     controller.prototype[name] = function (...args) {

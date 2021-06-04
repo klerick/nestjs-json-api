@@ -1,6 +1,6 @@
 import { Body, Param, Query, RequestMethod } from '@nestjs/common';
 
-import { BindingsConfig, JsonApiController } from '../types';
+import { BindingsConfig, JsonApiController, MethodName } from '../types';
 import {
   bodyDeleteRelationshipMixin,
   parseRelationshipNameMixin,
@@ -331,3 +331,8 @@ export const Bindings: BindingsConfig = {
     ]
   }
 };
+
+export function excludeMethod(names: Array<Partial<MethodName>>): Array<MethodName> {
+  const tmpObject = names.reduce((acum, key) => (acum[key] = true, acum), {})
+  return Object.keys(Bindings).filter(method => !tmpObject[method]) as Array<MethodName>
+}

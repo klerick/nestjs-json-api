@@ -2,7 +2,7 @@ name: Test
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
 env:
   BEFORE_SHA: ${{ github.event.before }}
 jobs:
