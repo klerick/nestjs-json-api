@@ -14,12 +14,14 @@ export type ServiceMixin = Type<JsonApiService>;
 export type TransformMixin = Type<JsonApiTransform>;
 export type NestController = Type<any>;
 export type NestProvider = Type<any>;
+export type NestImport = Type<any>;
 export type ProviderMixin = Type<any>;
 export type Entity = EntityClassOrSchema;
 
 export interface ModuleOptions {
   globalPrefix: string;
   controllers?: NestController[];
+  imports?: NestImport[];
   entities: Entity[];
   swagger?: SwaggerConfig;
   providers?: NestProvider[];

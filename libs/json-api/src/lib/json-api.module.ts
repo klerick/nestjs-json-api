@@ -48,6 +48,7 @@ export class JsonApiModule implements OnModuleInit {
   public static forRoot(options: ModuleOptions): DynamicModule {
     const { globalPrefix } = options;
     const optionsProviders = options.providers || [];
+    const optionsImports = options.imports || [];
     JsonApiModule.connectionName =
       options.connectionName || JsonApiModule.connectionName;
 
@@ -68,6 +69,7 @@ export class JsonApiModule implements OnModuleInit {
           options.entities,
           JsonApiModule.connectionName
         ),
+        ...optionsImports
       ],
     };
 
