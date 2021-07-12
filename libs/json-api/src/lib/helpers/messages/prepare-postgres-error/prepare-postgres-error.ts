@@ -57,5 +57,7 @@ export function preparePostgresError(
     }
   }
 
-  return new HttpException({ errors }, 409);
+  const preparedError = new HttpException({ errors }, 409);
+  preparedError.stack = error.stack;
+  return preparedError;
 }

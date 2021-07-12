@@ -40,11 +40,13 @@ export function interceptorMixin(): InterceptorMixin {
             return throwError(prepareHttpError(context, error));
           }
 
-          return throwError(new HttpException({
+          const preparedError = new HttpException({
             errors: [{
               detail: 'Internal server error',
             }]
-          }, 500));
+          }, 500);
+          preparedError.stack = error.stack;
+          return throwError(preparedError);
         })
       );
     }

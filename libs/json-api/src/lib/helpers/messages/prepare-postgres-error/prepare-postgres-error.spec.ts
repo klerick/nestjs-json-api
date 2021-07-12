@@ -73,4 +73,14 @@ describe('PreparePostgresError', () => {
     expect((result.getResponse() as any).errors[0].detail).toBeDefined();
     expect((result.getResponse() as any).errors).toHaveLength(1);
   });
+
+  it('Should save original error stack', () =>  {
+    const exceptionMock = {
+      code: PostgresErrors.KeyConstraint,
+      stack: 'original error stack',
+    };
+
+    const result = preparePostgresError(contextMock, exceptionMock);
+    expect(result.stack).toBe(exceptionMock.stack);
+  });
 });
