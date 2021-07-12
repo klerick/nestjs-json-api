@@ -26,5 +26,7 @@ export function prepareHttpError(
       errors.push(response);
   }
 
-  return new HttpException({ errors }, status);
+  const preparedError = new HttpException({ errors }, status);
+  preparedError.stack = error.stack;
+  return preparedError;
 }

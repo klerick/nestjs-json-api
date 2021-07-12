@@ -56,4 +56,14 @@ describe('PrepareHttpError', () => {
       }]
     });
   });
+
+  it('should save original error stack', () => {
+    const errorsArrayMock = [{someError: 'mock'}, {nextError:  'mock'}];
+    const exceptionMock = new NotFoundException(errorsArrayMock);
+    const contextMock = {} as ExecutionContext;
+    exceptionMock.stack = 'original error stack';
+
+    const result = prepareHttpError(contextMock, exceptionMock);
+    expect(result.stack).toBe(exceptionMock.stack);
+  });
 });

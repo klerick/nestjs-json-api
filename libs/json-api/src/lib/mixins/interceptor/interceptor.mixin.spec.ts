@@ -129,4 +129,29 @@ describe('InterceptorMixin', () => {
     expect(error).toBeInstanceOf(HttpException);
     expect(handleMock).toBeCalled();
   });
+
+  it('default error should save original stack', async () => {
+    const preparePostgresErrorsMock = (helpers.preparePostgresError as unknown as jest.Mock);
+    const prepareHttpErrorsMock = (helpers.prepareHttpError as unknown as jest.Mock);
+    jest.spyOn(nextMock, 'handle').mockReturnValue(
+      new Observable(subscriber => {
+        subscriber.error({
+          stack: 'some original stack'
+        });
+        subscriber.complete();
+      })
+    );
+
+    let error: HttpException;
+    try {
+      const result = await interceptor.intercept(contextMock, nextMock);
+      await result.toPromise();
+    } catch (e) {
+      error = await e;
+    }
+
+    expect(preparePostgresErrorsMock).not.toBeCalled();
+    expect(prepareHttpErrorsMock).not.toBeCalled();
+    expect(error.stack).toBe('some original stack');
+  });
 });
