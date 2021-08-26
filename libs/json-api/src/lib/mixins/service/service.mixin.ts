@@ -575,19 +575,17 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
     protected filterUniqueIncludes(data: ResponseResourceData[]): ResponseResourceData[] {
       const resourcesTypeMap = {};
 
-      return data.reduce((accum, value) => {
-        if (resourcesTypeMap[value.type]) {
-          if (!resourcesTypeMap[value.type][value.id]) {
-            resourcesTypeMap[value.type][value.id] = true;
-            accum.push(value);
-          }
-        } else {
-          resourcesTypeMap[value.type] = {[value.id]: true};
-          accum.push(value);
+      return data.filter((value) => {
+        let result = true;
+        if (resourcesTypeMap[value.type] && resourcesTypeMap[value.type][value.id]) {
+          result = false;
         }
-
-        return accum;
-      }, []);
+        if (!resourcesTypeMap[value.type]) {
+          resourcesTypeMap[value.type] = {};
+        }
+        resourcesTypeMap[value.type][value.id] = true;
+        return result;
+      });
     }
 
     protected prepareExistenceFilterSubQuery(
