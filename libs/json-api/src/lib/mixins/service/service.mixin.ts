@@ -728,7 +728,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       Object.entries(filters).forEach(([field, condition], i) => {
         const type = i === 0 ? 'where' : 'andWhere';
         const operand = Object.keys(condition).pop();
-        const paramName = `params-${i}`;
+        const paramName = `params_${i}`;
         const value = operand === FilterOperand.like
           ? `%${condition[operand]}%`
           : condition[operand];
