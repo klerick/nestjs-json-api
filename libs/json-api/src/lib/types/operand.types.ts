@@ -34,7 +34,7 @@ export type ReversOperand =
 
 export const OperandsMap = {
   [FilterOperand.eq]: '= :&',
-  [FilterOperand.regexp]: 'REGEXP ',
+  [FilterOperand.regexp]: '~* :&',
   [FilterOperand.gt]: '> :&',
   [FilterOperand.gte]: '>= :&',
   [FilterOperand.in]: 'IN (:...&)',
