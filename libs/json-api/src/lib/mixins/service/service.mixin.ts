@@ -698,7 +698,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
           subQuery
             .select(selectQuery)
             .from(joinTableName, joinTableName)
-            .leftJoin(resourceName, resourceName, onQuery)
+            .leftJoin(target, resourceName, onQuery)
             .where(`${resourceName}.${fieldName.split('.')[1]} ${expression}`);
 
           return `${preparedResourceName}.id IN ${subQuery.getQuery()}` ;
