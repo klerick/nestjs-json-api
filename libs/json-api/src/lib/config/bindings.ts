@@ -11,6 +11,7 @@ import {
   queryParamsMixin,
   bodyPatchMixin,
   bodyPostMixin,
+  paramsEscapeMixin
 } from '../mixins';
 import {
   PARAMS_RELATION_NAME,
@@ -84,6 +85,7 @@ export const Bindings: BindingsConfig = {
         mixins: [
           querySchemaMixin,
           queryParamsMixin,
+          paramsEscapeMixin
         ]
       }
     ]
@@ -212,6 +214,7 @@ export const Bindings: BindingsConfig = {
         mixins: [
           querySchemaMixin,
           queryParamsMixin,
+          paramsEscapeMixin
         ]
       }
     ]
