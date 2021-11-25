@@ -85,6 +85,7 @@ export const Bindings: BindingsConfig = {
         mixins: [
           querySchemaMixin,
           queryParamsMixin,
+          paramsEscapeMixin
         ]
       }
     ]
@@ -213,6 +214,7 @@ export const Bindings: BindingsConfig = {
         mixins: [
           querySchemaMixin,
           queryParamsMixin,
+          paramsEscapeMixin
         ]
       }
     ]
