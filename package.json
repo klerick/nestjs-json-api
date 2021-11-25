@@ -57,7 +57,7 @@
     "rxjs": "~6.6.0",
     "swagger-ui-express": "^4.1.6",
     "tslib": "^2.0.0",
-    "typeorm": "^0.2.37",
+    "typeorm": "0.2.37",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
