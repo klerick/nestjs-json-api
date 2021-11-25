@@ -11,6 +11,7 @@ import {
   queryParamsMixin,
   bodyPatchMixin,
   bodyPostMixin,
+  paramsEscapeMixin
 } from '../mixins';
 import {
   PARAMS_RELATION_NAME,

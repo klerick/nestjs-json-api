@@ -7,6 +7,7 @@ export * from './pipes/query-params/query-params';
 export * from './pipes/body-patch/body-patch';
 export * from './pipes/body-post-relationship/body-post-relationship';
 export * from './pipes/body-post/body-post';
+export * from './pipes/params-escape/params-escape';
 
 export * from './interceptor/interceptor.mixin';
 export * from './module/module.mixin';
