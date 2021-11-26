@@ -55,13 +55,14 @@ describe('ModuleMixin', () => {
   });
 
   it('should inject service', () => {
+    const mixinClass = mixin(class Service {}, 'Test');
     // @ts-ignore
-    serviceMixin.mockReturnValueOnce(mixin(class Service {}, 'Test'));
+    serviceMixin.mockReturnValueOnce(mixinClass);
     const result = moduleMixin('/api/v1', undefined, class Entity {}, mockConnectionName);
     const { controller } = result;
 
     const depsMetadata = Reflect.getMetadata(PROPERTY_DEPS_METADATA, controller);
-    expect(depsMetadata[0].type).toContain('Test-');
+    expect(depsMetadata[0].type).toEqual(mixinClass);
     expect(depsMetadata[0].key).toBe('serviceMixin');
   });
 
@@ -69,13 +70,14 @@ describe('ModuleMixin', () => {
     class Controller {
       @InjectService() protected testProp;
     }
+    const mixinClass = mixin(class Service {}, 'Test');
     // @ts-ignore
-    serviceMixin.mockReturnValueOnce(mixin(class Service {}, 'Test'));
+    serviceMixin.mockReturnValueOnce(mixinClass);
     const result = moduleMixin('/api/v1', Controller, class Entity {}, mockConnectionName);
     const { controller } = result;
 
     const depsMetadata = Reflect.getMetadata(PROPERTY_DEPS_METADATA, controller);
-    expect(depsMetadata.find(item => item.type.includes('Test-'))).toBeDefined();
+    expect(depsMetadata.find(item => item.type === mixinClass)).toBeDefined();
     expect(depsMetadata.find(item => item.key === 'testProp')).toBeDefined();
   });
 

@@ -13,7 +13,7 @@ export async function checkQueryParamsSchema(query: QueryParams): Promise<Valida
 
   if (!validate) {
     validateFunction.errors.forEach(error => {
-      const parameterParts = error.dataPath.split('/').filter(value => value !== '');
+      const parameterParts = error.instancePath.split('/').filter(value => value !== '');
       switch (error.keyword) {
         case 'uniqueItems':
           errors.push({

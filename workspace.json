@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "projects": {
+    "database": "libs/database",
+    "example": "apps/example",
+    "json-api": "libs/json-api"
+  }
+}

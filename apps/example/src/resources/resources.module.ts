@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { JsonApiModule } from 'nest-json-api';
 import { Addresses, Comments, Roles, Users } from 'database';
 
@@ -8,9 +8,6 @@ import {
 import {
   ExampleService
 } from './services/example.service';
-import {
-  Logger
-} from './services/logger.service';
 
 @Module({
   imports: [

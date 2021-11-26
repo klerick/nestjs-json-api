@@ -9,6 +9,7 @@ export enum FilterOperand {
   ne = 'ne',
   nin = 'nin',
   regexp = 'regexp',
+  some = 'some',
 }
 
 export type ConvertedFilter =
@@ -21,26 +22,28 @@ export type ConvertedFilter =
   }[]
 
 export type ReversOperand =
-  | '= :&'
-  | '> :&'
-  | '>= :&'
-  | 'IN (:...&)'
-  | 'LIKE %:&%'
-  | '< :&'
-  | '<= :&'
-  | '<> :&'
-  | 'NOT IN (:...&)'
-  | 'REGEXP ';
+  | '= :EXPRESSION'
+  | '> :EXPRESSION'
+  | '>= :EXPRESSION'
+  | 'IN (:...EXPRESSION)'
+  | 'LIKE %:EXPRESSION%'
+  | '< :EXPRESSION'
+  | '<= :EXPRESSION'
+  | '<> :EXPRESSION'
+  | 'NOT IN (:...EXPRESSION)'
+  | 'REGEXP '
+  | '&& :EXPRESSION';
 
 export const OperandsMap = {
-  [FilterOperand.eq]: '= :&',
-  [FilterOperand.regexp]: '~* :&',
-  [FilterOperand.gt]: '> :&',
-  [FilterOperand.gte]: '>= :&',
-  [FilterOperand.in]: 'IN (:...&)',
-  [FilterOperand.like]: 'ILIKE :&',
-  [FilterOperand.lt]: '< :&',
-  [FilterOperand.lte]: '<= :&',
-  [FilterOperand.ne]: '<> :&',
-  [FilterOperand.nin]: 'NOT IN (:...&)',
+  [FilterOperand.eq]: '= :EXPRESSION',
+  [FilterOperand.regexp]: '~* :EXPRESSION',
+  [FilterOperand.gt]: '> :EXPRESSION',
+  [FilterOperand.gte]: '>= :EXPRESSION',
+  [FilterOperand.in]: 'IN (:...EXPRESSION)',
+  [FilterOperand.like]: 'ILIKE :EXPRESSION',
+  [FilterOperand.lt]: '< :EXPRESSION',
+  [FilterOperand.lte]: '<= :EXPRESSION',
+  [FilterOperand.ne]: '<> :EXPRESSION',
+  [FilterOperand.nin]: 'NOT IN (:...EXPRESSION)',
+  [FilterOperand.some]: '&& :EXPRESSION',
 };
