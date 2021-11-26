@@ -738,7 +738,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
           : field;
 
         builder[type](selectQueryBuilder => {
-          let expression = OperandsMap[operand].replace('&', paramName);
+          let expression = OperandsMap[operand].replace('EXPRESSION', paramName);
           const textValue = value.toString().toLocaleLowerCase();
 
           if (

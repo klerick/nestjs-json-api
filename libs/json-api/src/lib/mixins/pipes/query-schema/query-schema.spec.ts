@@ -38,6 +38,9 @@ describe('QuerySchema', () => {
         'roles.id': '1',
         'roles.name': {
           'in': '2,3,4'
+        },
+        'ids': {
+          'some': '1,2,3'
         }
       },
       sort: 'id',
@@ -61,6 +64,13 @@ describe('QuerySchema', () => {
             '2',
             '3',
             '4'
+          ]
+        },
+        'ids':  {
+          'some': [
+            '1',
+            '2',
+            '3'
           ]
         }
       },

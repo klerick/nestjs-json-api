@@ -46,7 +46,11 @@ export function querySchemaMixin(entity: Entity): PipeTransformMixin {
         builtQuery[QueryField.filter] = Object
           .entries(value[QueryField.filter])
           .reduce<Filters>((accum, [field, value]: [string, any]) => {
-            if (value[FilterOperand.in] || value[FilterOperand.nin]) {
+            if (
+              value[FilterOperand.in] ||
+              value[FilterOperand.nin] ||
+              value[FilterOperand.some]
+            ) {
               accum[field] = Object.entries(value).reduce(
                 (acum, [op, filed]: [string, string]) => {
                   acum[op] = isString(filed) ? filed.split(',') : [];
