@@ -9,6 +9,7 @@ export async function checkQueryFilterParam(
   entityMetadata: EntityMetadata,
 ): Promise<ValidationError[]> {
   const relations = entityMetadata.relations.map(item => item.propertyPath);
+  const arrayColumns = entityMetadata.columns.filter(item => item.isArray).map((prop) => prop.propertyPath);
   const errors: ValidationError[] = [];
 
   (Object.entries(queryParams[QueryField.filter] || {})).forEach(([name, value]) => {
@@ -35,6 +36,28 @@ export async function checkQueryFilterParam(
       }
 
     } else {
+      if (arrayColumns.includes(name)) {
+        if (operand !== FilterOperand.some) {
+          errors.push({
+            detail: `Incorrect operand '${operand}' in array field '${name}'`,
+            source: {
+              parameter: QueryField.filter,
+            },
+          });
+          return;
+        }
+      } else {
+        if (operand === FilterOperand.some) {
+          errors.push({
+            detail: `Incorrect operand '${operand}' in non-array field '${name}'`,
+            source: {
+              parameter: QueryField.filter,
+            },
+          });
+          return;
+        }
+      }
+
       if (!OperandsMap[operand]) {
         errors.push({
           detail: `Incorrect operand '${operand}' in field '${name}'`,
