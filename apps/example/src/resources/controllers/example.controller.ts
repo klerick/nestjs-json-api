@@ -11,7 +11,7 @@ import { Users } from "database";
 export class ExampleController implements JsonApiController {
   public constructor(private readonly exampleService: ExampleService) {
   }
-  @InjectService() protected service: JsonApiService;x
+  @InjectService() protected service: JsonApiService;
 
   getOne(id: number, params: QueryParams){
     const tmp = this.exampleService.getHello();

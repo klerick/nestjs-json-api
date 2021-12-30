@@ -36,7 +36,7 @@ export function moduleMixin(
   if (properties.find(item => item.type === serviceToken)) {
     const serviceProp = properties.find(item => item.type === serviceToken);
     const restProps = properties.filter(item => item.type !== serviceToken);
-    serviceProp.type = builtService.name;
+    serviceProp.type = builtService;
     Reflect.defineMetadata(PROPERTY_DEPS_METADATA, [serviceProp, ...restProps], builtController);
   }
 

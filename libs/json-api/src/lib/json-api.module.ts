@@ -1,4 +1,4 @@
-import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
+import { DynamicModule, Module, OnModuleInit, Logger } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpAdapterHost, ModuleRef } from '@nestjs/core';
 import * as swaggerUi from 'swagger-ui-express';
@@ -98,7 +98,7 @@ export class JsonApiModule implements OnModuleInit {
 
       SwaggerService.addEntity(entity);
     });
-
+// console.log(moduleParams)
     return moduleParams;
   }
 }

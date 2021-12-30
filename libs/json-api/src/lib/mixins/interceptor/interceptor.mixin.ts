@@ -33,11 +33,11 @@ export function interceptorMixin(): InterceptorMixin {
           this.logger.error(error);
 
           if (Object.values(PostgresErrors).includes(error.code)) {
-            return throwError(preparePostgresError(context, error));
+            return throwError(() => preparePostgresError(context, error));
           }
 
           if (error instanceof HttpException) {
-            return throwError(prepareHttpError(context, error));
+            return throwError(() => prepareHttpError(context, error));
           }
 
           const preparedError = new HttpException({
@@ -46,7 +46,7 @@ export function interceptorMixin(): InterceptorMixin {
             }]
           }, 500);
           preparedError.stack = error.stack;
-          return throwError(preparedError);
+          return throwError(() => preparedError);
         })
       );
     }
