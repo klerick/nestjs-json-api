@@ -3,6 +3,8 @@
   "projects": {
     "database": "libs/database",
     "example": "apps/example",
-    "json-api": "libs/json-api"
+    "example-client": "apps/example-client",
+    "json-api": "libs/json-api",
+    "json-api-sdk": "libs/json-api-sdk"
   }
 }

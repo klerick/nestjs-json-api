@@ -16,8 +16,9 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "nest-json-api": ["libs/json-api/src/index.ts"],
-      "database": ["libs/database/src/index.ts"]
+      "database": ["libs/database/src/index.ts"],
+      "json-api-nestjs-sdk": ["libs/json-api-sdk/src/index.ts"],
+      "json-api-nestjs": ["libs/json-api/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

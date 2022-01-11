@@ -1,0 +1,42 @@
+{
+  "projectType": "library",
+  "root": "libs/json-api-sdk",
+  "sourceRoot": "libs/json-api-sdk/src",
+  "prefix": "nestjs-json-api",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:package",
+      "outputs": ["dist/libs/json-api-sdk"],
+      "options": {
+        "project": "libs/json-api-sdk/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/json-api-sdk/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/json-api-sdk/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/json-api-sdk"],
+      "options": {
+        "jestConfig": "libs/json-api-sdk/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/json-api-sdk/src/**/*.ts",
+          "libs/json-api-sdk/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}
