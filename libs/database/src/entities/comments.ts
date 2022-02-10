@@ -14,7 +14,7 @@ export enum CommentKind {
   Note = 'NOTE',
 }
 
-import { Users } from '.';
+import { Users, IUsers } from '.';
 
 @Entity('comments')
 export class Comments {
@@ -60,5 +60,5 @@ export class Comments {
   @JoinColumn({
     name: 'created_by',
   })
-  public createdBy: Users;
+  public createdBy: IUsers;
 }

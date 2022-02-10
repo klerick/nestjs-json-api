@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "declarationMap": false
+  },
+  "angularCompilerOptions": {
+    "compilationMode": "full"
+  },
+  "paths": {
+    "json-api-nestjs/filter-operand": ["dist/libs/json-api"]
+  }
+}

@@ -1,5 +1,5 @@
 import { Module, Logger } from '@nestjs/common';
-import { JsonApiModule } from 'nest-json-api';
+import { JsonApiModule } from 'json-api-nestjs';
 import { Addresses, Comments, Roles, Users } from 'database';
 
 import {

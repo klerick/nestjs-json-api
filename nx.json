@@ -42,12 +42,25 @@
       "e2eTestRunner": "cypress"
     },
     "@nrwl/angular:library": {
-      "style": "css",
       "linter": "eslint",
       "unitTestRunner": "jest"
     },
     "@nrwl/angular:component": {
       "style": "css"
+    },
+    "@nrwl/react": {
+      "application": {
+        "style": "css",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "css"
+      },
+      "library": {
+        "style": "css",
+        "linter": "eslint"
+      }
     }
   },
   "defaultProject": "example",

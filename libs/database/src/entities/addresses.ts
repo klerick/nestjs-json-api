@@ -7,7 +7,9 @@ import {
 } from 'typeorm';
 import { IsEmpty, IsOptional, Length } from 'class-validator';
 
-import { Users } from '.';
+import { Users, IUsers } from '.';
+
+export type IAddresses = Addresses;
 
 @Entity('addresses')
 export class Addresses {
@@ -63,5 +65,5 @@ export class Addresses {
   public updatedAt: Date;
 
   @OneToOne(() => Users, (item) => item.addresses)
-  public user: Users;
+  public user: IUsers;
 }

@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { IsNotEmpty, Length, IsOptional, IsEmpty } from 'class-validator';
 
-import { Users } from '.';
+import { Users, IUsers } from '.';
 
 @Entity('roles')
 export class Roles {
@@ -61,5 +61,5 @@ export class Roles {
   public updatedAt: Date;
 
   @ManyToMany(() => Users, (item) => item.roles)
-  public users: Users[];
+  public users: IUsers[];
 }
