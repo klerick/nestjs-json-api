@@ -13,6 +13,8 @@ import { Length, IsNotEmpty, IsOptional, IsEmpty, IsBoolean } from 'class-valida
 
 import { Addresses, Roles, Comments } from '.';
 
+export type IUsers = Users
+
 @Entity('users')
 export class Users {
   @PrimaryGeneratedColumn()

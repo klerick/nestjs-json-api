@@ -17,8 +17,10 @@
     "baseUrl": ".",
     "paths": {
       "database": ["libs/database/src/index.ts"],
-      "json-api-nestjs-sdk": ["libs/json-api-sdk/src/index.ts"],
-      "json-api-nestjs": ["libs/json-api/src/index.ts"]
+      "json-api-nestjs": ["libs/json-api/src/index.ts"],
+      "json-api-nestjs/filter-operand": ["dist/libs/json-api"],
+      "json-api-nestjs-sdk": ["dist/libs/json-api-sdk"],
+      "database/entity": ["libs/database/src/entity.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

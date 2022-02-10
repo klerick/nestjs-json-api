@@ -20,6 +20,28 @@
       },
       "defaultConfiguration": "production"
     },
+    "deploy": {
+      "executor": "@ng-builders/semrel:release",
+      "options": {
+        "npm": {
+          "pkgRoot": "./dist/libs/json-api-sdk"
+        }
+      }
+    },
+    "release": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npm run nx run json-api-sdk:build",
+            "forwardAllArgs": false
+          },
+          "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api-sdk/.npmrc"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/json-api-sdk"],

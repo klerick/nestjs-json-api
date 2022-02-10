@@ -2,12 +2,14 @@ import { getTestBed, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { JsonApiSdkService } from './json-api-sdk.service';
-import {JsonApiSdkConfig, JSON_API_SDK_CONFIG} from '../token/json-api-sdk';
+import { JsonApiSdkConfig, JSON_API_SDK_CONFIG, ALL_ENTITIES } from '../../token/json-api-sdk';
 
 const config: JsonApiSdkConfig = {
   apiHost: 'http://localhost:3000',
   apiPrefix: 'api'
 }
+
+class User{}
 
 describe('JsonApiSdkService', () => {
   let injector;
@@ -20,6 +22,11 @@ describe('JsonApiSdkService', () => {
       providers: [JsonApiSdkService, {
         provide: JSON_API_SDK_CONFIG,
         useValue: config
+      }, {
+        provide: ALL_ENTITIES,
+        useValue: {
+          User
+        }
       }]
     });
     injector = getTestBed();
