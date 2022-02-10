@@ -4,7 +4,7 @@
     "declarationMap": false
   },
   "angularCompilerOptions": {
-    "compilationMode": "full"
+    "compilationMode": "partial"
   },
   "paths": {
     "json-api-nestjs/filter-operand": ["dist/libs/json-api"]
