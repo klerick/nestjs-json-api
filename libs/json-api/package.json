@@ -43,5 +43,9 @@
     "@nestjs/typeorm": "^8.0.0",
     "rxjs": "^7.2.0",
     "typeorm": "^0.2.34"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./filter-operand": "./src/lib/types/operand.types.d.ts"
   }
 }

@@ -33,6 +33,10 @@
       "options": {
         "commands": [
           {
+            "command": "npm run nx run json-api:build",
+            "forwardAllArgs": false
+          },
+          {
             "command": "npm run nx run json-api-sdk:build",
             "forwardAllArgs": false
           },
