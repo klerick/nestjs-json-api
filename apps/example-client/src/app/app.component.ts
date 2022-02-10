@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import {JsonApiSdkService, EntityArray, JSON_SDK_WITH_MIXIN} from 'json-api-nestjs-sdk';
+import {JsonApiSdkService, EntityArray} from 'json-api-nestjs-sdk';
 import {Users, Addresses} from 'database/entity'
 import { map, Observable, shareReplay, switchMap } from 'rxjs';
 import { Test } from './app.module';
@@ -10,6 +10,7 @@ import { Test } from './app.module';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit{
+  title = 'example-client'
   oneUser$!: Observable<Users>;
   listAddresses$!: Observable<EntityArray<Addresses>>;
   listAllAddresses$!: Observable<EntityArray<Addresses>>;
