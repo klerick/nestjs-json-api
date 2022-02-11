@@ -290,7 +290,7 @@ export class JsonApiSdkService{
         });
       });
 
-      Object.entries(relation || {}).forEach(([keyT, table]) => {
+      Object.entries<any>(relation || {}).forEach(([keyT, table]) => {
         Object.entries(table).forEach(([keyF, field]) => {
           Object.entries(field as Operands).forEach(([k, v]) => {
             httpParams = httpParams.set(

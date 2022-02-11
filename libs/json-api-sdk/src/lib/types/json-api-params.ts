@@ -22,10 +22,10 @@ export type Field<T> = {
 
 type Filter<T> = {
   target: {
-    [P in EntityProps<T> as string]?: Operands;
+    [P in EntityProps<T>]?: Operands;
   };
   relation?: {
-    [P in EntityRelation<T> as string]?: {
+    [P in EntityRelation<T>]?: {
       [key in EntityProps<ElementType<T[P]>>]?: Operands;
     };
   };
