@@ -46,6 +46,12 @@
   },
   "exports": {
     ".": "./src/index.js",
-    "./filter-operand": "./src/lib/types/operand.types.d.ts"
+    "./filter-operand": "./src/lib/types/operand.types.js",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*":{
+      "filter-operand": ["./src/lib/types/operand.types.d.ts"]
+    }
   }
 }
