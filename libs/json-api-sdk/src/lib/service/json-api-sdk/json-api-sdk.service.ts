@@ -48,22 +48,59 @@ export class JsonApiSdkService{
   }
 
   public getOne<Entity extends ObjectLiteral>(
+    entity: Entity
+  ): Observable<Entity>;
+  public getOne<Entity extends ObjectLiteral, Meta>(
     entity: Entity,
-    params?: Pick<QueryParams<Entity>, 'include' | 'field'>
-  ): Observable<Entity>{
-    if (!entity['id']) {
+    returnMeta: boolean
+  ): Observable<{entity: Entity, meta: Meta}>;
+  public getOne<Entity extends ObjectLiteral>(
+    entity: Entity,
+    returnMeta: boolean
+  ): Observable<{entity: Entity, meta: any}>;
+  public getOne<Entity extends ObjectLiteral>(
+    entity: Entity,
+    params: Pick<QueryParams<Entity>, 'include' | 'field'>
+  ): Observable<Entity>;
+  public getOne<Entity extends ObjectLiteral, Meta>(
+    entity: Entity,
+    params: Pick<QueryParams<Entity>, 'include' | 'field'>,
+    returnMeta: boolean
+  ): Observable<{entity: Entity, meta: Meta}>;
+  public getOne<Entity extends ObjectLiteral>(
+    entity: Entity,
+    params: Pick<QueryParams<Entity>, 'include' | 'field'>,
+    returnMeta: boolean
+  ): Observable<{entity: Entity, meta: any}>;
+  public getOne(
+    entity?: any,
+    params?: any,
+    returnMeta?: boolean
+  ): Observable<any>
+  {
+    if (!entity || !entity['id']) {
       return throwError(() =>
         new Error('Resource params should be instance of resource with id params')
       );
     }
     const entityName = entity.constructor.name;
-    const query = this.getQueryString<Entity>(params, entityName);
-    return this.http.get<ResourceObject<Entity>>(
+    const query = this.getQueryString(params, entityName);
+    return this.http.get<any>(
       `${this.getUrlForResource(entityName)}/${entity['id']}`,
       { params: query }
     ).pipe(
-      map<ResourceObject<Entity>, Entity>(
-        (result) => this.convertResponseData<Entity>(result, params?.include)[0]
+      map(
+        (result) => {
+          const entity = this.convertResponseData(result, params?.include)[0]
+          if (returnMeta) {
+            const {meta} = result;
+            return {
+              entity,
+              meta: meta || {}
+            }
+          }
+          return entity;
+        }
       )
     )
   }
@@ -145,7 +182,10 @@ export class JsonApiSdkService{
     );
   }
 
-  public postOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity> {
+  public postOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity>;
+  public postOne<Entity extends ObjectLiteral, Meta>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: Meta}>;
+  public postOne<Entity extends ObjectLiteral>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: any}>;
+  public postOne(entity: any, returnMeta?: boolean): Observable<any>{
     const { attributes, relationships } = this.generateBody(entity);
     const body = {
       data: {
@@ -157,13 +197,14 @@ export class JsonApiSdkService{
 
     const entityName = entity.constructor.name;
     return this.http
-      .post<ResourceObject<Entity>>(this.getUrlForResource(entityName), body)
+      .post<any>(this.getUrlForResource(entityName), body)
       .pipe(
-        map<ResourceObject<Entity>, Entity>((jsonApiResult) =>
-          this.convertResponseData<Entity>(jsonApiResult)[0]
-        ),
-        map<Entity, Entity>((resourceItem) => {
-          return Object.entries(resourceItem).reduce((acum, [key, val]) => {
+        map((jsonApiResult) =>({
+          meta: jsonApiResult.meta || {},
+          resourceItem: this.convertResponseData(jsonApiResult)[0]
+        })),
+        map(({resourceItem, meta}) => {
+          const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
             Object.defineProperties(acum, {
               [key]: {
                 value: val
@@ -171,11 +212,18 @@ export class JsonApiSdkService{
             });
             return entity;
           }, entity);
+          if (returnMeta) {
+            return {entity: entityResult, meta}
+          }
+          return entityResult;
         })
       );
   }
 
-  public patchOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity> {
+  public patchOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity>;
+  public patchOne<Entity extends ObjectLiteral, Meta>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: Meta}>;
+  public patchOne<Entity extends ObjectLiteral>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: any}>;
+  public patchOne(entity: any, returnMeta?: boolean): Observable<any> {
     if (!entity['id']) {
       return throwError(() =>
         new Error('Resource params should be instance of resource with id params')
@@ -194,15 +242,16 @@ export class JsonApiSdkService{
     };
     const entityName = entity.constructor.name;
     return this.http
-      .patch<ResourceObject<Entity>>(
+      .patch<any>(
         `${this.getUrlForResource(entityName)}/${entity['id']}`, body
       )
       .pipe(
-        map<ResourceObject<Entity>, Entity>((jsonApiResult) => {
-          return this.convertResponseData<Entity>(jsonApiResult)[0];
-        }),
-        map<Entity, Entity>((resourceItem) => {
-          return Object.entries(resourceItem).reduce((acum, [key, val]) => {
+        map((jsonApiResult) => ({
+          meta: jsonApiResult.meta || {},
+          resourceItem: this.convertResponseData(jsonApiResult)[0]
+        })),
+        map(({resourceItem, meta}) => {
+          const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
             Object.defineProperties(acum, {
               [key]: {
                 value: val
@@ -210,6 +259,10 @@ export class JsonApiSdkService{
             });
             return entity;
           }, entity);
+          if (returnMeta) {
+            return {entity: entityResult, meta}
+          }
+          return entityResult;
         })
       );
   }
