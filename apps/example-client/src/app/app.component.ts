@@ -108,6 +108,10 @@ export class AppComponent implements OnInit{
     const user = new Users();
     user.id = 1;
 
+    this.jsonApiSdkService.getOne<Users>(user, {include: ['roles', 'manager']}, true).subscribe(
+      r => console.log(r)
+    )
+
     this.oneUser$ = this.jsonApiSdkService.getOne<Users>(user, {include: ['roles', 'manager']})
     this.listAddresses$ = this.jsonApiSdkService.getList<Addresses>(
       Addresses,
