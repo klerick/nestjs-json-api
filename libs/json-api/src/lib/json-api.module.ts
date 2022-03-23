@@ -9,7 +9,14 @@ import {
   JSON_API_CONFIG,
   JSON_API_ENTITY,
 } from './constants';
-import { ModuleConfig, ModuleOptions } from './types';
+import {
+  CustomRouteObject,
+  Entity,
+  MethodName,
+  ModuleConfig,
+  ModuleOptions,
+  NestController,
+} from './types';
 import { moduleMixin } from './mixins';
 
 import { DECORATORS } from '@nestjs/swagger/dist/constants';
@@ -81,7 +88,10 @@ export class JsonApiModule implements OnModuleInit {
       apiPrefix: swaggerOptions.apiPrefix || globalPrefix,
     });
 
-    const getOtherEndpoints = (controller, entity) => {
+    const getCustomRoutes = (
+      controller: NestController,
+      entity: Entity
+    ): CustomRouteObject[] => {
       if (
         !controller ||
         !Reflect.hasOwnMetadata(DECORATORS.API_TAGS, controller)
@@ -96,8 +106,9 @@ export class JsonApiModule implements OnModuleInit {
           DECORATORS.API_RESPONSE,
           controller.prototype[methodName]
         )
-      );
-      const entityName = entity.name;
+      ) as MethodName[];
+      const entityName =
+        entity instanceof Function ? entity.name : entity.options.name;
 
       return methodNames.map((methodName) => {
         const path = Reflect.getMetadata(
@@ -137,9 +148,9 @@ export class JsonApiModule implements OnModuleInit {
       ];
       moduleParams.providers = [...moduleParams.providers, ...module.providers];
 
-      const otherEndpoints = getOtherEndpoints(controller, entity);
-      if (otherEndpoints) {
-        SwaggerService.otherEndpoints.push(...otherEndpoints);
+      const customRoutes = getCustomRoutes(controller, entity);
+      if (customRoutes) {
+        SwaggerService.customRoutes.push(...customRoutes);
       }
 
       SwaggerService.addEntity(entity);

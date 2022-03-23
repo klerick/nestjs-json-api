@@ -11,6 +11,7 @@ import {
   OpenAPIObject,
   PathsObject,
   TagObject,
+  CustomRouteObject,
 } from '../../../index';
 
 import { MethodName, Entity } from '../../types';
@@ -23,7 +24,7 @@ export class SwaggerService {
   protected static tags: TagObject[] = [];
   protected static resources: any = {};
 
-  public static otherEndpoints = [];
+  public static customRoutes = [];
 
   public static addRouteConfig(
     entity: Entity,
@@ -1022,8 +1023,8 @@ export class SwaggerService {
       };
     }
 
-    if (this.otherEndpoints) {
-      this.otherEndpoints.forEach((endpoint) =>
+    if (this.customRoutes) {
+      this.customRoutes.forEach((endpoint) =>
         this.addCustomRouteConfig(endpoint)
       );
     }
@@ -1055,15 +1056,16 @@ export class SwaggerService {
     this.tags = [];
   }
 
-  public static addCustomRouteConfig(endpoint): void {
+  public static addCustomRouteConfig(route: CustomRouteObject): void {
     const {
       path,
       method,
       response = {},
-      operation = {},
+      operation,
       entityName,
-    } = endpoint;
-    const tag = this.prepareTag(entityName, method);
+      methodName,
+    } = route;
+    const tag = this.prepareTag(entityName, methodName);
     const swaggerPath = this.getSwaggerPath(entityName, path);
     const swaggerMethod = this.getMethodType(method);
     const defaultSecurity = [

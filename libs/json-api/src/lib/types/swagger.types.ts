@@ -1,3 +1,7 @@
+import { RequestMethod } from '@nestjs/common';
+import { ApiResponseOptions } from '@nestjs/swagger/dist/decorators/api-response.decorator';
+import { MethodName } from './binding.types';
+
 export interface SwaggerConfig {
   tokenUrl?: string;
   version?: string;
@@ -281,3 +285,12 @@ export interface OAuthFlowObject {
 
 export type ScopesObject = Record<string, any>;
 export type SecurityRequirementObject = Record<string, string[]>;
+
+export interface CustomRouteObject {
+  path: string;
+  method: RequestMethod;
+  response: ApiResponseOptions;
+  operation: OperationObject;
+  entityName: string;
+  methodName: MethodName;
+}
