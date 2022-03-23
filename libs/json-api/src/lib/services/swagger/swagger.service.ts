@@ -14,7 +14,7 @@ import {
 } from '../../../index';
 
 import { MethodName, Entity } from '../../types';
-
+import { RequestMethod } from '@nestjs/common';
 
 export class SwaggerService {
   protected static config: SwaggerConfig = {};
@@ -23,10 +23,15 @@ export class SwaggerService {
   protected static tags: TagObject[] = [];
   protected static resources: any = {};
 
-  public static otherEndpoints = {};
+  public static otherEndpoints = [];
 
-  public static addRouteConfig(entity: Entity, path: string, method: MethodName): void {
-    const entityName = entity instanceof Function ? entity.name : entity.options.name;
+  public static addRouteConfig(
+    entity: Entity,
+    path: string,
+    method: MethodName
+  ): void {
+    const entityName =
+      entity instanceof Function ? entity.name : entity.options.name;
     const swaggerPath = this.preparePath(path);
     const tag = this.prepareTag(entityName, method);
     this.addEntity(entity);
@@ -40,19 +45,16 @@ export class SwaggerService {
         ...this.prepareQueryParameters(entityName, method),
         ...this.preparePathParameters(entityName, method),
       ],
-      security: [{
-        authorisation: [
-          'SRE.api'
-        ]
-      }],
-      tags: [
-        tag.name
-      ]
+      security: [
+        {
+          authorisation: ['SRE.api'],
+        },
+      ],
+      tags: [tag.name],
     };
 
     if (this.paths[swaggerPath]) {
       this.paths[swaggerPath][swaggerMethod] = swaggerConfig;
-
     } else {
       this.paths[swaggerPath] = {
         [swaggerMethod]: swaggerConfig,
@@ -64,7 +66,7 @@ export class SwaggerService {
     const { name, columns, relations } = metadata;
 
     const relationships = {};
-    relations.forEach(relation => {
+    relations.forEach((relation) => {
       if (['many-to-many', 'one-to-many'].includes(relation.relationType)) {
         relationships[relation.propertyName] = {
           type: 'object',
@@ -75,15 +77,15 @@ export class SwaggerService {
                 type: 'object',
                 properties: {
                   type: {
-                    type: 'string'
+                    type: 'string',
                   },
                   id: {
                     type: 'string',
                   },
-                }
+                },
               },
-            }
-          }
+            },
+          },
         };
       } else {
         relationships[relation.propertyName] = {
@@ -93,23 +95,23 @@ export class SwaggerService {
               type: 'object',
               properties: {
                 type: {
-                  type: 'string'
+                  type: 'string',
                 },
                 id: {
                   type: 'string',
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         };
       }
     });
 
     const attributes = {};
     columns
-      .filter(column => !column.relationMetadata)
-      .filter(column => !column.isPrimary)
-      .forEach(column => {
+      .filter((column) => !column.relationMetadata)
+      .filter((column) => !column.isPrimary)
+      .forEach((column) => {
         let swaggerType = {};
         switch (column.type) {
           case 'interval':
@@ -149,7 +151,7 @@ export class SwaggerService {
           in: 'path',
           schema: {
             type: 'integer',
-          }
+          },
         },
         [PARAMS_RELATION_NAME]: {
           name: PARAMS_RELATION_NAME,
@@ -158,7 +160,7 @@ export class SwaggerService {
           schema: {
             type: 'string',
             enum: Object.keys(relationships),
-          }
+          },
         },
         [PARAMS_RELATION_ID]: {
           name: PARAMS_RELATION_ID,
@@ -166,44 +168,44 @@ export class SwaggerService {
           in: 'path',
           schema: {
             type: 'integer',
-          }
+          },
         },
-        'filter': {
+        filter: {
           name: 'filter',
           in: 'query',
           style: 'deepObject',
           schema: {
             type: 'object',
             example: {
-              'field': {
-                eq: 'value'
+              field: {
+                eq: 'value',
               },
               'relation.field': {
-                like: 'value'
-              }
-            }
-          }
+                like: 'value',
+              },
+            },
+          },
         },
-        'sort': {
+        sort: {
           name: 'sort',
           in: 'query',
           schema: {
             type: 'string',
-            example: '-field'
-          }
+            example: '-field',
+          },
         },
-        'include': {
+        include: {
           name: 'include',
           in: 'query',
           schema: {
             type: 'array',
             items: {
               type: 'string',
-              example: 'relation'
-            }
-          }
+              example: 'relation',
+            },
+          },
         },
-        'page': {
+        page: {
           name: 'page',
           in: 'query',
           style: 'deepObject',
@@ -219,61 +221,46 @@ export class SwaggerService {
                 type: 'integer',
                 minimum: 1,
                 example: DEFAULT_PAGE_SIZE,
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       },
       responses: {
         deleteRelationship: {
           200: {
-            description: 'Relationships deleted successfully'
+            description: 'Relationships deleted successfully',
           },
-          422: {description: 'Unprocessable data'},
-          404: {description: 'Resource not found'},
+          422: { description: 'Unprocessable data' },
+          404: { description: 'Resource not found' },
         },
         patchRelationship: {
           200: {
-            description: 'Relationships updated successfully'
+            description: 'Relationships updated successfully',
           },
-          422: {description: 'Unprocessable data'},
-          404: {description: 'Resource not found'},
+          422: { description: 'Unprocessable data' },
+          404: { description: 'Resource not found' },
         },
         postRelationship: {
           200: {
-            description: 'Relationships created successfully'
+            description: 'Relationships created successfully',
           },
-          422: {description: 'Unprocessable data'},
-          404: {description: 'Resource not found'},
+          422: { description: 'Unprocessable data' },
+          404: { description: 'Resource not found' },
         },
         getRelationship: {
           200: {
-            description: 'Relationships received successfully. Response `\'data\'` field depends on relationship type. <br />' +
+            description:
+              "Relationships received successfully. Response `'data'` field depends on relationship type. <br />" +
               'For many-to-many relations it should contain an array.',
             content: {
               'application/json': {
                 schema: {
-                  oneOf: [{
-                    type: 'object',
-                    properties: {
-                      data: {
-                        type: 'object',
-                        properties: {
-                          type: {
-                            type: 'string',
-                          },
-                          id: {
-                            type: 'string',
-                          },
-                        }
-                      }
-                    },
-                  }, {
-                    type: 'object',
-                    properties: {
-                      data: {
-                        type: 'array',
-                        items: {
+                  oneOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        data: {
                           type: 'object',
                           properties: {
                             type: {
@@ -282,51 +269,72 @@ export class SwaggerService {
                             id: {
                               type: 'string',
                             },
-                          }
-                        }
-                      }
+                          },
+                        },
+                      },
                     },
-                  }]
-                }
-              }
-            }
+                    {
+                      type: 'object',
+                      properties: {
+                        data: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              type: {
+                                type: 'string',
+                              },
+                              id: {
+                                type: 'string',
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
           },
-          404: {description: 'Resource not found'},
+          404: { description: 'Resource not found' },
         },
         getDirectAll: {
           200: {
-            description: 'Resource relation list received successfully. Response `\'data\'` field depends on relationship type',
+            description:
+              "Resource relation list received successfully. Response `'data'` field depends on relationship type",
             content: {
               'application/json': {
                 schema: {
                   type: 'object',
                   properties: {
                     meta: {
-                      $ref: `#/resources/${name}/schema/metadata`
+                      $ref: `#/resources/${name}/schema/metadata`,
                     },
                     data: {
                       type: 'array',
                       items: {
                         type: 'object',
-                      }
+                      },
                     },
                     includes: {
                       type: 'array',
                       items: {
-                        type: 'object'
-                      }
-                    }
-                  }
-                }
-              }
-            }
+                        type: 'object',
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
-          400: {description: 'Wrong query parameters'},
-          404: {description: 'Resource not found'},
+          400: { description: 'Wrong query parameters' },
+          404: { description: 'Resource not found' },
         },
         getDirectOne: {
           200: {
-            description: 'Resource relation received successfully. Response `\'data\'` field depends on relationship type',
+            description:
+              "Resource relation received successfully. Response `'data'` field depends on relationship type",
             content: {
               'application/json': {
                 schema: {
@@ -338,22 +346,22 @@ export class SwaggerService {
                     includes: {
                       type: 'array',
                       items: {
-                        type: 'object'
-                      }
-                    }
-                  }
-                }
-              }
-            }
+                        type: 'object',
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
-          400: {description: 'Wrong query parameters'},
-          404: {description: 'Resource not found'},
+          400: { description: 'Wrong query parameters' },
+          404: { description: 'Resource not found' },
         },
         deleteOne: {
           200: {
-            description: 'Resource deleted successfully'
+            description: 'Resource deleted successfully',
           },
-          404: {description: 'Resource not found'},
+          404: { description: 'Resource not found' },
         },
         getAll: {
           200: {
@@ -364,7 +372,7 @@ export class SwaggerService {
                   type: 'object',
                   properties: {
                     meta: {
-                      $ref: `#/resources/${name}/schema/metadata`
+                      $ref: `#/resources/${name}/schema/metadata`,
                     },
                     data: {
                       type: 'array',
@@ -376,8 +384,8 @@ export class SwaggerService {
                             properties: {
                               self: {
                                 type: 'string',
-                              }
-                            }
+                              },
+                            },
                           },
                           type: {
                             type: 'string',
@@ -390,22 +398,22 @@ export class SwaggerService {
                           },
                           relationships: {
                             $ref: `#/resources/${name}/schema/relationshipsLinks`,
-                          }
-                        }
-                      }
+                          },
+                        },
+                      },
                     },
                     includes: {
                       type: 'array',
                       items: {
-                        type: 'object'
-                      }
-                    }
+                        type: 'object',
+                      },
+                    },
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
-          400: {description: 'Wrong query parameters'},
+          400: { description: 'Wrong query parameters' },
         },
         getOne: {
           200: {
@@ -423,8 +431,8 @@ export class SwaggerService {
                           properties: {
                             self: {
                               type: 'string',
-                            }
-                          }
+                            },
+                          },
                         },
                         type: {
                           type: 'string',
@@ -437,22 +445,22 @@ export class SwaggerService {
                         },
                         relationships: {
                           $ref: `#/resources/${name}/schema/relationshipsLinks`,
-                        }
-                      }
+                        },
+                      },
                     },
                     includes: {
                       type: 'array',
                       items: {
-                        type: 'object'
-                      }
-                    }
+                        type: 'object',
+                      },
+                    },
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
-          400: {description: 'Wrong query parameters'},
-          404: {description: 'Resource not found'},
+          400: { description: 'Wrong query parameters' },
+          404: { description: 'Resource not found' },
         },
         patchOne: {
           200: {
@@ -470,8 +478,8 @@ export class SwaggerService {
                           properties: {
                             self: {
                               type: 'string',
-                            }
-                          }
+                            },
+                          },
                         },
                         type: {
                           type: 'string',
@@ -484,16 +492,16 @@ export class SwaggerService {
                         },
                         relationships: {
                           $ref: `#/resources/${name}/schema/relationshipsLinks`,
-                        }
-                      }
-                    }
+                        },
+                      },
+                    },
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
-          422: {description: 'Unprocessable data'},
-          404: {description: 'Resource not found'},
+          422: { description: 'Unprocessable data' },
+          404: { description: 'Resource not found' },
         },
         postOne: {
           200: {
@@ -511,8 +519,8 @@ export class SwaggerService {
                           properties: {
                             self: {
                               type: 'string',
-                            }
-                          }
+                            },
+                          },
                         },
                         type: {
                           type: 'string',
@@ -525,21 +533,22 @@ export class SwaggerService {
                         },
                         relationships: {
                           $ref: `#/resources/${name}/schema/relationshipsLinks`,
-                        }
-                      }
-                    }
+                        },
+                      },
+                    },
                   },
-                }
-              }
-            }
+                },
+              },
+            },
           },
-          422: {description: 'Unprocessable data'},
-          404: {description: 'Resource not found'},
-        }
+          422: { description: 'Unprocessable data' },
+          404: { description: 'Resource not found' },
+        },
       },
       requests: {
         deleteRelationship: {
-          description: "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
+          description:
+            "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
           required: true,
           content: {
             'application/json': {
@@ -549,14 +558,15 @@ export class SwaggerService {
                   data: {
                     type: 'string',
                     id: 'string',
-                  }
-                }
-              }
-            }
-          }
+                  },
+                },
+              },
+            },
+          },
         },
         patchRelationship: {
-          description: "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
+          description:
+            "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
           required: true,
           content: {
             'application/json': {
@@ -566,14 +576,15 @@ export class SwaggerService {
                   data: {
                     type: 'string',
                     id: 'string',
-                  }
-                }
-              }
-            }
-          }
+                  },
+                },
+              },
+            },
+          },
         },
         postRelationship: {
-          description: "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
+          description:
+            "Request `'data'` field depends on relationship type. For many-to-many relations it should contain an array.",
           required: true,
           content: {
             'application/json': {
@@ -583,11 +594,11 @@ export class SwaggerService {
                   data: {
                     type: 'string',
                     id: 'string',
-                  }
-                }
-              }
-            }
-          }
+                  },
+                },
+              },
+            },
+          },
         },
         getRelationship: {},
         getDirectAll: {},
@@ -616,13 +627,13 @@ export class SwaggerService {
                       },
                       relationships: {
                         $ref: `#/resources/${name}/schema/relationships`,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         },
         postOne: {
           required: true,
@@ -642,21 +653,20 @@ export class SwaggerService {
                       },
                       relationships: {
                         $ref: `#/resources/${name}/schema/relationships`,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 },
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       },
       schema: {
         relationshipsLinks: {
           type: 'object',
-          properties: Object
-            .entries(relationships)
-            .reduce((accum, [key, value]: [any, any]) => {
+          properties: Object.entries(relationships).reduce(
+            (accum, [key, value]: [any, any]) => {
               const clone = JSON.parse(JSON.stringify(value));
 
               if (value.properties.items) {
@@ -664,12 +674,12 @@ export class SwaggerService {
                   type: 'object',
                   properties: {
                     self: {
-                      type: 'string'
+                      type: 'string',
                     },
                     related: {
-                      type: 'string'
-                    }
-                  }
+                      type: 'string',
+                    },
+                  },
                 };
                 accum[key] = clone;
               } else {
@@ -677,18 +687,20 @@ export class SwaggerService {
                   type: 'object',
                   properties: {
                     self: {
-                      type: 'string'
+                      type: 'string',
                     },
                     related: {
-                      type: 'string'
-                    }
-                  }
+                      type: 'string',
+                    },
+                  },
                 };
                 accum[key] = clone;
               }
 
               return accum;
-            }, {}),
+            },
+            {}
+          ),
         },
         relationships: {
           properties: relationships,
@@ -702,21 +714,24 @@ export class SwaggerService {
           type: 'object',
           properties: {
             totalItems: {
-              type: 'integer'
+              type: 'integer',
             },
             pageNumber: {
-              type: 'integer'
+              type: 'integer',
             },
             pageSize: {
-              type: 'integer'
-            }
-          }
-        }
-      }
+              type: 'integer',
+            },
+          },
+        },
+      },
     };
   }
 
-  public static preparePathParameters(entityName: string, method: MethodName): ReferenceObject[] {
+  public static preparePathParameters(
+    entityName: string,
+    method: MethodName
+  ): ReferenceObject[] {
     switch (method) {
       case 'deleteRelationship':
       case 'getRelationship':
@@ -729,7 +744,7 @@ export class SwaggerService {
           },
           {
             $ref: `#/resources/${entityName}/parameters/${PARAMS_RELATION_NAME}`,
-          }
+          },
         ];
       }
       case 'getDirectOne': {
@@ -742,7 +757,7 @@ export class SwaggerService {
           },
           {
             $ref: `#/resources/${entityName}/parameters/${PARAMS_RELATION_ID}`,
-          }
+          },
         ];
       }
       case 'deleteOne':
@@ -751,7 +766,7 @@ export class SwaggerService {
         return [
           {
             $ref: `#/resources/${entityName}/parameters/${PARAMS_RESOURCE_ID}`,
-          }
+          },
         ];
       }
       default: {
@@ -760,7 +775,10 @@ export class SwaggerService {
     }
   }
 
-  public static prepareQueryParameters(entityName: string, method: MethodName): ReferenceObject[] {
+  public static prepareQueryParameters(
+    entityName: string,
+    method: MethodName
+  ): ReferenceObject[] {
     switch (method) {
       case 'getDirectAll':
       case 'getAll': {
@@ -776,7 +794,7 @@ export class SwaggerService {
           },
           {
             $ref: `#/resources/${entityName}/parameters/page`,
-          }
+          },
         ];
       }
       case 'getDirectOne':
@@ -793,7 +811,10 @@ export class SwaggerService {
     }
   }
 
-  public static prepareResponses(entityName: string, method: MethodName): Record<string, ReferenceObject> {
+  public static prepareResponses(
+    entityName: string,
+    method: MethodName
+  ): Record<string, ReferenceObject> {
     switch (method) {
       case 'deleteRelationship':
       case 'patchRelationship':
@@ -802,14 +823,14 @@ export class SwaggerService {
       case 'postOne': {
         return {
           200: {
-            $ref: `#/resources/${entityName}/responses/${method}/200`
+            $ref: `#/resources/${entityName}/responses/${method}/200`,
           },
           422: {
-            $ref: `#/resources/${entityName}/responses/${method}/422`
+            $ref: `#/resources/${entityName}/responses/${method}/422`,
           },
           404: {
-            $ref: `#/resources/${entityName}/responses/${method}/404`
-          }
+            $ref: `#/resources/${entityName}/responses/${method}/404`,
+          },
         };
       }
       case 'getDirectAll':
@@ -817,35 +838,35 @@ export class SwaggerService {
       case 'getOne': {
         return {
           200: {
-            $ref: `#/resources/${entityName}/responses/${method}/200`
+            $ref: `#/resources/${entityName}/responses/${method}/200`,
           },
           400: {
-            $ref: `#/resources/${entityName}/responses/${method}/400`
+            $ref: `#/resources/${entityName}/responses/${method}/400`,
           },
           404: {
-            $ref: `#/resources/${entityName}/responses/${method}/404`
-          }
+            $ref: `#/resources/${entityName}/responses/${method}/404`,
+          },
         };
       }
       case 'getRelationship':
       case 'deleteOne': {
         return {
           200: {
-            $ref: `#/resources/${entityName}/responses/${method}/200`
+            $ref: `#/resources/${entityName}/responses/${method}/200`,
           },
           404: {
-            $ref: `#/resources/${entityName}/responses/${method}/404`
-          }
+            $ref: `#/resources/${entityName}/responses/${method}/404`,
+          },
         };
       }
       case 'getAll': {
         return {
           200: {
-            $ref: `#/resources/${entityName}/responses/${method}/200`
+            $ref: `#/resources/${entityName}/responses/${method}/200`,
           },
           400: {
-            $ref: `#/resources/${entityName}/responses/${method}/400`
-          }
+            $ref: `#/resources/${entityName}/responses/${method}/400`,
+          },
         };
       }
       default: {
@@ -854,9 +875,12 @@ export class SwaggerService {
     }
   }
 
-  public static prepareRequest(entityName: string, method: MethodName): ReferenceObject {
+  public static prepareRequest(
+    entityName: string,
+    method: MethodName
+  ): ReferenceObject {
     return {
-      $ref: `#/resources/${entityName}/requests/${method}`
+      $ref: `#/resources/${entityName}/requests/${method}`,
     };
   }
 
@@ -891,15 +915,24 @@ export class SwaggerService {
     let swaggerPath = path;
 
     if (path.includes(`:${PARAMS_RESOURCE_ID}`)) {
-      swaggerPath = swaggerPath.replace(`:${PARAMS_RESOURCE_ID}`, `{${PARAMS_RESOURCE_ID}}`);
+      swaggerPath = swaggerPath.replace(
+        `:${PARAMS_RESOURCE_ID}`,
+        `{${PARAMS_RESOURCE_ID}}`
+      );
     }
 
     if (path.includes(`:${PARAMS_RELATION_NAME}`)) {
-      swaggerPath = swaggerPath.replace(`:${PARAMS_RELATION_NAME}`, `{${PARAMS_RELATION_NAME}}`);
+      swaggerPath = swaggerPath.replace(
+        `:${PARAMS_RELATION_NAME}`,
+        `{${PARAMS_RELATION_NAME}}`
+      );
     }
 
     if (path.includes(`:${PARAMS_RELATION_ID}`)) {
-      swaggerPath = swaggerPath.replace(`:${PARAMS_RELATION_ID}`, `{${PARAMS_RELATION_ID}}`);
+      swaggerPath = swaggerPath.replace(
+        `:${PARAMS_RELATION_ID}`,
+        `{${PARAMS_RELATION_ID}}`
+      );
     }
 
     return swaggerPath;
@@ -912,20 +945,26 @@ export class SwaggerService {
       case 'patchRelationship':
       case 'postRelationship': {
         return {
-          description: `Operations about "${paramCase(entityName)}" type relationships`,
+          description: `Operations about "${paramCase(
+            entityName
+          )}" type relationships`,
           name: `${entityName} / Relationships`,
         };
       }
       case 'getDirectAll':
       case 'getDirectOne': {
         return {
-          description: `Get "${paramCase(entityName)}" type relationships full info`,
+          description: `Get "${paramCase(
+            entityName
+          )}" type relationships full info`,
           name: `${entityName} / Direct`,
         };
       }
       default: {
         return {
-          description: `Operations about "${paramCase(entityName)}" resource type`,
+          description: `Operations about "${paramCase(
+            entityName
+          )}" resource type`,
           name: entityName,
         };
       }
@@ -937,16 +976,18 @@ export class SwaggerService {
       openapi: '3.0.3',
       info: {
         title: 'CMP Platform API Swagger',
-        description: 'This documentation describes API built according to https://jsonapi.org specification'
+        description:
+          'This documentation describes API built according to https://jsonapi.org specification',
       },
       components: {
-        schemas: Object
-          .entries(this.resources)
-          .reduce((accum, [key, value]: [any, any]) => {
+        schemas: Object.entries(this.resources).reduce(
+          (accum, [key, value]: [any, any]) => {
             accum[`${key}Relationships`] = value.schema.relationships;
             accum[`${key}Attributes`] = value.schema.attributes;
             return accum;
-          }, {}),
+          },
+          {}
+        ),
       },
       resources: this.resources,
       paths: this.paths,
@@ -954,9 +995,11 @@ export class SwaggerService {
     };
 
     if (this.config.apiHost) {
-      document.servers = [{
-        url: `${this.config.apiHost}/${this.config.apiPrefix || ''}`
-      }];
+      document.servers = [
+        {
+          url: `${this.config.apiHost}/${this.config.apiPrefix || ''}`,
+        },
+      ];
     }
 
     if (this.config.version) {
@@ -971,12 +1014,18 @@ export class SwaggerService {
             clientCredentials: {
               tokenUrl: this.config.tokenUrl,
               scopes: {
-                'SRE.api': 'SRE Tools API'
-              }
+                'SRE.api': 'SRE Tools API',
+              },
             },
-          }
-        }
+          },
+        },
       };
+    }
+
+    if (this.otherEndpoints) {
+      this.otherEndpoints.forEach((endpoint) =>
+        this.addCustomRouteConfig(endpoint)
+      );
     }
 
     return document;
@@ -1004,5 +1053,55 @@ export class SwaggerService {
     this.config = {};
     this.paths = {};
     this.tags = [];
+  }
+
+  public static addCustomRouteConfig(endpoint): void {
+    const {
+      path,
+      method,
+      response = {},
+      operation = {},
+      entityName,
+    } = endpoint;
+    const tag = this.prepareTag(entityName, method);
+    const swaggerPath = this.getSwaggerPath(entityName, path);
+    const swaggerMethod = this.getMethodType(method);
+    const defaultSecurity = [
+      {
+        authorisation: ['SRE.api'],
+      },
+    ];
+    const responses = operation?.responses
+      ? { ...response, ...operation.responses }
+      : response;
+
+    const swaggerConfig = {
+      ...operation,
+      responses,
+      security: operation?.security
+        ? { ...defaultSecurity, ...operation.security }
+        : defaultSecurity,
+      tags: [tag.name],
+    };
+
+    if (this.paths[swaggerPath]) {
+      this.paths[swaggerPath][swaggerMethod] = swaggerConfig;
+    } else {
+      this.paths[swaggerPath] = {
+        [swaggerMethod]: swaggerConfig,
+      };
+    }
+  }
+
+  public static getMethodType(requestMethod: RequestMethod): string {
+    const key = Object.keys(RequestMethod).find(
+      (key) => RequestMethod[key] === requestMethod
+    );
+    return key.toLocaleLowerCase();
+  }
+
+  public static getSwaggerPath(entityName: string, path: string): string {
+    const urlName = paramCase(entityName);
+    return this.preparePath(`/${urlName}` + (path ? `/${path}` : ''));
   }
 }

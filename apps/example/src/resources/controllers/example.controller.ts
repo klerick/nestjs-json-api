@@ -8,19 +8,9 @@ import {
   excludeMethod,
 } from 'json-api-nestjs';
 import { Users } from 'database';
-import { applyDecorators, Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-export function TestSwagger() {
-  return applyDecorators(
-    ApiResponse({
-      status: 200,
-      description: 'Data received successfully',
-    }),
-    ApiResponse({ status: 523, description: 'Origin is unreachable' }),
-    ApiOperation({ tags: ['test'] })
-  );
-}
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { ExampleSwagger } from '../decorators/example';
 
 @JsonApi(Users, {
   allowMethod: excludeMethod(['getAll', 'deleteRelationship']),
@@ -36,15 +26,9 @@ export class ExampleController implements JsonApiController {
     return this.service.getOne({ route: { id }, query: params });
   }
 
-  @TestSwagger()
-  @Get(':id/abc')
-  testOne(id: number, params: QueryParams) {
-    return 'one works';
-  }
-
-  @TestSwagger()
-  @Get(':id/def')
-  testTwo(id: number, params: QueryParams) {
-    return 'two works';
+  @ExampleSwagger()
+  @Get(':id/example')
+  testOne(@Param('id') id) {
+    return id;
   }
 }

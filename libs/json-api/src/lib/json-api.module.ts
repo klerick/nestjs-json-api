@@ -99,30 +99,25 @@ export class JsonApiModule implements OnModuleInit {
       );
       const entityName = entity.name;
 
-      return methodNames
-        .map((methodName) => {
-          const path = Reflect.getMetadata(
-            'path',
-            controller.prototype[methodName]
-          );
-          const method = Reflect.getMetadata(
-            'method',
-            controller.prototype[methodName]
-          );
-          const response = Reflect.getMetadata(
-            DECORATORS.API_RESPONSE,
-            controller.prototype[methodName]
-          );
-          const operation = Reflect.getMetadata(
-            DECORATORS.API_OPERATION,
-            controller.prototype[methodName]
-          );
-          return { path, method, response, operation, entityName };
-        })
-        .reduce((acc, item) => {
-          acc[item.path] = item;
-          return acc;
-        }, {});
+      return methodNames.map((methodName) => {
+        const path = Reflect.getMetadata(
+          'path',
+          controller.prototype[methodName]
+        );
+        const method = Reflect.getMetadata(
+          'method',
+          controller.prototype[methodName]
+        );
+        const response = Reflect.getMetadata(
+          DECORATORS.API_RESPONSE,
+          controller.prototype[methodName]
+        );
+        const operation = Reflect.getMetadata(
+          DECORATORS.API_OPERATION,
+          controller.prototype[methodName]
+        );
+        return { path, method, response, operation, entityName, methodName };
+      });
     };
 
     options.entities.forEach((entity) => {
@@ -144,7 +139,7 @@ export class JsonApiModule implements OnModuleInit {
 
       const otherEndpoints = getOtherEndpoints(controller, entity);
       if (otherEndpoints) {
-        SwaggerService.otherEndpoints[(entity as any).name] = otherEndpoints;
+        SwaggerService.otherEndpoints.push(...otherEndpoints);
       }
 
       SwaggerService.addEntity(entity);
