@@ -46,11 +46,6 @@ export class SwaggerService {
         ...this.prepareQueryParameters(entityName, method),
         ...this.preparePathParameters(entityName, method),
       ],
-      security: [
-        {
-          authorisation: ['SRE.api'],
-        },
-      ],
       tags: [tag.name],
     };
 
@@ -1068,11 +1063,6 @@ export class SwaggerService {
     const tag = this.prepareTag(entityName, methodName);
     const swaggerPath = this.getSwaggerPath(entityName, path);
     const swaggerMethod = this.getMethodType(method);
-    const defaultSecurity = [
-      {
-        authorisation: ['SRE.api'],
-      },
-    ];
     const responses = operation?.responses
       ? { ...response, ...operation.responses }
       : response;
@@ -1080,9 +1070,6 @@ export class SwaggerService {
     const swaggerConfig = {
       ...operation,
       responses,
-      security: operation?.security
-        ? { ...defaultSecurity, ...operation.security }
-        : defaultSecurity,
       tags: [tag.name],
     };
 
