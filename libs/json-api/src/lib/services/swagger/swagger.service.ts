@@ -23,6 +23,8 @@ export class SwaggerService {
   protected static tags: TagObject[] = [];
   protected static resources: any = {};
 
+  public static otherEndpoints = {};
+
   public static addRouteConfig(entity: Entity, path: string, method: MethodName): void {
     const entityName = entity instanceof Function ? entity.name : entity.options.name;
     const swaggerPath = this.preparePath(path);
