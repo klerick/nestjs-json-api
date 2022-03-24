@@ -7,7 +7,6 @@ export function ExampleSwagger() {
     ApiResponse({
       status: 200,
       description: 'Resource received successfully',
-      type: Users,
     }),
     ApiResponse({
       status: 523,
