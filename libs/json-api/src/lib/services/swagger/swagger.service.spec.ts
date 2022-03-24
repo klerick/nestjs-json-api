@@ -3,7 +3,7 @@ import {
   PARAMS_RELATION_ID,
   PARAMS_RELATION_NAME,
   PARAMS_RESOURCE_ID,
-  SwaggerConfig
+  SwaggerConfig,
 } from '../../../index';
 
 import { SwaggerService } from './swagger.service';
@@ -20,13 +20,13 @@ describe('SwaggerService', () => {
       class ThirdEntity {},
     ];
 
-    entitiesList.forEach(item => {
+    entitiesList.forEach((item) => {
       SwaggerService.addEntity(item);
     });
 
     const result = SwaggerService.getEntities();
     expect(result).toHaveLength(3);
-    entitiesList.forEach(item => {
+    entitiesList.forEach((item) => {
       expect(result.includes(item)).toBeTruthy();
     });
   });
@@ -51,7 +51,7 @@ describe('SwaggerService', () => {
       'postRelationship',
     ];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       const result = SwaggerService.prepareTag('TestEntity', method);
 
       expect(result.name).toBe('TestEntity / Relationships');
@@ -60,12 +60,9 @@ describe('SwaggerService', () => {
   });
 
   it('should prepare tag for direct', () => {
-    const methods: MethodName[] = [
-      'getDirectAll',
-      'getDirectOne',
-    ];
+    const methods: MethodName[] = ['getDirectAll', 'getDirectOne'];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       const result = SwaggerService.prepareTag('TestEntity', method);
 
       expect(result.name).toBe('TestEntity / Direct');
@@ -74,14 +71,9 @@ describe('SwaggerService', () => {
   });
 
   it('should prepare tag for resource', () => {
-    const methods: MethodName[] = [
-      'postOne',
-      'patchOne',
-      'getOne',
-      'getAll',
-    ];
+    const methods: MethodName[] = ['postOne', 'patchOne', 'getOne', 'getAll'];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       const result = SwaggerService.prepareTag('TestEntity', method);
 
       expect(result.name).toBe('TestEntity');
@@ -90,8 +82,12 @@ describe('SwaggerService', () => {
   });
 
   it('should change parameters to swagger', () => {
-    const result = SwaggerService.preparePath(`path/:${PARAMS_RESOURCE_ID}/second/:${PARAMS_RELATION_NAME}/:${PARAMS_RELATION_ID}`);
-    expect(result).toBe(`path/{${PARAMS_RESOURCE_ID}}/second/{${PARAMS_RELATION_NAME}}/{${PARAMS_RELATION_ID}}`);
+    const result = SwaggerService.preparePath(
+      `path/:${PARAMS_RESOURCE_ID}/second/:${PARAMS_RELATION_NAME}/:${PARAMS_RELATION_ID}`
+    );
+    expect(result).toBe(
+      `path/{${PARAMS_RESOURCE_ID}}/second/{${PARAMS_RELATION_NAME}}/{${PARAMS_RELATION_ID}}`
+    );
   });
 
   it('should prepare correct get method', () => {
@@ -103,40 +99,31 @@ describe('SwaggerService', () => {
       'getOne',
     ];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       expect(SwaggerService.prepareMethodName(method)).toBe('get');
     });
   });
 
   it('should prepare correct post method', () => {
-    const methods: MethodName[] = [
-      'postRelationship',
-      'postOne',
-    ];
+    const methods: MethodName[] = ['postRelationship', 'postOne'];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       expect(SwaggerService.prepareMethodName(method)).toBe('post');
     });
   });
 
   it('should prepare correct patch method', () => {
-    const methods: MethodName[] = [
-      'patchRelationship',
-      'patchOne',
-    ];
+    const methods: MethodName[] = ['patchRelationship', 'patchOne'];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       expect(SwaggerService.prepareMethodName(method)).toBe('patch');
     });
   });
 
   it('should prepare correct delete method', () => {
-    const methods: MethodName[] = [
-      'deleteRelationship',
-      'deleteOne',
-    ];
+    const methods: MethodName[] = ['deleteRelationship', 'deleteOne'];
 
-    methods.forEach(method => {
+    methods.forEach((method) => {
       expect(SwaggerService.prepareMethodName(method)).toBe('delete');
     });
   });
@@ -162,11 +149,11 @@ describe('SwaggerService', () => {
 
     expect(result.paths['entity-mock/{id}'].get.parameters).toEqual([
       {
-        '$ref': '#/resources/SomeEntity/parameters/include'
+        $ref: '#/resources/SomeEntity/parameters/include',
       },
       {
-        '$ref': '#/resources/SomeEntity/parameters/id'
-      }
+        $ref: '#/resources/SomeEntity/parameters/id',
+      },
     ]);
   });
 
@@ -179,7 +166,7 @@ describe('SwaggerService', () => {
     const result = SwaggerService.prepareDocument();
 
     expect(result.paths['entity-mock/{id}'].patch.requestBody).toEqual({
-      '$ref': '#/resources/SomeEntity/requests/patchOne'
+      $ref: '#/resources/SomeEntity/requests/patchOne',
     });
   });
 
@@ -191,22 +178,9 @@ describe('SwaggerService', () => {
     SwaggerService.addRouteConfig(entityMock, path, method);
     const result = SwaggerService.prepareDocument();
 
-    expect(result.paths['entity-mock/{id}'].patch.tags[0]).toEqual('SomeEntity / Relationships');
-  });
-
-  it('should add authorization scope', () => {
-    const entityMock = class SomeEntity {};
-    const method: MethodName = 'patchRelationship';
-    const path = 'entity-mock/:id';
-
-    SwaggerService.addRouteConfig(entityMock, path, method);
-    const result = SwaggerService.prepareDocument();
-
-    expect(result.paths['entity-mock/{id}'].patch.security[0]).toEqual({
-      authorisation: [
-        'SRE.api'
-      ]
-    });
+    expect(result.paths['entity-mock/{id}'].patch.tags[0]).toEqual(
+      'SomeEntity / Relationships'
+    );
   });
 
   it('should create server block if config exists', () => {
@@ -242,11 +216,11 @@ describe('SwaggerService', () => {
           clientCredentials: {
             tokenUrl: 'http://example',
             scopes: {
-              'SRE.api': 'SRE Tools API'
-            }
+              'SRE.api': 'SRE Tools API',
+            },
           },
-        }
-      }
+        },
+      },
     });
   });
 
@@ -259,5 +233,33 @@ describe('SwaggerService', () => {
     result = SwaggerService.prepareDocument();
 
     expect(result.info.version).toBe('1.0.0');
+  });
+
+  it('should create custom route', () => {
+    const customRoute = {
+      path: ':id/test',
+      method: 0,
+      response: {},
+      operation: { responses: { 200: { description: '200 desc' } } },
+      entityName: 'Test',
+      methodName: 'methodMock' as MethodName,
+    };
+    SwaggerService.addCustomRouteConfig(customRoute);
+    const result = SwaggerService.prepareDocument();
+
+    const expectedRoute = {
+      '/test/{id}/test': {
+        get: {
+          responses: {
+            '200': {
+              description: '200 desc',
+            },
+          },
+          tags: ['Test'],
+        },
+      },
+    };
+
+    expect(result.paths).toStrictEqual(expectedRoute);
   });
 });

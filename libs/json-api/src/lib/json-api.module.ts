@@ -1,16 +1,25 @@
-import { DynamicModule, Module, OnModuleInit, Logger } from '@nestjs/common';
+import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpAdapterHost, ModuleRef } from '@nestjs/core';
 import * as swaggerUi from 'swagger-ui-express';
 
 import { SwaggerService } from './services/swagger/swagger.service';
 import {
+  DEFAULT_CONNECTION_NAME,
   JSON_API_CONFIG,
   JSON_API_ENTITY,
-  DEFAULT_CONNECTION_NAME,
 } from './constants';
-import { ModuleConfig, ModuleOptions } from './types';
+import {
+  CustomRouteObject,
+  Entity,
+  MethodName,
+  ModuleConfig,
+  ModuleOptions,
+  NestController,
+} from './types';
 import { moduleMixin } from './mixins';
+
+import { DECORATORS } from '@nestjs/swagger/dist/constants';
 
 @Module({})
 export class JsonApiModule implements OnModuleInit {
@@ -69,7 +78,7 @@ export class JsonApiModule implements OnModuleInit {
           options.entities,
           JsonApiModule.connectionName
         ),
-        ...optionsImports
+        ...optionsImports,
       ],
     };
 
@@ -78,6 +87,49 @@ export class JsonApiModule implements OnModuleInit {
       ...swaggerOptions,
       apiPrefix: swaggerOptions.apiPrefix || globalPrefix,
     });
+
+    const getCustomRoutes = (
+      controller: NestController,
+      entity: Entity
+    ): CustomRouteObject[] => {
+      if (
+        !controller ||
+        !Reflect.hasOwnMetadata(DECORATORS.API_TAGS, controller)
+      ) {
+        return;
+      }
+
+      const methodNames = Object.getOwnPropertyNames(
+        controller.prototype
+      ).filter((methodName) =>
+        Reflect.hasOwnMetadata(
+          DECORATORS.API_RESPONSE,
+          controller.prototype[methodName]
+        )
+      ) as MethodName[];
+      const entityName =
+        entity instanceof Function ? entity.name : entity.options.name;
+
+      return methodNames.map((methodName) => {
+        const path = Reflect.getMetadata(
+          'path',
+          controller.prototype[methodName]
+        );
+        const method = Reflect.getMetadata(
+          'method',
+          controller.prototype[methodName]
+        );
+        const response = Reflect.getMetadata(
+          DECORATORS.API_RESPONSE,
+          controller.prototype[methodName]
+        );
+        const operation = Reflect.getMetadata(
+          DECORATORS.API_OPERATION,
+          controller.prototype[methodName]
+        );
+        return { path, method, response, operation, entityName, methodName };
+      });
+    };
 
     options.entities.forEach((entity) => {
       const controller = (options.controllers || []).find(
@@ -96,9 +148,14 @@ export class JsonApiModule implements OnModuleInit {
       ];
       moduleParams.providers = [...moduleParams.providers, ...module.providers];
 
+      const customRoutes = getCustomRoutes(controller, entity);
+      if (customRoutes) {
+        SwaggerService.customRoutes.push(...customRoutes);
+      }
+
       SwaggerService.addEntity(entity);
     });
-// console.log(moduleParams)
+    // console.log(moduleParams)
     return moduleParams;
   }
 }
