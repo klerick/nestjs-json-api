@@ -5,6 +5,7 @@ export * from './lib/decorators';
 export * from './lib/constants';
 export * from './lib/helpers';
 export * from './lib/types';
+export * from './lib/mixins';
 export { SwaggerService } from './lib/services/swagger/swagger.service';
 export { excludeMethod } from './lib/config/bindings';
 
