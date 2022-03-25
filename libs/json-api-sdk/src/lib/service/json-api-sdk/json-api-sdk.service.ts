@@ -207,7 +207,8 @@ export class JsonApiSdkService{
           const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
             Object.defineProperties(acum, {
               [key]: {
-                value: val
+                value: val,
+                enumerable: true
               },
             });
             return entity;
@@ -254,7 +255,8 @@ export class JsonApiSdkService{
           const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
             Object.defineProperties(acum, {
               [key]: {
-                value: val
+                value: val,
+                enumerable: true
               },
             });
             return entity;
