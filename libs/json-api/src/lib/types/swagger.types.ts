@@ -2,9 +2,26 @@ import { RequestMethod } from '@nestjs/common';
 import { ApiResponseOptions } from '@nestjs/swagger/dist/decorators/api-response.decorator';
 import { MethodName } from './binding.types';
 
+export interface ClientCredentials {
+  tokenUrl: string
+  scopes: string[]
+}
+
+export interface AuthorizationCodeConfig extends ClientCredentials{
+  authorizationUrl: string
+}
+
+
+
+
+
 export interface SwaggerConfig {
   tokenUrl?: string;
   version?: string;
+  authConfig?: {
+    authorizationCode?: AuthorizationCodeConfig,
+    clientCredentials?: ClientCredentials
+  }
   apiPrefix?: string;
   apiHost?: string;
   prefix?: string;

@@ -50,7 +50,12 @@ export class JsonApiModule implements OnModuleInit {
 
       const swaggerHtml = swaggerUi.generateHTML(document, {});
       httpAdapter.get(`/${config.prefix}`, (req, res) => res.send(swaggerHtml));
-      httpAdapter.use(`/${config.prefix}`, swaggerUi.serveFiles(document, {}));
+      httpAdapter.use(`/${config.prefix}`, swaggerUi.serveFiles(document, {swaggerOptions: {
+          // oauth: {
+          //   usePkceWithAuthorizationCodeGrant: true
+          // }
+        }
+      }));
     }
   }
 
