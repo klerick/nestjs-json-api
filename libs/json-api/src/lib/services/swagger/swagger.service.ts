@@ -37,7 +37,19 @@ export class SwaggerService {
     const tag = this.prepareTag(entityName, method);
     this.addEntity(entity);
     this.tags.push(tag);
-
+    const authorisation = [];
+    if (this.config.authConfig) {
+      const scopes = [];
+      if (this.config.authConfig.authorizationCode) {
+        scopes.push(...this.config.authConfig.authorizationCode.scopes)
+      }
+      if (this.config.authConfig.clientCredentials) {
+        scopes.push(...this.config.authConfig.clientCredentials.scopes)
+      }
+      authorisation.push({
+        authorisation: scopes
+      })
+    }
     const swaggerMethod = this.prepareMethodName(method);
     const swaggerConfig = {
       requestBody: this.prepareRequest(entityName, method),
@@ -46,6 +58,7 @@ export class SwaggerService {
         ...this.prepareQueryParameters(entityName, method),
         ...this.preparePathParameters(entityName, method),
       ],
+      security: authorisation,
       tags: [tag.name],
     };
 
@@ -1002,18 +1015,23 @@ export class SwaggerService {
       document.info.version = this.config.version;
     }
 
-    if (this.config.tokenUrl) {
+    if (this.config.authConfig) {
+      const authConfig = {};
+
+
+      if (this.config.authConfig.authorizationCode) {
+        authConfig['authorizationCode'] = this.config.authConfig.authorizationCode;
+        authConfig['authorizationCode'].scopes = authConfig['authorizationCode'].scopes.reduce((acum, item) => (acum[item] = item, acum), {})
+      }
+      if (this.config.authConfig.clientCredentials) {
+        authConfig['clientCredentials'] = this.config.authConfig.clientCredentials;
+        authConfig['clientCredentials'].scopes = authConfig['clientCredentials'].scopes.reduce((acum, item) => (acum[item] = item, acum), {})
+      }
+
       document.components.securitySchemes = {
         authorisation: {
           type: 'oauth2',
-          flows: {
-            clientCredentials: {
-              tokenUrl: this.config.tokenUrl,
-              scopes: {
-                'SRE.api': 'SRE Tools API',
-              },
-            },
-          },
+          flows: authConfig,
         },
       };
     }

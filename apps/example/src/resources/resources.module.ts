@@ -14,7 +14,6 @@ import {
     JsonApiModule.forRoot({
       globalPrefix: 'api',
       swagger: {
-        tokenUrl: process.env.API_APPLICATION_SWAGGER_TOKEN_URL,
         apiHost: 'http://localhost:3000',
         version: '3.1.0',
         prefix: 'swagger'

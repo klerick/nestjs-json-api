@@ -61,7 +61,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.7",
     "rxjs": "^7.0.0",
-    "swagger-ui-express": "^4.1.6",
+    "swagger-ui-express": "^4.3.0",
     "ts-json-api": "^1.1.2",
     "tslib": "^2.0.0",
     "typeorm": "0.2.41",
