@@ -205,7 +205,12 @@ describe('SwaggerService', () => {
     expect(result.components.securitySchemes).not.toBeDefined();
 
     SwaggerService.setConfig({
-      tokenUrl: 'http://example',
+      authConfig: {
+        clientCredentials: {
+          tokenUrl: 'http://localhost:3000',
+          scopes: ['test']
+        }
+      }
     });
     result = SwaggerService.prepareDocument();
 
@@ -214,9 +219,9 @@ describe('SwaggerService', () => {
         type: 'oauth2',
         flows: {
           clientCredentials: {
-            tokenUrl: 'http://example',
+            tokenUrl: 'http://localhost:3000',
             scopes: {
-              'SRE.api': 'SRE Tools API',
+              'test': 'test',
             },
           },
         },
