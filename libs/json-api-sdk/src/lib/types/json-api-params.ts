@@ -3,7 +3,7 @@ import { FilterOperand } from 'json-api-nestjs/filter-operand';
 
 type MapFilterOperandTypeString = Exclude<
   FilterOperand,
-  FilterOperand.in | FilterOperand.nin
+  FilterOperand.in | FilterOperand.nin | FilterOperand.some
 >;
 export type Operands = {
   [P in FilterOperand]?: P extends MapFilterOperandTypeString ? string : string[];
