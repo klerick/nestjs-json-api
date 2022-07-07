@@ -18,7 +18,7 @@ export class UsersHaveRoles {
     nullable: false,
     unique: false,
   })
-  public userId: string;
+  public userId: number;
 
   @IsNotEmpty()
   @Column({
@@ -27,7 +27,7 @@ export class UsersHaveRoles {
     nullable: false,
     unique: false,
   })
-  public roleId: string;
+  public roleId: number;
 
   @IsEmpty()
   @Column({
