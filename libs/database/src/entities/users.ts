@@ -9,11 +9,17 @@ import {
   Column,
   UpdateDateColumn,
 } from 'typeorm';
-import { Length, IsNotEmpty, IsOptional, IsEmpty, IsBoolean } from 'class-validator';
+import {
+  Length,
+  IsNotEmpty,
+  IsOptional,
+  IsEmpty,
+  IsBoolean,
+} from 'class-validator';
 
 import { Addresses, Roles, Comments } from '.';
 
-export type IUsers = Users
+export type IUsers = Users;
 
 @Entity('users')
 export class Users {
@@ -63,7 +69,6 @@ export class Users {
   })
   public isActive: boolean;
 
-
   @IsEmpty()
   @Column({
     name: 'created_at',
@@ -81,7 +86,6 @@ export class Users {
     default: 'CURRENT_TIMESTAMP',
   })
   public updatedAt: Date;
-
 
   @OneToOne(() => Addresses, (item) => item.id)
   @IsNotEmpty()
@@ -102,16 +106,15 @@ export class Users {
     name: 'users_have_roles',
     inverseJoinColumn: {
       referencedColumnName: 'id',
-      name: 'role_id',
+      name: 'roleId',
     },
     joinColumn: {
       referencedColumnName: 'id',
-      name: 'user_id',
+      name: 'userId',
     },
   })
   public roles: Roles[];
 
   @OneToMany(() => Comments, (item) => item.createdBy)
   public comments: Comments[];
-
 }
