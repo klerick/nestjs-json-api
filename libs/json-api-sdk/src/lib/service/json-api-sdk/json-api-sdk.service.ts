@@ -4,14 +4,20 @@ import { paramCase } from 'param-case';
 import { ObjectLiteral, ObjectType } from 'typeorm/browser';
 import { EMPTY, expand, map, Observable, reduce, throwError } from 'rxjs';
 
-import { JSON_API_SDK_CONFIG, JsonApiSdkConfig, ListEntities, ALL_ENTITIES } from '../../token/json-api-sdk';
+import {
+  JSON_API_SDK_CONFIG,
+  JsonApiSdkConfig,
+  ListEntities,
+  ALL_ENTITIES,
+} from '../../token/json-api-sdk';
 import {
   EntityArray,
   Operands,
   QueryParams,
   RelationshipData,
   ResourceData,
-  ResourceObject
+  ResourceObject,
+  EntityRelation,
 } from '../../types';
 
 const capitalizeFirstChar = (str: string) =>
@@ -23,28 +29,21 @@ const capitalizeFirstChar = (str: string) =>
 const getTypeForReq = (str: string) => paramCase(str).toLocaleLowerCase();
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class JsonApiSdkService{
+export class JsonApiSdkService {
   public constructor(
     protected http: HttpClient,
     @Inject(JSON_API_SDK_CONFIG) protected jsonApiSdkConfig: JsonApiSdkConfig,
-    @Inject(ALL_ENTITIES) protected listEntities: ListEntities,
-  ) {
-  }
+    @Inject(ALL_ENTITIES) protected listEntities: ListEntities
+  ) {}
 
-  public getUrlForResource(resource: string): string{
-
-    const url: string[] = [
-      paramCase(resource).toLocaleLowerCase()
-    ];
+  public getUrlForResource(resource: string): string {
+    const url: string[] = [paramCase(resource).toLocaleLowerCase()];
     if (this.jsonApiSdkConfig.apiPrefix) {
-      url.unshift(this.jsonApiSdkConfig.apiPrefix)
+      url.unshift(this.jsonApiSdkConfig.apiPrefix);
     }
-    return new URL(
-      url.join('/'),
-      this.jsonApiSdkConfig.apiHost
-    ).toString();
+    return new URL(url.join('/'), this.jsonApiSdkConfig.apiHost).toString();
   }
 
   public getOne<Entity extends ObjectLiteral>(
@@ -53,11 +52,11 @@ export class JsonApiSdkService{
   public getOne<Entity extends ObjectLiteral, Meta>(
     entity: Entity,
     returnMeta: boolean
-  ): Observable<{entity: Entity, meta: Meta}>;
+  ): Observable<{ entity: Entity; meta: Meta }>;
   public getOne<Entity extends ObjectLiteral>(
     entity: Entity,
     returnMeta: boolean
-  ): Observable<{entity: Entity, meta: any}>;
+  ): Observable<{ entity: Entity; meta: any }>;
   public getOne<Entity extends ObjectLiteral>(
     entity: Entity,
     params: Pick<QueryParams<Entity>, 'include' | 'field'>
@@ -66,78 +65,83 @@ export class JsonApiSdkService{
     entity: Entity,
     params: Pick<QueryParams<Entity>, 'include' | 'field'>,
     returnMeta: boolean
-  ): Observable<{entity: Entity, meta: Meta}>;
+  ): Observable<{ entity: Entity; meta: Meta }>;
   public getOne<Entity extends ObjectLiteral>(
     entity: Entity,
     params: Pick<QueryParams<Entity>, 'include' | 'field'>,
     returnMeta: boolean
-  ): Observable<{entity: Entity, meta: any}>;
+  ): Observable<{ entity: Entity; meta: any }>;
   public getOne(
     entity?: any,
     params?: any,
     returnMeta?: boolean
-  ): Observable<any>
-  {
+  ): Observable<any> {
     if (!entity || !entity['id']) {
-      return throwError(() =>
-        new Error('Resource params should be instance of resource with id params')
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
       );
     }
     const entityName = entity.constructor.name;
     const query = this.getQueryString(params, entityName);
-    return this.http.get<any>(
-      `${this.getUrlForResource(entityName)}/${entity['id']}`,
-      { params: query }
-    ).pipe(
-      map(
-        (result) => {
-          const entity = this.convertResponseData(result, params?.include)[0]
+    return this.http
+      .get<any>(`${this.getUrlForResource(entityName)}/${entity['id']}`, {
+        params: query,
+      })
+      .pipe(
+        map((result) => {
+          const entity = this.convertResponseData(result, params?.include)[0];
           if (returnMeta) {
-            const {meta} = result;
+            const { meta } = result;
             return {
               entity,
-              meta: meta || {}
-            }
+              meta: meta || {},
+            };
           }
           return entity;
-        }
-      )
-    )
+        })
+      );
   }
 
   public getList<Entity extends ObjectLiteral>(
     resource: ObjectType<Entity>,
     params?: QueryParams<Entity>
-  ): Observable<EntityArray<Entity>>{
+  ): Observable<EntityArray<Entity>> {
     const query = this.getQueryString<Entity>(params, resource.name);
-    return this.http.get<ResourceObject<Entity>>(
-      this.getUrlForResource(resource.name),
-      { params: query }
-    ).pipe(
-      map<ResourceObject<Entity>, EntityArray<Entity>>(result => {
-        const resource = this.convertResponseData<Entity>(result, params?.include);
-        const { totalItems, pageSize, pageNumber } = Object.assign(
-          {
-            totalItems: 0,
-            pageNumber: 0,
-            pageSize: 0,
-          },
-          result.meta
-        )
-
-        return new EntityArray<Entity>(resource, {
-          totalItems,
-          pageNumber,
-          pageSize,
-        })
+    return this.http
+      .get<ResourceObject<Entity>>(this.getUrlForResource(resource.name), {
+        params: query,
       })
-    )
+      .pipe(
+        map<ResourceObject<Entity>, EntityArray<Entity>>((result) => {
+          const resource = this.convertResponseData<Entity>(
+            result,
+            params?.include
+          );
+          const { totalItems, pageSize, pageNumber } = Object.assign(
+            {
+              totalItems: 0,
+              pageNumber: 0,
+              pageSize: 0,
+            },
+            result.meta
+          );
+
+          return new EntityArray<Entity>(resource, {
+            totalItems,
+            pageNumber,
+            pageSize,
+          });
+        })
+      );
   }
 
   public getAll<Entity extends ObjectLiteral>(
     resource: ObjectType<Entity>,
     params: QueryParams<Entity> = {}
-  ): Observable<EntityArray<Entity>>{
+  ): Observable<EntityArray<Entity>> {
     return this.getList(resource, params).pipe(
       expand((r) => {
         if (r.pageNumber * r.pageSize >= r.totalItems) {
@@ -149,10 +153,10 @@ export class JsonApiSdkService{
             pagination: {
               number: r.pageNumber + 1,
               size: r.pageSize,
-            }
-          }
-        }
-        return this.getList(resource, newParams)
+            },
+          },
+        };
+        return this.getList(resource, newParams);
       }),
       reduce<Entity[]>((acum, item) => {
         if (!acum && !Array.isArray(acum)) {
@@ -161,18 +165,26 @@ export class JsonApiSdkService{
         acum.push(...item);
         return acum;
       }),
-      map(r => new EntityArray<Entity>(r, {
-        pageSize: r.length,
-        pageNumber: 1,
-        totalItems: r.length,
-      }))
-    )
+      map(
+        (r) =>
+          new EntityArray<Entity>(r, {
+            pageSize: r.length,
+            pageNumber: 1,
+            totalItems: r.length,
+          })
+      )
+    );
   }
 
-  public deleteOne<Entity extends ObjectLiteral>(entity: Entity): Observable<void> {
+  public deleteOne<Entity extends ObjectLiteral>(
+    entity: Entity
+  ): Observable<void> {
     if (!entity['id']) {
-      return throwError(() =>
-        new Error('Resource params should be instance of resource with id params')
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
       );
     }
 
@@ -182,10 +194,18 @@ export class JsonApiSdkService{
     );
   }
 
-  public postOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity>;
-  public postOne<Entity extends ObjectLiteral, Meta>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: Meta}>;
-  public postOne<Entity extends ObjectLiteral>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: any}>;
-  public postOne(entity: any, returnMeta?: boolean): Observable<any>{
+  public postOne<Entity extends ObjectLiteral>(
+    entity: Entity
+  ): Observable<Entity>;
+  public postOne<Entity extends ObjectLiteral, Meta>(
+    entity: Entity,
+    returnMeta: boolean
+  ): Observable<{ entity: Entity; meta: Meta }>;
+  public postOne<Entity extends ObjectLiteral>(
+    entity: Entity,
+    returnMeta: boolean
+  ): Observable<{ entity: Entity; meta: any }>;
+  public postOne(entity: any, returnMeta?: boolean): Observable<any> {
     const { attributes, relationships } = this.generateBody(entity);
     const body = {
       data: {
@@ -196,38 +216,50 @@ export class JsonApiSdkService{
     };
 
     const entityName = entity.constructor.name;
-    return this.http
-      .post<any>(this.getUrlForResource(entityName), body)
-      .pipe(
-        map((jsonApiResult) =>({
-          meta: jsonApiResult.meta || {},
-          resourceItem: this.convertResponseData(jsonApiResult)[0]
-        })),
-        map(({resourceItem, meta}) => {
-          const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
+    return this.http.post<any>(this.getUrlForResource(entityName), body).pipe(
+      map((jsonApiResult) => ({
+        meta: jsonApiResult.meta || {},
+        resourceItem: this.convertResponseData(jsonApiResult)[0],
+      })),
+      map(({ resourceItem, meta }) => {
+        const entityResult = Object.entries(resourceItem).reduce(
+          (acum, [key, val]) => {
             Object.defineProperties(acum, {
               [key]: {
                 value: val,
-                enumerable: true
+                enumerable: true,
               },
             });
             return entity;
-          }, entity);
-          if (returnMeta) {
-            return {entity: entityResult, meta}
-          }
-          return entityResult;
-        })
-      );
+          },
+          entity
+        );
+        if (returnMeta) {
+          return { entity: entityResult, meta };
+        }
+        return entityResult;
+      })
+    );
   }
 
-  public patchOne<Entity extends ObjectLiteral>(entity: Entity): Observable<Entity>;
-  public patchOne<Entity extends ObjectLiteral, Meta>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: Meta}>;
-  public patchOne<Entity extends ObjectLiteral>(entity: Entity, returnMeta: boolean): Observable<{entity: Entity, meta: any}>;
+  public patchOne<Entity extends ObjectLiteral>(
+    entity: Entity
+  ): Observable<Entity>;
+  public patchOne<Entity extends ObjectLiteral, Meta>(
+    entity: Entity,
+    returnMeta: boolean
+  ): Observable<{ entity: Entity; meta: Meta }>;
+  public patchOne<Entity extends ObjectLiteral>(
+    entity: Entity,
+    returnMeta: boolean
+  ): Observable<{ entity: Entity; meta: any }>;
   public patchOne(entity: any, returnMeta?: boolean): Observable<any> {
     if (!entity['id']) {
-      return throwError(() =>
-        new Error('Resource params should be instance of resource with id params')
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
       );
     }
 
@@ -243,26 +275,27 @@ export class JsonApiSdkService{
     };
     const entityName = entity.constructor.name;
     return this.http
-      .patch<any>(
-        `${this.getUrlForResource(entityName)}/${entity['id']}`, body
-      )
+      .patch<any>(`${this.getUrlForResource(entityName)}/${entity['id']}`, body)
       .pipe(
         map((jsonApiResult) => ({
           meta: jsonApiResult.meta || {},
-          resourceItem: this.convertResponseData(jsonApiResult)[0]
+          resourceItem: this.convertResponseData(jsonApiResult)[0],
         })),
-        map(({resourceItem, meta}) => {
-          const entityResult = Object.entries(resourceItem).reduce((acum, [key, val]) => {
-            Object.defineProperties(acum, {
-              [key]: {
-                value: val,
-                enumerable: true
-              },
-            });
-            return entity;
-          }, entity);
+        map(({ resourceItem, meta }) => {
+          const entityResult = Object.entries(resourceItem).reduce(
+            (acum, [key, val]) => {
+              Object.defineProperties(acum, {
+                [key]: {
+                  value: val,
+                  enumerable: true,
+                },
+              });
+              return entity;
+            },
+            entity
+          );
           if (returnMeta) {
-            return {entity: entityResult, meta}
+            return { entity: entityResult, meta };
           }
           return entityResult;
         })
@@ -276,17 +309,19 @@ export class JsonApiSdkService{
     const { data, included } = body;
     const arrayData = Array.isArray(data) ? data : [data];
 
-    const result: Entity[] = []
-    for(const dataItem of arrayData) {
+    const result: Entity[] = [];
+    for (const dataItem of arrayData) {
       const itemEntity = this.createEntityInstance(dataItem.type);
       itemEntity['id'] = dataItem.id;
-      Object.entries(dataItem.attributes || []).forEach(([key, val]) =>
-        itemEntity[key] = val
-      )
+      Object.entries(dataItem.attributes || []).forEach(
+        ([key, val]) => (itemEntity[key] = val)
+      );
 
       if (includeEntity.length > 0) {
-        for(const itemInclude of includeEntity) {
-          if (!(dataItem.relationships && dataItem.relationships[itemInclude])) {
+        for (const itemInclude of includeEntity) {
+          if (
+            !(dataItem.relationships && dataItem.relationships[itemInclude])
+          ) {
             continue;
           }
           const relationship = dataItem.relationships[itemInclude];
@@ -299,8 +334,7 @@ export class JsonApiSdkService{
             const relatedResource = this.createEntityInstance(item.type);
             const relatedIncluded = included.find(
               (includedItem) =>
-                includedItem.type === item.type &&
-                includedItem.id === item.id
+                includedItem.type === item.type && includedItem.id === item.id
             );
             if (!relatedIncluded) {
               return;
@@ -312,22 +346,29 @@ export class JsonApiSdkService{
             return relatedResource;
           };
 
-          if (Array.isArray(relationshipData)){
-            itemEntity[itemInclude] = (relationshipData as RelationshipData<Entity>[])
+          if (Array.isArray(relationshipData)) {
+            itemEntity[itemInclude] = (
+              relationshipData as RelationshipData<Entity>[]
+            )
               .map((item) => findIncludeEntity(item))
-              .filter(i => !!i)
+              .filter((i) => !!i);
           } else {
-            itemEntity[itemInclude] = findIncludeEntity((relationshipData as RelationshipData<Entity>))
+            itemEntity[itemInclude] = findIncludeEntity(
+              relationshipData as RelationshipData<Entity>
+            );
           }
         }
       }
 
-      result.push(itemEntity)
+      result.push(itemEntity);
     }
     return result;
   }
 
-  public getQueryString<Entity>(params: QueryParams<Entity> = {}, resource: string): HttpParams {
+  public getQueryString<Entity>(
+    params: QueryParams<Entity> = {},
+    resource: string
+  ): HttpParams {
     let httpParams = new HttpParams();
     const { include, sort, field, pagination, filter } = params;
     if (include && Array.isArray(include)) {
@@ -366,7 +407,11 @@ export class JsonApiSdkService{
       );
     }
 
-    if (pagination && !Array.isArray(pagination) && Object.keys(pagination).length > 0) {
+    if (
+      pagination &&
+      !Array.isArray(pagination) &&
+      Object.keys(pagination).length > 0
+    ) {
       const { number, size } = pagination;
       httpParams = httpParams.set(`page[number]`, `${number || 1}`);
       httpParams = httpParams.set(`page[size]`, `${size}`);
@@ -375,45 +420,42 @@ export class JsonApiSdkService{
     return httpParams;
   }
 
-  protected createEntityInstance(name: string){
-    const entityName = capitalizeFirstChar(name)
+  protected createEntityInstance(name: string) {
+    const entityName = capitalizeFirstChar(name);
     if (this.listEntities[capitalizeFirstChar(name)]) {
       return new this.listEntities[capitalizeFirstChar(name)]();
     }
-    console.warn(`Do not find entity: "${entityName}". Will create in runtime`)
-    return (Function('return new class ' + entityName + '{}'))()
+    console.warn(`Do not find entity: "${entityName}". Will create in runtime`);
+    return Function('return new class ' + entityName + '{}')();
   }
 
   protected generateBody<Entity extends ObjectLiteral>(
     entity: Entity
-  ): Pick<ResourceData<Entity>, 'relationships' | 'attributes'>{
-
+  ): Pick<ResourceData<Entity>, 'relationships' | 'attributes'> {
     const attributes = Object.entries(entity)
       .filter(([key, val]) => {
-      if (key === 'id') {
-        return false;
-      }
-      const item = Array.isArray(val) ? val[0] : val;
-      if (!item?.constructor) {
-        return true;
-      }
+        if (key === 'id') {
+          return false;
+        }
+        const item = Array.isArray(val) ? val[0] : val;
+        if (!item?.constructor) {
+          return true;
+        }
 
-      return !this.listEntities[item.constructor.name];
-    })
-      .reduce<ResourceData<Entity>['attributes']>(
-        (acum, [key, val]) => {
-          Object.defineProperties(acum, {
-            [key]: {
-              value: val,
-              configurable: true,
-              enumerable: true,
-              writable: true
-            },
-          })
+        return !this.listEntities[item.constructor.name];
+      })
+      .reduce<ResourceData<Entity>['attributes']>((acum, [key, val]) => {
+        Object.defineProperties(acum, {
+          [key]: {
+            value: val,
+            configurable: true,
+            enumerable: true,
+            writable: true,
+          },
+        });
 
-          return acum;
-        }, {} as ResourceData<Entity>['attributes']
-      );
+        return acum;
+      }, {} as ResourceData<Entity>['attributes']);
 
     const relationships = Object.entries(entity)
       .filter(([key, val]) => {
@@ -443,17 +485,171 @@ export class JsonApiSdkService{
         }
         Object.defineProperties(acum, {
           [key]: {
-            value: {data},
+            value: { data },
             configurable: true,
             enumerable: true,
-            writable: true
+            writable: true,
           },
-        })
+        });
         return acum;
       }, {});
 
-    return {attributes, relationships}
+    return { attributes, relationships };
   }
 
+  public getRelationships<
+    Entity extends ObjectLiteral,
+    RelationEntity extends ObjectLiteral
+  >(
+    entity: Entity,
+    relationType: EntityRelation<Entity>,
+    needAttribute = false
+  ): Observable<RelationEntity | RelationEntity[]> {
+    if (!entity['id']) {
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
+      );
+    }
 
+    const entityName = entity.constructor.name;
+    return this.http
+      .get<any>(
+        `${this.getUrlForResource(entityName)}/${
+          entity['id']
+        }/relationships/${String(relationType)}?needAttribute=${needAttribute}`
+      )
+      .pipe(
+        map((body) => {
+          const { data } = body;
+          if (Array.isArray(data)) {
+            return data.map((item) => {
+              const instance = this.createEntityInstance(item.type);
+              instance.id = item.id;
+              return instance;
+            });
+          } else {
+            const instance = this.createEntityInstance(data.type);
+            instance.id = data.id;
+            return instance;
+          }
+        })
+      );
+  }
+
+  public patchRelationships<
+    Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral
+  >(
+    entity: Entity,
+    relationType: EntityRelation<Entity>,
+    relationshipEntity: RelationshipEntity | RelationshipEntity[]
+  ): Observable<RelationshipEntity | RelationshipEntity[]> {
+    if (!entity['id']) {
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
+      );
+    }
+
+    const body = {
+      data: this.generateRelationshipsBody<RelationshipEntity>(
+        relationshipEntity
+      ),
+    };
+    const entityName = entity.constructor.name;
+    return this.http
+      .patch<any>(
+        `${this.getUrlForResource(entityName)}/${
+          entity['id']
+        }/relationships/${String(relationType)}`,
+        body
+      )
+      .pipe(map(() => relationshipEntity));
+  }
+
+  public postRelationships<
+    Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral
+  >(
+    entity: Entity,
+    relationType: EntityRelation<Entity>,
+    relationshipEntity: RelationshipEntity | RelationshipEntity[]
+  ): Observable<RelationshipEntity | RelationshipEntity[]> {
+    if (!entity['id']) {
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
+      );
+    }
+
+    const body = {
+      data: this.generateRelationshipsBody<RelationshipEntity>(
+        relationshipEntity
+      ),
+    };
+    const entityName = entity.constructor.name;
+    return this.http
+      .post<any>(
+        `${this.getUrlForResource(entityName)}/${
+          entity['id']
+        }/relationships/${String(relationType)}`,
+        body
+      )
+      .pipe(map(() => relationshipEntity));
+  }
+
+  public deleteRelationships<
+    Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral
+  >(
+    entity: Entity,
+    relationType: EntityRelation<Entity>,
+    relationshipEntity: RelationshipEntity | RelationshipEntity[]
+  ): Observable<void> {
+    if (!entity['id']) {
+      return throwError(
+        () =>
+          new Error(
+            'Resource params should be instance of resource with id params'
+          )
+      );
+    }
+
+    const body = {
+      data: this.generateRelationshipsBody<RelationshipEntity>(
+        relationshipEntity
+      ),
+    };
+    const entityName = entity.constructor.name;
+    return this.http
+      .request(
+        'delete',
+        `${this.getUrlForResource(entityName)}/${
+          entity['id']
+        }/relationships/${String(relationType)}`,
+        { body }
+      )
+      .pipe(map(() => void 0));
+  }
+
+  generateRelationshipsBody<RelationshipEntity extends ObjectLiteral>(
+    relationshipEntity: RelationshipEntity | RelationshipEntity[]
+  ) {
+    const generateRelationObj = (relation: RelationshipEntity) => ({
+      id: String(relation['id']),
+      type: getTypeForReq(relation.constructor.name),
+    });
+
+    const data = Array.isArray(relationshipEntity)
+      ? relationshipEntity.map((item) => generateRelationObj(item))
+      : generateRelationObj(relationshipEntity);
+    return data;
+  }
 }
