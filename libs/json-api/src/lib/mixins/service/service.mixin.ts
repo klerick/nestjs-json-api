@@ -1,7 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { EntityMetadata, Equal, In, QueryBuilder, SelectQueryBuilder } from 'typeorm';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EntityMetadata, EntitySchema, Equal, In, QueryBuilder, SelectQueryBuilder } from 'typeorm';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { paramCase } from 'param-case';
+
 
 import { mixin } from '../../helpers/mixin';
 import {
@@ -21,6 +23,7 @@ import {
   ServiceOptions,
   TransformMixin
 } from '../../types';
+import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 
 
 export function serviceMixin(entity: Entity, transform: TransformMixin, connectionName: string): ServiceMixin {
@@ -32,7 +35,8 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
     public async getRelationship(options: ServiceOptions<void>): Promise<ResponseRelationshipsObject> {
       const mainResourceName = paramCase(this.repository.metadata.name);
       const { relName, id } = options.route;
-
+      const { needAttribute } = options.query;
+      const returnAttr: {[key: string]: Record<string, any>} = {};
       const result = await this.repository
         .createQueryBuilder(mainResourceName)
         .leftJoinAndSelect(`${mainResourceName}.${relName}`, relName)
@@ -44,16 +48,63 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         });
       }
 
-      let data;
-      if(Array.isArray(result[relName])){
-        data = result[relName].map(item => {
-          const { id, type } = this.transform.transformData(item);
-          return { id, type };
+      if (needAttribute) {
+        const relations = this.repository.metadata.relations.find(item => {
+          return item.propertyName === relName;
         });
 
-      } else if (result[relName]){
+        if (relations.relationType !== 'many-to-many') {
+          throw new BadRequestException({
+            detail: `'${relName}' is not 'many-to-many' relation in resource '${mainResourceName}'`
+          });
+        }
+
+        const relationIDs = relations.junctionEntityMetadata.inverseColumns.reduce<Record<string, boolean>>(
+          (acum, item) => (
+            acum[item.propertyName] = true, acum
+          ), {});
+        const removeProps = relations.junctionEntityMetadata.ownColumns.reduce<Record<string, boolean>>(
+          (acum, item) => (
+            acum[item.propertyName] = true, acum
+          ), { id: true, ...relationIDs });
+
+        const repoTarget = this.repository.manager.getRepository(relations.junctionEntityMetadata.target);
+        const currentData = await repoTarget.find({
+          where: {
+            [relations.junctionEntityMetadata.ownColumns[0].databasePath]: id
+          }
+        });
+        currentData.reduce<{[key: string]: Record<string, any>}>((acum, item) => {
+          let relationID: string;
+          const tmpResult = Object.entries(item).reduce<Record<string, any>>((acumProps, [key, val]) => {
+            if (!removeProps[key]) {
+              acumProps[key] = val;
+            }
+            if (relationIDs[key]) {
+              relationID = val;
+            }
+            return acumProps;
+          }, {});
+          acum[relationID] = tmpResult;
+          return acum;
+        }, returnAttr);
+
+      }
+
+      let data;
+      if (Array.isArray(result[relName])) {
+        data = result[relName].map(item => {
+          const { id, type } = this.transform.transformData(item);
+          const result = { id, type };
+          if (needAttribute) {
+            result['attributes'] = returnAttr[id]
+          }
+          return result;
+        });
+
+      } else if (result[relName]) {
         const { id, type } = this.transform.transformData(result[relName]);
-        data = {id, type};
+        data = { id, type };
 
       } else {
         data = result[relName];
@@ -61,9 +112,9 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 
       return {
         links: {
-          self: this.transform.getRelationshipLink(mainResourceName, id.toString(), relName),
+          self: this.transform.getRelationshipLink(mainResourceName, id.toString(), relName)
         },
-        data,
+        data
       };
     }
 
@@ -98,7 +149,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         relationshipsBuilder = this.repository.manager
           .getRepository(relationshipsObject.type)
           .createQueryBuilder(relName);
-        relationshipsBuilder.where(`${relationshipsBuilder.alias}.id = :id`, {id: relId});
+        relationshipsBuilder.where(`${relationshipsBuilder.alias}.id = :id`, { id: relId });
       }
 
       relationshipsObject.inverseEntityMetadata.relations.map(relation => relation.propertyPath)
@@ -153,7 +204,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       if (relationshipsObject.type === this.repository.metadata.target) {
         relationshipsBuilder = this.repository
           .createQueryBuilder(mainResourceName)
-          .where(`${mainResourceName}.id = :id`, {id: result[relName].id});
+          .where(`${mainResourceName}.id = :id`, { id: result[relName].id });
 
       } else {
         relationshipsBuilder = this.repository.manager
@@ -172,7 +223,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             ids = [-1];
           }
 
-          relationshipsBuilder.where(`${relationshipsBuilder.alias}.id IN (:...ids)`, {ids});
+          relationshipsBuilder.where(`${relationshipsBuilder.alias}.id IN (:...ids)`, { ids });
           const skip = (page.number - 1) * page.size;
           relationshipsBuilder.skip(skip).take(page.size);
           this.applyQueryFilters(relationshipsObject.inverseEntityMetadata, filter, relationshipsBuilder);
@@ -180,7 +231,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
           needPagination = true;
         } else {
           const id = resultRelationships ? resultRelationships.id : [-1];
-          relationshipsBuilder.where(`${relationshipsBuilder.alias}.id = :id`, {id});
+          relationshipsBuilder.where(`${relationshipsBuilder.alias}.id = :id`, { id });
         }
       }
 
@@ -222,7 +273,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         apiResult.meta = {
           totalItems: totalCount,
           pageNumber: page.number,
-          pageSize: page.size,
+          pageSize: page.size
         };
       }
 
@@ -257,7 +308,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       }
 
       const apiResult: ResponseResourceObject = {
-        data:  this.transform.transformData(result)
+        data: this.transform.transformData(result)
       };
       if (include.length > 0) {
         apiResult.included = this.transform.transformInclude(result);
@@ -306,7 +357,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         meta: {
           totalItems: count,
           pageNumber: page.number,
-          pageSize: page.size,
+          pageSize: page.size
         },
         data: result.map(item => this.transform.transformData(item))
       };
@@ -350,7 +401,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             saveRelQueryType.push({
               type: relation.relationType,
               rel: key,
-              id: null,
+              id: null
             });
             return null;
           }
@@ -366,7 +417,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 
           if (!Array.isArray(data)) {
             const { type, id } = data;
-            saveRelQueryType.push({type, rel: key, id});
+            saveRelQueryType.push({ type, rel: key, id });
             return this.repository.manager.getRepository(relationTarget)
               .findOne({
                 id: Equal(id)
@@ -426,6 +477,27 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 
         await builderDeleteRelationships.addAndRemove(idsToAdd, idsToDelete);
 
+        if (relationObject.relationType === 'many-to-many') {
+          const repoTarget = this.repository.manager.getRepository<EntitySchema>(relationObject.junctionEntityMetadata.target);
+          const currentData = await repoTarget.find({
+            where: {
+              [relationObject.junctionEntityMetadata.ownColumns[0].databasePath]: id
+            }
+          });
+          const propertyName = relationObject.junctionEntityMetadata.inverseColumns[0].propertyName
+          const bodyParams = body as BaseData[];
+          currentData.forEach((item) => {
+            bodyParams.forEach(body => {
+              if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
+                Object.entries(body.attributes).forEach(([key, val]) => {
+                  item[key] = val;
+                });
+              }
+            })
+          });
+          await repoTarget.save(currentData);
+        }
+
       } else if (body !== null) {
         const { id } = Array.isArray(body) ? body.shift() : body;
         await builderDeleteRelationships.set(id);
@@ -438,7 +510,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
     public async postOne(options: ServiceOptions<RequestResourceData>): Promise<ResponseResourceObject> {
       const target = this.repository.manager.create(
         this.repository.target,
-        options.body.attributes,
+        options.body.attributes
       );
 
       if (options.body.relationships) {
@@ -452,7 +524,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             const { data } = value;
 
             if (!Array.isArray(data)) {
-              const { type, id } = data ;
+              const { type, id } = data;
               saveRelQueryType.push({ type, id, rel: key });
               return this.repository.manager.getRepository(target)
                 .findOne({
@@ -463,7 +535,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 
             const idsToAdd = data.map(item => item.id);
             const { type } = data.pop();
-            saveRelQueryType.push({type, rel: key, id: idsToAdd});
+            saveRelQueryType.push({ type, rel: key, id: idsToAdd });
             return this.repository.manager.getRepository(target)
               .find({
                 id: In(idsToAdd)
@@ -474,7 +546,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         for await (const rel of relPromise) {
           if (!rel) {
             throw new NotFoundException({
-              detail: `Resource '${saveRelQueryType[i].type}' with `+
+              detail: `Resource '${saveRelQueryType[i].type}' with ` +
                 `id '${saveRelQueryType[i].id}' does not exist`
             });
           }
@@ -518,6 +590,27 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         const { id } = Array.isArray(body) ? body.shift() : body;
         await postBuilder.set(id);
       }
+      if (relations.relationType === 'many-to-many') {
+        const repoTarget = this.repository.manager.getRepository<EntitySchema>(relations.junctionEntityMetadata.target);
+        const currentData = await repoTarget.find({
+          where: {
+            [relations.junctionEntityMetadata.ownColumns[0].databasePath]: id
+          }
+        });
+        const propertyName = relations.junctionEntityMetadata.inverseColumns[0].propertyName
+        const bodyParams = body as BaseData[];
+        currentData.forEach((item) => {
+          bodyParams.forEach(body => {
+            if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
+              Object.entries(body.attributes).forEach(([key, val]) => {
+                item[key] = val;
+              });
+            }
+          })
+        });
+        await repoTarget.save(currentData);
+      }
+
     }
 
     public async deleteOne(options: ServiceOptions<void>): Promise<void> {
@@ -593,7 +686,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       metadata: EntityMetadata,
       fieldName: string,
       operand: string,
-      expression: string,
+      expression: string
     ): string {
       const relationProperty = fieldName.split('.')[1];
       const relation = metadata.relations.find(item => {
@@ -604,8 +697,8 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         inverseSidePropertyPath,
         inverseEntityMetadata: {
           target,
-          name,
-        },
+          name
+        }
       } = relation;
       const resourceName = paramCase(name);
 
@@ -636,7 +729,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             .leftJoin(resourceName, resourceName, onQuery)
             .where(`${selectQuery} = ${metadata.tableName}.id`);
 
-          return `${expression} ${subQuery.getQuery()}` ;
+          return `${expression} ${subQuery.getQuery()}`;
         }
 
         case 'one-to-many': {
@@ -645,7 +738,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             .from(target, resourceName)
             .where(`${resourceName}.${inverseSidePropertyPath} = ${metadata.tableName}.id`);
 
-          return `${expression} ${subQuery.getQuery()}` ;
+          return `${expression} ${subQuery.getQuery()}`;
         }
         default:
           return `${fieldName} ${operand === FilterOperand.ne ? 'IS NOT NULL' : 'IS NULL'}`;
@@ -657,7 +750,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       metadata: EntityMetadata,
       fieldName: string,
       operand: string,
-      expression: string,
+      expression: string
     ): string {
       const preparedResourceName = paramCase(metadata.name);
       const relationProperty = fieldName.split('.')[0];
@@ -669,8 +762,8 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         inverseSidePropertyPath,
         inverseEntityMetadata: {
           target,
-          name,
-        },
+          name
+        }
       } = relation;
       const resourceName = paramCase(name);
 
@@ -701,7 +794,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             .leftJoin(target, resourceName, onQuery)
             .where(`${resourceName}.${fieldName.split('.')[1]} ${expression}`);
 
-          return `${preparedResourceName}.id IN ${subQuery.getQuery()}` ;
+          return `${preparedResourceName}.id IN ${subQuery.getQuery()}`;
         }
         case 'one-to-many': {
           subQuery
@@ -709,7 +802,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
             .from(target, resourceName)
             .where(`${resourceName}.${fieldName.split('.')[1]} ${expression}`);
 
-          return `${preparedResourceName}.id IN ${subQuery.getQuery()}` ;
+          return `${preparedResourceName}.id IN ${subQuery.getQuery()}`;
         }
 
         default:
@@ -720,7 +813,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
     protected applyQueryFilters(
       metadata: EntityMetadata,
       filters: Filters,
-      builder: QueryBuilder<any>,
+      builder: QueryBuilder<any>
     ): void {
       const preparedResourceName = paramCase(metadata.name);
       const relations = metadata.relations.map(item => item.propertyName);
@@ -763,7 +856,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
               metadata,
               fieldName,
               operand,
-              expression,
+              expression
             );
           }
 
@@ -786,7 +879,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
               metadata,
               fieldName,
               operand,
-              expression,
+              expression
             );
           }
 

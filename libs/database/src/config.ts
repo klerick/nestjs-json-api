@@ -7,6 +7,7 @@ const config = {
   username: "postgres",
   password: "password",
   database: "example",
+  logging: true,
   migrations: [join(__dirname, '/migrations/**/*{.ts,.js}')],
   entities: [join(__dirname, '/entities/**/*{.ts,.js}')],
   factories: [join(__dirname, '/seed-factories/**/*{.ts,.js}')],

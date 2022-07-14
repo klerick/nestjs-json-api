@@ -9,6 +9,7 @@ import {
   parseResourceIdMixin,
   querySchemaMixin,
   queryParamsMixin,
+  queryNeedAttributeMixin,
   bodyPatchMixin,
   bodyPostMixin,
   paramsEscapeMixin
@@ -121,9 +122,10 @@ export const Bindings: BindingsConfig = {
     method: RequestMethod.GET,
     name: 'getRelationship',
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
-    implementation: async function (id, relName) {
+    implementation: async function (id, relName, query) {
       return this.serviceMixin.getRelationship({
         route: { id, relName },
+        query
       });
     } as JsonApiController['getRelationship'],
     parameters: [
@@ -140,6 +142,12 @@ export const Bindings: BindingsConfig = {
         mixins: [
           parseRelationshipNameMixin
         ],
+      },
+      {
+        decorator: Query,
+        mixins: [
+          queryNeedAttributeMixin
+        ]
       },
     ]
   },

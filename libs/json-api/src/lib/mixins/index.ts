@@ -4,6 +4,7 @@ export * from './pipes/parse-resource-id/parse-resource-id';
 export * from './pipes/body-patch-relationship/body-patch-relationship';
 export * from './pipes/query-schema/query-schema';
 export * from './pipes/query-params/query-params';
+export * from './pipes/query-need-attribute/query-need-attribute';
 export * from './pipes/body-patch/body-patch';
 export * from './pipes/body-post-relationship/body-post-relationship';
 export * from './pipes/body-post/body-post';

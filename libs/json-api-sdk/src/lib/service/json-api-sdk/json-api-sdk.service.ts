@@ -8,7 +8,7 @@ import {
   JSON_API_SDK_CONFIG,
   JsonApiSdkConfig,
   ListEntities,
-  ALL_ENTITIES,
+  ALL_ENTITIES
 } from '../../token/json-api-sdk';
 import {
   EntityArray,
@@ -17,7 +17,7 @@ import {
   RelationshipData,
   ResourceData,
   ResourceObject,
-  EntityRelation,
+  EntityRelation
 } from '../../types';
 
 const capitalizeFirstChar = (str: string) =>
@@ -29,14 +29,15 @@ const capitalizeFirstChar = (str: string) =>
 const getTypeForReq = (str: string) => paramCase(str).toLocaleLowerCase();
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class JsonApiSdkService {
   public constructor(
     protected http: HttpClient,
     @Inject(JSON_API_SDK_CONFIG) protected jsonApiSdkConfig: JsonApiSdkConfig,
     @Inject(ALL_ENTITIES) protected listEntities: ListEntities
-  ) {}
+  ) {
+  }
 
   public getUrlForResource(resource: string): string {
     const url: string[] = [paramCase(resource).toLocaleLowerCase()];
@@ -88,7 +89,7 @@ export class JsonApiSdkService {
     const query = this.getQueryString(params, entityName);
     return this.http
       .get<any>(`${this.getUrlForResource(entityName)}/${entity['id']}`, {
-        params: query,
+        params: query
       })
       .pipe(
         map((result) => {
@@ -97,7 +98,7 @@ export class JsonApiSdkService {
             const { meta } = result;
             return {
               entity,
-              meta: meta || {},
+              meta: meta || {}
             };
           }
           return entity;
@@ -112,7 +113,7 @@ export class JsonApiSdkService {
     const query = this.getQueryString<Entity>(params, resource.name);
     return this.http
       .get<ResourceObject<Entity>>(this.getUrlForResource(resource.name), {
-        params: query,
+        params: query
       })
       .pipe(
         map<ResourceObject<Entity>, EntityArray<Entity>>((result) => {
@@ -124,7 +125,7 @@ export class JsonApiSdkService {
             {
               totalItems: 0,
               pageNumber: 0,
-              pageSize: 0,
+              pageSize: 0
             },
             result.meta
           );
@@ -132,7 +133,7 @@ export class JsonApiSdkService {
           return new EntityArray<Entity>(resource, {
             totalItems,
             pageNumber,
-            pageSize,
+            pageSize
           });
         })
       );
@@ -152,9 +153,9 @@ export class JsonApiSdkService {
           ...{
             pagination: {
               number: r.pageNumber + 1,
-              size: r.pageSize,
-            },
-          },
+              size: r.pageSize
+            }
+          }
         };
         return this.getList(resource, newParams);
       }),
@@ -170,7 +171,7 @@ export class JsonApiSdkService {
           new EntityArray<Entity>(r, {
             pageSize: r.length,
             pageNumber: 1,
-            totalItems: r.length,
+            totalItems: r.length
           })
       )
     );
@@ -211,15 +212,15 @@ export class JsonApiSdkService {
       data: {
         type: getTypeForReq(entity.constructor.name),
         attributes,
-        relationships,
-      },
+        relationships
+      }
     };
 
     const entityName = entity.constructor.name;
     return this.http.post<any>(this.getUrlForResource(entityName), body).pipe(
       map((jsonApiResult) => ({
         meta: jsonApiResult.meta || {},
-        resourceItem: this.convertResponseData(jsonApiResult)[0],
+        resourceItem: this.convertResponseData(jsonApiResult)[0]
       })),
       map(({ resourceItem, meta }) => {
         const entityResult = Object.entries(resourceItem).reduce(
@@ -227,8 +228,8 @@ export class JsonApiSdkService {
             Object.defineProperties(acum, {
               [key]: {
                 value: val,
-                enumerable: true,
-              },
+                enumerable: true
+              }
             });
             return entity;
           },
@@ -270,8 +271,8 @@ export class JsonApiSdkService {
         id: entity['id'].toString(),
         type: getTypeForReq(entity.constructor.name),
         attributes,
-        relationships,
-      },
+        relationships
+      }
     };
     const entityName = entity.constructor.name;
     return this.http
@@ -279,7 +280,7 @@ export class JsonApiSdkService {
       .pipe(
         map((jsonApiResult) => ({
           meta: jsonApiResult.meta || {},
-          resourceItem: this.convertResponseData(jsonApiResult)[0],
+          resourceItem: this.convertResponseData(jsonApiResult)[0]
         })),
         map(({ resourceItem, meta }) => {
           const entityResult = Object.entries(resourceItem).reduce(
@@ -287,8 +288,8 @@ export class JsonApiSdkService {
               Object.defineProperties(acum, {
                 [key]: {
                   value: val,
-                  enumerable: true,
-                },
+                  enumerable: true
+                }
               });
               return entity;
             },
@@ -450,8 +451,8 @@ export class JsonApiSdkService {
             value: val,
             configurable: true,
             enumerable: true,
-            writable: true,
-          },
+            writable: true
+          }
         });
 
         return acum;
@@ -471,13 +472,13 @@ export class JsonApiSdkService {
         if (Array.isArray(val)) {
           data = val.map((i) => ({
             type: getTypeForReq(i.constructor.name),
-            id: i.id,
+            id: i.id
           }));
         } else {
           if (val.id !== null) {
             data = {
               type: getTypeForReq(val.constructor.name),
-              id: val.id,
+              id: val.id
             };
           } else {
             data = null;
@@ -488,8 +489,8 @@ export class JsonApiSdkService {
             value: { data },
             configurable: true,
             enumerable: true,
-            writable: true,
-          },
+            writable: true
+          }
         });
         return acum;
       }, {});
@@ -497,14 +498,25 @@ export class JsonApiSdkService {
     return { attributes, relationships };
   }
 
-  public getRelationships<
-    Entity extends ObjectLiteral,
-    RelationEntity extends ObjectLiteral
-  >(
+  public getRelationships<Entity extends ObjectLiteral,
+    RelationEntity extends ObjectLiteral>(
     entity: Entity,
     relationType: EntityRelation<Entity>,
-    needAttribute = false
-  ): Observable<RelationEntity | RelationEntity[]> {
+  ): Observable<RelationEntity | RelationEntity[]>
+  public getRelationships<
+    Entity extends ObjectLiteral,
+    RelationEntity extends ObjectLiteral,
+    AttributeEntity
+    >(
+    entity: Entity,
+    relationType: EntityRelation<Entity>,
+    needAttribute: new () => AttributeEntity
+  ): Observable<{relation: RelationEntity[], attribute: {[key: string]: AttributeEntity}}>
+  public getRelationships(
+    entity: any,
+    relationType: any,
+    needAttribute?: any
+  ): Observable<any> {
     if (!entity['id']) {
       return throwError(
         () =>
@@ -515,34 +527,49 @@ export class JsonApiSdkService {
     }
 
     const entityName = entity.constructor.name;
+    const options: {params?: HttpParams} = {}
+    if (needAttribute) {
+      options['params'] = new HttpParams({
+        fromObject: {
+          'need-attribute': true
+        }
+      })
+    }
     return this.http
       .get<any>(
-        `${this.getUrlForResource(entityName)}/${
-          entity['id']
-        }/relationships/${String(relationType)}?needAttribute=${needAttribute}`
-      )
+        `${this.getUrlForResource(entityName)}/${entity['id']}/relationships/${String(relationType)}`
+        , options)
       .pipe(
         map((body) => {
           const { data } = body;
           if (Array.isArray(data)) {
-            return data.map((item) => {
+            const relation = data.map((item) => {
               const instance = this.createEntityInstance(item.type);
               instance.id = item.id;
               return instance;
             });
+
+            if (needAttribute) {
+              const attribute = data.reduce((acum, item) => {
+                acum[item.id] = Object.assign(new needAttribute(), item.attributes)
+                return acum;
+              }, {});
+              return {relation, attribute}
+            } else {
+              return relation;
+            }
+
           } else {
             const instance = this.createEntityInstance(data.type);
             instance.id = data.id;
             return instance;
           }
-        })
+        }),
       );
   }
 
-  public patchRelationships<
-    Entity extends ObjectLiteral,
-    RelationshipEntity extends ObjectLiteral
-  >(
+  public patchRelationships<Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral>(
     entity: Entity,
     relationType: EntityRelation<Entity>,
     relationshipEntity: RelationshipEntity | RelationshipEntity[]
@@ -559,7 +586,7 @@ export class JsonApiSdkService {
     const body = {
       data: this.generateRelationshipsBody<RelationshipEntity>(
         relationshipEntity
-      ),
+      )
     };
     const entityName = entity.constructor.name;
     return this.http
@@ -572,10 +599,8 @@ export class JsonApiSdkService {
       .pipe(map(() => relationshipEntity));
   }
 
-  public postRelationships<
-    Entity extends ObjectLiteral,
-    RelationshipEntity extends ObjectLiteral
-  >(
+  public postRelationships<Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral>(
     entity: Entity,
     relationType: EntityRelation<Entity>,
     relationshipEntity: RelationshipEntity | RelationshipEntity[]
@@ -592,7 +617,7 @@ export class JsonApiSdkService {
     const body = {
       data: this.generateRelationshipsBody<RelationshipEntity>(
         relationshipEntity
-      ),
+      )
     };
     const entityName = entity.constructor.name;
     return this.http
@@ -605,10 +630,8 @@ export class JsonApiSdkService {
       .pipe(map(() => relationshipEntity));
   }
 
-  public deleteRelationships<
-    Entity extends ObjectLiteral,
-    RelationshipEntity extends ObjectLiteral
-  >(
+  public deleteRelationships<Entity extends ObjectLiteral,
+    RelationshipEntity extends ObjectLiteral>(
     entity: Entity,
     relationType: EntityRelation<Entity>,
     relationshipEntity: RelationshipEntity | RelationshipEntity[]
@@ -625,7 +648,7 @@ export class JsonApiSdkService {
     const body = {
       data: this.generateRelationshipsBody<RelationshipEntity>(
         relationshipEntity
-      ),
+      )
     };
     const entityName = entity.constructor.name;
     return this.http
@@ -644,7 +667,7 @@ export class JsonApiSdkService {
   ) {
     const generateRelationObj = (relation: RelationshipEntity) => ({
       id: String(relation['id']),
-      type: getTypeForReq(relation.constructor.name),
+      type: getTypeForReq(relation.constructor.name)
     });
 
     const data = Array.isArray(relationshipEntity)

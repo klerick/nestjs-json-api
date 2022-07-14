@@ -34,6 +34,7 @@ export interface QueryParams {
   [QueryField.include]: Includes,
   [QueryField.sort]: SortRules,
   [QueryField.page]: Pagination,
+  needAttribute?: boolean
 }
 
 export interface RouteParams {
@@ -65,4 +66,5 @@ export interface RequestAttributesObject {
 export interface BaseData {
   type: string;
   id: string;
+  attributes?: RequestAttributesObject
 }

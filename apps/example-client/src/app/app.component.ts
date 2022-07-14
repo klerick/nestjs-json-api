@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {JsonApiSdkService, EntityArray} from 'json-api-nestjs-sdk';
-import {Users, Addresses} from 'database/entity'
+import {Users, Addresses, Requests, Pods, RequestsHavePodLocks} from 'database/entity'
 import { map, Observable, shareReplay, switchMap } from 'rxjs';
 import { Test } from './app.module';
 
@@ -108,9 +108,9 @@ export class AppComponent implements OnInit{
     const user = new Users();
     user.id = 1;
 
-    this.jsonApiSdkService.getOne<Users>(user, {include: ['roles', 'manager']}, true).subscribe(
-      r => console.log(r)
-    )
+    const requests = new Requests();
+    requests.id = 2;
+    this.jsonApiSdkService.getRelationships<Requests, Pods, RequestsHavePodLocks>(requests, 'podLocks', RequestsHavePodLocks).subscribe(r => console.log(r))
 
     this.oneUser$ = this.jsonApiSdkService.getOne<Users>(user, {include: ['roles', 'manager']})
     this.listAddresses$ = this.jsonApiSdkService.getList<Addresses>(
