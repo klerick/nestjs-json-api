@@ -14,13 +14,21 @@ export class RequestsHavePodLocks {
   @PrimaryGeneratedColumn()
   public id: number;
 
+  public set requestId(id){
+    this.request_id = id
+  }
+
+  public get requestId(){
+    return this.request_id;
+  }
+
   @IsNotEmpty()
   @Column({
     name: 'request_id',
     type: 'int',
     nullable: false,
   })
-  public requestId: number;
+  protected request_id: number;
 
   @IsNotEmpty()
   @Column({
@@ -28,7 +36,15 @@ export class RequestsHavePodLocks {
     type: 'int',
     nullable: false,
   })
-  public podId: number;
+  protected pod_id: number;
+
+  public set podId(id){
+    this.pod_id = id
+  }
+
+  public get podId(): number{
+    return this.request_id;
+  }
 
   @IsEmpty()
   @CreateDateColumn({

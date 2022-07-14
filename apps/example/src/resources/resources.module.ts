@@ -1,6 +1,6 @@
 import { Module, Logger } from '@nestjs/common';
 import { JsonApiModule } from 'json-api-nestjs';
-import { Addresses, Comments, Roles, Users } from 'database';
+import { Addresses, Comments, Roles, Users, Pods, RequestsHavePodLocks, Requests } from 'database';
 
 import {
   ExampleController
@@ -29,7 +29,9 @@ import {
         Comments,
         Addresses,
         Roles,
-        Users
+        Users,
+        Pods,
+        Requests
       ]
     })
   ],
