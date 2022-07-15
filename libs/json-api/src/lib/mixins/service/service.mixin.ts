@@ -477,7 +477,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 
         await builderDeleteRelationships.addAndRemove(idsToAdd, idsToDelete);
 
-        if (relationObject.relationType === 'many-to-many') {
+        if (relationObject.relationType === 'many-to-many' && (body as BaseData[]).some(i => i.attributes)) {
           const repoTarget = this.repository.manager.getRepository<EntitySchema>(relationObject.junctionEntityMetadata.target);
           const currentData = await repoTarget.find({
             where: {
@@ -590,7 +590,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         const { id } = Array.isArray(body) ? body.shift() : body;
         await postBuilder.set(id);
       }
-      if (relations.relationType === 'many-to-many') {
+      if (relations.relationType === 'many-to-many' && (body as BaseData[]).some(item => item.attributes)) {
         const repoTarget = this.repository.manager.getRepository<EntitySchema>(relations.junctionEntityMetadata.target);
         const currentData = await repoTarget.find({
           where: {
