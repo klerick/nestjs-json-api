@@ -35,7 +35,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
     public async getRelationship(options: ServiceOptions<void>): Promise<ResponseRelationshipsObject> {
       const mainResourceName = paramCase(this.repository.metadata.name);
       const { relName, id } = options.route;
-      const { needAttribute } = options.query;
+      const { needAttribute } = (options.query || {needAttribute: false});
       const returnAttr: {[key: string]: Record<string, any>} = {};
       const result = await this.repository
         .createQueryBuilder(mainResourceName)
