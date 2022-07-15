@@ -1,4 +1,5 @@
-import { Entity, mixin, PipeTransformMixin } from 'json-api-nestjs';
+import { mixin } from '../../../helpers/mixin';
+import { Entity, PipeTransformMixin } from '../../../types';
 import { Injectable, PipeTransform } from '@nestjs/common';
 
 export function queryNeedAttributeMixin(entity: Entity): PipeTransformMixin {
