@@ -470,34 +470,40 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
         .relation(relName)
         .of(id);
 
+      if (relationObject.relationType === 'many-to-many' && (body as BaseData[]).some(i => i.attributes)) {
+        const repoTarget = this.repository.manager.getRepository<EntitySchema>(relationObject.junctionEntityMetadata.target);
+
+        const entityTarget = repoTarget.target as any
+        const ownerPropertyName = relationObject.junctionEntityMetadata.ownerColumns[0].propertyName
+        const inversePropertyName = relationObject.junctionEntityMetadata.inverseColumns[0].propertyName
+        const bodyParams = body as BaseData[];
+
+        const currentData = bodyParams.map((body) => {
+          const target = new entityTarget();
+
+          target[ownerPropertyName] = id
+          target[inversePropertyName] = body.id
+          if (body.attributes) {
+            Object.entries(body.attributes).forEach(([key, val]) => {
+              target[key] = val;
+            });
+          }
+          return target;
+        })
+        const removeData = bodyParams.map(body => ({
+          [ownerPropertyName]: id,
+          [inversePropertyName]: body.id
+        }));
+        await repoTarget.createQueryBuilder().delete().where(removeData).execute();
+        await repoTarget.save(currentData);
+        return;
+      }
+
       if (['one-to-many', 'many-to-many'].includes(relationObject.relationType)) {
         const currentEntities = await builderDeleteRelationships.loadMany();
         const idsToDelete = currentEntities.map(entity => entity.id);
         const idsToAdd = body !== null ? (body as BaseData[]).map(i => i.id) : [];
-
         await builderDeleteRelationships.addAndRemove(idsToAdd, idsToDelete);
-
-        if (relationObject.relationType === 'many-to-many' && (body as BaseData[]).some(i => i.attributes)) {
-          const repoTarget = this.repository.manager.getRepository<EntitySchema>(relationObject.junctionEntityMetadata.target);
-          const currentData = await repoTarget.find({
-            where: {
-              [relationObject.junctionEntityMetadata.ownColumns[0].databasePath]: id
-            }
-          });
-          const propertyName = relationObject.junctionEntityMetadata.inverseColumns[0].propertyName
-          const bodyParams = body as BaseData[];
-          currentData.forEach((item) => {
-            bodyParams.forEach(body => {
-              if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
-                Object.entries(body.attributes).forEach(([key, val]) => {
-                  item[key] = val;
-                });
-              }
-            })
-          });
-          await repoTarget.save(currentData);
-        }
-
       } else if (body !== null) {
         const { id } = Array.isArray(body) ? body.shift() : body;
         await builderDeleteRelationships.set(id);
@@ -580,6 +586,29 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       const relations = this.repository.metadata.relations.find(item => {
         return item.propertyName === relName;
       });
+
+      if (relations.relationType === 'many-to-many' && (body as BaseData[]).some(item => item.attributes)) {
+        const repoTarget = this.repository.manager.getRepository<EntitySchema>(relations.junctionEntityMetadata.target);
+        const entityTarget = repoTarget.target as any
+
+        const ownerPropertyName = relations.junctionEntityMetadata.ownerColumns[0].propertyName
+        const inversePropertyName = relations.junctionEntityMetadata.inverseColumns[0].propertyName
+        const bodyParams = body as BaseData[];
+        const currentData = bodyParams.map((body) => {
+          const target = new entityTarget(entityTarget);
+          target[ownerPropertyName] = id
+          target[inversePropertyName] = body.id
+          if (body.attributes) {
+            Object.entries(body.attributes).forEach(([key, val]) => {
+              target[key] = val;
+            });
+          }
+          return target;
+        })
+        await repoTarget.save(currentData);
+        return;
+      }
+
       const postBuilder = this.repository.createQueryBuilder()
         .relation(relName)
         .of(id);
@@ -589,26 +618,6 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
       } else {
         const { id } = Array.isArray(body) ? body.shift() : body;
         await postBuilder.set(id);
-      }
-      if (relations.relationType === 'many-to-many' && (body as BaseData[]).some(item => item.attributes)) {
-        const repoTarget = this.repository.manager.getRepository<EntitySchema>(relations.junctionEntityMetadata.target);
-        const currentData = await repoTarget.find({
-          where: {
-            [relations.junctionEntityMetadata.ownColumns[0].databasePath]: id
-          }
-        });
-        const propertyName = relations.junctionEntityMetadata.inverseColumns[0].propertyName
-        const bodyParams = body as BaseData[];
-        currentData.forEach((item) => {
-          bodyParams.forEach(body => {
-            if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
-              Object.entries(body.attributes).forEach(([key, val]) => {
-                item[key] = val;
-              });
-            }
-          })
-        });
-        await repoTarget.save(currentData);
       }
 
     }
