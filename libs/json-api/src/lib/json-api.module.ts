@@ -160,7 +160,6 @@ export class JsonApiModule implements OnModuleInit {
 
       SwaggerService.addEntity(entity);
     });
-    // console.log(moduleParams)
     return moduleParams;
   }
 }
