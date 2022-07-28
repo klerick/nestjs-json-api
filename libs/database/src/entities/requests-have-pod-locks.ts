@@ -1,9 +1,10 @@
 import {
+  AfterLoad, BeforeInsert, BeforeRemove, BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { IsEmpty, IsNotEmpty } from 'class-validator';
 
@@ -14,13 +15,39 @@ export class RequestsHavePodLocks {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  public set requestId(id){
-    this.request_id = id
+  @AfterLoad()
+  protected getRequestId() {
+    this.requestId = this.request_id;
   }
 
-  public get requestId(){
-    return this.request_id;
+  @BeforeInsert()
+  @BeforeUpdate()
+  @BeforeRemove()
+  protected setRequestId() {
+    if (this.requestId) {
+      this.request_id = this.requestId;
+    }
+
   }
+
+  public requestId: number;
+
+  @AfterLoad()
+  protected getPodId() {
+    this.podId = this.pod_id;
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  @BeforeRemove()
+  protected setPodId() {
+    if (this.podId) {
+      this.pod_id = this.podId;
+    }
+
+  }
+
+  public podId: number;
 
   @IsNotEmpty()
   @Column({
@@ -37,14 +64,6 @@ export class RequestsHavePodLocks {
     nullable: false,
   })
   protected pod_id: number;
-
-  public set podId(id){
-    this.pod_id = id
-  }
-
-  public get podId(): number{
-    return this.request_id;
-  }
 
   @IsEmpty()
   @CreateDateColumn({
