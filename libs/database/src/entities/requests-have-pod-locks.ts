@@ -27,7 +27,6 @@ export class RequestsHavePodLocks {
     if (this.requestId) {
       this.request_id = this.requestId;
     }
-
   }
 
   public requestId: number;
