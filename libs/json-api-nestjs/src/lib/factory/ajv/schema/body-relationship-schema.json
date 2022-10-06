@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jsonapi.json",
+  "title": "JSON API Request Validation",
+  "description": "Validation schema for validating JSON API body",
+  "type": "object",
+  "properties": {
+    "data": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/dataSchema"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataSchema"
+          },
+          "minItems": 1
+        }
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "dataSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^\\d+$",
+          "description": "Use string should be as number string"
+        }
+      },
+      "required": [
+        "type", "id"
+      ]
+    }
+  }
+}

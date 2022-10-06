@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jsonapi.json",
+  "title": "JSON API Request Validation",
+  "description": "Validation schema for validating JSON API querystrings",
+  "type": "object",
+  "properties": {
+    "fields": {
+      "type": "object",
+      "title": "Fields object for JSON API Request",
+      "description": "https://jsonapi.org/format/#fetching-sparse-fieldsets",
+      "additionalProperties": false,
+      "properties": {
+
+      }
+    },
+    "filter": {
+      "type": "object",
+      "title": "Fields object for JSON API Request",
+      "description": "https://jsonapi.org/format/#fetching-sparse-fieldsets",
+      "additionalProperties": false,
+      "properties": {
+
+      }
+    },
+    "include": {
+      "description": "https://jsonapi.org/format/#fetching-sorting",
+      "type": "string",
+      "minLength": 1
+    },
+    "page": {
+      "description": "https://jsonapi.org/format/#fetching-pagination",
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      },
+      "dependencies": {
+        "number": ["size"]
+      },
+      "additionalProperties": false
+    },
+    "sort": {
+      "description": "https://jsonapi.org/format/#fetching-includes",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "operand": {
+      "type": "object",
+      "description": "Operand type",
+      "additionalProperties": false,
+      "properties": {
+        "eq": {
+          "type": "string"
+        },
+        "ne": {
+          "type": "string"
+        },
+        "gt": {
+          "type": "string"
+        },
+        "gte": {
+          "type": "string"
+        },
+        "lt": {
+          "type": "string"
+        },
+        "lte": {
+          "type": "string"
+        },
+        "like": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string"
+        },
+        "nin": {
+          "type": "string"
+        },
+        "regexp": {
+          "type": "string"
+        },
+        "some": {
+          "type": "string"
+        }
+      }
+    },
+    "operandForRelationProps": {
+      "type": "object",
+      "description": "Operand for null relation type",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "properties": {
+        "eq": {
+          "type": "string",
+          "enum": [
+            "null"
+          ]
+        },
+        "ne": {
+          "type": "string",
+          "enum": [
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

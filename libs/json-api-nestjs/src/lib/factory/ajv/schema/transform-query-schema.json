@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jsonapi.json/schema",
+  "title": "JSON API Request Validation",
+  "description": "Validation schema for validating JSON API querystrings",
+  "type": "object",
+  "properties": {
+    "filter": {
+      "type": "object",
+      "title": "Filter object for JSON API Request",
+      "description": "https://jsonapi.org/format/#fetching-filtering",
+      "additionalProperties": false,
+      "minProperties": 2,
+      "properties": {
+        "target": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/filterTarget"
+            }
+          ]
+        },
+        "relation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/filterRelation"
+            }
+          ]
+        }
+      }
+    },
+    "fields": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/fieldsDefs"
+        }
+      ]
+    },
+    "include": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/includeDefs"
+        }
+      ]
+    },
+    "sort": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/sortDefs"
+        }
+      ]
+    },
+    "page": {
+      "description": "https://jsonapi.org/format/#fetching-pagination",
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "dependencies": {
+        "number": [
+          "size"
+        ]
+      },
+      "additionalProperties": false
+    },
+    "needAttribute": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "filterTarget": {
+      "type": "object",
+      "title": "Object current entity",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {}
+    },
+    "filterRelation": {
+      "type": "object",
+      "title": "Object reletion of current entity",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {}
+    },
+    "operandForRelationProps": {
+      "type": "object",
+      "description": "Operand for null relation type",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "properties": {
+        "eq": {
+          "type": "string",
+          "enum": [
+            "null"
+          ]
+        },
+        "ne": {
+          "type": "string",
+          "enum": [
+            "null"
+          ]
+        }
+      }
+    },
+    "operandForArrayProps": {
+      "type": "object",
+      "description": "Operand type for array",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "properties": {
+        "some": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "operand": {
+      "type": "object",
+      "description": "Operand type",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "properties": {
+        "eq": {
+          "type": "string"
+        },
+        "ne": {
+          "type": "string"
+        },
+        "gt": {
+          "type": "string"
+        },
+        "gte": {
+          "type": "string"
+        },
+        "lt": {
+          "type": "string"
+        },
+        "lte": {
+          "type": "string"
+        },
+        "like": {
+          "type": "string"
+        },
+        "in": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "nin": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regexp": {
+          "type": "string"
+        }
+      }
+    },
+    "sortSchema": {
+      "type": "string",
+      "enum": [
+        "DESC",
+        "ASC"
+      ]
+    },
+    "sortDefs": {
+      "description": "https://jsonapi.org/format/#fetching-sorting",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+      }
+    },
+    "includeDefs": {
+      "title": "Relation array",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": []
+      }
+    },
+    "fieldsDefs": {
+      "type": "object",
+      "title": "Fields object for JSON API Request",
+      "description": "https://jsonapi.org/format/#fetching-sparse-fieldsets",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": []
+          }
+        }
+      }
+    }
+  }
+}
