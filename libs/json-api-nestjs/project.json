@@ -4,15 +4,39 @@
   "sourceRoot": "libs/json-api-nestjs/src",
   "projectType": "library",
   "targets": {
+    "deploy": {
+      "executor": "@ng-builders/semrel:release",
+      "dependsOn": [{ "projects": "self", "target": "release" }],
+      "options": {
+        "npm": {
+          "pkgRoot": "./dist/libs/json-api-nestjs"
+        }
+      }
+    },
+    "release": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": "self", "target": "build" }],
+      "options": {
+        "commands": [
+          "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api-nestjs/.npmrc"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/json-api-nestjs",
         "tsConfig": "libs/json-api-nestjs/tsconfig.lib.json",
         "packageJson": "libs/json-api-nestjs/package.json",
         "main": "libs/json-api-nestjs/src/index.ts",
-        "assets": ["libs/json-api-nestjs/*.md"]
+        "assets": [
+          "libs/json-api-nestjs/*.md"
+        ]
       }
     },
     "publish": {
@@ -29,14 +53,20 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/json-api-nestjs/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/json-api-nestjs/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/json-api-nestjs"],
+      "outputs": [
+        "coverage/libs/json-api-nestjs"
+      ],
       "options": {
         "jestConfig": "libs/json-api-nestjs/jest.config.ts",
         "passWithNoTests": true
