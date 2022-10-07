@@ -95,8 +95,8 @@ describe('GetAll methode test', () => {
   })
 
   it('should be call applyQueryFilters', async () => {
-    const applyQueryFilterRelationSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFilterRelation').mockReturnValueOnce([])
-    const applyQueryFiltersTargetSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFiltersTarget').mockReturnValueOnce([]);
+    const applyQueryFilterRelationSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFilterRelation').mockReturnValueOnce([])
+    const applyQueryFiltersTargetSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFiltersTarget').mockReturnValueOnce([]);
 
 
     const filter: QueryParams<Users>['filter'] = {
@@ -123,8 +123,8 @@ describe('GetAll methode test', () => {
   })
 
   it('should be not call applyQueryFilters', async () => {
-    const applyQueryFilterRelationSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFilterRelation')
-    const applyQueryFiltersTargetSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFiltersTarget');
+    const applyQueryFilterRelationSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFilterRelation')
+    const applyQueryFiltersTargetSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFiltersTarget');
 
     const filter: QueryParams<Users>['filter'] = {
       target: null,
@@ -142,8 +142,8 @@ describe('GetAll methode test', () => {
   })
 
   it('check default query', async () => {
-    const applyQueryFilterRelationSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFilterRelation')
-    const applyQueryFiltersTargetSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFiltersTarget');
+    const applyQueryFilterRelationSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFilterRelation')
+    const applyQueryFiltersTargetSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFiltersTarget');
     let joinSpy;
     let selectSpy;
     let offsetSpy;
@@ -221,8 +221,8 @@ describe('GetAll methode test', () => {
     }
     const include: QueryParams<Users>['include'] =  ['addresses', 'roles'];
 
-    const applyQueryFilterRelationSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFilterRelation')
-    const applyQueryFiltersTargetSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFiltersTarget');
+    const applyQueryFilterRelationSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFilterRelation')
+    const applyQueryFiltersTargetSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFiltersTarget');
     let joinSpy;
     let selectSpy;
     let offsetSpy;
@@ -341,8 +341,8 @@ describe('GetAll methode test', () => {
     }
     const include: QueryParams<Users>['include'] =  ['addresses', 'roles', 'manager', 'comments'];
 
-    const applyQueryFilterRelationSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFilterRelation')
-    const applyQueryFiltersTargetSpy = jest.spyOn(typeormService.UtilsMethode, 'applyQueryFiltersTarget');
+    const applyQueryFilterRelationSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFilterRelation')
+    const applyQueryFiltersTargetSpy = jest.spyOn(Reflect.get(typeormService, 'UtilsMethode'), 'applyQueryFiltersTarget');
     let joinSpy;
     let selectSpy;
     let offsetSpy;

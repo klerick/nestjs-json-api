@@ -1,6 +1,7 @@
 import {Body, Param, ParseIntPipe, Query, RequestMethod} from '@nestjs/common';
 
 import {BindingsConfig, MethodName} from '../types';
+import {JsonBaseController} from '../mixin'
 import {
   bodyInputPatchPipeMixin,
   bodyInputPostMixin,
@@ -15,14 +16,12 @@ import {
 
 import {PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID} from '../constants';
 
-const Bindings: any = {
+const Bindings: BindingsConfig = {
   getAll: {
     method: RequestMethod.GET,
     name: 'getAll',
     path: '',
-    implementation: async function (query, rest) {
-      return this.serviceMixin.getAll({query});
-    },
+    implementation: JsonBaseController.prototype['getAll'],
     parameters: [{
       decorator: Query,
       mixins: [
@@ -37,14 +36,7 @@ const Bindings: any = {
     method: RequestMethod.GET,
     name: 'getOne',
     path: `:${PARAMS_RESOURCE_ID}`,
-    implementation: async function (id, query, rest) {
-      return this.serviceMixin.getOne({
-        route: {
-          id
-        },
-        query
-      });
-    },
+    implementation: JsonBaseController.prototype['getOne'],
     parameters: [{
       property: PARAMS_RESOURCE_ID,
       decorator: Param,
@@ -65,13 +57,7 @@ const Bindings: any = {
     method: RequestMethod.DELETE,
     name: 'deleteOne',
     path: `:${PARAMS_RESOURCE_ID}`,
-    implementation: async function (id, rest) {
-      return this.serviceMixin.deleteOne({
-        route: {
-          id
-        }
-      });
-    },
+    implementation: JsonBaseController.prototype['deleteOne'],
     parameters: [{
       property: PARAMS_RESOURCE_ID,
       decorator: Param,
@@ -84,11 +70,7 @@ const Bindings: any = {
     method: RequestMethod.POST,
     name: 'postOne',
     path: '',
-    implementation: async function (body, ...rest) {
-      return this.serviceMixin.postOne({
-        body
-      });
-    },
+    implementation: JsonBaseController.prototype['postOne'],
     parameters: [{
       decorator: Body,
       mixins: [
@@ -100,16 +82,7 @@ const Bindings: any = {
     method: RequestMethod.PATCH,
     name: 'patchOne',
     path: `:${PARAMS_RESOURCE_ID}`,
-    implementation: async function (id, body, ...rest) {
-      return this.serviceMixin.patchOne({
-        body,
-        ...{
-          route: {
-            id
-          }
-        }
-      });
-    },
+    implementation: JsonBaseController.prototype['patchOne'],
     parameters: [{
       property: PARAMS_RESOURCE_ID,
       decorator: Param,
@@ -127,11 +100,7 @@ const Bindings: any = {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'getRelationship',
     method: RequestMethod.GET,
-    implementation: function (id, relName){
-      return this.serviceMixin.getRelationship({
-        route: { id, relName }
-      })
-    },
+    implementation: JsonBaseController.prototype['getRelationship'],
     parameters: [
       {
         property: PARAMS_RESOURCE_ID,
@@ -152,12 +121,7 @@ const Bindings: any = {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'deleteRelationship',
     method: RequestMethod.DELETE,
-    implementation: function (id, relName, body){
-      return this.serviceMixin.deleteRelationship({
-        route: { id, relName },
-        body
-      })
-    },
+    implementation: JsonBaseController.prototype['deleteRelationship'],
     parameters: [
       {
         property: PARAMS_RESOURCE_ID,
@@ -183,12 +147,7 @@ const Bindings: any = {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'postRelationship',
     method: RequestMethod.POST,
-    implementation: function (id, relName, body){
-      return this.serviceMixin.postRelationship({
-        route: { id, relName },
-        body
-      })
-    },
+    implementation: JsonBaseController.prototype['postRelationship'],
     parameters: [
       {
         property: PARAMS_RESOURCE_ID,
@@ -214,12 +173,7 @@ const Bindings: any = {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'patchRelationship',
     method: RequestMethod.PATCH,
-    implementation: function (id, relName, body){
-      return this.serviceMixin.patchRelationship({
-        route: { id, relName },
-        body
-      })
-    },
+    implementation: JsonBaseController.prototype['patchRelationship'],
     parameters: [
       {
         property: PARAMS_RESOURCE_ID,

@@ -37,7 +37,7 @@ export interface Binding<T extends MethodName> {
   path: string;
   method: MapNameToTypeMethod[T];
   name: T;
-  implementation: ControllerTypes<ObjectLiteral>[T];
+  implementation: ControllerTypes<any>[T];
   parameters: {
     decorator: ParameterDecorator;
     property?: string;

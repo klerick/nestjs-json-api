@@ -1,8 +1,9 @@
 import {Controller, DynamicModule, Inject, UseInterceptors} from '@nestjs/common';
 import { PROPERTY_DEPS_METADATA } from '@nestjs/common/constants';
 
-import {BaseModuleStaticClass, ConfigParam, DecoratorOptions, JsonBaseController} from '../../types';
+import {BaseModuleStaticClass, ConfigParam, DecoratorOptions} from '../../types';
 import {nameIt, bindController, setSwaggerDecorator, getProviderName, camelToKebab} from '../../helper';
+import {JsonBaseController} from '../controller';
 import { typeormMixin, transformMixin } from '../';
 import {
   JSON_API_DECORATOR_OPTIONS,
@@ -33,13 +34,12 @@ BaseModuleClass.forRoot = function(options): DynamicModule {
   } = options;
   const entityName = entity instanceof Function ? entity.name : entity.options.name;
 
-  const controllerClass = controller || nameIt(getProviderName(entity, JSON_API_CONTROLLER_POSTFIX), JsonBaseController);
+  const controllerClass = controller || nameIt(getProviderName(entity, JSON_API_CONTROLLER_POSTFIX), class {});
   const transformService = transformMixin(entity, connectionName);
   const serviceClass = typeormMixin(entity, connectionName, transformService);
   Controller(`${camelToKebab(entityName)}`)(controllerClass);
-
   UseInterceptors(ErrorInterceptors)(controllerClass);
-
+  Inject(serviceClass)(controllerClass.prototype, 'serviceMixin');
   const properties = Reflect.getMetadata(PROPERTY_DEPS_METADATA, controllerClass);
 
   const serviceToken = getProviderName(controllerClass, JSON_API_SERVICE_POSTFIX);
@@ -48,8 +48,6 @@ BaseModuleClass.forRoot = function(options): DynamicModule {
     const restProps = properties.filter(item => item.type !== serviceToken);
     serviceProp.type = serviceClass;
     Reflect.defineMetadata(PROPERTY_DEPS_METADATA, [serviceProp, ...restProps], controllerClass);
-  } else {
-    Inject(serviceClass)(controllerClass.prototype, 'serviceMixin');
   }
   const decoratorOptions: DecoratorOptions = Reflect.getMetadata(JSON_API_DECORATOR_OPTIONS, controllerClass);
   const moduleConfig: ConfigParam= {
@@ -57,10 +55,8 @@ BaseModuleClass.forRoot = function(options): DynamicModule {
     ...options.config,
     ...decoratorOptions
   }
-console.log(moduleConfig)
+
   bindController(controllerClass, entity, connectionName);
-
-
   setSwaggerDecorator(controllerClass, entity, moduleConfig);
 
 

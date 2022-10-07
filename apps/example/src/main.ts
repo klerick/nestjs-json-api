@@ -3,14 +3,19 @@
  * This is only a minimal backend to get started.
  */
 
-import {Logger, VersioningType} from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-
-import { AppModule } from './app/app.module';
+import {VersioningType} from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {Logger} from 'nestjs-pino';
+
+import {AppModule} from './app/app.module';
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {bufferLogs: true});
+  const ligerInst = app.get(Logger)
+  app.useLogger(ligerInst);
+  app.flushLogs();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
@@ -29,7 +34,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3333;
   await app.listen(port);
-  Logger.log(
+  ligerInst.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
 }

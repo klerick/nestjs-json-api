@@ -17,9 +17,10 @@ export function bindController(controller: NestController, entity: Entity, conne
     }
 
     let implementationResultFunction = implementation;
-
-    // Dirty hack, @nestjs/swagger will crash with pipe and without type
-    implementationResultFunction = controller.prototype[name];
+    // Dirty hack, @nestjs/swagger will crash, because descriptor is empty for inherite class
+    if (controller.prototype[name]) {
+      implementationResultFunction = controller.prototype[name];
+    }
     controller.prototype[name] = function(...args) {
       return implementationResultFunction.call(this, ...args);
     };

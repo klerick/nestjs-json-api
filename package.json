@@ -5,14 +5,13 @@
   "scripts": {
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2020 browser module main",
-    "start": "nx serve",
-    "build": "nx build",
     "test": "nx test",
     "typeorm": "ts-node -r tsconfig-paths/register --project libs/database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/database/src/lib/config-cli.ts",
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
     "seed:run": "ts-node -r tsconfig-paths/register --project libs/database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/database/src/lib/config-cli.ts seed libs/database/src/lib/seeders/root.seeder.ts",
-    "json-api-nestjs:build": "nx build json-api-nestjs"
+    "json-api-nestjs:build": "nx build json-api-nestjs",
+    "example:serve": "nx serve"
   },
   "private": true,
   "dependencies": {
@@ -32,7 +31,9 @@
     "@nrwl/angular": "14.8.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "nestjs-pino": "^3.1.1",
     "pg": "^8.8.0",
+    "pino-http": "^8.2.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",

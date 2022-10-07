@@ -1,5 +1,5 @@
 import {CallHandler, ExecutionContext, HttpException, Injectable, Logger, NestInterceptor} from '@nestjs/common';
-import {catchError, Observable, of, throwError} from 'rxjs';
+import {catchError, Observable, of, tap, throwError} from 'rxjs';
 
 import {ResourceObject} from '../../../types-common'
 import {QueryField} from '../../../types';
@@ -14,13 +14,12 @@ export enum PostgresErrors {
 }
 
 @Injectable()
-export class ErrorInterceptors<T>  implements NestInterceptor {
+export class ErrorInterceptors<T> implements NestInterceptor {
   private readonly logger = new Logger(ErrorInterceptors.name);
+
   intercept(context: ExecutionContext, next: CallHandler<ResourceObject<T>>): Observable<ResourceObject<T>> {
     return next.handle().pipe(
       catchError(error => {
-        this.logger.error(error);
-        console.log(error)
         if (Object.values(PostgresErrors).includes(error.code)) {
           return throwError(() => this.preparePostgresError(context, error));
         }
@@ -35,6 +34,15 @@ export class ErrorInterceptors<T>  implements NestInterceptor {
         }, 500);
         preparedError.stack = error.stack;
         return throwError(() => preparedError);
+      }),
+      tap({
+        error: (error) => {
+          if (error instanceof HttpException && error.getStatus() >= 400 || error.getStatus() < 500) {
+            this.logger.debug(error)
+          } else {
+            this.logger.error(error)
+          }
+        }
       })
     )
   }
@@ -49,7 +57,7 @@ export class ErrorInterceptors<T>  implements NestInterceptor {
 
     switch (typeof response.message) {
       case 'string':
-        errors.push({ detail: response.message });
+        errors.push({detail: response.message});
         break;
 
       case 'object':
@@ -64,7 +72,7 @@ export class ErrorInterceptors<T>  implements NestInterceptor {
         errors.push(response);
     }
 
-    const preparedError = new HttpException({ status, errors }, status);
+    const preparedError = new HttpException({status, errors}, status);
     preparedError.stack = error.stack;
     return preparedError;
   }
@@ -132,7 +140,7 @@ export class ErrorInterceptors<T>  implements NestInterceptor {
       }
     }
 
-    const preparedError = new HttpException({ errors }, statusCode);
+    const preparedError = new HttpException({errors}, statusCode);
     preparedError.stack = error.stack;
     return preparedError;
   }
