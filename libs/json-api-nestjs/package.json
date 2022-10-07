@@ -1,5 +1,42 @@
 {
   "name": "json-api-nestjs",
-  "version": "0.0.1",
-  "type": "commonjs"
+  "version": "0.0.0-development",
+  "engines": {
+    "node": ">= 16.0.0"
+  },
+  "type": "commonjs",
+  "description": "JsonAPi Plugin for NestJs",
+  "contributors": [
+    {
+      "email": "klerick666@gmain.com",
+      "name": "Aleksandr Kharkovey"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klerick/nestjs-json-api.git"
+  },
+  "private": false,
+  "license": "MIT",
+  "files": [
+    "src/**"
+  ],
+  "keywords": [
+    "nestjs",
+    "nest",
+    "jsonapi",
+    "json-api",
+    "typeorm",
+    "CRUD"
+  ],
+  "exports": {
+    ".": {},
+    "./filter-operand": "./src/lib/types-common/operand.js",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*":{
+      "filter-operand": ["./src/lib/types-common/operand.d.ts"]
+    }
+  }
 }

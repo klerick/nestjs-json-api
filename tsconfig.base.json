@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "database": ["libs/database/src/index.ts"],
-      "json-api-nestjs": ["dist/libs/json-api-nestjs/src"]
+      "json-api-nestjs": ["dist/libs/json-api-nestjs/src"],
+      "json-api-nestjs/filter-operand": ["dist/libs/json-api-nestjs"]
     }
   },
   "exclude": ["node_modules", "tmp"]
