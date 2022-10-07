@@ -111,5 +111,4 @@ type FilterOperand = {
 	some: string, // is equal to the conditional of query "WHERE 'attribute_name' && [value1]
 }
 ```
-
  
