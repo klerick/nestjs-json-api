@@ -29,6 +29,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Test
-        run: npm run nx affected:test -- --base=remotes/origin/master
+        run: npx nx affected:test -- --base=remotes/origin/master
         env:
           CI: true
