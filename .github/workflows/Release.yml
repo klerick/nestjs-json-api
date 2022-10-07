@@ -30,7 +30,7 @@ jobs:
         run: npm ci
       - name: Test
         run: |
-          npx run-many --target=test --all --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html,json
+          npx nx run-many --target=test --all --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html,json
           SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}')
           echo "COVERAGE=$(echo ${SUMMARY})" >> $GITHUB_ENV
       - name: Cretae Badge
