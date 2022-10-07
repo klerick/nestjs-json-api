@@ -94,3 +94,6 @@ export class ExtendUserController extends JsonBaseController<Users> {
 
 For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com/openapi/introduction)
 
+## Reference Example
+
+[example](https://github.com/klerick/nestjs-json-api/tree/master/apps/example) is an example project that demonstrates the usage of this module.
