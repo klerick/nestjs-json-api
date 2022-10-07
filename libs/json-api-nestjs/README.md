@@ -94,6 +94,22 @@ export class ExtendUserController extends JsonBaseController<Users> {
 
 For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com/openapi/introduction)
 
-## Reference Example
 
-[example](https://github.com/klerick/nestjs-json-api/tree/master/apps/example) is an example project that demonstrates the usage of this module.
+##  Filter operand
+
+```typescript
+type FilterOperand = {
+	in: string[], // is equal to the conditional of query "WHERE 'attribute_name' IN ('value1', 'value2')"
+	nin: string[], // is equal to the conditional of query "WHERE 'attribute_name' NOT IN ('value1', 'value1')"
+	eq: string, // is equal to the conditional of query "WHERE 'attribute_name' = 'value1'
+	ne: string, // is equal to the conditional of query "WHERE 'attribute_name' <> 'value1'
+	gte: string, // is equal to the conditional of query "WHERE 'attribute_name' >= 'value1'
+	gt: string, // is equal to the conditional of query "WHERE 'attribute_name' > 'value1'
+	lt: string, // is equal to the conditional of query "WHERE 'attribute_name' < 'value1'
+	lte:string, // is equal to the conditional of query "WHERE 'attribute_name' <= 'value1'
+	regexp: string, // is equal to the conditional of query "WHERE 'attribute_name' ~* value1
+	some: string, // is equal to the conditional of query "WHERE 'attribute_name' && [value1]
+}
+```
+
+ 
