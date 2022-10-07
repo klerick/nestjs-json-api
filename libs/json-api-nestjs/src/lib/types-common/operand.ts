@@ -29,9 +29,9 @@ export const OperandsMap = {
 export const OperandMapForNull = {
   [FilterOperand.ne]: 'IS NOT NULL',
   [FilterOperand.eq]: 'IS NULL',
-}
+};
 
 export const OperandMapForNullRelation = {
   [FilterOperand.ne]: 'EXISTS EXPRESSION',
   [FilterOperand.eq]: 'NOT EXISTS EXPRESSION',
-}
+};

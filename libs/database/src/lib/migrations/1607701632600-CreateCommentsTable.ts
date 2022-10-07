@@ -60,7 +60,7 @@ export class CreateCommentsTable1607701632600 implements MigrationInterface {
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
             columnNames: ['created_by'],
-          })
+          }),
         ],
       })
     );

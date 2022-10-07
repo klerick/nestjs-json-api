@@ -6,7 +6,7 @@
     "types": ["node"],
     "target": "es6",
     "resolveJsonModule": true,
-    "strictBindCallApply": true,
+    "strictBindCallApply": true
   },
   "include": ["**/*.ts"],
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]

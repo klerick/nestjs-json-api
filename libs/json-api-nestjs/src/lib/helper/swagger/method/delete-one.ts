@@ -1,7 +1,7 @@
-import {ApiParam, ApiOperation, ApiResponse} from '@nestjs/swagger';
+import { ApiParam, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-import {Binding, NestController, Entity, ConfigParam} from '../../../types';
-import {errorSchema} from './index';
+import { Binding, NestController, Entity, ConfigParam } from '../../../types';
+import { errorSchema } from './index';
 
 export function deleteOne(
   controller: NestController,
@@ -9,9 +9,12 @@ export function deleteOne(
   binding: Binding<'deleteOne'>,
   config: ConfigParam
 ) {
-
-  const entityName = entity instanceof Function ? entity.name : entity.options.name;
-  const descriptor = Reflect.getOwnPropertyDescriptor(controller.prototype, binding.name);
+  const entityName =
+    entity instanceof Function ? entity.name : entity.options.name;
+  const descriptor = Reflect.getOwnPropertyDescriptor(
+    controller.prototype,
+    binding.name
+  );
 
   if (!descriptor) {
     return;
@@ -27,7 +30,7 @@ export function deleteOne(
   ApiResponse({
     status: 404,
     description: `Item of resource "${entityName}" not found`,
-    schema: errorSchema
+    schema: errorSchema,
   })(controller.prototype, binding.name, descriptor);
 
   ApiResponse({
@@ -38,7 +41,7 @@ export function deleteOne(
   ApiResponse({
     status: 400,
     description: 'Wrong query parameters',
-    schema: errorSchema
+    schema: errorSchema,
   })(controller.prototype, binding.name, descriptor);
 
   ApiOperation({

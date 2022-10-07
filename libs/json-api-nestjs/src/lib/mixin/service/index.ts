@@ -1,2 +1,2 @@
-export * from './typeorm'
-export * from './transform'
+export * from './typeorm';
+export * from './transform';

@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 
-import {DatabaseModule} from 'database';
-import {ResourcesModule} from './resources/resources.module';
-
+import { DatabaseModule } from 'database';
+import { ResourcesModule } from './resources/resources.module';
 
 @Module({
   imports: [
@@ -11,9 +10,9 @@ import {ResourcesModule} from './resources/resources.module';
     ResourcesModule,
     LoggerModule.forRoot({
       pinoHttp: {
-        level: 'debug'
-      }
-    })
+        level: 'debug',
+      },
+    }),
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import {Attributes, Relationships} from './response';
+import { Attributes, Relationships } from './response';
 
 export type ResourceRequestObject<T> = {
   data: {
@@ -6,5 +6,5 @@ export type ResourceRequestObject<T> = {
     id?: string;
     attributes: Attributes<Omit<T, 'id'>>;
     relationships?: Partial<Relationships<T>>;
-  },
-}
+  };
+};

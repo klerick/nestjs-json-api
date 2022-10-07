@@ -10,18 +10,14 @@
       "title": "Fields object for JSON API Request",
       "description": "https://jsonapi.org/format/#fetching-sparse-fieldsets",
       "additionalProperties": false,
-      "properties": {
-
-      }
+      "properties": {}
     },
     "filter": {
       "type": "object",
       "title": "Fields object for JSON API Request",
       "description": "https://jsonapi.org/format/#fetching-sparse-fieldsets",
       "additionalProperties": false,
-      "properties": {
-
-      }
+      "properties": {}
     },
     "include": {
       "description": "https://jsonapi.org/format/#fetching-sorting",
@@ -100,15 +96,11 @@
       "properties": {
         "eq": {
           "type": "string",
-          "enum": [
-            "null"
-          ]
+          "enum": ["null"]
         },
         "ne": {
           "type": "string",
-          "enum": [
-            "null"
-          ]
+          "enum": ["null"]
         }
       }
     }

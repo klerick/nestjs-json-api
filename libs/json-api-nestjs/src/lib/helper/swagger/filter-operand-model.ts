@@ -40,45 +40,45 @@ export class FilterOperand {
 
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.eq],
-    required: false
+    required: false,
   })
   [FilterOperandType.eq]: string;
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.ne],
-    required: false
+    required: false,
   })
   [FilterOperandType.ne]: string;
 
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.gte],
-    required: false
+    required: false,
   })
   [FilterOperandType.gte]: string;
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.gt],
-    required: false
+    required: false,
   })
   [FilterOperandType.gt]: string;
 
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.lt],
-    required: false
+    required: false,
   })
   [FilterOperandType.lt]: string;
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.lte],
-    required: false
+    required: false,
   })
   [FilterOperandType.lte]: string;
 
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.regexp],
-    required: false
+    required: false,
   })
   [FilterOperandType.regexp]: string;
   @ApiProperty({
     title: OperandsMapTitle[FilterOperandType.some],
-    required: false
+    required: false,
   })
   [FilterOperandType.some]: string;
 }

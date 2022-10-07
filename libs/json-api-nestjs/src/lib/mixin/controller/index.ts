@@ -1,1 +1,1 @@
-export * from './json-base/json-base.controller'
+export * from './json-base/json-base.controller';

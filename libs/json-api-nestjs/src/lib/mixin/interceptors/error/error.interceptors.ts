@@ -1,8 +1,15 @@
-import {CallHandler, ExecutionContext, HttpException, Injectable, Logger, NestInterceptor} from '@nestjs/common';
-import {catchError, Observable, of, tap, throwError} from 'rxjs';
+import {
+  CallHandler,
+  ExecutionContext,
+  HttpException,
+  Injectable,
+  Logger,
+  NestInterceptor,
+} from '@nestjs/common';
+import { catchError, Observable, of, tap, throwError } from 'rxjs';
 
-import {ResourceObject} from '../../../types-common'
-import {QueryField} from '../../../types';
+import { ResourceObject } from '../../../types-common';
+import { QueryField } from '../../../types';
 
 export enum PostgresErrors {
   OperatorDoesNotExist = '42883',
@@ -10,16 +17,19 @@ export enum PostgresErrors {
   InvalidType = '22P02',
   KeyConstraint = '23503',
   DuplicateKey = '23505',
-  OutOfRange = '22003'
+  OutOfRange = '22003',
 }
 
 @Injectable()
 export class ErrorInterceptors<T> implements NestInterceptor {
   private readonly logger = new Logger(ErrorInterceptors.name);
 
-  intercept(context: ExecutionContext, next: CallHandler<ResourceObject<T>>): Observable<ResourceObject<T>> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler<ResourceObject<T>>
+  ): Observable<ResourceObject<T>> {
     return next.handle().pipe(
-      catchError(error => {
+      catchError((error) => {
         if (Object.values(PostgresErrors).includes(error.code)) {
           return throwError(() => this.preparePostgresError(context, error));
         }
@@ -27,29 +37,37 @@ export class ErrorInterceptors<T> implements NestInterceptor {
         if (error instanceof HttpException) {
           return throwError(() => this.prepareHttpError(context, error));
         }
-        const preparedError = new HttpException({
-          errors: [{
-            detail: 'Internal server error',
-          }]
-        }, 500);
+        const preparedError = new HttpException(
+          {
+            errors: [
+              {
+                detail: 'Internal server error',
+              },
+            ],
+          },
+          500
+        );
         preparedError.stack = error.stack;
         return throwError(() => preparedError);
       }),
       tap({
         error: (error) => {
-          if (error instanceof HttpException && error.getStatus() >= 400 || error.getStatus() < 500) {
-            this.logger.debug(error)
+          if (
+            (error instanceof HttpException && error.getStatus() >= 400) ||
+            error.getStatus() < 500
+          ) {
+            this.logger.debug(error);
           } else {
-            this.logger.error(error)
+            this.logger.error(error);
           }
-        }
+        },
       })
-    )
+    );
   }
 
   prepareHttpError(
     context: ExecutionContext,
-    error: HttpException,
+    error: HttpException
   ): HttpException {
     const response = error.getResponse() as any;
     const status = error.getStatus();
@@ -57,7 +75,7 @@ export class ErrorInterceptors<T> implements NestInterceptor {
 
     switch (typeof response.message) {
       case 'string':
-        errors.push({detail: response.message});
+        errors.push({ detail: response.message });
         break;
 
       case 'object':
@@ -72,33 +90,30 @@ export class ErrorInterceptors<T> implements NestInterceptor {
         errors.push(response);
     }
 
-    const preparedError = new HttpException({status, errors}, status);
+    const preparedError = new HttpException({ status, errors }, status);
     preparedError.stack = error.stack;
     return preparedError;
   }
 
-  preparePostgresError(
-    context: ExecutionContext,
-    error: any,
-  ): HttpException {
+  preparePostgresError(context: ExecutionContext, error: any): HttpException {
     const request = context.switchToHttp().getRequest();
     const errors = [];
     let statusCode = 400;
     switch (error.code) {
       case PostgresErrors.InvalidTimestamp:
       case PostgresErrors.InvalidType: {
-        Object.entries(request.query.filter || {})
-          .forEach(([key, value]) => {
-            const test = typeof value === 'object' ? Object.values(value).pop() : value;
-            if (error.message.includes(`"${test}"`)) {
-              errors.push({
-                detail: `Filter param '${key}' has invalid type`,
-                source: {
-                  parameter: QueryField.filter,
-                },
-              });
-            }
-          });
+        Object.entries(request.query.filter || {}).forEach(([key, value]) => {
+          const test =
+            typeof value === 'object' ? Object.values(value).pop() : value;
+          if (error.message.includes(`"${test}"`)) {
+            errors.push({
+              detail: `Filter param '${key}' has invalid type`,
+              source: {
+                parameter: QueryField.filter,
+              },
+            });
+          }
+        });
         break;
       }
 
@@ -106,25 +121,25 @@ export class ErrorInterceptors<T> implements NestInterceptor {
         const matches = error.detail.match(/(?<=\().+?(?=\))/gm);
         errors.push({
           source: {
-            pointer: `/data/attributes/${matches[0]}`
+            pointer: `/data/attributes/${matches[0]}`,
           },
-          detail: `Duplicate value '${matches[1]}' in the '${matches[0]}' attribute`
+          detail: `Duplicate value '${matches[1]}' in the '${matches[0]}' attribute`,
         });
-        statusCode = 409
+        statusCode = 409;
         break;
       }
 
       case PostgresErrors.OutOfRange: {
-        const errorMsg = error.driverError.message
+        const errorMsg = error.driverError.message;
         errors.push({
-          detail: errorMsg.charAt(0).toUpperCase() + errorMsg.slice(1)
+          detail: errorMsg.charAt(0).toUpperCase() + errorMsg.slice(1),
         });
         break;
       }
 
       case PostgresErrors.KeyConstraint: {
         errors.push({
-          detail: 'You must clean entity relationships before this operation'
+          detail: 'You must clean entity relationships before this operation',
         });
         break;
       }
@@ -140,7 +155,7 @@ export class ErrorInterceptors<T> implements NestInterceptor {
       }
     }
 
-    const preparedError = new HttpException({errors}, statusCode);
+    const preparedError = new HttpException({ errors }, statusCode);
     preparedError.stack = error.stack;
     return preparedError;
   }

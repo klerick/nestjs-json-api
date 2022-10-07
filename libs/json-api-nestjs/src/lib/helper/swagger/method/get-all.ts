@@ -1,14 +1,21 @@
-import {ApiOperation, ApiQuery, ApiResponse, getSchemaPath, ApiProperty, ApiExtraModels} from '@nestjs/swagger';
-import {getMetadataArgsStorage} from 'typeorm';
-import {plainToClass} from 'class-transformer';
-import {ColumnType} from 'typeorm/driver/types/ColumnTypes';
-import {RelationTypeInFunction} from 'typeorm/metadata/types/RelationTypeInFunction';
+import {
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  getSchemaPath,
+  ApiProperty,
+  ApiExtraModels,
+} from '@nestjs/swagger';
+import { getMetadataArgsStorage } from 'typeorm';
+import { plainToClass } from 'class-transformer';
+import { ColumnType } from 'typeorm/driver/types/ColumnTypes';
+import { RelationTypeInFunction } from 'typeorm/metadata/types/RelationTypeInFunction';
 
-import {DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE} from '../../../constants';
-import {Binding, NestController, Entity, ConfigParam} from '../../../types';
-import {camelToKebab, getEntityName, nameIt} from '../../utils';
-import {getColumOptions, getRelationsOptions} from '../utils';
-import {errorSchema} from './index';
+import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../constants';
+import { Binding, NestController, Entity, ConfigParam } from '../../../types';
+import { camelToKebab, getEntityName, nameIt } from '../../utils';
+import { getColumOptions, getRelationsOptions } from '../utils';
+import { errorSchema } from './index';
 
 export function getAll(
   controller: NestController,
@@ -16,120 +23,123 @@ export function getAll(
   binding: Binding<'getAll'>,
   config: ConfigParam
 ): void {
-  const entityName = entity instanceof Function ? entity.name : entity.options.name;
-  const descriptor = Reflect.getOwnPropertyDescriptor(controller.prototype, binding.name);
+  const entityName =
+    entity instanceof Function ? entity.name : entity.options.name;
+  const descriptor = Reflect.getOwnPropertyDescriptor(
+    controller.prototype,
+    binding.name
+  );
 
   if (!descriptor) {
     return;
   }
 
   const columOptions = getColumOptions(entity);
-  const fakeObject = Object.keys(columOptions).reduce<Record<string, string>>((acum, item) => {
-    acum[item] = '';
-    return acum;
-  }, {});
+  const fakeObject = Object.keys(columOptions).reduce<Record<string, string>>(
+    (acum, item) => {
+      acum[item] = '';
+      return acum;
+    },
+    {}
+  );
 
-  const currentField = Object.keys(plainToClass(entity as any, fakeObject)).map(i => i);
+  const currentField = Object.keys(plainToClass(entity as any, fakeObject)).map(
+    (i) => i
+  );
 
   const relationsOptions = getRelationsOptions(entity);
 
   const jsonSchemaResponse = {
-    'type': 'object',
-    'properties': {
-      'meta': {
-        'type': 'object',
-        'properties': {
-          'pageSize': {
-            'type': 'integer'
+    type: 'object',
+    properties: {
+      meta: {
+        type: 'object',
+        properties: {
+          pageSize: {
+            type: 'integer',
           },
-          'totalItems': {
-            'type': 'integer'
+          totalItems: {
+            type: 'integer',
           },
-          'pageNumber': {
-            'type': 'integer'
+          pageNumber: {
+            type: 'integer',
           },
-          'debug': {
-            'type': 'object',
-            'properties': {
-              'callQuery': {
-                'type': 'integer'
+          debug: {
+            type: 'object',
+            properties: {
+              callQuery: {
+                type: 'integer',
               },
-              'prepareParams': {
-                'type': 'integer'
+              prepareParams: {
+                type: 'integer',
               },
-              'transform': {
-                'type': 'integer'
-              }
+              transform: {
+                type: 'integer',
+              },
             },
-            'required': [
-              'callQuery',
-              'prepareParams',
-              'transform'
-            ]
-          }
+            required: ['callQuery', 'prepareParams', 'transform'],
+          },
         },
-        'required': [
-          'pageSize',
-          'totalItems',
-          'pageNumber'
-        ]
+        required: ['pageSize', 'totalItems', 'pageNumber'],
       },
-      'data': {
-        'type': 'array',
-        'items': {
-          'type': 'object',
-          'properties': {
-            'type': {
-              'type': 'string',
-              'enum': [
-                camelToKebab(getEntityName(entity))
-              ]
+      data: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            type: {
+              type: 'string',
+              enum: [camelToKebab(getEntityName(entity))],
             },
-            'id': {
-              'type': 'string'
+            id: {
+              type: 'string',
             },
-            'attributes': {
-              'type': 'object',
-              'properties': currentField.reduce((acum, item) => {
-                const typeMetadata = Reflect.getMetadata('design:type', entity['prototype'], item);
+            attributes: {
+              type: 'object',
+              properties: currentField.reduce((acum, item) => {
+                const typeMetadata = Reflect.getMetadata(
+                  'design:type',
+                  entity['prototype'],
+                  item
+                );
                 let value = {};
                 switch (typeMetadata) {
                   case Array:
                     value = {
                       type: 'array',
                       items: {
-                        type: 'string'
-                      }
+                        type: 'string',
+                      },
                     };
                     break;
                   case Date:
                     value = {
                       format: 'date-time',
-                      type: 'string'
+                      type: 'string',
                     };
                     break;
                   case Number:
                     value = {
-                      type: 'integer'
+                      type: 'integer',
                     };
                     break;
                   case Boolean:
                     value = {
-                      type: 'boolean'
+                      type: 'boolean',
                     };
                     break;
                   default:
                     value = {
-                      type: 'string'
-                    }
+                      type: 'string',
+                    };
                 }
                 acum[item] = value;
                 return acum;
               }, {}),
             },
-            'relationships': {
-              'type': 'object',
-              'properties': Object.keys(relationsOptions).reduce((acum, item) => {
+            relationships: {
+              type: 'object',
+              properties: Object.keys(relationsOptions).reduce((acum, item) => {
                 const dataItem = {
                   type: 'object',
                   properties: {
@@ -137,89 +147,73 @@ export function getAll(
                       type: 'string',
                       enum: [
                         // @ts-ignore
-                        camelToKebab(getEntityName(relationsOptions[item]()))
-                      ]
+                        camelToKebab(getEntityName(relationsOptions[item]())),
+                      ],
                     },
                     id: {
-                      'type': 'string'
-                    }
+                      type: 'string',
+                    },
                   },
-                  required: [
-                    'type',
-                    'id'
-                  ]
-                }
+                  required: ['type', 'id'],
+                };
 
                 const dataArray = {
                   type: 'array',
-                  items: dataItem
+                  items: dataItem,
                 };
-
 
                 acum[item] = {
                   type: 'object',
                   properties: {
-                    data: Reflect.getMetadata('design:type', entity['prototype'], item) === Array ? dataArray : dataItem,
+                    data:
+                      Reflect.getMetadata(
+                        'design:type',
+                        entity['prototype'],
+                        item
+                      ) === Array
+                        ? dataArray
+                        : dataItem,
                     links: {
                       type: 'object',
                       properties: {
                         self: {
-                          type: 'string'
+                          type: 'string',
                         },
                         related: {
-                          type: 'string'
-                        }
+                          type: 'string',
+                        },
                       },
-                      required: [
-                        'self',
-                        'related'
-                      ]
-                    }
+                      required: ['self', 'related'],
+                    },
                   },
-                  required: [
-                    'links'
-                  ]
-                }
+                  required: ['links'],
+                };
                 return acum;
               }, {}),
-              'required': Object.keys(relationsOptions)
+              required: Object.keys(relationsOptions),
             },
-            'links': {
-              'type': 'object',
-              'properties': {
-                'self': {
-                  'type': 'string'
-                }
+            links: {
+              type: 'object',
+              properties: {
+                self: {
+                  type: 'string',
+                },
               },
-              'required': [
-                'self'
-              ]
-            }
+              required: ['self'],
+            },
           },
-          'required': [
-            'type',
-            'id',
-            'attributes',
-            'relationships',
-            'links'
-          ]
-        }
+          required: ['type', 'id', 'attributes', 'relationships', 'links'],
+        },
       },
-      'included': {
-        'type': 'array',
-        'items': {}
-      }
+      included: {
+        type: 'array',
+        items: {},
+      },
     },
-    'required': [
-      'meta',
-      'data',
-      'included'
-    ]
-  }
-
+    required: ['meta', 'data', 'included'],
+  };
 
   const relationsFields = Object.keys(relationsOptions);
-
 
   ApiQuery({
     name: 'fields',
@@ -228,8 +222,8 @@ export function getAll(
     schema: {
       type: 'object',
     },
-    example: {target: currentField.join(','), [relationsFields[0]]: 'id'},
-    description: `Object of field for select field from "${entityName}" resource`
+    example: { target: currentField.join(','), [relationsFields[0]]: 'id' },
+    description: `Object of field for select field from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);
 
   ApiQuery({
@@ -240,8 +234,11 @@ export function getAll(
       type: 'object',
       additionalProperties: false,
     },
-    example: {[currentField[0]]: {eq: 'test'}, [`${relationsFields[0]}.id`]: {ne: '1'}},
-    description: `Object of filter for select items from "${entityName}" resource`
+    example: {
+      [currentField[0]]: { eq: 'test' },
+      [`${relationsFields[0]}.id`]: { ne: '1' },
+    },
+    description: `Object of filter for select items from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);
 
   ApiQuery({
@@ -250,14 +247,16 @@ export function getAll(
     enum: relationsFields,
     style: 'simple',
     isArray: true,
-    description: `"${entityName}" resource has been extended with existing relations`
+    description: `"${entityName}" resource has been extended with existing relations`,
   })(controller.prototype, binding.name, descriptor);
 
   ApiQuery({
     name: 'sort',
     type: 'string',
     required: false,
-    description: `"${entityName}" resource has been filtered with existing attribute: "${currentField.join('", "')}". Divide by comma.`
+    description: `"${entityName}" resource has been filtered with existing attribute: "${currentField.join(
+      '", "'
+    )}". Divide by comma.`,
   })(controller.prototype, binding.name, descriptor);
 
   ApiQuery({
@@ -270,39 +269,36 @@ export function getAll(
         number: {
           type: 'integer',
           minimum: 1,
-          example: DEFAULT_QUERY_PAGE
+          example: DEFAULT_QUERY_PAGE,
         },
         size: {
           type: 'integer',
           minimum: 1,
           example: DEFAULT_PAGE_SIZE,
-          maximum: 500
-        }
+          maximum: 500,
+        },
       },
-      additionalProperties: false
+      additionalProperties: false,
     },
-    description: `"${entityName}" resource has been limit and offset with this params.`
+    description: `"${entityName}" resource has been limit and offset with this params.`,
   })(controller.prototype, binding.name, descriptor);
-
 
   ApiOperation({
     summary: `Get list items of resource "${entityName}"`,
-    operationId: `${controller.name}_${binding.name}`
+    operationId: `${controller.name}_${binding.name}`,
   })(controller.prototype, binding.name, descriptor);
 
   ApiResponse({
     status: 200,
     description: 'Resource list received successfully',
     schema: {
-      ...jsonSchemaResponse as any
+      ...(jsonSchemaResponse as any),
     },
   })(controller.prototype, binding.name, descriptor);
-
 
   ApiResponse({
     status: 400,
     description: 'Wrong query parameters',
-    schema: errorSchema
+    schema: errorSchema,
   })(controller.prototype, binding.name, descriptor);
 }
-

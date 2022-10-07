@@ -1,1 +1,1 @@
-export * from './error/error.interceptors'
+export * from './error/error.interceptors';

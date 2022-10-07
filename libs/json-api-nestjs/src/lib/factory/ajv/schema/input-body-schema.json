@@ -25,14 +25,9 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "type",
-        "attributes"
-      ]
+      "required": ["type", "attributes"]
     }
   },
-  "required": [
-    "data"
-  ],
+  "required": ["data"],
   "additionalProperties": false
 }

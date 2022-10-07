@@ -20,9 +20,7 @@
       ]
     }
   },
-  "required": [
-    "data"
-  ],
+  "required": ["data"],
   "additionalProperties": false,
   "$defs": {
     "dataSchema": {
@@ -37,9 +35,7 @@
           "description": "Use string should be as number string"
         }
       },
-      "required": [
-        "type", "id"
-      ]
+      "required": ["type", "id"]
     }
   }
 }

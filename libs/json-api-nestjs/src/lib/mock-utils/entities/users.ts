@@ -17,7 +17,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 
-import {Exclude} from 'class-transformer';
+import { Exclude } from 'class-transformer';
 
 import { Addresses, Roles, Comments } from '.';
 

@@ -1,8 +1,8 @@
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {DynamicModule} from '@nestjs/common';
-import {newDb} from 'pg-mem';
-import {readFileSync} from 'fs';
-import {join} from 'path';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DynamicModule } from '@nestjs/common';
+import { newDb } from 'pg-mem';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 import {
   Users,
@@ -13,9 +13,9 @@ import {
   Comments,
   Addresses,
 } from './entities';
-import {DataSource} from 'typeorm';
+import { DataSource } from 'typeorm';
 
-export * from './entities'
+export * from './entities';
 
 export const entities = [
   Users,
@@ -25,9 +25,9 @@ export const entities = [
   Pods,
   Comments,
   Addresses,
-]
+];
 
-const dump = readFileSync(join(__dirname, 'db-for-test'), {encoding: 'utf8'});
+const dump = readFileSync(join(__dirname, 'db-for-test'), { encoding: 'utf8' });
 export function mockDBTestModule(): DynamicModule {
   const db = newDb({
     autoCreateForeignKeyIndices: true,
@@ -40,8 +40,9 @@ export function mockDBTestModule(): DynamicModule {
 
   db.public.registerFunction({
     name: 'version',
-    implementation: () => 'PostgreSQL 12.5 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit'
-  })
+    implementation: () =>
+      'PostgreSQL 12.5 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit',
+  });
 
   db.public.none(dump);
   const backup = db.backup();
@@ -57,13 +58,15 @@ export function mockDBTestModule(): DynamicModule {
           Pods,
           Comments,
           Addresses,
-        ]
-      }
+        ],
+      };
     },
     async dataSourceFactory(options) {
-      const dataSource: DataSource = await db.adapters.createTypeormDataSource(options);
+      const dataSource: DataSource = await db.adapters.createTypeormDataSource(
+        options
+      );
 
       return dataSource;
-    }
-  })
+    },
+  });
 }

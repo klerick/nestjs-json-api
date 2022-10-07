@@ -4,7 +4,7 @@ import { Roles } from '../entities';
 export enum RoleKeys {
   ReadOnly = 'READ_ONLY',
   User = 'USER',
-  Administrator = 'ADMINISTRATOR'
+  Administrator = 'ADMINISTRATOR',
 }
 
 export class CreateRolesTable1607701632200 implements MigrationInterface {
@@ -77,9 +77,7 @@ export class CreateRolesTable1607701632200 implements MigrationInterface {
     roles.admin.name = 'Administrator';
     roles.admin.key = RoleKeys.Administrator;
 
-
     await repo.save(Object.values(roles), { reload: false });
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

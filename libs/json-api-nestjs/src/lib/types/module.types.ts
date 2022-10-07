@@ -9,31 +9,27 @@ export type PipeMixin = Type<PipeTransform>;
 export type PipeFabric = (entity: Entity, connectionName?: string) => PipeMixin;
 
 export interface ConfigParam {
-  requiredSelectField: boolean,
-  debug: boolean,
-  maxExecutionTime: number,
+  requiredSelectField: boolean;
+  debug: boolean;
+  maxExecutionTime: number;
 }
 
 export interface ModuleOptions {
-  entities: Entity[],
-  controllers?: NestController[],
-  connectionName?: string,
+  entities: Entity[];
+  controllers?: NestController[];
+  connectionName?: string;
   providers?: NestProvider[];
-  options?: Partial<ConfigParam>
+  options?: Partial<ConfigParam>;
 }
 
 export interface BaseModuleOptions {
-  entity: Entity,
-  connectionName: string
-  controller?: NestController,
-  config: ConfigParam
+  entity: Entity;
+  connectionName: string;
+  controller?: NestController;
+  config: ConfigParam;
 }
 
-export interface BaseModuleStaticClass{
-  new(): any;
-  forRoot(options: BaseModuleOptions): DynamicModule
+export interface BaseModuleStaticClass {
+  new (): any;
+  forRoot(options: BaseModuleOptions): DynamicModule;
 }
-
-
-
-

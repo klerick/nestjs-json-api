@@ -1,23 +1,26 @@
-import {Binding, ConfigParam, Entity, NestController} from '../../../types';
-import {ApiOperation, ApiParam, ApiResponse} from '@nestjs/swagger';
-import {getRelationsOptions} from '../utils';
-import {errorSchema} from './index';
+import { Binding, ConfigParam, Entity, NestController } from '../../../types';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { getRelationsOptions } from '../utils';
+import { errorSchema } from './index';
 
 export function getRelationship(
   controller: NestController,
   entity: Entity,
   binding: Binding<'getRelationship'>,
   config: ConfigParam
-){
-  const entityName = entity instanceof Function ? entity.name : entity.options.name;
-  const descriptor = Reflect.getOwnPropertyDescriptor(controller.prototype, binding.name);
+) {
+  const entityName =
+    entity instanceof Function ? entity.name : entity.options.name;
+  const descriptor = Reflect.getOwnPropertyDescriptor(
+    controller.prototype,
+    binding.name
+  );
 
   const relationsOptions = getRelationsOptions(entity);
 
   if (!descriptor) {
     return;
   }
-
 
   ApiParam({
     name: 'id',
@@ -37,12 +40,12 @@ export function getRelationship(
     type: 'object',
     properties: {
       type: {
-        type: 'string'
+        type: 'string',
       },
       id: {
-        type: 'string'
-      }
-    }
+        type: 'string',
+      },
+    },
   };
   ApiResponse({
     status: 200,
@@ -55,11 +58,11 @@ export function getRelationship(
             {
               type: 'array',
               items: dataType,
-              minItems: 1
-            }
-          ]
-        }
-      }
+              minItems: 1,
+            },
+          ],
+        },
+      },
     },
     description: `Item/s of relation of "${entityName}". Relationships received successfully. Response 'data' field depends on relationship type.
 For many-to-many relations it should contain an array.`,
@@ -68,7 +71,7 @@ For many-to-many relations it should contain an array.`,
   ApiResponse({
     status: 400,
     description: 'Wrong url parameters',
-    schema: errorSchema
+    schema: errorSchema,
   })(controller.prototype, binding.name, descriptor);
 
   ApiOperation({

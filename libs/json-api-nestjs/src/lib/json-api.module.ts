@@ -1,10 +1,13 @@
-import {DynamicModule, Module} from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 
-import {JsonApiNestJsCommonModule} from './json-api-nestjs-common.module';
-import {DEFAULT_CONNECTION_NAME, JSON_API_DECORATOR_ENTITY, ConfigParamDefault} from '../lib/constants';
-import {BaseModuleClass} from '../lib/mixin';
-import {ModuleOptions} from '../lib/types';
-
+import { JsonApiNestJsCommonModule } from './json-api-nestjs-common.module';
+import {
+  DEFAULT_CONNECTION_NAME,
+  JSON_API_DECORATOR_ENTITY,
+  ConfigParamDefault,
+} from '../lib/constants';
+import { BaseModuleClass } from '../lib/mixin';
+import { ModuleOptions } from '../lib/types';
 
 @Module({})
 export class JsonApiModule {
@@ -22,7 +25,8 @@ export class JsonApiModule {
 
     const entityImport = options.entities.map((entity) => {
       const controller = (options.controllers || []).find(
-        (item) => Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, item) === entity
+        (item) =>
+          Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, item) === entity
       );
       const module = BaseModuleClass.forRoot({
         entity,
@@ -31,20 +35,18 @@ export class JsonApiModule {
         config: {
           ...ConfigParamDefault,
           ...options.options,
-        }
+        },
       });
       module.imports = [
         ...module.imports,
-        JsonApiNestJsCommonModule.forRoot(options)
+        JsonApiNestJsCommonModule.forRoot(options),
       ];
       return module;
     });
 
     return {
       module: JsonApiModule,
-      imports: [
-        ...entityImport
-      ]
+      imports: [...entityImport],
     };
   }
 }

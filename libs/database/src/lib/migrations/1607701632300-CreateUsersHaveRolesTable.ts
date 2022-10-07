@@ -7,7 +7,9 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class CreateUsersHaveRolesTable1607701632300 implements MigrationInterface {
+export class CreateUsersHaveRolesTable1607701632300
+  implements MigrationInterface
+{
   protected readonly tableName = 'users_have_roles';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

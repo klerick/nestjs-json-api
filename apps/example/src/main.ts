@@ -3,17 +3,16 @@
  * This is only a minimal backend to get started.
  */
 
-import {VersioningType} from '@nestjs/common';
-import {NestFactory} from '@nestjs/core';
-import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
-import {Logger} from 'nestjs-pino';
+import { VersioningType } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 
-import {AppModule} from './app/app.module';
-
+import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {bufferLogs: true});
-  const ligerInst = app.get(Logger)
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const ligerInst = app.get(Logger);
   app.useLogger(ligerInst);
   app.flushLogs();
   const globalPrefix = 'api';
@@ -21,7 +20,7 @@ async function bootstrap() {
 
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1'
+    defaultVersion: '1',
   });
 
   const config = new DocumentBuilder()

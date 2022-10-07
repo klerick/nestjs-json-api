@@ -1,14 +1,13 @@
+import { BadRequestException, Inject, PipeTransform } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import AjvCall, { ErrorObject, ValidateFunction } from 'ajv';
 
-import {BadRequestException, Inject, PipeTransform} from '@nestjs/common';
-import {Repository} from 'typeorm';
-import AjvCall, {ErrorObject, ValidateFunction} from 'ajv';
-
-import {getEntityName} from '../../../helper';
+import { getEntityName } from '../../../helper';
 import {
   FilterOperand,
   PipeMixin,
   QueryParams,
-  ValidationError
+  ValidationError,
 } from '../../../types';
 
 export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
@@ -27,22 +26,40 @@ export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
     protected repository: Repository<Entity>,
     protected ajvCall: AjvCall
   ) {
-
     const schemaName = getEntityName(this.repository.target);
-    this.validateFunction = this.ajvCall.getSchema(`transformQuerySchema-${schemaName}`);
-    this.allowPropsFilter = Object.keys(this.validateFunction.schema['$defs']['filterTarget'].properties)
-    this.allowPropsSort = Object.keys(this.validateFunction.schema['$defs']['sortDefs'].properties.target.properties)
-    this.allowPropsField = Object.keys(this.validateFunction.schema['$defs']['fieldsDefs'].properties);
+    this.validateFunction = this.ajvCall.getSchema(
+      `transformQuerySchema-${schemaName}`
+    );
+    this.allowPropsFilter = Object.keys(
+      this.validateFunction.schema['$defs']['filterTarget'].properties
+    );
+    this.allowPropsSort = Object.keys(
+      this.validateFunction.schema['$defs']['sortDefs'].properties.target
+        .properties
+    );
+    this.allowPropsField = Object.keys(
+      this.validateFunction.schema['$defs']['fieldsDefs'].properties
+    );
 
-    this.allowPropsRelationFilter = this.allowPropsRelationSort = Object.keys(this.validateFunction.schema['$defs'].filterRelation.properties).reduce((acum, item) => {
-      acum[item] = Object.keys(this.validateFunction.schema['$defs'].filterRelation.properties[item].properties)
+    this.allowPropsRelationFilter = this.allowPropsRelationSort = Object.keys(
+      this.validateFunction.schema['$defs'].filterRelation.properties
+    ).reduce((acum, item) => {
+      acum[item] = Object.keys(
+        this.validateFunction.schema['$defs'].filterRelation.properties[item]
+          .properties
+      );
       return acum;
-    }, {})
+    }, {});
 
-    this.allowPropsRelationSort = Object.keys(this.validateFunction.schema['$defs']['sortDefs'].properties).reduce((acum, item) => {
-      acum[item] = Object.keys(this.validateFunction.schema['$defs']['sortDefs'].properties[item].properties)
+    this.allowPropsRelationSort = Object.keys(
+      this.validateFunction.schema['$defs']['sortDefs'].properties
+    ).reduce((acum, item) => {
+      acum[item] = Object.keys(
+        this.validateFunction.schema['$defs']['sortDefs'].properties[item]
+          .properties
+      );
       return acum;
-    }, {})
+    }, {});
   }
 
   async transform(value: QueryParams<Entity>): Promise<QueryParams<Entity>> {
@@ -59,9 +76,11 @@ export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
   private getErrors(errors: ErrorObject[]): ValidationError[] {
     const errorResult: ValidationError[] = [];
     for (const error of errors) {
-      const parameterParts = error.instancePath.split('/').filter(value => value !== '');
+      const parameterParts = error.instancePath
+        .split('/')
+        .filter((value) => value !== '');
       const fields = parameterParts[0];
-      let detailMsg = ''
+      let detailMsg = '';
       switch (fields) {
         case 'fields': {
           switch (error.keyword) {
@@ -69,35 +88,63 @@ export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
               detailMsg = error.message;
               break;
             case 'enum':
-              detailMsg = `${error.message}. The allowed values are: "${error.params.allowedValues.join(',')}"`;
+              detailMsg = `${
+                error.message
+              }. The allowed values are: "${error.params.allowedValues.join(
+                ','
+              )}"`;
               break;
             case 'additionalProperties':
-              detailMsg = `${error.message}. The allowed properties are: "${this.allowPropsField.join(',')}"`;
+              detailMsg = `${
+                error.message
+              }. The allowed properties are: "${this.allowPropsField.join(
+                ','
+              )}"`;
               break;
           }
           break;
         }
         case 'filter': {
-          if (error.instancePath === '/filter/target' && error.schemaPath === '#/additionalProperties') {
+          if (
+            error.instancePath === '/filter/target' &&
+            error.schemaPath === '#/additionalProperties'
+          ) {
             detailMsg = `${error.message}. The additionalProperty properties is: "${error.params.additionalProperty}"`;
           }
           if (error.keyword === 'maxProperties') {
             detailMsg = `${error.message}. Only one operator allow for field`;
           }
 
-          if ((error.keyword === 'minProperties' || error.keyword === 'type') && error.message !== 'must be null') {
+          if (
+            (error.keyword === 'minProperties' || error.keyword === 'type') &&
+            error.message !== 'must be null'
+          ) {
             detailMsg = error.message;
           }
           if (error.schemaPath.indexOf('target/additionalProperties') > -1) {
-            detailMsg = `${error.message}. The allowed properties are: "${this.allowPropsFilter.join(',')}"`;
+            detailMsg = `${
+              error.message
+            }. The allowed properties are: "${this.allowPropsFilter.join(
+              ','
+            )}"`;
           }
 
           if (error.schemaPath.indexOf('relation') > -1) {
-            if (error.schemaPath.indexOf('relation/additionalProperties') > -1) {
-              detailMsg = `${error.message}. The allowed properties are: "${Object.keys(this.allowPropsRelationFilter).join(',')}"`;
-            } else if(error.keyword === 'additionalProperties') {
+            if (
+              error.schemaPath.indexOf('relation/additionalProperties') > -1
+            ) {
+              detailMsg = `${
+                error.message
+              }. The allowed properties are: "${Object.keys(
+                this.allowPropsRelationFilter
+              ).join(',')}"`;
+            } else if (error.keyword === 'additionalProperties') {
               const relationName = error.instancePath.split('/').pop();
-              detailMsg = `${error.message}. The allowed properties for "${relationName}" are: "${this.allowPropsRelationFilter[relationName].join(',')}"`;
+              detailMsg = `${
+                error.message
+              }. The allowed properties for "${relationName}" are: "${this.allowPropsRelationFilter[
+                relationName
+              ].join(',')}"`;
             }
           }
 
@@ -115,30 +162,47 @@ export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
 
           break;
         }
-        case 'include':{
+        case 'include': {
           if (error.keyword === 'minItems') {
             detailMsg = error.message;
           }
           if (error.keyword === 'enum') {
-            detailMsg = `${error.message}. The allowed values are: "${error.params.allowedValues.join(',')}"`;
+            detailMsg = `${
+              error.message
+            }. The allowed values are: "${error.params.allowedValues.join(
+              ','
+            )}"`;
           }
           break;
         }
-        case 'sort':{
-
-          if (error.schemaPath.indexOf('targetResource/additionalProperties') > -1) {
-            detailMsg = `${error.message}. The allowed properties are: "${this.allowPropsSort.join(',')}"`;
+        case 'sort': {
+          if (
+            error.schemaPath.indexOf('targetResource/additionalProperties') > -1
+          ) {
+            detailMsg = `${
+              error.message
+            }. The allowed properties are: "${this.allowPropsSort.join(',')}"`;
           }
           if (error.schemaPath === '#/additionalProperties') {
-            detailMsg = `${error.message}. The allowed properties are: "${Object.keys(this.allowPropsRelationSort).join(',')}"`;
+            detailMsg = `${
+              error.message
+            }. The allowed properties are: "${Object.keys(
+              this.allowPropsRelationSort
+            ).join(',')}"`;
           }
 
           if (error.schemaPath === '#/properties/target/additionalProperties') {
-            detailMsg = `${error.message}. The allowed properties are: "${this.allowPropsSort.join(',')}"`;
+            detailMsg = `${
+              error.message
+            }. The allowed properties are: "${this.allowPropsSort.join(',')}"`;
           }
 
           if (error.keyword === 'enum') {
-            detailMsg = `${error.message}. The allowed values are: "${error.params.allowedValues.join(',')}"`;
+            detailMsg = `${
+              error.message
+            }. The allowed values are: "${error.params.allowedValues.join(
+              ','
+            )}"`;
           }
 
           if (error.keyword === 'minProperties') {
@@ -152,12 +216,11 @@ export class QueryTransformSchemaPipe<Entity> implements PipeTransform {
       if (detailMsg) {
         errorResult.push({
           source: {
-            parameter: error.instancePath
+            parameter: error.instancePath,
           },
-          detail: detailMsg[0].toUpperCase() + detailMsg.slice(1)
-        })
+          detail: detailMsg[0].toUpperCase() + detailMsg.slice(1),
+        });
       }
-
     }
 
     return errorResult;

@@ -1,16 +1,29 @@
-import {Delete, Get, Post, Patch, RequestMethod, HttpCode} from '@nestjs/common';
+import {
+  Delete,
+  Get,
+  Post,
+  Patch,
+  RequestMethod,
+  HttpCode,
+} from '@nestjs/common';
 
 import { Bindings } from '../../config/bindings';
 import { NestController, Entity, DecoratorOptions } from '../../types';
 import { JSON_API_DECORATOR_OPTIONS } from '../../constants';
 
-
-export function bindController(controller: NestController, entity: Entity, connectionName: string): void {
+export function bindController(
+  controller: NestController,
+  entity: Entity,
+  connectionName: string
+): void {
   for (const methodName in Bindings) {
+    const { name, path, parameters, method, implementation } =
+      Bindings[methodName];
 
-    const { name, path, parameters, method, implementation } = Bindings[methodName];
-
-    const decoratorOptions: DecoratorOptions = Reflect.getMetadata(JSON_API_DECORATOR_OPTIONS, controller);
+    const decoratorOptions: DecoratorOptions = Reflect.getMetadata(
+      JSON_API_DECORATOR_OPTIONS,
+      controller
+    );
     if (decoratorOptions) {
       const { allowMethod = [] } = decoratorOptions;
       if (!allowMethod.includes(name)) continue;
@@ -21,11 +34,14 @@ export function bindController(controller: NestController, entity: Entity, conne
     if (controller.prototype[name]) {
       implementationResultFunction = controller.prototype[name];
     }
-    controller.prototype[name] = function(...args) {
+    controller.prototype[name] = function (...args) {
       return implementationResultFunction.call(this, ...args);
     };
 
-    const descriptor = Object.getOwnPropertyDescriptor(controller.prototype, name);
+    const descriptor = Object.getOwnPropertyDescriptor(
+      controller.prototype,
+      name
+    );
 
     switch (method) {
       case RequestMethod.GET: {
@@ -53,9 +69,8 @@ export function bindController(controller: NestController, entity: Entity, conne
     for (const key in parameters) {
       const parameter = parameters[key];
       const { property, decorator, mixins } = parameter;
-      const resultMixin = mixins.map(mixin => mixin(entity, connectionName));
+      const resultMixin = mixins.map((mixin) => mixin(entity, connectionName));
       decorator(property, ...resultMixin)(controller.prototype, name, key);
     }
   }
 }
-

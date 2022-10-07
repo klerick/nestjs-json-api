@@ -1,7 +1,7 @@
 export interface ValidationError {
   status?: string;
   code?: string;
-  title?: string
+  title?: string;
   meta?: string;
   detail: string;
   source?: {

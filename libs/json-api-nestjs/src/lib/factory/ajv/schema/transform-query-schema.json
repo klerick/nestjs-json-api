@@ -78,9 +78,7 @@
         }
       },
       "dependencies": {
-        "number": [
-          "size"
-        ]
+        "number": ["size"]
       },
       "additionalProperties": false
     },
@@ -113,15 +111,11 @@
       "properties": {
         "eq": {
           "type": "string",
-          "enum": [
-            "null"
-          ]
+          "enum": ["null"]
         },
         "ne": {
           "type": "string",
-          "enum": [
-            "null"
-          ]
+          "enum": ["null"]
         }
       }
     },
@@ -187,18 +181,14 @@
     },
     "sortSchema": {
       "type": "string",
-      "enum": [
-        "DESC",
-        "ASC"
-      ]
+      "enum": ["DESC", "ASC"]
     },
     "sortDefs": {
       "description": "https://jsonapi.org/format/#fetching-sorting",
       "type": "object",
       "additionalProperties": false,
       "minProperties": 1,
-      "properties": {
-      }
+      "properties": {}
     },
     "includeDefs": {
       "title": "Relation array",

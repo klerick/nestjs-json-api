@@ -53,7 +53,7 @@ export class Addresses {
     default: 'NULL',
     array: true,
   })
-  public arrayField: string[]
+  public arrayField: string[];
 
   @IsEmpty()
   @Column({

@@ -1,31 +1,35 @@
 import { Repository } from 'typeorm';
 
-import {MethodsService} from './methods';
-import {TransformMixinService} from '../transform/transform.mixin';
+import { MethodsService } from './methods';
+import { TransformMixinService } from '../transform/transform.mixin';
 import {
   JsonApiServiceMethode,
   ServiceOptions,
   ConfigParam,
 } from '../../../types';
-import {Meta, Relationship, ResourceObject} from '../../../types-common';
-import {UtilsMethode} from './utils/utils-methode'
+import { Meta, Relationship, ResourceObject } from '../../../types-common';
+import { UtilsMethode } from './utils/utils-methode';
 
-export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity> {
-  protected UtilsMethode = UtilsMethode
+export class TypeormMixinService<Entity>
+  implements JsonApiServiceMethode<Entity>
+{
+  protected UtilsMethode = UtilsMethode;
 
   constructor(
     protected repository: Repository<Entity>,
     protected config: ConfigParam,
-    protected transform: TransformMixinService<Entity>,
-  ) {
-  }
+    protected transform: TransformMixinService<Entity>
+  ) {}
 
-  getAll(this: TypeormMixinService<Entity>, options: ServiceOptions<Entity>): Promise<ResourceObject<Entity>> {
+  getAll(
+    this: TypeormMixinService<Entity>,
+    options: ServiceOptions<Entity>
+  ): Promise<ResourceObject<Entity>> {
     return MethodsService.getAll.call<
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<ResourceObject<Entity>>
-    >(this, options)
+    >(this, options);
   }
 
   getOne(options: ServiceOptions<Entity>): Promise<ResourceObject<Entity>> {
@@ -33,7 +37,7 @@ export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<ResourceObject<Entity>>
-      >(this, options)
+    >(this, options);
   }
 
   deleteOne(options: ServiceOptions<Entity>): Promise<void> {
@@ -41,7 +45,7 @@ export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<void>
-      >(this, options)
+    >(this, options);
   }
 
   postOne(options: ServiceOptions<Entity>): Promise<ResourceObject<Entity>> {
@@ -49,7 +53,7 @@ export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<ResourceObject<Entity>>
-      >(this, options)
+    >(this, options);
   }
 
   patchOne(options: ServiceOptions<Entity>): Promise<ResourceObject<Entity>> {
@@ -57,17 +61,21 @@ export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<ResourceObject<Entity>>
-      >(this, options)
+    >(this, options);
   }
 
-  getRelationship(options: ServiceOptions<Entity>): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
+  getRelationship(
+    options: ServiceOptions<Entity>
+  ): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
     return MethodsService.getRelationship.call<
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
-      Promise<{
-        meta?: Partial<Meta>;
-      } & Relationship<Entity>>
-      >(this, options);
+      Promise<
+        {
+          meta?: Partial<Meta>;
+        } & Relationship<Entity>
+      >
+    >(this, options);
   }
 
   deleteRelationship(options: ServiceOptions<Entity>): Promise<void> {
@@ -75,30 +83,34 @@ export class TypeormMixinService<Entity> implements JsonApiServiceMethode<Entity
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
       Promise<void>
-      >(this, options);
+    >(this, options);
   }
 
-  postRelationship(options: ServiceOptions<Entity>): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
+  postRelationship(
+    options: ServiceOptions<Entity>
+  ): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
     return MethodsService.postRelationship.call<
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
-      Promise<{
-        meta?: Partial<Meta>;
-      } & Relationship<Entity>>
-      >(this, options);
+      Promise<
+        {
+          meta?: Partial<Meta>;
+        } & Relationship<Entity>
+      >
+    >(this, options);
   }
 
-  patchRelationship(options: ServiceOptions<Entity>): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
+  patchRelationship(
+    options: ServiceOptions<Entity>
+  ): Promise<{ meta?: Partial<Meta> } & Relationship<Entity>> {
     return MethodsService.patchRelationship.call<
       TypeormMixinService<Entity>,
       [ServiceOptions<Entity>],
-      Promise<{
-        meta?: Partial<Meta>;
-      } & Relationship<Entity>>
-      >(this, options);
+      Promise<
+        {
+          meta?: Partial<Meta>;
+        } & Relationship<Entity>
+      >
+    >(this, options);
   }
-
 }
-
-
-

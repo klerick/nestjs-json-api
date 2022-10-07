@@ -1,10 +1,13 @@
 import {
-  AfterLoad, BeforeInsert, BeforeRemove, BeforeUpdate,
+  AfterLoad,
+  BeforeInsert,
+  BeforeRemove,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from 'typeorm';
 import { IsEmpty, IsNotEmpty } from 'class-validator';
 
@@ -43,7 +46,6 @@ export class RequestsHavePodLocks {
     if (this.podId) {
       this.pod_id = this.podId;
     }
-
   }
 
   public podId: number;

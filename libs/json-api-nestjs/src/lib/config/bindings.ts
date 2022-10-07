@@ -1,7 +1,13 @@
-import {Body, Param, ParseIntPipe, Query, RequestMethod} from '@nestjs/common';
+import {
+  Body,
+  Param,
+  ParseIntPipe,
+  Query,
+  RequestMethod,
+} from '@nestjs/common';
 
-import {BindingsConfig, MethodName} from '../types';
-import {JsonBaseController} from '../mixin'
+import { BindingsConfig, MethodName } from '../types';
+import { JsonBaseController } from '../mixin';
 import {
   bodyInputPatchPipeMixin,
   bodyInputPostMixin,
@@ -11,10 +17,10 @@ import {
   queryTransformMixin,
   queryTransformSchemaMixin,
   bodyRelationshipPipeMixin,
-  bodyRelationshipPatchPipeMixin
+  bodyRelationshipPatchPipeMixin,
 } from '../mixin/pipes';
 
-import {PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID} from '../constants';
+import { PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID } from '../constants';
 
 const Bindings: BindingsConfig = {
   getAll: {
@@ -22,79 +28,81 @@ const Bindings: BindingsConfig = {
     name: 'getAll',
     path: '',
     implementation: JsonBaseController.prototype['getAll'],
-    parameters: [{
-      decorator: Query,
-      mixins: [
-        querySchemaMixin,
-        queryTransformMixin,
-        queryTransformSchemaMixin,
-        queryFiledInIncludeMixin
-      ]
-    }]
+    parameters: [
+      {
+        decorator: Query,
+        mixins: [
+          querySchemaMixin,
+          queryTransformMixin,
+          queryTransformSchemaMixin,
+          queryFiledInIncludeMixin,
+        ],
+      },
+    ],
   },
   getOne: {
     method: RequestMethod.GET,
     name: 'getOne',
     path: `:${PARAMS_RESOURCE_ID}`,
     implementation: JsonBaseController.prototype['getOne'],
-    parameters: [{
-      property: PARAMS_RESOURCE_ID,
-      decorator: Param,
-      mixins: [
-        () => ParseIntPipe,
-      ]
-    }, {
-      decorator: Query,
-      mixins: [
-        querySchemaMixin,
-        queryTransformMixin,
-        queryTransformSchemaMixin,
-        queryFiledInIncludeMixin
-      ]
-    }]
+    parameters: [
+      {
+        property: PARAMS_RESOURCE_ID,
+        decorator: Param,
+        mixins: [() => ParseIntPipe],
+      },
+      {
+        decorator: Query,
+        mixins: [
+          querySchemaMixin,
+          queryTransformMixin,
+          queryTransformSchemaMixin,
+          queryFiledInIncludeMixin,
+        ],
+      },
+    ],
   },
   deleteOne: {
     method: RequestMethod.DELETE,
     name: 'deleteOne',
     path: `:${PARAMS_RESOURCE_ID}`,
     implementation: JsonBaseController.prototype['deleteOne'],
-    parameters: [{
-      property: PARAMS_RESOURCE_ID,
-      decorator: Param,
-      mixins: [
-        () => ParseIntPipe,
-      ]
-    }]
+    parameters: [
+      {
+        property: PARAMS_RESOURCE_ID,
+        decorator: Param,
+        mixins: [() => ParseIntPipe],
+      },
+    ],
   },
   postOne: {
     method: RequestMethod.POST,
     name: 'postOne',
     path: '',
     implementation: JsonBaseController.prototype['postOne'],
-    parameters: [{
-      decorator: Body,
-      mixins: [
-        bodyInputPostMixin
-      ]
-    }]
+    parameters: [
+      {
+        decorator: Body,
+        mixins: [bodyInputPostMixin],
+      },
+    ],
   },
   patchOne: {
     method: RequestMethod.PATCH,
     name: 'patchOne',
     path: `:${PARAMS_RESOURCE_ID}`,
     implementation: JsonBaseController.prototype['patchOne'],
-    parameters: [{
-      property: PARAMS_RESOURCE_ID,
-      decorator: Param,
-      mixins: [
-        () => ParseIntPipe,
-      ]
-    }, {
-      decorator: Body,
-      mixins: [
-        bodyInputPatchPipeMixin
-      ]
-    }]
+    parameters: [
+      {
+        property: PARAMS_RESOURCE_ID,
+        decorator: Param,
+        mixins: [() => ParseIntPipe],
+      },
+      {
+        decorator: Body,
+        mixins: [bodyInputPatchPipeMixin],
+      },
+    ],
   },
   getRelationship: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
@@ -105,17 +113,14 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [
-          () => ParseIntPipe,
-        ]
-      },{
+        mixins: [() => ParseIntPipe],
+      },
+      {
         property: PARAMS_RELATION_NAME,
         decorator: Param,
-        mixins: [
-          parseRelationshipNameMixin
-        ]
-      }
-    ]
+        mixins: [parseRelationshipNameMixin],
+      },
+    ],
   },
   deleteRelationship: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
@@ -126,22 +131,18 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [
-          () => ParseIntPipe,
-        ]
-      },{
+        mixins: [() => ParseIntPipe],
+      },
+      {
         property: PARAMS_RELATION_NAME,
         decorator: Param,
-        mixins: [
-          parseRelationshipNameMixin
-        ]
-      },{
+        mixins: [parseRelationshipNameMixin],
+      },
+      {
         decorator: Body,
-        mixins: [
-          bodyRelationshipPipeMixin
-        ]
-      }
-    ]
+        mixins: [bodyRelationshipPipeMixin],
+      },
+    ],
   },
   postRelationship: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
@@ -152,22 +153,18 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [
-          () => ParseIntPipe,
-        ]
-      },{
+        mixins: [() => ParseIntPipe],
+      },
+      {
         property: PARAMS_RELATION_NAME,
         decorator: Param,
-        mixins: [
-          parseRelationshipNameMixin
-        ]
-      },{
+        mixins: [parseRelationshipNameMixin],
+      },
+      {
         decorator: Body,
-        mixins: [
-          bodyRelationshipPipeMixin
-        ]
-      }
-    ]
+        mixins: [bodyRelationshipPipeMixin],
+      },
+    ],
   },
   patchRelationship: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
@@ -178,30 +175,28 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [
-          () => ParseIntPipe,
-        ]
-      },{
+        mixins: [() => ParseIntPipe],
+      },
+      {
         property: PARAMS_RELATION_NAME,
         decorator: Param,
-        mixins: [
-          parseRelationshipNameMixin
-        ]
-      },{
+        mixins: [parseRelationshipNameMixin],
+      },
+      {
         decorator: Body,
-        mixins: [
-          bodyRelationshipPatchPipeMixin
-        ]
-      }
-    ]
-  }
+        mixins: [bodyRelationshipPatchPipeMixin],
+      },
+    ],
+  },
 };
 
-export {
-  Bindings
-};
+export { Bindings };
 
-export function excludeMethod(names: Array<Partial<MethodName>>): Array<MethodName> {
-  const tmpObject = names.reduce((acum, key) => (acum[key] = true, acum), {})
-  return Object.keys(Bindings).filter(method => !tmpObject[method]) as Array<MethodName>
+export function excludeMethod(
+  names: Array<Partial<MethodName>>
+): Array<MethodName> {
+  const tmpObject = names.reduce((acum, key) => ((acum[key] = true), acum), {});
+  return Object.keys(Bindings).filter(
+    (method) => !tmpObject[method]
+  ) as Array<MethodName>;
 }
