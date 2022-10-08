@@ -15,7 +15,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@nestjs-json-api/sevrel": ["libs/sevrel/src/index.ts"],
       "database": ["libs/database/src/index.ts"],
       "json-api-nestjs": ["dist/libs/json-api-nestjs/src"],
       "json-api-nestjs/filter-operand": ["dist/libs/json-api-nestjs"]

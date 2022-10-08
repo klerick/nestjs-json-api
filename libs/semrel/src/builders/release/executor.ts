@@ -6,10 +6,10 @@ import { releaseNotesGenerator } from './release-notes-generator';
 import { commitAnalyzer } from './commit-analyzer';
 import { npm } from './npm';
 import { plugins } from './plugins';
-// import { preparePlugin } from './prepare';
+import { preparePlugin } from './prepare-plugin';
 import { platformPlugin } from './platform-plugin';
 
-async function runRelease(
+export async function runRelease(
   options: ReleaseExecutorSchema,
   builderContext: BuilderContext
 ) {
@@ -49,7 +49,7 @@ async function runRelease(
       extends: undefined,
       dryRun,
       plugins: plugins([
-        // preparePlugin({ publishable, publishPath }),
+        preparePlugin({ publishable, publishPath }),
         commitAnalyzer({ project }),
         releaseNotesGenerator({ project }),
         npm({ publishable, publishPath }),
