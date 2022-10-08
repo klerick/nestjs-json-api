@@ -1,0 +1,56 @@
+{
+  "name": "sevrel",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/sevrel/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/sevrel",
+        "main": "libs/sevrel/src/index.ts",
+        "tsConfig": "libs/sevrel/tsconfig.lib.json",
+        "assets": [
+          "libs/sevrel/*.md",
+          {
+            "input": "./libs/sevrel/src",
+            "glob": "**/!(*.ts)",
+            "output": "./src"
+          },
+          {
+            "input": "./libs/sevrel/src",
+            "glob": "**/*.d.ts",
+            "output": "./src"
+          },
+          {
+            "input": "./libs/sevrel",
+            "glob": "builders.json",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/sevrel/**/*.ts",
+          "libs/sevrel/generators.json",
+          "libs/sevrel/executors.json",
+          "libs/sevrel/package.json"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/sevrel"],
+      "options": {
+        "jestConfig": "libs/sevrel/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
