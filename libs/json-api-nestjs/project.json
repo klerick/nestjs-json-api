@@ -5,8 +5,11 @@
   "projectType": "library",
   "targets": {
     "deploy": {
-      "executor": "@ng-builders/semrel:release",
-      "dependsOn": [{ "projects": "self", "target": "release" }],
+      "executor": "./dist/libs/sevrel:release",
+      "dependsOn": [
+        { "projects": "dependencies", "target": "build" },
+        { "projects": "self", "target": "release" }
+      ],
       "options": {
         "npm": {
           "pkgRoot": "./dist/libs/json-api-nestjs"
