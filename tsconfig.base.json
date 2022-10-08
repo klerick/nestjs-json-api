@@ -8,13 +8,14 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2018",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": ["es2018", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@nestjs-json-api/sevrel": ["libs/sevrel/src/index.ts"],
       "database": ["libs/database/src/index.ts"],
       "json-api-nestjs": ["dist/libs/json-api-nestjs/src"],
       "json-api-nestjs/filter-operand": ["dist/libs/json-api-nestjs"]
