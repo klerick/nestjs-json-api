@@ -1,16 +1,18 @@
-name: Test
-
+name: Pre-Release
 on:
-  pull_request:
-    types: [opened, synchronize]
+  push:
+    branches:
+      - next
+      - beta
+      - "*.x" # maintenance releases branches
 env:
   BEFORE_SHA: ${{ github.event.before }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 jobs:
-  test:
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,5 +32,6 @@ jobs:
         run: npm ci
       - name: Test
         run: npx nx affected:test --base=remotes/origin/master
-        env:
-          CI: true
+      - name: Deploy
+        run: npx nx affected --target=deploy --base=remotes/origin/master
+

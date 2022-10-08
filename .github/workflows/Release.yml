@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - master
-      - next
-      - beta
-      - "*.x" # maintenance releases branches
 env:
   BEFORE_SHA: ${{ github.event.before }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
