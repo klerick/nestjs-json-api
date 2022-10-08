@@ -30,5 +30,7 @@ jobs:
         run: npm ci
       - name: Test
         run: npx nx affected:test --base=remotes/origin/master
+      - name: Publishing pre-releases
+        run: npx nx affected --target=deploy --base=remotes/origin/master
         env:
           CI: true

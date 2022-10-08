@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "deploy": {
-      "executor": "./dist/libs/sevrel:release",
+      "executor": "./dist/libs/semrel:release",
       "dependsOn": [
         { "projects": "dependencies", "target": "build" },
         { "projects": "self", "target": "release" }
@@ -77,5 +77,5 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["sevrel"]
+  "implicitDependencies": ["semrel"]
 }
