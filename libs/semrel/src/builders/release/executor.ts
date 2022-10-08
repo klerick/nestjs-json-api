@@ -49,7 +49,7 @@ export async function runRelease(
       extends: undefined,
       dryRun,
       plugins: plugins([
-        preparePlugin({ publishable, publishPath }),
+        // preparePlugin({ publishable, publishPath }),
         commitAnalyzer({ project }),
         releaseNotesGenerator({ project }),
         npm({ publishable, publishPath }),
