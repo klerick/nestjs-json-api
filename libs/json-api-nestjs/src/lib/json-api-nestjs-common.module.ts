@@ -1,8 +1,12 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 import { ModuleOptions } from '../lib/types';
-import { GLOBAL_MODULE_OPTIONS_TOKEN } from './constants';
+import {
+  CURRENT_DATA_SOURCE_TOKEN,
+  GLOBAL_MODULE_OPTIONS_TOKEN,
+} from './constants';
 import { ajvFactory } from './factory';
 import { ErrorInterceptors } from './mixin/interceptors';
 
@@ -12,6 +16,12 @@ export class JsonApiNestJsCommonModule {
     const optionProvider = {
       provide: GLOBAL_MODULE_OPTIONS_TOKEN,
       useValue: options,
+    };
+
+    const currentDataSourceProvider = {
+      provide: CURRENT_DATA_SOURCE_TOKEN,
+      useFactory: (dataSource: DataSource) => dataSource,
+      inject: [getDataSourceToken(options.connectionName)],
     };
 
     const typeOrmModule = TypeOrmModule.forFeature(
@@ -25,6 +35,7 @@ export class JsonApiNestJsCommonModule {
         ...(options.providers || []),
         ajvFactory,
         optionProvider,
+        currentDataSourceProvider,
         ErrorInterceptors,
       ],
       exports: [

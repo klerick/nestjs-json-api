@@ -5,6 +5,7 @@ import { BadRequestException } from '@nestjs/common';
 
 import { entities, mockDBTestModule, Users } from '../../../mock-utils';
 import {
+  CURRENT_DATA_SOURCE_TOKEN,
   DEFAULT_CONNECTION_NAME,
   GLOBAL_MODULE_OPTIONS_TOKEN,
 } from '../../../constants';
@@ -34,11 +35,21 @@ describe('ParseRelationshipNamePipe', () => {
           },
         },
         {
-          provide: getRepositoryToken(Users, mockConnectionName),
+          provide: CURRENT_DATA_SOURCE_TOKEN,
+          useFactory: (dataSource: DataSource) => dataSource,
+          inject: [getDataSourceToken(DEFAULT_CONNECTION_NAME)],
+        },
+        {
+          provide: getRepositoryToken(Users, DEFAULT_CONNECTION_NAME),
           useFactory(dataSource: DataSource) {
             return dataSource.getRepository<Users>(Users);
           },
-          inject: [getDataSourceToken()],
+          inject: [
+            {
+              token: CURRENT_DATA_SOURCE_TOKEN,
+              optional: false,
+            },
+          ],
         },
       ],
     }).compile();

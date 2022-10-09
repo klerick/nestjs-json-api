@@ -1,13 +1,13 @@
 export const JSON_API_DECORATOR_ENTITY = Symbol('JSON_API_ENTITY');
 export const JSON_API_DECORATOR_OPTIONS = Symbol('JSON_API_OPTIONS');
+export const GLOBAL_MODULE_OPTIONS_TOKEN = Symbol('GLOBAL_MODULE_OPTIONS');
+export const CURRENT_DATA_SOURCE_TOKEN = Symbol('CURRENT_DATA_SOURCE_TOKEN');
 
 export const PARAMS_RESOURCE_ID = 'id';
 export const PARAMS_RELATION_ID = 'relId';
 export const PARAMS_RELATION_NAME = 'relName';
 
 export const JSON_API_CONFIG = 'JSON_API_CONFIG';
-
-export const GLOBAL_MODULE_OPTIONS_TOKEN = Symbol('GLOBAL_MODULE_OPTIONS');
 
 export const JSON_API_SERVICE_POSTFIX = 'JsonApiService';
 export const CONFIG_PARAM_POSTFIX = 'JsonApiConfigParam';
