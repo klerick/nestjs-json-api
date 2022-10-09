@@ -100,11 +100,11 @@ For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com
 ## Available endpoint method
 Using **Users** entity and relation **Roles** entity as example
 
-include
-
-
 ### List item of Users
-	GET /users
+ 
+  ```
+  GET /users
+  ```
 Available query params:
 
 - **include** - you can extend result with relations (aka join)
@@ -115,7 +115,7 @@ Available query params:
 
 - **fields** - you can specify required fields of result query
   
-- ```
+  ```
    GET /users?fields[target]=login,lastName&fileds[roles]=name,key
    ```
   The "target" is **Users** entity
@@ -123,7 +123,7 @@ Available query params:
   So, result of request will be have only fields  *login* and *lastName* for **Users** entity and fields *name* and *key* for **Roles** entity
 - **sort** - you can sort result of the request
   
-- ```
+  ```
    GET /users?sort=target.name,-roles.key
    ```
   The "target" is **Users** entity
@@ -131,12 +131,12 @@ Available query params:
   So, result of the request will be sorted by field *name* of **Users** by *ASC* and field *key* of **Roles** entity by **DESC**.
 - **page** - pagination for you request
   
-- ```
+  ```
   GET /users?page[number]=1page[size]=20
   ```
 - **filter** - filter for query
   
-- ```
+  ```
   GET /users?filter[name][eq]=1&filter[roles.name][ne]=test&filter[roles.status][eq]=true
   ```
   The "name" is a field of **Users** entity
