@@ -1,4 +1,4 @@
-
+****strong text****
 # json-api-nestjs
 
 ## Installation
@@ -90,23 +90,79 @@ export class ExtendUserController extends JsonBaseController<Users> {
 }
 ```
 
+You can overwrite default config for current controller using options in decorator **JsonAPi**.
+The same you can mention api method needing for you, using **allowMethod**
+
 ## Swagger UI
 
 For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com/openapi/introduction)
 
+## Available end point method
+Using **Users** entity and relation **Roles** entity as example
+
+include
+
+
+### List item of Users
+	GET /users
+Available query params:
+
+- **include** - you can extend result with relation(aka join)
+   ```
+   GET /users?include=roles
+   ```
+  result of request will have role relation for each **Users** item
+
+- **fields** - you can specify needing filed of result query
+  
+- ```
+   GET /users?fields[target]=login,lastName&fileds[roles]=name,key
+   ```
+  The "target" is **Users** entity
+  The "roles" is **Roles** entity
+  So, result of request will be have only fields  *login* and *lastName* for **Users** entity and fields *name* and *key* for **Roles** entity
+- **sort** - you can sort result of request
+  
+- ```
+   GET /users?sort=target.name,-roles.key
+   ```
+  The "target" is **Users** entity
+  The "roles" is **Roles** entity
+  So, result of request will be sort filed *name* of **Users** by *ASC* and filed *key* of **Roles** entity by **DESC**.
+- **page** - pagination for you request
+  
+- ```
+  GET /users?page[number]=1page[size]=20
+  ```
+- **filter** - filter for query
+  
+- ```
+  GET /users?filter[name][eq]=1&filter[roles.name][ne]=test&filter[roles.status][eq]=true
+  ```
+  The "name" is filed of **Users** entity
+  The "roles.name" is *name* filed of **Roles** entity
+  The "eq", "ne" is *[Filter operand](#filter-operand)*
+
+  So, this query will be transform like sql:
+  ```sql
+   WHERE users.name = 1 AND roles.name <> 'test' AND roles.status = true
+  ```
+
 ##  Filter operand
 
 ```typescript
-type FilterOperand = {
-	in: string[], // is equal to the conditional of query "WHERE 'attribute_name' IN ('value1', 'value2')"
-	nin: string[], // is equal to the conditional of query "WHERE 'attribute_name' NOT IN ('value1', 'value1')"
-	eq: string, // is equal to the conditional of query "WHERE 'attribute_name' = 'value1'
-	ne: string, // is equal to the conditional of query "WHERE 'attribute_name' <> 'value1'
-	gte: string, // is equal to the conditional of query "WHERE 'attribute_name' >= 'value1'
-	gt: string, // is equal to the conditional of query "WHERE 'attribute_name' > 'value1'
-	lt: string, // is equal to the conditional of query "WHERE 'attribute_name' < 'value1'
-	lte:string, // is equal to the conditional of query "WHERE 'attribute_name' <= 'value1'
-	regexp: string, // is equal to the conditional of query "WHERE 'attribute_name' ~* value1
-	some: string, // is equal to the conditional of query "WHERE 'attribute_name' && [value1]
+type FilterOperand {
+	in: string[] // is equal to the conditional of query "WHERE 'attribute_name' IN ('value1', 'value2')"
+	nin: string[] // is equal to the conditional of query "WHERE 'attribute_name' NOT IN ('value1', 'value1')"
+	eq: string // is equal to the conditional of query "WHERE 'attribute_name' = 'value1'
+	ne: string // is equal to the conditional of query "WHERE 'attribute_name' <> 'value1'
+	gte: string // is equal to the conditional of query "WHERE 'attribute_name' >= 'value1'
+	gt: string // is equal to the conditional of query "WHERE 'attribute_name' > 'value1'
+	lt: string // is equal to the conditional of query "WHERE 'attribute_name' < 'value1'
+	lte:string // is equal to the conditional of query "WHERE 'attribute_name' <= 'value1'
+	regexp: string // is equal to the conditional of query "WHERE 'attribute_name' ~* value1
+	some: string // is equal to the conditional of query "WHERE 'attribute_name' && [value1]
 }
 ```
+
+ 
