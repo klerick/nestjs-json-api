@@ -4,7 +4,7 @@ import {
   JsonApiServiceMethode,
   QueryParams,
 } from '../../../types';
-import { ResourceRequestObject } from '../../../types-common/request';
+import { ResourceRequestObject } from '../../../types-common';
 import { Relationship } from '../../../types-common';
 
 export class JsonBaseController<Entity> implements ControllerTypes<Entity> {

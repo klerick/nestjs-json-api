@@ -3,6 +3,7 @@ import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 import {
+  CURRENT_DATA_SOURCE_TOKEN,
   DEFAULT_CONNECTION_NAME,
   GLOBAL_MODULE_OPTIONS_TOKEN,
 } from '../../../constants';
@@ -29,15 +30,25 @@ describe('BodyInputPostPipe', () => {
           provide: GLOBAL_MODULE_OPTIONS_TOKEN,
           useValue: {
             entities: entities,
-            connectionName: DEFAULT_CONNECTION_NAME,
+            connectionName: mockConnectionName,
           },
+        },
+        {
+          provide: CURRENT_DATA_SOURCE_TOKEN,
+          useFactory: (dataSource: DataSource) => dataSource,
+          inject: [getDataSourceToken(mockConnectionName)],
         },
         {
           provide: getRepositoryToken(Users, mockConnectionName),
           useFactory(dataSource: DataSource) {
             return dataSource.getRepository<Users>(Users);
           },
-          inject: [getDataSourceToken()],
+          inject: [
+            {
+              token: CURRENT_DATA_SOURCE_TOKEN,
+              optional: false,
+            },
+          ],
         },
       ],
     }).compile();

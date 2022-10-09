@@ -1,8 +1,7 @@
 import { JsonApiServiceMethode } from './service.types';
 import { QueryParams } from './query.types';
-import { ResourceRequestObject } from '../types-common/request';
+import { ResourceRequestObject } from '../types-common';
 import { Relationship } from '../types-common';
-import { TypeormMixinService } from '../mixin/service/typeorm/typeorm.mixin';
 
 export interface ControllerTypes<Entity> {
   serviceMixin: JsonApiServiceMethode<Entity>;

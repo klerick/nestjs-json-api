@@ -4,10 +4,13 @@ import { ajvFactory } from '../../../factory';
 import { entities, mockDBTestModule, Users } from '../../../mock-utils';
 import { BodyRelationshipPatchPipe } from './body-relationship-patch.pipe';
 import {
+  CURRENT_DATA_SOURCE_TOKEN,
   DEFAULT_CONNECTION_NAME,
   GLOBAL_MODULE_OPTIONS_TOKEN,
 } from '../../../constants';
 import { BadRequestException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 
 describe('BodyRelationshipPatchPipe', () => {
   let pipe: BodyRelationshipPatchPipe<Users>;
@@ -24,6 +27,23 @@ describe('BodyRelationshipPatchPipe', () => {
             entities: entities,
             connectionName: DEFAULT_CONNECTION_NAME,
           },
+        },
+        {
+          provide: CURRENT_DATA_SOURCE_TOKEN,
+          useFactory: (dataSource: DataSource) => dataSource,
+          inject: [getDataSourceToken(DEFAULT_CONNECTION_NAME)],
+        },
+        {
+          provide: getRepositoryToken(Users, DEFAULT_CONNECTION_NAME),
+          useFactory(dataSource: DataSource) {
+            return dataSource.getRepository<Users>(Users);
+          },
+          inject: [
+            {
+              token: CURRENT_DATA_SOURCE_TOKEN,
+              optional: false,
+            },
+          ],
         },
       ],
     }).compile();

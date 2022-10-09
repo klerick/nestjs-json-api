@@ -1,11 +1,14 @@
 import AjvCall from 'ajv';
 import { FactoryProvider } from '@nestjs/common/interfaces/modules/provider.interface';
-import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 
 import { ModuleOptions } from '../../types';
-import { GLOBAL_MODULE_OPTIONS_TOKEN } from '../../constants';
+import {
+  CURRENT_DATA_SOURCE_TOKEN,
+  GLOBAL_MODULE_OPTIONS_TOKEN,
+} from '../../constants';
+
 import {
   inputQuerySchema,
   inputBodyPostSchema,
@@ -141,7 +144,10 @@ export const ajvFactory: FactoryProvider<AjvCall> = {
   provide: AjvCall,
   useFactory: AjvCallFactory,
   inject: [
-    getDataSourceToken(),
+    {
+      token: CURRENT_DATA_SOURCE_TOKEN,
+      optional: false,
+    },
     {
       token: GLOBAL_MODULE_OPTIONS_TOKEN,
       optional: false,

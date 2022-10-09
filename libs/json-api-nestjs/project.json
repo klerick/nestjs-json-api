@@ -5,8 +5,11 @@
   "projectType": "library",
   "targets": {
     "deploy": {
-      "executor": "@ng-builders/semrel:release",
-      "dependsOn": [{ "projects": "self", "target": "release" }],
+      "executor": "./dist/libs/semrel:release",
+      "dependsOn": [
+        { "projects": "self", "target": "buildSemRel"},
+        { "projects": "self", "target": "release" }
+      ],
       "options": {
         "npm": {
           "pkgRoot": "./dist/libs/json-api-nestjs"
@@ -19,6 +22,16 @@
       "options": {
         "commands": [
           "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api-nestjs/.npmrc"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "buildSemRel": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx build semrel"
         ],
         "cwd": "./",
         "parallel": false
@@ -73,6 +86,5 @@
       }
     }
   },
-  "tags": [],
-  "implicitDependencies": ["sevrel"]
+  "tags": []
 }

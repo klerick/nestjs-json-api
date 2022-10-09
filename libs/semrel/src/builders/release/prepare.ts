@@ -1,8 +1,7 @@
-import { Context, PluginSpec } from 'semantic-release';
-import { execa } from 'execa';
+import { Context } from 'semantic-release';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { from } from 'rxjs';
+import { firstValueFrom, from } from 'rxjs';
 import { concatMap, filter } from 'rxjs/operators';
 import semver from 'semver';
 
@@ -31,6 +30,7 @@ export function parseTag(tag: string): Tag {
 }
 
 export async function getTags(branch: string): Promise<Tag[]> {
+  const { execa } = await import('execa');
   const { stdout } = await execa('git', ['tag', '--merged', branch]);
 
   return stdout
@@ -64,49 +64,33 @@ export async function prepare(
     readFileSync(join(publishPath, 'package.json')).toString()
   );
 
-  await from(['dependencies', 'peerDependencies', 'devDependencies'])
-    .pipe(
-      filter((type) => !!pckg[type]),
-      concatMap((type: string) =>
-        from(Object.entries(pckg[type])).pipe(
-          filter(([, version]) => version === '0.0.0-development'),
-          concatMap(async ([name]) => {
-            const [, project = name] = name.split('/');
+  const obsForPromise = await from([
+    'dependencies',
+    'peerDependencies',
+    'devDependencies',
+  ]).pipe(
+    filter((type) => !!pckg[type]),
+    concatMap((type: string) =>
+      from(Object.entries(pckg[type])).pipe(
+        filter(([, version]) => version === '0.0.0-development'),
+        concatMap(async ([name]) => {
+          const [, project = name] = name.split('/');
 
-            const tags = await getTags(context.branch.name);
-            const [latest] = await getSortedVersions(tags, {
-              project,
-              channel: context.branch.channel,
-            });
+          const tags = await getTags(context.branch.name);
+          const [latest] = await getSortedVersions(tags, {
+            project,
+            channel: context.branch.channel,
+          });
 
-            pckg[type][name] = latest;
-          })
-        )
+          pckg[type][name] = latest;
+        })
       )
     )
-    .toPromise();
+  );
+  await firstValueFrom(obsForPromise);
 
   writeFileSync(
     join(publishPath, 'package.json'),
     JSON.stringify(pckg, null, 2)
   );
-}
-
-export function preparePlugin({
-  publishable,
-  publishPath,
-}: {
-  publishable: boolean;
-  publishPath: string;
-}): PluginSpec | null {
-  let plugin: string;
-
-  try {
-    require.resolve('@ng-builders/semrel');
-    plugin = '@ng-builders/semrel';
-  } catch (e) {
-    plugin = './dist/libs/semrel';
-  }
-
-  return publishable ? [plugin, { publishPath }] : null;
 }

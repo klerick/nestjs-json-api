@@ -1,0 +1,37 @@
+name: Pre-Release
+on:
+  push:
+    branches:
+      - next
+      - beta
+      - "*.x" # maintenance releases branches
+env:
+  BEFORE_SHA: ${{ github.event.before }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('./package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
+      - name: Test
+        run: npx nx affected:test --base=remotes/origin/master
+      - name: Deploy
+        run: npx nx affected --target=deploy --base=remotes/origin/master
+
