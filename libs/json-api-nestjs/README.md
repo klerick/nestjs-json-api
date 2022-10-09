@@ -94,7 +94,6 @@ export class ExtendUserController extends JsonBaseController<Users> {
 
 For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com/openapi/introduction)
 
-
 ##  Filter operand
 
 ```typescript
