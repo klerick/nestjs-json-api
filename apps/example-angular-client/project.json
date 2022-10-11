@@ -6,9 +6,15 @@
   "prefix": "nestjs-json-api",
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-builders/custom-webpack:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "customWebpackConfig": {
+          "path": "apps/example-angular-client/webpack.config.ts",
+          "mergeRules": {
+            "externals": "replace"
+          }
+        },
         "outputPath": "dist/apps/example-angular-client",
         "index": "apps/example-angular-client/src/index.html",
         "main": "apps/example-angular-client/src/main.ts",
@@ -55,7 +61,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-builders/custom-webpack:dev-server",
       "configurations": {
         "production": {
           "browserTarget": "example-angular-client:build:production"

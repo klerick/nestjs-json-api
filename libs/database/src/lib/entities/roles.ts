@@ -9,10 +9,12 @@ import { IsNotEmpty, Length, IsOptional, IsEmpty } from 'class-validator';
 
 import { Users, IUsers } from '.';
 
+export type IRoles = Roles;
+
 @Entity('roles')
 export class Roles {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @IsOptional()
   @Length(3, 128)
@@ -22,7 +24,7 @@ export class Roles {
     nullable: true,
     default: 'NULL',
   })
-  public name: string;
+  public name!: string;
 
   @IsNotEmpty()
   @Length(3, 128)
@@ -32,7 +34,7 @@ export class Roles {
     nullable: false,
     unique: true,
   })
-  public key: string;
+  public key!: string;
 
   @IsOptional()
   @Column({
@@ -40,7 +42,7 @@ export class Roles {
     type: 'boolean',
     default: 'false',
   })
-  public isDefault: boolean;
+  public isDefault!: boolean;
 
   @IsEmpty()
   @Column({
@@ -49,7 +51,7 @@ export class Roles {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public createdAt: Date;
+  public createdAt!: Date;
 
   @IsEmpty()
   @UpdateDateColumn({
@@ -58,8 +60,8 @@ export class Roles {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public updatedAt!: Date;
 
   @ManyToMany(() => Users, (item) => item.roles)
-  public users: IUsers[];
+  public users!: IUsers[];
 }

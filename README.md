@@ -16,8 +16,8 @@
 </p>
 
 - *[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api-nestjs)* - plugin for create CRUD overs JSON API
-- *json-api-nestjs-sdk* - tool for client, call api over *json-api-nestjs*(coming soon...)
-- *kson-api-nestjs-acl* - tool for acl over *json-api-nestjs*(coming soon...)
+- *[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api-nestjs-sdk)* - tool for client, call api over *json-api-nestjs*
+- *json-api-nestjs-acl* - tool for acl over *json-api-nestjs*(coming soon...)
 ## Installation
 
 ```bash

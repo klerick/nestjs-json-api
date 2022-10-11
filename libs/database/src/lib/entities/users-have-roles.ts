@@ -9,7 +9,7 @@ import { IsNotEmpty, IsEmpty } from 'class-validator';
 @Entity('users_have_roles')
 export class UsersHaveRoles {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @IsNotEmpty()
   @Column({
@@ -18,7 +18,7 @@ export class UsersHaveRoles {
     nullable: false,
     unique: false,
   })
-  public userId: number;
+  public userId!: number;
 
   @IsNotEmpty()
   @Column({
@@ -27,7 +27,7 @@ export class UsersHaveRoles {
     nullable: false,
     unique: false,
   })
-  public roleId: number;
+  public roleId!: number;
 
   @IsEmpty()
   @Column({
@@ -36,7 +36,7 @@ export class UsersHaveRoles {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public createdAt: Date;
+  public createdAt!: Date;
 
   @IsEmpty()
   @UpdateDateColumn({
@@ -45,5 +45,5 @@ export class UsersHaveRoles {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public updatedAt!: Date;
 }

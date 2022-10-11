@@ -16,17 +16,19 @@ export enum CommentKind {
 
 import { Users, IUsers } from '.';
 
+export type IComments = Comments;
+
 @Entity('comments')
 export class Comments {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @IsNotEmpty()
   @Column({
     type: 'text',
     nullable: false,
   })
-  public text: string;
+  public text!: string;
 
   @IsNotEmpty()
   @IsEnum(CommentKind)
@@ -35,7 +37,7 @@ export class Comments {
     enum: CommentKind,
     nullable: false,
   })
-  public kind: CommentKind;
+  public kind!: CommentKind;
 
   @IsEmpty()
   @Column({
@@ -44,7 +46,7 @@ export class Comments {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public createdAt: Date;
+  public createdAt!: Date;
 
   @IsEmpty()
   @UpdateDateColumn({
@@ -53,12 +55,12 @@ export class Comments {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public updatedAt!: Date;
 
   @ManyToOne(() => Users, (item) => item.id)
   @IsNotEmpty()
   @JoinColumn({
     name: 'created_by',
   })
-  public createdBy: IUsers;
+  public createdBy!: IUsers;
 }
