@@ -13,7 +13,7 @@ import { UtilsMethode } from './utils-methode';
 import { snakeToCamel } from '../../../../helper';
 import { Filter, FilterOperand } from '../../../../types';
 import { OperandsMap, OperandMapForNull } from '../../../../types-common';
-import { ResourceRequestObject } from '../../../../types-common/request';
+import { ResourceRequestObject } from '../../../../types-common';
 import {
   NotFoundException,
   UnprocessableEntityException,
@@ -202,18 +202,18 @@ describe('Utils methode test', () => {
 
       const commentQuery = repository.manager
         .getRepository('comments')
-        .createQueryBuilder('comments')
-        .select('comments.createdBy')
-        .where(`comments.createdBy = ${alias}.id`)
+        .createQueryBuilder('Comments')
+        .select('Comments.createdBy')
+        .where(`Comments.createdBy = ${alias}.id`)
         .getQuery();
       const rolesQuery = repository.manager
         .getRepository('users_have_roles')
         .createQueryBuilder('users_have_roles')
         .select('users_have_roles.user_id', 'users_have_roles_user_id')
-        .leftJoin('roles', 'roles', 'users_have_roles.role_id = roles.id')
+        .leftJoin('Roles', 'Roles', 'users_have_roles.role_id = Roles.id')
         .where(`users_have_roles.user_id = ${alias}.id`)
         .getQuery();
-      expect(expression[0].expression).toBe('users.addresses IS NULL');
+      expect(expression[0].expression).toBe('Users.addresses IS NULL');
       expect(expression[1].expression).toBe(`NOT EXISTS (${commentQuery})`);
       expect(expression[2].expression).toBe(`NOT EXISTS (${rolesQuery})`);
       expect(expression[0].params).toBe(null);
@@ -231,7 +231,7 @@ describe('Utils methode test', () => {
         .getRepository('users_have_roles')
         .createQueryBuilder('users_have_roles')
         .select('users_have_roles.role_id', 'users_have_roles_role_id')
-        .leftJoin('users', 'users', 'users_have_roles.user_id = users.id')
+        .leftJoin('Users', 'Users', 'users_have_roles.user_id = Users.id')
         .where(`users_have_roles.role_id = ${alias1}.id`)
         .getQuery();
       const expression1 = UtilsMethode.applyQueryFiltersTarget<Roles>(
@@ -387,7 +387,7 @@ describe('Utils methode test', () => {
         .getRepository('users_have_roles')
         .createQueryBuilder('users_have_roles')
         .select('users_have_roles.user_id', 'users_have_roles_user_id')
-        .leftJoin('roles', 'roles', 'users_have_roles.role_id = roles.id');
+        .leftJoin('Roles', 'roles', 'users_have_roles.role_id = Roles.id');
 
       const expression = UtilsMethode.applyQueryFilterRelation<Users>(
         queryBuilder,
@@ -433,8 +433,8 @@ describe('Utils methode test', () => {
 
       const query = repository.manager
         .getRepository('comments')
-        .createQueryBuilder('comments')
-        .select('comments.createdBy');
+        .createQueryBuilder('Comments')
+        .select('Comments.createdBy');
 
       const expression = UtilsMethode.applyQueryFilterRelation<Users>(
         queryBuilder,
@@ -465,7 +465,7 @@ describe('Utils methode test', () => {
         );
         const resultQuery = query
           .where(
-            `${relName}.${fieldName} ${OperandsMap[operand].replace(
+            `${query.alias}.${fieldName} ${OperandsMap[operand].replace(
               'EXPRESSION',
               paramsName
             )}`

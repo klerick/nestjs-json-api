@@ -18,9 +18,10 @@ describe('Test utils', () => {
   it('snakeToCamel', () => {
     const result = snakeToCamel('test_test');
     const result1 = snakeToCamel('test-test');
-
+    const result2 = snakeToCamel('testTest');
     expect(result).toBe('testTest');
     expect(result1).toBe('testTest');
+    expect(result2).toBe('testTest');
   });
 
   it('isString', () => {

@@ -19,7 +19,7 @@ import {
 } from '../../../../../types';
 import { snakeToCamel, getProviderName } from '../../../../../helper';
 import { transformMixin } from '../../../transform';
-import { typeormMixin } from '../../../typeorm';
+import { typeormMixin } from '../../index';
 import { TypeormMixinService } from '../../typeorm.mixin';
 
 describe('GetAll methode test', () => {
@@ -181,10 +181,12 @@ describe('GetAll methode test', () => {
     let offsetSpy;
     let limitSpy;
     let orderBySpy;
+    let aliasString: string;
     const createQueryBuilderSpy = jest
       .spyOn(repository, 'createQueryBuilder')
       .mockImplementationOnce((...alias) => {
         const builder = repository.createQueryBuilder(...alias);
+        aliasString = builder.alias;
         joinSpy = jest.spyOn(builder, 'leftJoin');
         selectSpy = jest.spyOn(builder, 'select');
         offsetSpy = jest.spyOn(builder, 'offset');
@@ -204,13 +206,13 @@ describe('GetAll methode test', () => {
     );
     expect(joinSpy).toBeCalledTimes(0);
     expect(selectSpy).toBeCalledTimes(1);
-    expect(selectSpy).toBeCalledWith(`users.id`, 'subQueryId');
+    expect(selectSpy).toBeCalledWith(`${aliasString}.id`, 'subQueryId');
     expect(offsetSpy).toBeCalledTimes(1);
     expect(offsetSpy).toBeCalledWith(0);
     expect(limitSpy).toBeCalledTimes(1);
     expect(limitSpy).toBeCalledWith(20);
     expect(orderBySpy).toBeCalledTimes(1);
-    expect(orderBySpy).toBeCalledWith({ ['users.id']: 'ASC' });
+    expect(orderBySpy).toBeCalledWith({ [`${aliasString}.id`]: 'ASC' });
     expect(applyQueryFilterRelationSpy).not.toBeCalled();
     expect(applyQueryFiltersTargetSpy).not.toBeCalled();
 
@@ -274,7 +276,7 @@ describe('GetAll methode test', () => {
     let resultJoinSpy;
     let resultSelectSpy;
     let i = 0;
-
+    let aliasString: string;
     const originalCreateQueryBuilder =
       repository.createQueryBuilder.bind(repository);
     const createQueryBuilderSpy = jest
@@ -282,6 +284,7 @@ describe('GetAll methode test', () => {
       .mockImplementation((...alias) => {
         const builder = originalCreateQueryBuilder(...alias);
         if (i === 0) {
+          aliasString = builder.alias;
           joinSpy = jest.spyOn(builder, 'leftJoin');
           selectSpy = jest.spyOn(builder, 'select');
           offsetSpy = jest.spyOn(builder, 'offset');
@@ -315,10 +318,18 @@ describe('GetAll methode test', () => {
     });
 
     expect(joinSpy).toBeCalledTimes(2);
-    expect(joinSpy).toHaveBeenNthCalledWith(1, 'users.manager', 'manager');
-    expect(joinSpy).toHaveBeenNthCalledWith(2, 'users.addresses', 'addresses');
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      1,
+      `${aliasString}.manager`,
+      'manager'
+    );
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      2,
+      `${aliasString}.addresses`,
+      'addresses'
+    );
     expect(selectSpy).toBeCalledTimes(1);
-    expect(selectSpy).toBeCalledWith(`users.id`, 'subQueryId');
+    expect(selectSpy).toBeCalledWith(`${aliasString}.id`, 'subQueryId');
     expect(offsetSpy).toBeCalledTimes(1);
     expect(offsetSpy).toBeCalledWith((page.number - 1) * page.size);
     expect(limitSpy).toBeCalledTimes(1);
@@ -326,7 +337,7 @@ describe('GetAll methode test', () => {
     expect(orderBySpy).toBeCalledTimes(1);
     expect(orderBySpy).toBeCalledWith({
       ['addresses.country']: 'ASC',
-      ['users.login']: 'DESC',
+      [`${aliasString}.login`]: 'DESC',
     });
     expect(applyQueryFilterRelationSpy).toBeCalledTimes(1);
     expect(applyQueryFiltersTargetSpy).toBeCalledTimes(1);
@@ -345,17 +356,17 @@ describe('GetAll methode test', () => {
     expect(resultJoinSpy).toBeCalledTimes(2);
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       1,
-      `users.${include[0]}`,
+      `${aliasString}.${include[0]}`,
       include[0]
     );
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       2,
-      `users.${include[1]}`,
+      `${aliasString}.${include[1]}`,
       include[1]
     );
 
     expect(resultSelectSpy).toBeCalledTimes(1);
-    expect(resultSelectSpy).toBeCalledWith([...include, 'users']);
+    expect(resultSelectSpy).toBeCalledWith([...include, aliasString]);
   });
 
   it('check query with param and select field', async () => {
@@ -416,7 +427,7 @@ describe('GetAll methode test', () => {
     let resultJoinSpy;
     let resultSelectSpy;
     let i = 0;
-
+    let alisString: string;
     const originalCreateQueryBuilder =
       repository.createQueryBuilder.bind(repository);
     const createQueryBuilderSpy = jest
@@ -424,6 +435,7 @@ describe('GetAll methode test', () => {
       .mockImplementation((...alias) => {
         const builder = originalCreateQueryBuilder(...alias);
         if (i === 0) {
+          alisString = builder.alias;
           joinSpy = jest.spyOn(builder, 'leftJoin');
           selectSpy = jest.spyOn(builder, 'select');
           offsetSpy = jest.spyOn(builder, 'offset');
@@ -458,10 +470,18 @@ describe('GetAll methode test', () => {
     });
 
     expect(joinSpy).toBeCalledTimes(2);
-    expect(joinSpy).toHaveBeenNthCalledWith(1, 'users.manager', 'manager');
-    expect(joinSpy).toHaveBeenNthCalledWith(2, 'users.addresses', 'addresses');
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      1,
+      `${alisString}.manager`,
+      'manager'
+    );
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      2,
+      `${alisString}.addresses`,
+      'addresses'
+    );
     expect(selectSpy).toBeCalledTimes(1);
-    expect(selectSpy).toBeCalledWith(`users.id`, 'subQueryId');
+    expect(selectSpy).toBeCalledWith(`${alisString}.id`, 'subQueryId');
     expect(offsetSpy).toBeCalledTimes(1);
     expect(offsetSpy).toBeCalledWith((page.number - 1) * page.size);
     expect(limitSpy).toBeCalledTimes(1);
@@ -469,7 +489,7 @@ describe('GetAll methode test', () => {
     expect(orderBySpy).toBeCalledTimes(1);
     expect(orderBySpy).toBeCalledWith({
       ['addresses.country']: 'ASC',
-      ['users.login']: 'DESC',
+      [`${alisString}.login`]: 'DESC',
     });
     expect(applyQueryFilterRelationSpy).toBeCalledTimes(1);
     expect(applyQueryFiltersTargetSpy).toBeCalledTimes(1);
@@ -488,30 +508,30 @@ describe('GetAll methode test', () => {
     expect(resultJoinSpy).toBeCalledTimes(4);
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       1,
-      `users.${include[0]}`,
+      `${alisString}.${include[0]}`,
       include[0]
     );
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       2,
-      `users.${include[1]}`,
+      `${alisString}.${include[1]}`,
       include[1]
     );
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       3,
-      `users.${include[2]}`,
+      `${alisString}.${include[2]}`,
       include[2]
     );
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       4,
-      `users.${include[3]}`,
+      `${alisString}.${include[3]}`,
       include[3]
     );
 
     expect(resultSelectSpy).toBeCalledTimes(1);
     expect(resultSelectSpy).toBeCalledWith([
       ...include.map((i) => `${i}.id`),
-      ...fields.target.map((i) => `users.${i}`),
-      'users.id',
+      ...fields.target.map((i) => `${alisString}.${i}`),
+      `${alisString}.id`,
       ...fields.manager.map((i) => `manager.${i}`),
       ...fields.comments.map((i) => `comments.${i}`),
     ]);

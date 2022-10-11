@@ -32,6 +32,9 @@ export function isString<T, P extends T>(value: T): value is P {
 }
 
 export function snakeToCamel(str: string): string {
+  if (!str.match(/[\s_-]/g)) {
+    return str;
+  }
   return str
     .toLowerCase()
     .replace(/([-_][a-z])/g, (group) =>

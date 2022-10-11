@@ -102,7 +102,7 @@ export class UtilsMethode {
               .select(selectQuery)
               .from(joinTableName, joinTableName)
               .leftJoin(resourceRelationName, resourceRelationName, onQuery)
-              .where(`${selectQuery} = ${metadata.tableName}.${primaryColumn}`)
+              .where(`${selectQuery} = ${builder.alias}.${primaryColumn}`)
               .getQuery();
             resultExpression.push({
               expression: OperandMapForNullRelation[operand].replace(
@@ -119,7 +119,7 @@ export class UtilsMethode {
               .select(`${resourceRelationName}.${inverseSidePropertyPath}`)
               .from(target, resourceRelationName)
               .where(
-                `${resourceRelationName}.${inverseSidePropertyPath} = ${metadata.tableName}.id`
+                `${resourceRelationName}.${inverseSidePropertyPath} = ${builder.alias}.id`
               )
               .getQuery();
             resultExpression.push({
@@ -389,7 +389,7 @@ export class UtilsMethode {
 
   public static async validateRelationRequestData<T>(
     repository: Repository<T>,
-    id: number,
+    id: number | string,
     relName: string,
     body: ServiceOptions<T>['body']
   ): Promise<{

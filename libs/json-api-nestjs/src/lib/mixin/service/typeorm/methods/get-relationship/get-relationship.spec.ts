@@ -18,7 +18,6 @@ import {
 } from '../../../../../constants';
 import { typeormMixin } from '../../index';
 import { getProviderName } from '../../../../../helper';
-import { ResourceRequestObject } from '../../../../../types-common/request';
 
 describe('GetRelationship methode test', () => {
   let typeormService: TypeormMixinService<Users>;
@@ -110,7 +109,7 @@ describe('GetRelationship methode test', () => {
     } catch (e) {
       expect(e).toBeInstanceOf(NotFoundException);
       expect(e.response.detail).toBe(
-        `Resource 'users' with id '2' does not exist`
+        `Resource 'Users' with id '2' does not exist`
       );
     }
   });
