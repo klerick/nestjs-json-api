@@ -30,7 +30,7 @@ export class JsonApiNestJsCommonModule {
     );
     return {
       module: JsonApiNestJsCommonModule,
-      imports: [typeOrmModule],
+      imports: [typeOrmModule, ...(options.imports || [])],
       providers: [
         ...(options.providers || []),
         ajvFactory,
@@ -44,6 +44,7 @@ export class JsonApiNestJsCommonModule {
         ajvFactory,
         optionProvider,
         ErrorInterceptors,
+        ...(options.imports || []),
       ],
     };
   }

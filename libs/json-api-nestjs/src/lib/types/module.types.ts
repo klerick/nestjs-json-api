@@ -5,6 +5,7 @@ import { DynamicModule, PipeTransform } from '@nestjs/common';
 export type Entity = EntityClassOrSchema;
 export type NestController = Type<any>;
 export type NestProvider = Type<any>;
+export type NestImport = Type<any>;
 export type PipeMixin = Type<PipeTransform>;
 export type PipeFabric = (
   entity: Entity,
@@ -25,6 +26,7 @@ export interface ModuleOptions {
   connectionName?: string;
   providers?: NestProvider[];
   options?: Partial<ConfigParam>;
+  imports?: NestImport[];
 }
 
 export interface BaseModuleOptions {
@@ -32,6 +34,7 @@ export interface BaseModuleOptions {
   connectionName: string;
   controller?: NestController;
   config: ConfigParam;
+  imports?: NestImport[];
 }
 
 export interface BaseModuleStaticClass {

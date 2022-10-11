@@ -48,6 +48,7 @@ export interface ModuleOptions {
     controllers?: NestController[];  // List of controller, if you need extend default present
     connectionName?: string; // Type orm connection name: "default" is default name  
     providers?: NestProvider[]; // List of addition provider for useing in custom controller
+    imports?: NestImport[]; // List of addition module for useing in custom controller
     options?: {  
 	  requiredSelectField?: boolean; // Need list of select field in get endpoint, try is default
 	  debug?: boolean; // Debug info in result object

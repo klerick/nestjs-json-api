@@ -239,12 +239,9 @@ export function getAll(
     },
     example: {
       [currentField[0]]: { eq: 'test' },
-      example: {
-        target: currentField.join(','),
-        ...(relationsFields.length > 0
-          ? { [`${relationsFields[0]}.id`]: { ne: '1' } }
-          : {}),
-      },
+      ...(relationsFields.length > 0
+        ? { [`${relationsFields[0]}.id`]: { ne: '1' } }
+        : {}),
     },
     description: `Object of filter for select items from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);
