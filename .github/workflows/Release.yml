@@ -31,18 +31,18 @@ jobs:
       - name: Test
         run: |
           npx nx run-many --target=test --all --code-coverage --coverage --reporters=default --reporters=default --coverageReporters=cobertura,html,json
-          SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}')
-          echo "COVERAGE=$(echo ${SUMMARY})" >> $GITHUB_ENV
-      - name: Cretae Badge
-        uses: schneegans/dynamic-badges-action@v1.0.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: ${{ secrets.GIST_ID }}
-          filename: coverage-json-api.json
-          label: Test Coverage
-          message: ${{ env.COVERAGE }}
-          color: green
-          namedLogo: jest
+#          SUMMARY=$(node ./tools/utils/merge-codecoverage/index.js | grep "All files" | awk '{print $4}')
+#          echo "COVERAGE=$(echo ${SUMMARY})" >> $GITHUB_ENV
+#      - name: Cretae Badge
+#        uses: schneegans/dynamic-badges-action@v1.0.0
+#        with:
+#          auth: ${{ secrets.GIST_SECRET }}
+#          gistID: ${{ secrets.GIST_ID }}
+#          filename: coverage-json-api.json
+#          label: Test Coverage
+#          message: ${{ env.COVERAGE }}
+#          color: green
+#          namedLogo: jest
       - name: Deploy
         run: npx nx affected --target=deploy --base=$BEFORE_SHA
 

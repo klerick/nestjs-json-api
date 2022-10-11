@@ -1,5 +1,6 @@
-****strong text****
 # json-api-nestjs
+
+This plugin works upon TypeOrm library, which is used as the main database abstraction layer tool. The module automatically generates an API according to JSON API specification from the database structure (TypeORM entities). It supports features such as requests validation based on database fields types, request filtering, endpoints extending, data relations control and much more. Our module significantly reduces the development time of REST services by removing the need to negotiate the mechanism of client-server interaction and implementing automatic API generation without the need to write any code.
 
 ## Installation
 
@@ -50,6 +51,7 @@ export interface ModuleOptions {
     options?: {  
 	  requiredSelectField?: boolean; // Need list of select field in get endpoint, try is default
 	  debug?: boolean; // Debug info in result object
+    pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
 	};  
 }
 ```
