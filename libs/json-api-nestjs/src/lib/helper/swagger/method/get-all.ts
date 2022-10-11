@@ -222,7 +222,10 @@ export function getAll(
     schema: {
       type: 'object',
     },
-    example: { target: currentField.join(','), [relationsFields[0]]: 'id' },
+    example: {
+      target: currentField.join(','),
+      ...(relationsFields.length > 0 ? { [relationsFields[0]]: 'id' } : {}),
+    },
     description: `Object of field for select field from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);
 
@@ -236,7 +239,12 @@ export function getAll(
     },
     example: {
       [currentField[0]]: { eq: 'test' },
-      [`${relationsFields[0]}.id`]: { ne: '1' },
+      example: {
+        target: currentField.join(','),
+        ...(relationsFields.length > 0
+          ? { [`${relationsFields[0]}.id`]: { ne: '1' } }
+          : {}),
+      },
     },
     description: `Object of filter for select items from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);

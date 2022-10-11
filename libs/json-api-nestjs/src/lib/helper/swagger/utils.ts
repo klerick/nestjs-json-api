@@ -7,6 +7,7 @@ import { RelationTypeInFunction } from 'typeorm/metadata/types/RelationTypeInFun
 import { Entity } from '../../types';
 import { ColumnType } from 'typeorm/driver/types/ColumnTypes';
 import { camelToKebab, getEntityName, nameIt } from '../utils';
+import { idPipeMixin } from '../../mixin/pipes';
 
 export function getRelationsOptions(entity: Entity) {
   return getMetadataArgsStorage()
@@ -40,7 +41,11 @@ export function getOptionsFiled(entity: Entity) {
     }, {});
 }
 
-export function jsonSchemaBody(entity: Entity, currentField: string[]) {
+export function jsonSchemaBody(
+  entity: Entity,
+  currentField: string[],
+  needRequired = true
+) {
   const optionsFiled = getOptionsFiled(entity);
   const relationsOptions = getRelationsOptions(entity);
   return {
@@ -95,9 +100,9 @@ export function jsonSchemaBody(entity: Entity, currentField: string[]) {
               acum[item] = value;
               return acum;
             }, {}),
-          required: currentField.filter(
-            (i) => optionsFiled[i] === IS_NOT_EMPTY
-          ),
+          required: needRequired
+            ? currentField.filter((i) => optionsFiled[i] === IS_NOT_EMPTY)
+            : [],
         },
         relationships: {
           type: 'object',
@@ -140,9 +145,11 @@ export function jsonSchemaBody(entity: Entity, currentField: string[]) {
             };
             return acum;
           }, {}),
-          required: Object.keys(relationsOptions).filter(
-            (i) => optionsFiled[i] === IS_NOT_EMPTY
-          ),
+          required: needRequired
+            ? Object.keys(relationsOptions).filter(
+                (i) => optionsFiled[i] === IS_NOT_EMPTY
+              )
+            : [],
         },
       },
       required: ['type', 'attributes'],

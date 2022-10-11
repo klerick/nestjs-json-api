@@ -1,8 +1,8 @@
-import { RequestMethod } from '@nestjs/common';
-import { ObjectLiteral } from 'typeorm/common/ObjectLiteral';
+import { PipeTransform, RequestMethod } from '@nestjs/common';
 
 import { PipeFabric } from './module.types';
 import { ControllerTypes } from './controller.types';
+import { Type } from '@nestjs/common/interfaces';
 
 export type MethodName =
   | 'getAll'
@@ -37,7 +37,10 @@ export interface Binding<T extends MethodName> {
   name: T;
   implementation: ControllerTypes<any>[T];
   parameters: {
-    decorator: ParameterDecorator;
+    decorator: (
+      property: string,
+      ...pipes: (Type<PipeTransform> | PipeTransform)[]
+    ) => ParameterDecorator;
     property?: string;
     mixins: PipeFabric[];
   }[];

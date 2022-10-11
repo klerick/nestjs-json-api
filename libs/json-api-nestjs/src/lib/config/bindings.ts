@@ -18,6 +18,7 @@ import {
   queryTransformSchemaMixin,
   bodyRelationshipPipeMixin,
   bodyRelationshipPatchPipeMixin,
+  idPipeMixin,
 } from '../mixin/pipes';
 
 import { PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID } from '../constants';
@@ -49,7 +50,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         decorator: Query,
@@ -71,7 +72,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
     ],
   },
@@ -96,7 +97,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         decorator: Body,
@@ -113,7 +114,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -131,7 +132,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -153,7 +154,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -175,7 +176,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [() => ParseIntPipe],
+        mixins: [idPipeMixin],
       },
       {
         property: PARAMS_RELATION_NAME,

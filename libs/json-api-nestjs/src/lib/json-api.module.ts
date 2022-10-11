@@ -5,9 +5,9 @@ import {
   DEFAULT_CONNECTION_NAME,
   JSON_API_DECORATOR_ENTITY,
   ConfigParamDefault,
-} from '../lib/constants';
-import { BaseModuleClass } from '../lib/mixin';
-import { ModuleOptions } from '../lib/types';
+} from './constants';
+import { BaseModuleClass } from './mixin';
+import { ModuleOptions } from './types';
 
 @Module({})
 export class JsonApiModule {

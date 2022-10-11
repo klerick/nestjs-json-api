@@ -44,7 +44,10 @@ export function getOne(
   ApiParam({
     name: 'id',
     required: true,
-    type: 'integer',
+    type:
+      Reflect.getMetadata('design:type', entity['prototype'], 'id') === Number
+        ? 'integer'
+        : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller.prototype, binding.name, descriptor);
 
@@ -64,7 +67,10 @@ export function getOne(
     schema: {
       type: 'object',
     },
-    example: { target: currentField.join(','), [relationsFields[0]]: 'id' },
+    example: {
+      target: currentField.join(','),
+      ...(relationsFields.length > 0 ? { [relationsFields[0]]: 'id' } : {}),
+    },
     description: `Object of field for select field from "${entityName}" resource`,
   })(controller.prototype, binding.name, descriptor);
 

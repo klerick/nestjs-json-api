@@ -105,9 +105,15 @@ export function inputBodyPostSchema(
         ...relDataType.properties.data.properties,
         type: {
           ...relDataType.properties.data.properties.type,
-          enum: [
-            camelToKebab(getEntityName(arrayPropsConfig.relationType[item])),
-          ],
+          ...(arrayPropsConfig.relationType[item]
+            ? {
+                enum: [
+                  camelToKebab(
+                    getEntityName(arrayPropsConfig.relationType[item])
+                  ),
+                ],
+              }
+            : {}),
         },
       },
     };

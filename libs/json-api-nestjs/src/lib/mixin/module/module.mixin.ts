@@ -83,7 +83,7 @@ BaseModuleClass.forRoot = function (options): DynamicModule {
     ...decoratorOptions,
   };
 
-  bindController(controllerClass, entity, connectionName);
+  bindController(controllerClass, entity, connectionName, moduleConfig);
   setSwaggerDecorator(controllerClass, entity, moduleConfig);
 
   const optionProvider = {

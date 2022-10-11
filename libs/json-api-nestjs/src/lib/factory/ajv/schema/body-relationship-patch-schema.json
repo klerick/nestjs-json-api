@@ -34,9 +34,7 @@
               "type": "string"
             },
             "id": {
-              "type": "string",
-              "pattern": "^\\d+$",
-              "description": "Use string should be as number string"
+              "type": "string"
             }
           },
           "required": ["type", "id"]

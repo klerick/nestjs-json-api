@@ -8,24 +8,31 @@ import {
 } from '@nestjs/common';
 
 import { Bindings } from '../../config/bindings';
-import { NestController, Entity, DecoratorOptions } from '../../types';
+import {
+  NestController,
+  Entity,
+  DecoratorOptions,
+  ConfigParam,
+  MethodName,
+} from '../../types';
 import { JSON_API_DECORATOR_OPTIONS } from '../../constants';
 
 export function bindController(
   controller: NestController,
   entity: Entity,
-  connectionName: string
+  connectionName: string,
+  config: ConfigParam
 ): void {
   for (const methodName in Bindings) {
     const { name, path, parameters, method, implementation } =
-      Bindings[methodName];
+      Bindings[methodName as MethodName];
 
     const decoratorOptions: DecoratorOptions = Reflect.getMetadata(
       JSON_API_DECORATOR_OPTIONS,
       controller
     );
     if (decoratorOptions) {
-      const { allowMethod = [] } = decoratorOptions;
+      const { allowMethod = Object.keys(Bindings) } = decoratorOptions;
       if (!allowMethod.includes(name)) continue;
     }
 
@@ -35,6 +42,7 @@ export function bindController(
       implementationResultFunction = controller.prototype[name];
     }
     controller.prototype[name] = function (...args) {
+      // @ts-ignore
       return implementationResultFunction.call(this, ...args);
     };
 
@@ -69,8 +77,14 @@ export function bindController(
     for (const key in parameters) {
       const parameter = parameters[key];
       const { property, decorator, mixins } = parameter;
-      const resultMixin = mixins.map((mixin) => mixin(entity, connectionName));
-      decorator(property, ...resultMixin)(controller.prototype, name, key);
+      const resultMixin = mixins.map((mixin) =>
+        mixin(entity, connectionName, config)
+      );
+      decorator(property, ...resultMixin)(
+        controller.prototype,
+        name,
+        parseInt(key, 10)
+      );
     }
   }
 }

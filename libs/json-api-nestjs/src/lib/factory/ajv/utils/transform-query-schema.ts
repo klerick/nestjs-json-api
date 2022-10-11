@@ -93,8 +93,11 @@ export function transformQuerySchema(
       filter: {},
     }
   );
-
-  json.$defs['includeDefs'].items.enum.push(...Object.keys(relationsField));
+  if (Object.keys(relationsField).length === 0) {
+    delete json.$defs['includeDefs'].items.enum;
+  } else {
+    json.$defs['includeDefs'].items.enum.push(...Object.keys(relationsField));
+  }
 
   json.$defs['sortDefs'].properties = {
     ...json.$defs['sortDefs'].properties,

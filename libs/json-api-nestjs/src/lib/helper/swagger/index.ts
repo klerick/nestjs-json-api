@@ -35,7 +35,7 @@ export function setSwaggerDecorator(
 
   for (const method in Bindings) {
     if (decoratorOptions) {
-      const { allowMethod = [] } = decoratorOptions;
+      const { allowMethod = Object.keys(Bindings) } = decoratorOptions;
 
       if (!allowMethod.includes(method as MethodName)) {
         continue;

@@ -1,3 +1,4 @@
+import { ParseIntPipe } from '@nestjs/common';
 import { ConfigParam } from '../types';
 
 export const DEFAULT_QUERY_PAGE = 1;
@@ -8,4 +9,5 @@ export const ConfigParamDefault: ConfigParam = {
   debug: true,
   maxExecutionTime: 5000,
   requiredSelectField: true,
+  pipeForId: ParseIntPipe,
 };

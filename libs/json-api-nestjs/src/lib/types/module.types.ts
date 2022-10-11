@@ -6,12 +6,17 @@ export type Entity = EntityClassOrSchema;
 export type NestController = Type<any>;
 export type NestProvider = Type<any>;
 export type PipeMixin = Type<PipeTransform>;
-export type PipeFabric = (entity: Entity, connectionName?: string) => PipeMixin;
+export type PipeFabric = (
+  entity: Entity,
+  connectionName?: string,
+  config?: ConfigParam
+) => PipeMixin;
 
 export interface ConfigParam {
   requiredSelectField: boolean;
   debug: boolean;
   maxExecutionTime: number;
+  pipeForId: PipeMixin;
 }
 
 export interface ModuleOptions {

@@ -82,24 +82,6 @@ describe('BodyRelationshipPipe', () => {
     }
   });
 
-  it('Should be error, incorrect id is no number string', async () => {
-    const data = {
-      data: { type: 'type', id: 'sdfsf' },
-    };
-    expect.assertions(5);
-    try {
-      await pipe.transform(data as any);
-    } catch (e) {
-      expect(e).toBeInstanceOf(BadRequestException);
-      expect(e.response.message[0].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[1].detail).toBe('Must be array');
-      expect(e.response.message[2].detail).toBe(
-        'Must match exactly one schema: "object" or "array"'
-      );
-      expect(e.response.message.length).toBeGreaterThan(0);
-    }
-  });
-
   it('Should be error, array is empty', async () => {
     const data = {
       data: [],
@@ -120,27 +102,6 @@ describe('BodyRelationshipPipe', () => {
     }
   });
 
-  it('Should be error, array with id no number', async () => {
-    const data = {
-      data: [
-        { type: 'type', id: 'wsdf' },
-        { type: 'type', id: '2' },
-      ],
-    };
-    expect.assertions(5);
-    try {
-      await pipe.transform(data as any);
-    } catch (e) {
-      expect(e).toBeInstanceOf(BadRequestException);
-      expect(e.response.message[0].detail).toBe('Must be object');
-      expect(e.response.message[1].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[2].detail).toBe(
-        'Must match exactly one schema: "object" or "array"'
-      );
-      expect(e.response.message.length).toBeGreaterThan(0);
-    }
-  });
-
   it('Should be error, array with incorrect items', async () => {
     const data = {
       data: [
@@ -149,7 +110,7 @@ describe('BodyRelationshipPipe', () => {
         { type: 'type', id: '2' },
       ],
     };
-    expect.assertions(8);
+    expect.assertions(7);
     try {
       await pipe.transform(data as any);
     } catch (e) {
@@ -164,8 +125,7 @@ describe('BodyRelationshipPipe', () => {
       expect(e.response.message[3].detail).toBe(
         "Must have required property 'type'"
       );
-      expect(e.response.message[4].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[5].detail).toBe(
+      expect(e.response.message[4].detail).toBe(
         'Must match exactly one schema: "object" or "array"'
       );
       expect(e.response.message.length).toBeGreaterThan(0);

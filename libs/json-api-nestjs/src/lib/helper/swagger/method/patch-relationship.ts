@@ -56,7 +56,10 @@ export function patchRelationship(
   ApiParam({
     name: 'id',
     required: true,
-    type: 'integer',
+    type:
+      Reflect.getMetadata('design:type', entity['prototype'], 'id') === Number
+        ? 'integer'
+        : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller.prototype, binding.name, descriptor);
 

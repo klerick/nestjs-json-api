@@ -18,7 +18,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   getOne(
-    id: number,
+    id: number | string,
     query: QueryParams<Entity>,
     rest
   ): ReturnType<JsonApiServiceMethode<Entity>['getOne']> {
@@ -31,7 +31,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   deleteOne(
-    id: number,
+    id: number | string,
     rest
   ): ReturnType<JsonApiServiceMethode<Entity>['deleteOne']> {
     return this.serviceMixin.deleteOne({
@@ -51,7 +51,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   patchOne(
-    id: number,
+    id: number | string,
     body: ResourceRequestObject<Entity>['data'],
     rest
   ): ReturnType<JsonApiServiceMethode<Entity>['patchOne']> {
@@ -66,7 +66,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   getRelationship(
-    id: number,
+    id: number | string,
     relName: string,
     rest
   ): ReturnType<JsonApiServiceMethode<Entity>['getRelationship']> {
@@ -76,7 +76,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   deleteRelationship(
-    id: number,
+    id: number | string,
     relName: string,
     body: Exclude<Relationship<Entity>['data'], 'links'>,
     rest
@@ -88,7 +88,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   patchRelationship(
-    id: number,
+    id: number | string,
     relName: string,
     body: Exclude<Relationship<Entity>['data'], 'links'>,
     rest
@@ -100,7 +100,7 @@ export class JsonBaseController<Entity> implements ControllerTypes<Entity> {
   }
 
   postRelationship(
-    id: number,
+    id: number | string,
     relName: string,
     body: Exclude<Relationship<Entity>['data'], 'links'>,
     rest
