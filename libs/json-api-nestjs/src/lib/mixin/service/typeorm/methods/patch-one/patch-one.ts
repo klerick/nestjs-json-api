@@ -23,7 +23,7 @@ export async function patchOne<T>(
   const body = options.body as ResourceRequestObject<T>['data'];
   const { id: idBody, attributes, relationships } = body;
 
-  if (id !== parseInt(idBody, 10)) {
+  if (`${id}` !== idBody) {
     throw new UnprocessableEntityException({
       source: { pointer: '/data/id' },
       detail: "Data 'id' must be equal to url param",

@@ -129,10 +129,12 @@ describe('GetOne methode test', () => {
   it('Should be correct query', async () => {
     let joinSpy;
     let selectSpy;
+    let aliasString;
     const createQueryBuilderSpy = jest
       .spyOn(repository, 'createQueryBuilder')
       .mockImplementationOnce((...alias) => {
         const builder = repository.createQueryBuilder(...alias);
+        aliasString = builder.alias;
         joinSpy = jest.spyOn(builder, 'leftJoin');
         selectSpy = jest.spyOn(builder, 'select');
         return builder;
@@ -145,16 +147,18 @@ describe('GetOne methode test', () => {
     );
     expect(joinSpy).toBeCalledTimes(0);
     expect(selectSpy).toBeCalledTimes(1);
-    expect(selectSpy).toBeCalledWith([`users`]);
+    expect(selectSpy).toBeCalledWith([aliasString]);
   });
 
   it('Should be correct query with include', async () => {
     let joinSpy;
     let selectSpy;
+    let aliasString;
     const createQueryBuilderSpy = jest
       .spyOn(repository, 'createQueryBuilder')
       .mockImplementationOnce((...alias) => {
         const builder = repository.createQueryBuilder(...alias);
+        aliasString = builder.alias;
         joinSpy = jest.spyOn(builder, 'leftJoin');
         selectSpy = jest.spyOn(builder, 'select');
         return builder;
@@ -172,25 +176,27 @@ describe('GetOne methode test', () => {
     expect(joinSpy).toBeCalledTimes(2);
     expect(joinSpy).toHaveBeenNthCalledWith(
       1,
-      `users.${defaultField['include'][0]}`,
+      `${aliasString}.${defaultField['include'][0]}`,
       defaultField['include'][0]
     );
     expect(joinSpy).toHaveBeenNthCalledWith(
       2,
-      `users.${defaultField['include'][1]}`,
+      `${aliasString}.${defaultField['include'][1]}`,
       defaultField['include'][1]
     );
     expect(selectSpy).toBeCalledTimes(1);
-    expect(selectSpy).toBeCalledWith([...defaultField['include'], `users`]);
+    expect(selectSpy).toBeCalledWith([...defaultField['include'], aliasString]);
   });
 
   it('Should be correct query with params', async () => {
     let joinSpy;
     let selectSpy;
+    let aliasString;
     const createQueryBuilderSpy = jest
       .spyOn(repository, 'createQueryBuilder')
       .mockImplementationOnce((...alias) => {
         const builder = repository.createQueryBuilder(...alias);
+        aliasString = builder.alias;
         joinSpy = jest.spyOn(builder, 'leftJoin');
         selectSpy = jest.spyOn(builder, 'select');
         return builder;
@@ -208,14 +214,14 @@ describe('GetOne methode test', () => {
     expect(joinSpy).toBeCalledTimes(1);
     expect(joinSpy).toHaveBeenNthCalledWith(
       1,
-      `users.${defaultField['include'][0]}`,
+      `${aliasString}.${defaultField['include'][0]}`,
       defaultField['include'][0]
     );
     expect(selectSpy).toBeCalledTimes(1);
     expect(selectSpy).toBeCalledWith([
       `${defaultField['include'][0]}.id`,
-      ...defaultField['fields']['target'].map((i) => `users.${i}`),
-      'users.id',
+      ...defaultField['fields']['target'].map((i) => `${aliasString}.${i}`),
+      `${aliasString}.id`,
       ...defaultField['fields']['addresses'].map((i) => `addresses.${i}`),
     ]);
   });

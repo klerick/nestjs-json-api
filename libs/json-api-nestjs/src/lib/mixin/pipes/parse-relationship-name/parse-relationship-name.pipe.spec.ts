@@ -69,7 +69,7 @@ describe('ParseRelationshipNamePipe', () => {
     } catch (e) {
       expect(e).toBeInstanceOf(BadRequestException);
       expect(e.response.message[0].detail).toBe(
-        "Relation 'rereerer' does not exist in resource 'users'"
+        `Relation 'rereerer' does not exist in resource 'Users'`
       );
       expect(e.response.message.length).toBeGreaterThan(0);
     }

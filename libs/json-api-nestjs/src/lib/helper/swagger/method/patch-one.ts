@@ -37,11 +37,14 @@ export function patchOne(
   ApiParam({
     name: 'id',
     required: true,
-    type: 'integer',
+    type:
+      Reflect.getMetadata('design:type', entity['prototype'], 'id') === Number
+        ? 'integer'
+        : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller.prototype, binding.name, descriptor);
 
-  const jsonSchemaProperty = jsonSchemaBody(entity, currentField);
+  const jsonSchemaProperty = jsonSchemaBody(entity, currentField, false);
   jsonSchemaProperty.data.properties = {
     ...{
       id: {

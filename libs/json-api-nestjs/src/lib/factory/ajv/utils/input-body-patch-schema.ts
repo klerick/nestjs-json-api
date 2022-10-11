@@ -21,12 +21,18 @@ export function inputBodyPatchSchema(
     schemaName,
     arrayPropsConfig
   );
+  const patternObject: Record<string, string> = {};
+  if (
+    Reflect.getMetadata('design:type', entity['prototype'], 'id') === Number
+  ) {
+    patternObject.pattern = '^\\d+$';
+    patternObject.description = 'Use string should be as number string';
+  }
   json.properties.data.properties = {
     ...{
       id: {
         type: 'string',
-        pattern: '^\\d+$',
-        description: 'Use string should be as number string',
+        ...patternObject,
       },
     },
     ...json.properties.data.properties,

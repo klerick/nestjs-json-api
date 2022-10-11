@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  Json API plugin for 
+  Json API plugins for 
   <a href="http://nestjs.com/" target="blank">NestJS</a>
   framework 
 </p>
@@ -15,12 +15,9 @@
    Tools to implement JSON API, such as, end point, query params, body params, validation and transformation response.
 </p>
 
-## Description
-
-<p>
-This plugin works upon TypeOrm library, which is used as the main database abstraction layer tool. The module automatically generates an API according to JSON API specification from the database structure (TypeORM entities). It supports features such as requests validation based on database fields types, request filtering, endpoints extending, data relations control and much more. Our module significantly reduces the development time of REST services by removing the need to negotiate the mechanism of client-server interaction and implementing automatic API generation without the need to write any code.
-</p>
-
+- *[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api-nestjs)* - plugin for create CRUD overs JSON API
+- *json-api-nestjs-sdk* - tool for client, call api over *json-api-nestjs*(coming soon...)
+- *kson-api-nestjs-acl* - tool for acl over *json-api-nestjs*(coming soon...)
 ## Installation
 
 ```bash

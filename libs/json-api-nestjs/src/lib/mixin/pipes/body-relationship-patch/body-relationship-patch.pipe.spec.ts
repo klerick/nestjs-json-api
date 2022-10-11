@@ -88,57 +88,6 @@ describe('BodyRelationshipPatchPipe', () => {
     }
   });
 
-  it('Should be error, incorrect id is no number string', async () => {
-    const data = {
-      data: { type: 'type', id: 'sdfsf' },
-    };
-    expect.assertions(7);
-    try {
-      await pipe.transform(data as any);
-    } catch (e) {
-      expect(e).toBeInstanceOf(BadRequestException);
-      expect(e.response.message[0].detail).toBe('Must be null');
-      expect(e.response.message[1].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[2].detail).toBe(
-        'Must match exactly one schema: "null" or "object"'
-      );
-      expect(e.response.message[3].detail).toBe('Must be array');
-      expect(e.response.message[4].detail).toBe(
-        'Must match exactly one schema: "object" or "array"'
-      );
-      expect(e.response.message.length).toBeGreaterThan(0);
-    }
-  });
-
-  it('Should be error, array with id no number', async () => {
-    const data = {
-      data: [
-        { type: 'type', id: 'wsdf' },
-        { type: 'type', id: '2' },
-      ],
-    };
-    expect.assertions(9);
-    try {
-      await pipe.transform(data as any);
-    } catch (e) {
-      expect(e).toBeInstanceOf(BadRequestException);
-      expect(e.response.message[0].detail).toBe('Must be null');
-      expect(e.response.message[1].detail).toBe('Must be object');
-      expect(e.response.message[2].detail).toBe(
-        'Must match exactly one schema: "null" or "object"'
-      );
-      expect(e.response.message[3].detail).toBe('Must be null');
-      expect(e.response.message[4].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[5].detail).toBe(
-        'Must match exactly one schema: "null" or "object"'
-      );
-      expect(e.response.message[6].detail).toBe(
-        'Must match exactly one schema: "object" or "array"'
-      );
-      expect(e.response.message.length).toBeGreaterThan(0);
-    }
-  });
-
   it('Should be error, array with incorrect items', async () => {
     const data = {
       data: [
@@ -147,7 +96,7 @@ describe('BodyRelationshipPatchPipe', () => {
         { type: 'type', id: '2' },
       ],
     };
-    expect.assertions(14);
+    expect.assertions(13);
     try {
       await pipe.transform(data as any);
     } catch (e) {
@@ -171,11 +120,10 @@ describe('BodyRelationshipPatchPipe', () => {
       expect(e.response.message[8].detail).toBe(
         "Must have required property 'type'"
       );
-      expect(e.response.message[9].detail).toBe('Must match pattern "^\\d+$"');
-      expect(e.response.message[10].detail).toBe(
+      expect(e.response.message[9].detail).toBe(
         'Must match exactly one schema: "null" or "object"'
       );
-      expect(e.response.message[11].detail).toBe(
+      expect(e.response.message[10].detail).toBe(
         'Must match exactly one schema: "object" or "array"'
       );
       expect(e.response.message.length).toBeGreaterThan(0);

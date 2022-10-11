@@ -17,7 +17,7 @@ import {
 import { typeormMixin } from '../../index';
 
 import { getProviderName } from '../../../../../helper';
-import { ResourceRequestObject } from '../../../../../types-common/request';
+import { ResourceRequestObject } from '../../../../../types-common';
 import {
   NotFoundException,
   UnprocessableEntityException,
@@ -157,7 +157,7 @@ describe('PostOne methode test', () => {
     } catch (e) {
       expect(e).toBeInstanceOf(NotFoundException);
       expect(e.response.detail).toBe(
-        `Resource 'users' with id '${body.id}' does not exist`
+        `Resource '${repository.metadata.targetName}' with id '${body.id}' does not exist`
       );
     }
   });

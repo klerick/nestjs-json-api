@@ -5,9 +5,9 @@ import {
   DEFAULT_CONNECTION_NAME,
   JSON_API_DECORATOR_ENTITY,
   ConfigParamDefault,
-} from '../lib/constants';
-import { BaseModuleClass } from '../lib/mixin';
-import { ModuleOptions } from '../lib/types';
+} from './constants';
+import { BaseModuleClass } from './mixin';
+import { ModuleOptions } from './types';
 
 @Module({})
 export class JsonApiModule {
@@ -22,7 +22,7 @@ export class JsonApiModule {
       ...ConfigParamDefault,
       ...options.options,
     };
-
+    const commonModule = JsonApiNestJsCommonModule.forRoot(options);
     const entityImport = options.entities.map((entity) => {
       const controller = (options.controllers || []).find(
         (item) =>
@@ -37,10 +37,7 @@ export class JsonApiModule {
           ...options.options,
         },
       });
-      module.imports = [
-        ...module.imports,
-        JsonApiNestJsCommonModule.forRoot(options),
-      ];
+      module.imports = [commonModule, ...module.imports];
       return module;
     });
 
