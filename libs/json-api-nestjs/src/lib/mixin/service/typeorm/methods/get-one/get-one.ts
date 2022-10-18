@@ -59,7 +59,7 @@ export async function getOne<T>(
   const result = await builder
     .select([...fieldsSelect])
     .where({ id })
-    .getRawOne();
+    .getRawMany();
 
   if (!result) {
     throw new NotFoundException({
@@ -67,7 +67,7 @@ export async function getOne<T>(
     });
   }
   const callQuery = Date.now() - startTime;
-  const itemResult = this.transform.transformRawData([result]);
+  const itemResult = this.transform.transformRawData(result);
   const data = this.transform.transformData(itemResult[0], include);
   const included = this.transform.transformInclude(itemResult);
 
