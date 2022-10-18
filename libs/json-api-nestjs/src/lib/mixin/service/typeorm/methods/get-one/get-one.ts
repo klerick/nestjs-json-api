@@ -61,7 +61,7 @@ export async function getOne<T>(
     .where({ id })
     .getRawMany();
 
-  if (!result) {
+  if (result.length === 0) {
     throw new NotFoundException({
       detail: `Resource '${preparedResourceName}' with id '${id}' does not exist`,
     });
