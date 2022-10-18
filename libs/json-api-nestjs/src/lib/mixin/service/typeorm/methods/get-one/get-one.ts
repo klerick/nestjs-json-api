@@ -59,15 +59,15 @@ export async function getOne<T>(
   const result = await builder
     .select([...fieldsSelect])
     .where({ id })
-    .getRawOne();
+    .getRawMany();
 
-  if (!result) {
+  if (result.length === 0) {
     throw new NotFoundException({
       detail: `Resource '${preparedResourceName}' with id '${id}' does not exist`,
     });
   }
   const callQuery = Date.now() - startTime;
-  const itemResult = this.transform.transformRawData([result]);
+  const itemResult = this.transform.transformRawData(result);
   const data = this.transform.transformData(itemResult[0], include);
   const included = this.transform.transformInclude(itemResult);
 

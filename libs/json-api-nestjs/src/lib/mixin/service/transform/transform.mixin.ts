@@ -78,11 +78,11 @@ export class TransformMixinService<T> {
     this.repository.metadata.relations.reduce((acum, i) => {
       switch (i.relationType) {
         case 'one-to-one':
-        case 'one-to-many':
+        case 'many-to-one':
           acum[i.propertyName] = false;
           break;
         case 'many-to-many':
-        case 'many-to-one':
+        case 'one-to-many':
           acum[i.propertyName] = true;
           break;
       }
