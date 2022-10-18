@@ -88,3 +88,23 @@ export class AppComponent implements OnInit {
 ```
 
 You can find more example [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/example-angular-client/src/app/app.component.ts)
+
+## Using with react, etc
+
+```typescript
+import { getInstance } from 'json-api-nestjs-sdk';
+import { Users } from 'database';
+
+const service = getInstance(
+  {
+    apiPrefix: '/api/v1',
+    apiHost: window.location.origin,
+  },
+  {
+    Users,
+  }
+);
+```
+
+You should add [linker plugin](https://angular.io/guide/creating-libraries#consuming-partial-ivy-code-outside-the-angular-cli) in your webpack config
+You can find example webpack config [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/example-react-client/webpack.config.ts)
