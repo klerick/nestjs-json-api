@@ -14,7 +14,7 @@ import { map } from 'rxjs';
 
 @JsonApi(Users, {
   allowMethod: excludeMethod(['deleteRelationship']),
-  requiredSelectField: true,
+  requiredSelectField: false,
 })
 export class ExtendUserController extends JsonBaseController<Users> {
   @InjectService() public service: JsonApiService<Users>;

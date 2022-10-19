@@ -14,7 +14,7 @@ export type IAddresses = Addresses;
 @Entity('addresses')
 export class Addresses {
   @PrimaryGeneratedColumn()
-  public id: number;
+  public id!: number;
 
   @IsOptional()
   @Length(3, 70)
@@ -24,7 +24,7 @@ export class Addresses {
     nullable: true,
     default: 'NULL',
   })
-  public city: string;
+  public city!: string;
 
   @IsOptional()
   @Length(3, 70)
@@ -34,7 +34,7 @@ export class Addresses {
     nullable: true,
     default: 'NULL',
   })
-  public state: string;
+  public state!: string;
 
   @IsOptional()
   @Length(3, 68)
@@ -44,7 +44,7 @@ export class Addresses {
     nullable: true,
     default: 'NULL',
   })
-  public country: string;
+  public country!: string;
 
   @IsEmpty()
   @Column({
@@ -53,7 +53,7 @@ export class Addresses {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public createdAt: Date;
+  public createdAt!: Date;
 
   @IsEmpty()
   @UpdateDateColumn({
@@ -62,8 +62,8 @@ export class Addresses {
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
-  public updatedAt: Date;
+  public updatedAt!: Date;
 
   @OneToOne(() => Users, (item) => item.addresses)
-  public user: IUsers;
+  public user!: IUsers;
 }

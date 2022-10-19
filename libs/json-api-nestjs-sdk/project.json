@@ -1,0 +1,77 @@
+{
+  "name": "json-api-nestjs-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/json-api-nestjs-sdk/src",
+  "prefix": "nestjs-json-api",
+  "targets": {
+    "deploy": {
+      "executor": "./dist/libs/semrel:release",
+      "dependsOn": [
+        { "projects": "self", "target": "buildSemRel"},
+        { "projects": "self", "target": "release" }
+      ],
+      "options": {
+        "npm": {
+          "pkgRoot": "./dist/libs/json-api-nestjs-sdk"
+        }
+      }
+    },
+    "release": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": "self", "target": "build" }],
+      "options": {
+        "commands": [
+          "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}'>./dist/libs/json-api-nestjs/.npmrc"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "buildSemRel": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx build semrel"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "build": {
+      "executor": "@nrwl/angular:package",
+      "outputs": ["dist/libs/json-api-nestjs-sdk"],
+      "options": {
+        "project": "libs/json-api-nestjs-sdk/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/json-api-nestjs-sdk/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/json-api-nestjs-sdk/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "dependsOn": [{ "projects": "dependencies", "target": "build" }],
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/json-api-nestjs-sdk"],
+      "options": {
+        "jestConfig": "libs/json-api-nestjs-sdk/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/json-api-nestjs-sdk/**/*.ts",
+          "libs/json-api-nestjs-sdk/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}
