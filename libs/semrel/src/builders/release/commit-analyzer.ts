@@ -8,6 +8,7 @@ export function commitAnalyzer({ project }: { project: string }): PluginSpec {
         headerPattern: new RegExp(`^(\\w*)(?:\\((${project})\\))?: (.*)$`),
       },
       releaseRules: [
+        { scope: null, release: false },
         { breaking: true, scope: project, release: 'major' },
         { revert: true, scope: project, release: 'patch' },
         // Angular
