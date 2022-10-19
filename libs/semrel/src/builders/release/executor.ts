@@ -52,8 +52,8 @@ export async function runRelease(
         // preparePlugin({ publishable, publishPath }),
         commitAnalyzer({ project }),
         releaseNotesGenerator({ project }),
-        npm({ publishable, publishPath }),
-        platformPlugin(options, builderContext),
+        // npm({ publishable, publishPath }),
+        // platformPlugin(options, builderContext),
       ]),
     },
     {
