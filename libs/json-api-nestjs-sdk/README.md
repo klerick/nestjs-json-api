@@ -109,3 +109,4 @@ const service = getInstance(
 );
 ```
 You should add [linker plugin](https://angular.io/guide/creating-libraries#consuming-partial-ivy-code-outside-the-angular-cli) in your webpack config. You can find example webpack config [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/example-react-client/webpack.config.ts)
+
