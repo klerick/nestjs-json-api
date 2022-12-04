@@ -12,7 +12,6 @@ import { ModuleOptions } from './types';
 @Module({})
 export class JsonApiModule {
   private static connectionName = DEFAULT_CONNECTION_NAME;
-
   public static forRoot(options: ModuleOptions): DynamicModule {
     JsonApiModule.connectionName =
       options.connectionName || JsonApiModule.connectionName;
