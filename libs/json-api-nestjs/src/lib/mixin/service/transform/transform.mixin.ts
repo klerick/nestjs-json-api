@@ -221,13 +221,13 @@ export class TransformMixinService<T> {
         links: {
           self: this.getLink(
             urlTable,
-            data[this.relationPrimaryField.get(itemRelation)],
+            data[this.relationPrimaryField.get(table)],
             'relationships',
             field
           ),
           related: this.getLink(
             urlTable,
-            data[this.relationPrimaryField.get(itemRelation)],
+            data[this.relationPrimaryField.get(table)],
             field
           ),
         },
