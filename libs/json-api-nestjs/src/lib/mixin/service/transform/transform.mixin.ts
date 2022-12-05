@@ -278,7 +278,11 @@ export class TransformMixinService<T> {
       (acum, item) => {
         const items = Object.values<T>(result[item]);
         acum.push(
-          ...(items.map((i) => this.transformData(i, [], item)) as any)
+          ...(items.map((i) => {
+            const dataForInclude = this.transformData(i, [], item);
+            dataForInclude.type = camelToKebab(i['constructor']['name']);
+            return dataForInclude;
+          }) as any)
         );
         return acum;
       },
