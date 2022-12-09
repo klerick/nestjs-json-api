@@ -387,7 +387,7 @@ describe('Utils methode test', () => {
         .getRepository('users_have_roles')
         .createQueryBuilder('users_have_roles')
         .select('users_have_roles.user_id', 'users_have_roles_user_id')
-        .leftJoin('Roles', 'roles', 'users_have_roles.role_id = Roles.id');
+        .leftJoin('Roles', 'roles', 'users_have_roles.role_id = roles.id');
 
       const expression = UtilsMethode.applyQueryFilterRelation<Users>(
         queryBuilder,

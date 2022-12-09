@@ -226,7 +226,7 @@ export class UtilsMethode {
               relation.isManyToManyOwner
                 ? joinColumns[0]
                 : inverseJoinColumns[0];
-            const onQuery = `${joinTableName}.${queryJoinPropsName} = ${resourceName}.${primaryColumn}`;
+            const onQuery = `${joinTableName}.${queryJoinPropsName} = ${relationProperty}.${primaryColumn}`;
             const selectQuery = `${joinTableName}.${selectJoinPropsName}`;
 
             const query = builder
