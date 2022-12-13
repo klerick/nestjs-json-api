@@ -35,11 +35,9 @@ export function snakeToCamel(str: string): string {
   if (!str.match(/[\s_-]/g)) {
     return str;
   }
-  return str
-    .toLowerCase()
-    .replace(/([-_][a-z])/g, (group) =>
-      group.toUpperCase().replace('-', '').replace('_', '')
-    );
+  return str.replace(/([-_][a-z])/g, (group) =>
+    group.toUpperCase().replace('-', '').replace('_', '')
+  );
 }
 
 export function camelToKebab(str: string): string {

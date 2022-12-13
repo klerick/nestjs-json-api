@@ -122,7 +122,7 @@ export class TransformMixinService<T> {
           this.commonColumnsForRelation.has(tableName) &&
           this.commonColumnsForRelation.get(tableName).has(fieldName)
         ) {
-          if (!currentItem[field]) {
+          if (!(field in currentItem)) {
             continue;
           }
           relationObject[tableName] = relationObject[tableName] || {};
@@ -181,6 +181,7 @@ export class TransformMixinService<T> {
         const propsData = data[field];
         const typeName = getEntityName(this.relationTarget.get(field));
         if (Array.isArray(propsData)) {
+          console.log(propsData, this.relationPrimaryField.get(field));
           builtData.data = propsData.map((i) => ({
             type: camelToKebab(typeName),
             id: i[this.relationPrimaryField.get(field)].toString(),
