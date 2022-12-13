@@ -122,7 +122,7 @@ export class TransformMixinService<T> {
           this.commonColumnsForRelation.has(tableName) &&
           this.commonColumnsForRelation.get(tableName).has(fieldName)
         ) {
-          if (!currentItem[field]) {
+          if (!(field in currentItem)) {
             continue;
           }
           relationObject[tableName] = relationObject[tableName] || {};
@@ -141,7 +141,9 @@ export class TransformMixinService<T> {
             val
           );
           if (Array.isArray(acum[key])) {
-            acum[key].push(plainObject);
+            if (plainObject[this.relationPrimaryField.get(key)] !== null) {
+              acum[key].push(plainObject);
+            }
           } else {
             acum[key] = plainObject;
           }

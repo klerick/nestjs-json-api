@@ -19,9 +19,11 @@ describe('Test utils', () => {
     const result = snakeToCamel('test_test');
     const result1 = snakeToCamel('test-test');
     const result2 = snakeToCamel('testTest');
+    const result3 = snakeToCamel('event_incident_typeFK');
     expect(result).toBe('testTest');
     expect(result1).toBe('testTest');
     expect(result2).toBe('testTest');
+    expect(result3).toBe('eventIncidentTypeFK');
   });
 
   it('isString', () => {
