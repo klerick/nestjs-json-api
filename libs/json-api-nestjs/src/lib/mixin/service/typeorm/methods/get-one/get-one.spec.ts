@@ -3,12 +3,7 @@ import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { TypeormMixinService } from '../../typeorm.mixin';
-import {
-  mockDBTestModule,
-  Users,
-  Addresses,
-  Roles,
-} from '../../../../../mock-utils';
+import { mockDBTestModule, Users, Addresses } from '../../../../../mock-utils';
 import { ConfigParam, QueryField, QueryParams } from '../../../../../types';
 import { DataSource, Repository } from 'typeorm';
 import {
@@ -89,19 +84,11 @@ describe('GetOne methode test', () => {
       })
     );
 
-    const roles = await repository.manager.getRepository(Roles).save(
-      Object.assign(new Roles(), {
-        name: 'test',
-        key: 'test',
-      })
-    );
-    console.log(roles);
     const user = {
       login: 'login',
       lastName: 'lastName',
       isActive: true,
       addresses: addresses,
-      roles: [roles],
     };
     await repository.save(Object.assign(new Users(), user));
   });
