@@ -5,6 +5,7 @@ import {
   JSON_API_SDK_CONFIG,
   JsonApiSdkConfig,
   ListEntities,
+  PATCH_ENTITIES,
 } from '../../token/json-api-sdk';
 
 import {
@@ -25,6 +26,13 @@ import { ObjectLiteral } from 'typeorm';
 export class JsonApiUtilsService {
   protected jsonApiSdkConfig = inject<JsonApiSdkConfig>(JSON_API_SDK_CONFIG);
   protected listEntities = inject<ListEntities>(ALL_ENTITIES);
+  // protected patchEntities = inject<ListEntities>(PATCH_ENTITIES, {
+  //   optional: true,
+  // });
+
+  constructor() {
+    console.log(this.listEntities);
+  }
 
   public getUrlForResource(resource: string): string {
     const url: string[] = [camelToKebab(resource).toLocaleLowerCase()];

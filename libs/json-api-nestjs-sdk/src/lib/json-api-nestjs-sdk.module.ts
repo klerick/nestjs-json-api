@@ -1,4 +1,12 @@
-import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
+import {
+  Inject,
+  ModuleWithProviders,
+  NgModule,
+  Optional,
+  Provider,
+  Self,
+  SkipSelf,
+} from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import {
@@ -6,6 +14,7 @@ import {
   JSON_API_SDK_CONFIG,
   JsonApiSdkConfig,
   ListEntities,
+  PATCH_ENTITIES,
 } from './token/json-api-sdk';
 
 @NgModule({
@@ -31,5 +40,34 @@ export class JsonApiNestjsSdkModule {
       ngModule: JsonApiNestjsSdkModule,
       providers,
     };
+  }
+
+  public static forChild(
+    entities: ListEntities
+  ): ModuleWithProviders<JsonApiNestjsSdkModule> {
+    return {
+      ngModule: JsonApiNestjsSdkModule,
+      providers: [
+        {
+          provide: PATCH_ENTITIES,
+          useValue: entities,
+        },
+      ],
+    };
+  }
+  constructor(
+    @Optional() @SkipSelf() parentModule: JsonApiNestjsSdkModule,
+    @Optional()
+    @Self()
+    @Inject(PATCH_ENTITIES)
+    patchEntities: ListEntities,
+    @Optional()
+    @SkipSelf()
+    @Inject(ALL_ENTITIES)
+    allEntities: ListEntities
+  ) {
+    if (parentModule) {
+      Object.assign(allEntities, patchEntities);
+    }
   }
 }

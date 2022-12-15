@@ -2,8 +2,8 @@
   "name": "json-api-nestjs-sdk",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^14.2.0",
-    "@angular/core": "^14.2.0",
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0",
     "json-api-nestjs": "^3.1.0"
   },
   "dependencies": {
