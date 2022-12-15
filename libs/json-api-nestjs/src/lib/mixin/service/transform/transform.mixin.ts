@@ -145,7 +145,10 @@ export class TransformMixinService<T> {
               acum[key].push(plainObject);
             }
           } else {
-            acum[key] = plainObject;
+            acum[key] =
+              plainObject[this.relationPrimaryField.get(key)] === null
+                ? undefined
+                : plainObject;
           }
           return acum;
         }, dataJson[currentId]),
