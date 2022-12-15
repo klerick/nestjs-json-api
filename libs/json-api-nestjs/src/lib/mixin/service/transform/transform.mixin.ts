@@ -235,9 +235,12 @@ export class TransformMixinService<T> {
         },
       };
     }
-
+    const idNameField =
+      table === this.currentResourceName
+        ? this.currentPrimaryField
+        : this.relationPrimaryField.get(table);
     return {
-      id: data[this.currentPrimaryField].toString(),
+      id: data[idNameField].toString(),
       type: urlTable,
       attributes,
       relationships,
