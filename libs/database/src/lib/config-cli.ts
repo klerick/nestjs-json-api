@@ -6,7 +6,7 @@ const config: DataSourceOptions = {
   host: 'localhost',
   port: 5432,
   username: 'postgres',
-  password: 'password',
+  password: 'postgres',
   database: 'example_new',
   logging: true,
   migrations: [join(__dirname, '/migrations/**/*{.ts,.js}')],
