@@ -4,7 +4,8 @@
   "peerDependencies": {
     "@angular/common": "^15.0.0",
     "@angular/core": "^15.0.0",
-    "json-api-nestjs": "^4.0.0"
+    "json-api-nestjs": "^4.0.0",
+    "@angular/platform-browser": "^15.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
