@@ -10,9 +10,9 @@ export async function deleteOne<T>(
 ): Promise<void> {
   const preparedResourceName = snakeToCamel(this.repository.metadata.name);
   const { id } = options.route;
-
+  const primaryID = this.repository.metadata.primaryColumns[0].propertyName;
   const builder = this.repository.createQueryBuilder(preparedResourceName);
-  builder.where({ id });
+  builder.where({ [primaryID]: id });
 
   const result = await builder.getOne();
   if (!result) {

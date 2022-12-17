@@ -77,6 +77,11 @@ export function inputBodyPostSchema(
             type: 'boolean',
           };
           break;
+        case Object:
+          dataType = {
+            type: 'object',
+          };
+          break;
         default:
           dataType = {
             type: 'string',

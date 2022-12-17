@@ -29,9 +29,9 @@ export async function patchOne<T>(
       detail: "Data 'id' must be equal to url param",
     });
   }
-
+  const primaryID = this.repository.metadata.primaryColumns[0].propertyName;
   const whereCondition = {
-    id: Equal(id),
+    [primaryID]: Equal(id),
   } as unknown as FindOptionsWhere<T>;
 
   const target = await this.repository.findOne({
