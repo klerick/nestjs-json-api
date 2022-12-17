@@ -273,7 +273,8 @@ export class TransformMixinService<T> {
           : [itemRow[field]];
 
         for (const includeItem of includeArray) {
-          const { id } = includeItem;
+          const idName = this.relationPrimaryField.get(field)
+          const id = includeItem[idName];
           if (result[field][id]) {
             continue;
           }
