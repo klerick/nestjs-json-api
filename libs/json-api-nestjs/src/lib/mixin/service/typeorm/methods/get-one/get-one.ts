@@ -55,10 +55,11 @@ export async function getOne<T>(
       });
     });
   }
+  const primaryID = this.repository.metadata.primaryColumns[0].propertyName;
   const prepareParams = Date.now() - startTime;
   const result = await builder
     .select([...fieldsSelect])
-    .where({ id })
+    .where({ [primaryID]: id })
     .getRawMany();
 
   if (result.length === 0) {
