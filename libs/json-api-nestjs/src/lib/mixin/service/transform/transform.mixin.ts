@@ -217,6 +217,10 @@ export class TransformMixinService<T> {
         };
       }
     }
+    const idNameField =
+      table === this.currentResourceName
+        ? this.currentPrimaryField
+        : this.relationPrimaryField.get(table);
     for (const itemRelation of relationList.values()) {
       const field = camelToKebab(itemRelation);
       if (relationships[itemRelation]) {
@@ -226,29 +230,21 @@ export class TransformMixinService<T> {
         links: {
           self: this.getLink(
             urlTable,
-            data[this.relationPrimaryField.get(table)],
+            data[idNameField],
             'relationships',
             field
           ),
-          related: this.getLink(
-            urlTable,
-            data[this.relationPrimaryField.get(table)],
-            field
-          ),
+          related: this.getLink(urlTable, data[idNameField], field),
         },
       };
     }
-    const idNameField =
-      table === this.currentResourceName
-        ? this.currentPrimaryField
-        : this.relationPrimaryField.get(table);
     return {
       id: data[idNameField].toString(),
       type: urlTable,
       attributes,
       relationships,
       links: {
-        self: this.getLink(urlTable, data['id']),
+        self: this.getLink(urlTable, data[idNameField]),
       },
     };
   }
@@ -273,7 +269,7 @@ export class TransformMixinService<T> {
           : [itemRow[field]];
 
         for (const includeItem of includeArray) {
-          const idName = this.relationPrimaryField.get(field)
+          const idName = this.relationPrimaryField.get(field);
           const id = includeItem[idName];
           if (result[field][id]) {
             continue;
