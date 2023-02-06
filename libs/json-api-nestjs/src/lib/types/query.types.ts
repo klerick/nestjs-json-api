@@ -47,10 +47,11 @@ export type Operands = {
   [P in FilterOperand]: Record<
     P,
     P extends MapFilterOperandTypeString ? string : string[]
-  > &
-    Partial<Record<Exclude<FilterOperand, P>, never>> extends infer O
-    ? { [Q in keyof O]: O[Q] }
-    : never;
+  >;
+  // &
+  // Partial<Record<Exclude<FilterOperand, P>, never>> extends infer O
+  // ? { [Q in keyof O]: O[Q] }
+  // : never;
 }[FilterOperand];
 
 export type OperandsRelation = {

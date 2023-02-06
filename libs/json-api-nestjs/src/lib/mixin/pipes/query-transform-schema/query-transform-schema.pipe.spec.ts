@@ -184,7 +184,7 @@ describe('QueryTransformSchema', () => {
   });
 
   describe('Check filter', () => {
-    it('Error if operand for field more one', async () => {
+    it('Should be correct if operand for field more one', async () => {
       const resultInput: QueryParams<Users> = {
         ...resultInputMock,
         filter: {
@@ -197,16 +197,16 @@ describe('QueryTransformSchema', () => {
           relation: null,
         },
       } as any;
-      expect.assertions(3);
+      expect.assertions(0);
       try {
         await pipe.transform(resultInput);
       } catch (e) {
         expect(e).toBeInstanceOf(BadRequestException);
-        const countError = e.response.message.filter(
-          (item) => item.source.parameter.split('/')[1] === 'filter'
-        ).length;
-        expect(e.response.message.length).toBe(countError);
-        expect(e.response.message.length).toBeGreaterThan(0);
+        // const countError = e.response.message.filter(
+        //   (item) => item.source.parameter.split('/')[1] === 'filter'
+        // ).length;
+        // expect(e.response.message.length).toBe(countError);
+        // expect(e.response.message.length).toBeGreaterThan(0);
       }
     });
 
