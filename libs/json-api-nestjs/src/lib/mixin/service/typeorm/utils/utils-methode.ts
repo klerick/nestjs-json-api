@@ -62,105 +62,112 @@ export class UtilsMethode {
     let i = 0;
 
     for (field in filter) {
-      const operand = Object.keys(filter[field]).pop();
-      const value =
-        operand === FilterOperand.like
-          ? `%${filter[field][operand]}%`
-          : filter[field][operand];
+      const operands = Object.keys(filter[field]);
+      for (const operand of operands) {
+        const value =
+          operand === FilterOperand.like
+            ? `%${filter[field][operand]}%`
+            : filter[field][operand];
 
-      if (relations.has(field)) {
-        const relation = metadata.relations.find(
-          (item) => item.propertyName === field
-        );
-        const {
-          inverseSidePropertyPath,
-          inverseEntityMetadata: { target, name },
-        } = relation;
-        const resourceRelationName = snakeToCamel(name);
-        const primaryColumn = metadata.primaryColumns[0].databaseName;
-        switch (relation.relationType) {
-          case 'many-to-many': {
-            const { inverseJoinColumns, joinColumns } =
-              relation.isManyToManyOwner ? relation : relation.inverseRelation;
-            const relationProps = relation.isManyToManyOwner
-              ? relation
-              : relation.inverseRelation;
-            const { joinTableName } = relationProps;
-            const { databaseName: queryJoinPropsName } =
-              relation.isManyToManyOwner
-                ? inverseJoinColumns[0]
-                : joinColumns[0];
-            const { databaseName: selectJoinPropsName } =
-              relation.isManyToManyOwner
-                ? joinColumns[0]
-                : inverseJoinColumns[0];
-            const onQuery = `${joinTableName}.${queryJoinPropsName} = ${resourceRelationName}.${primaryColumn}`;
-            const selectQuery = `${joinTableName}.${selectJoinPropsName}`;
+        if (relations.has(field)) {
+          const relation = metadata.relations.find(
+            (item) => item.propertyName === field
+          );
+          const {
+            inverseSidePropertyPath,
+            inverseEntityMetadata: { target, name },
+          } = relation;
+          const resourceRelationName = snakeToCamel(name);
+          const primaryColumn = metadata.primaryColumns[0].databaseName;
+          switch (relation.relationType) {
+            case 'many-to-many': {
+              const { inverseJoinColumns, joinColumns } =
+                relation.isManyToManyOwner
+                  ? relation
+                  : relation.inverseRelation;
+              const relationProps = relation.isManyToManyOwner
+                ? relation
+                : relation.inverseRelation;
+              const { joinTableName } = relationProps;
+              const { databaseName: queryJoinPropsName } =
+                relation.isManyToManyOwner
+                  ? inverseJoinColumns[0]
+                  : joinColumns[0];
+              const { databaseName: selectJoinPropsName } =
+                relation.isManyToManyOwner
+                  ? joinColumns[0]
+                  : inverseJoinColumns[0];
+              const onQuery = `${joinTableName}.${queryJoinPropsName} = ${resourceRelationName}.${primaryColumn}`;
+              const selectQuery = `${joinTableName}.${selectJoinPropsName}`;
 
-            const query = builder
-              .subQuery()
-              .select(selectQuery)
-              .from(joinTableName, joinTableName)
-              .leftJoin(resourceRelationName, resourceRelationName, onQuery)
-              .where(`${selectQuery} = ${builder.alias}.${primaryColumn}`)
-              .getQuery();
-            resultExpression.push({
-              expression: OperandMapForNullRelation[operand].replace(
-                'EXPRESSION',
-                query
+              const query = builder
+                .subQuery()
+                .select(selectQuery)
+                .from(joinTableName, joinTableName)
+                .leftJoin(resourceRelationName, resourceRelationName, onQuery)
+                .where(`${selectQuery} = ${builder.alias}.${primaryColumn}`)
+                .getQuery();
+              resultExpression.push({
+                expression: OperandMapForNullRelation[operand].replace(
+                  'EXPRESSION',
+                  query
+                ),
+                params: null,
+              });
+              break;
+            }
+            case 'one-to-many': {
+              const query = builder
+                .subQuery()
+                .select(`${resourceRelationName}.${inverseSidePropertyPath}`)
+                .from(target, resourceRelationName)
+                .where(
+                  `${resourceRelationName}.${inverseSidePropertyPath} = ${builder.alias}.id`
+                )
+                .getQuery();
+              resultExpression.push({
+                expression: OperandMapForNullRelation[operand].replace(
+                  'EXPRESSION',
+                  query
+                ),
+                params: null,
+              });
+              break;
+            }
+            default: {
+              resultExpression.push({
+                expression: `${preparedResourceName}.${field.toString()} ${OperandMapForNull[
+                  operand
+                ].replace(
+                  'EXPRESSION',
+                  UtilsMethode.getParamName(
+                    `${preparedResourceName}.${field}`,
+                    i
+                  )
+                )}`,
+                params: null,
+              });
+            }
+          }
+        } else {
+          resultExpression.push({
+            expression: `${preparedResourceName}.${field.toString()} ${OperandsMap[
+              operand
+            ].replace(
+              'EXPRESSION',
+              UtilsMethode.getParamName(`${preparedResourceName}.${field}`, i)
+            )}`,
+            params: {
+              name: UtilsMethode.getParamName(
+                `${preparedResourceName}.${field}`,
+                i
               ),
-              params: null,
-            });
-            break;
-          }
-          case 'one-to-many': {
-            const query = builder
-              .subQuery()
-              .select(`${resourceRelationName}.${inverseSidePropertyPath}`)
-              .from(target, resourceRelationName)
-              .where(
-                `${resourceRelationName}.${inverseSidePropertyPath} = ${builder.alias}.id`
-              )
-              .getQuery();
-            resultExpression.push({
-              expression: OperandMapForNullRelation[operand].replace(
-                'EXPRESSION',
-                query
-              ),
-              params: null,
-            });
-            break;
-          }
-          default: {
-            resultExpression.push({
-              expression: `${preparedResourceName}.${field.toString()} ${OperandMapForNull[
-                operand
-              ].replace(
-                'EXPRESSION',
-                UtilsMethode.getParamName(`${preparedResourceName}.${field}`, i)
-              )}`,
-              params: null,
-            });
-          }
+              val: value,
+            },
+          });
         }
-      } else {
-        resultExpression.push({
-          expression: `${preparedResourceName}.${field.toString()} ${OperandsMap[
-            operand
-          ].replace(
-            'EXPRESSION',
-            UtilsMethode.getParamName(`${preparedResourceName}.${field}`, i)
-          )}`,
-          params: {
-            name: UtilsMethode.getParamName(
-              `${preparedResourceName}.${field}`,
-              i
-            ),
-            val: value,
-          },
-        });
+        i++;
       }
-      i++;
     }
 
     return resultExpression;
