@@ -13,9 +13,7 @@ export function snakeToCamel(str: string): string {
 }
 
 export function camelToKebab(str: string): string {
-  return str
-    .replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1')
-    .toLowerCase();
+  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 export function getTypeForReq(str: string): string {
