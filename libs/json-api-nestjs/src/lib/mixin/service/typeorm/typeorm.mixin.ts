@@ -18,7 +18,7 @@ export class TypeormMixinService<Entity>
   constructor(
     protected repository: Repository<Entity>,
     protected config: ConfigParam,
-    protected transform: TransformMixinService<Entity>
+    public transform: TransformMixinService<Entity>
   ) {}
 
   getAll(
