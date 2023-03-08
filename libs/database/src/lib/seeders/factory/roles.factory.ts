@@ -1,7 +1,7 @@
 import { FactorizedAttrs, Factory } from '@jorgebodega/typeorm-factory';
-import { Roles } from '@nestjs-json-api/database';
 import { DataSource } from 'typeorm';
 import { faker } from '@faker-js/faker';
+import { Roles } from '../../entities';
 
 export class RolesFactory extends Factory<Roles> {
   protected entity = Roles;
