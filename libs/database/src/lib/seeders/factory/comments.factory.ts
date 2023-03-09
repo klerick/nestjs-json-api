@@ -1,7 +1,7 @@
 import { FactorizedAttrs, Factory } from '@jorgebodega/typeorm-factory';
-import { CommentKind, Comments } from '@nestjs-json-api/database';
 import { faker } from '@faker-js/faker';
 import { DataSource } from 'typeorm';
+import { CommentKind, Comments } from '../../entities';
 
 export class CommentsFactory extends Factory<Comments> {
   protected entity = Comments;
