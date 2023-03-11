@@ -18,7 +18,12 @@ import {
   ServiceOptions,
   ValidationError,
 } from '../../../../types';
-import { snakeToCamel, getEntityName, camelToKebab } from '../../../../helper';
+import {
+  snakeToCamel,
+  getEntityName,
+  camelToKebab,
+  kebabToCamel,
+} from '../../../../helper';
 import {
   OperandMapForNull,
   OperandMapForNullRelation,
@@ -355,7 +360,7 @@ export class UtilsMethode {
       const relationsTypeName = isArray ? data[0]['type'] : data['type'];
 
       const result = await repository.manager
-        .getRepository(relationsTypeName)
+        .getRepository(kebabToCamel(relationsTypeName))
         .find({
           select: {
             id: true,
