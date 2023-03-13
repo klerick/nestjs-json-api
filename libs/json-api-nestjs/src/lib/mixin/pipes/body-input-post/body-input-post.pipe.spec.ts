@@ -269,6 +269,12 @@ describe('BodyInputPostPipe', () => {
               id: '1',
             },
           },
+          userGroup: {
+            data: {
+              type: 'user-groups',
+              id: '1',
+            },
+          },
         },
       },
     };
@@ -299,6 +305,12 @@ describe('BodyInputPostPipe', () => {
           addresses: {
             data: {
               type: 'addresses',
+              id: '1',
+            },
+          },
+          userGroup: {
+            data: {
+              type: 'user-groups',
               id: '1',
             },
           },
