@@ -12,6 +12,7 @@ import {
   Pods,
   Comments,
   Addresses,
+  UserGroups,
 } from './entities';
 import { DataSource } from 'typeorm';
 
@@ -19,6 +20,7 @@ export * from './entities';
 
 export const entities = [
   Users,
+  UserGroups,
   Roles,
   RequestsHavePodLocks,
   Requests,
@@ -52,6 +54,7 @@ export function mockDBTestModule(): DynamicModule {
         type: 'postgres',
         entities: [
           Users,
+          UserGroups,
           Roles,
           RequestsHavePodLocks,
           Requests,

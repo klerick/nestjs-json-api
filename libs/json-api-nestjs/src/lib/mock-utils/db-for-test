@@ -286,9 +286,19 @@ CREATE TABLE public.users (
     is_active boolean DEFAULT false,
     manager_id integer,
     addresses_id integer NOT NULL,
+    user_groups_id integer,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     test_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+--
+-- Name: user_groups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_groups (
+    id integer NOT NULL,
+    label character varying NOT NULL
 );
 
 
@@ -343,6 +353,25 @@ CREATE SEQUENCE public.users_id_seq
 --
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_groups_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+--
+-- Name: user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_groups_id_seq OWNED BY public.user_groups.id;
 
 
 --
@@ -402,6 +431,13 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_groups ALTER COLUMN id SET DEFAULT nextval('public.user_groups_id_seq'::regclass);
+
+
+--
 -- Name: users_have_roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -455,6 +491,13 @@ ALTER TABLE ONLY public.users_have_roles
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY (id);
 
+
+--
+-- Name: users PK_user_groups; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_groups
+    ADD CONSTRAINT "PK_user_groups" PRIMARY KEY (id);
 
 --
 -- Name: pods PK_b00bbc2c7fb41627be2b169f0dd; Type: CONSTRAINT; Schema: public; Owner: -
@@ -516,6 +559,13 @@ CREATE UNIQUE INDEX "IDX_61c360686dfe8d62a9b03873bf" ON public.users_have_roles 
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "FK_2f8d527df0d3acb8aa51945a968" FOREIGN KEY (addresses_id) REFERENCES public.addresses(id);
+
+
+--
+-- Name: users FK_user_groups; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT "FK_user_groups" FOREIGN KEY (user_groups_id) REFERENCES public.user_groups(id);
 
 
 --

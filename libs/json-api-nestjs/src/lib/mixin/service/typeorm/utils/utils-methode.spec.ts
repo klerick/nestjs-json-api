@@ -7,6 +7,7 @@ import {
   Users,
   Roles,
   Addresses,
+  UserGroups,
 } from '../../../../mock-utils';
 import { DEFAULT_CONNECTION_NAME } from '../../../../constants';
 import { UtilsMethode } from './utils-methode';
@@ -46,6 +47,12 @@ describe('Utils methode test', () => {
       })
     );
 
+    const userGroup = await repository.manager.getRepository(UserGroups).save(
+      Object.assign(new UserGroups(), {
+        label: 'Editors',
+      })
+    );
+
     await repository.manager.getRepository(Roles).save(
       Object.assign(new Roles(), {
         name: 'user',
@@ -62,6 +69,7 @@ describe('Utils methode test', () => {
         isActive: true,
         login: 'login',
         addresses: address,
+        userGroups: userGroup,
       })
     );
   });
@@ -678,6 +686,30 @@ describe('Utils methode test', () => {
       expect(Array.isArray(result[0].rel)).toBe(true);
       expect(result[0].rel).toEqual([]);
       expect(result[0].type).toBe(null);
+      expect(result[0].propsName).toBe(Object.keys(data)[0]);
+    });
+
+    it('should be ok if relation entity name is compound', async () => {
+      const data: ResourceRequestObject<Users>['data']['relationships'] = {
+        userGroup: {
+          data: {
+            type: 'user-groups',
+            id: '1',
+          },
+        },
+      };
+      const result = [];
+      for await (const tmp of UtilsMethode.asyncIterateFindRelationships(
+        data,
+        repository
+      )) {
+        result.push(tmp);
+      }
+      expect(result.length).toBe(1);
+      expect(result[0].id).toBe(data.userGroup.data.id);
+      expect(Array.isArray(result[0].rel)).toBe(false);
+      expect(result[0].rel).toBeInstanceOf(UserGroups);
+      expect(result[0].type).toBe(data.userGroup.data.type);
       expect(result[0].propsName).toBe(Object.keys(data)[0]);
     });
   });

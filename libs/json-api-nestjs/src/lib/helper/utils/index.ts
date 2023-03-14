@@ -54,3 +54,10 @@ export function getProviderName(entity: EntityTarget<Entity>, name: string) {
   const entityName = getEntityName(entity);
   return `${upperFirstLetter(entityName)}${name}`;
 }
+
+export function kebabToCamel(str: string) {
+  return str
+    .split('-')
+    .map((i) => i.charAt(0).toUpperCase() + i.substring(1))
+    .join('');
+}

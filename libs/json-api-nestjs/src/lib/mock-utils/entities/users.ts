@@ -8,6 +8,7 @@ import {
   Entity,
   Column,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import {
   Length,
@@ -20,6 +21,7 @@ import {
 import { Exclude } from 'class-transformer';
 
 import { Addresses, Roles, Comments } from '.';
+import { UserGroups } from './user-groups';
 
 export type IUsers = Users;
 
@@ -128,4 +130,9 @@ export class Users {
 
   @OneToMany(() => Comments, (item) => item.createdBy)
   public comments: Comments[];
+
+  @ManyToOne(() => UserGroups, (userGroup) => userGroup.id)
+  @IsNotEmpty()
+  @JoinColumn({ name: 'user_groups_id' })
+  public userGroup: UserGroups;
 }
