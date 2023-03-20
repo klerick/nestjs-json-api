@@ -20,8 +20,7 @@ import {
 
 import { Exclude } from 'class-transformer';
 
-import { Addresses, Roles, Comments } from '.';
-import { UserGroups } from './user-groups';
+import { Addresses, Roles, Comments, Notes, UserGroups } from '.';
 
 export type IUsers = Users;
 
@@ -130,6 +129,9 @@ export class Users {
 
   @OneToMany(() => Comments, (item) => item.createdBy)
   public comments: Comments[];
+
+  @OneToMany(() => Notes, (item) => item.createdBy)
+  public notes: Notes[];
 
   @ManyToOne(() => UserGroups, (userGroup) => userGroup.id)
   @IsNotEmpty()

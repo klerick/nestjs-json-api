@@ -3,7 +3,14 @@ import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { TypeormMixinService } from '../../typeorm.mixin';
-import { mockDBTestModule, Users, Addresses } from '../../../../../mock-utils';
+import {
+  mockDBTestModule,
+  Users,
+  Addresses,
+  Notes,
+  Comments,
+  Roles,
+} from '../../../../../mock-utils';
 import { ConfigParam, QueryField, QueryParams } from '../../../../../types';
 import { DataSource, Repository } from 'typeorm';
 import {
@@ -84,11 +91,42 @@ describe('GetOne methode test', () => {
       })
     );
 
+    await repository.manager.getRepository(Roles).save(
+      Object.assign(new Roles(), {
+        name: 'user',
+        key: 'USER',
+        isDefault: true,
+      })
+    );
+
+    const comments = await repository.manager.getRepository(Comments).save([
+      Object.assign(new Comments(), {
+        kind: 'COMMENT',
+        text: 'text',
+      }),
+      Object.assign(new Comments(), {
+        kind: 'COMMENT',
+        text: 'text',
+      }),
+      Object.assign(new Comments(), {
+        kind: 'COMMENT',
+        text: 'text',
+      }),
+    ]);
+
+    const notes = await repository.manager.getRepository(Notes).save([
+      Object.assign(new Notes(), {
+        text: 'text',
+      }),
+    ]);
+
     const user = {
       login: 'login',
       lastName: 'lastName',
       isActive: true,
       addresses: addresses,
+      comments,
+      notes,
     };
     await repository.save(Object.assign(new Users(), user));
   });
@@ -186,6 +224,17 @@ describe('GetOne methode test', () => {
     );
     expect(selectSpy).toBeCalledTimes(1);
     expect(selectSpy).toBeCalledWith([...defaultField['include'], aliasString]);
+  });
+
+  it('included relationships should only return unique values', async () => {
+    defaultField['include'] = ['comments', 'notes'];
+    const res = await typeormService.getOne({
+      query: defaultField,
+      route: { id: params },
+    });
+
+    expect(res.data['relationships'].comments.data.length).toBe(3);
+    expect(res.data['relationships'].notes.data.length).toBe(1);
   });
 
   it('Should be correct query with params', async () => {
