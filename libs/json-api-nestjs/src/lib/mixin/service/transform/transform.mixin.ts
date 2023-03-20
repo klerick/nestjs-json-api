@@ -186,10 +186,17 @@ export class TransformMixinService<T> {
         const propsData = data[field];
         const typeName = getEntityName(this.relationTarget.get(field));
         if (Array.isArray(propsData)) {
-          builtData.data = propsData.map((i) => ({
-            type: camelToKebab(typeName),
-            id: i[this.relationPrimaryField.get(field)].toString(),
-          }));
+          builtData.data = propsData
+            .map((i) => ({
+              type: camelToKebab(typeName),
+              id: i[this.relationPrimaryField.get(field)].toString(),
+            }))
+            .reduce((acum, i) => {
+              if (acum.find((a) => a.id === i.id)) {
+                return acum;
+              }
+              return [...acum, i];
+            }, []);
         }
 
         if (!Array.isArray(data[field]) && typeof data[field] !== 'undefined') {
