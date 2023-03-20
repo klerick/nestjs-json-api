@@ -13,6 +13,7 @@ import {
   Comments,
   Addresses,
   UserGroups,
+  Notes,
 } from './entities';
 import { DataSource } from 'typeorm';
 
@@ -27,6 +28,7 @@ export const entities = [
   Pods,
   Comments,
   Addresses,
+  Notes,
 ];
 
 const dump = readFileSync(join(__dirname, 'db-for-test'), { encoding: 'utf8' });
@@ -61,6 +63,7 @@ export function mockDBTestModule(): DynamicModule {
           Pods,
           Comments,
           Addresses,
+          Notes,
         ],
       };
     },

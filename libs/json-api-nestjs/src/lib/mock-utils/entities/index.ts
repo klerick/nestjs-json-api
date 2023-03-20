@@ -6,3 +6,4 @@ export * from './pods';
 export * from './comments';
 export * from './addresses';
 export * from './user-groups';
+export * from './notes';
