@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import AjvCall, { ValidateFunction } from 'ajv';
-import { validate as classValidate } from 'class-validator';
+import { isUUID, validate as classValidate } from 'class-validator';
 
 import { PipeMixin, ValidationError } from '../../../types';
 import { ResourceRequestObject } from '../../../types-common/request';
@@ -102,6 +102,29 @@ export class BodyInputPostPipe<Entity> implements PipeTransform {
 
     if (errorResult.length > 0) {
       throw new UnprocessableEntityException(errorResult);
+    }
+
+    const relationsMetadata = this.repository.metadata.relations;
+
+    for (const relationMetadata of relationsMetadata) {
+      const targetMetadata = relationMetadata.inverseEntityMetadata;
+      const primaryColumn = targetMetadata.primaryColumns[0];
+      const isUuidPrimaryKey = primaryColumn.generationStrategy === 'uuid';
+
+      if (isUuidPrimaryKey) {
+        const valid = isUUID(
+          value.data.relationships[relationMetadata.propertyName].data.id
+        );
+
+        if (!valid) {
+          throw new UnprocessableEntityException({
+            source: {
+              pointer: `/data/relationships/${relationMetadata.propertyName}/id`,
+            },
+            detail: `Invalid UUID`,
+          });
+        }
+      }
     }
 
     const dateKey = Object.keys(value.data.attributes).filter(

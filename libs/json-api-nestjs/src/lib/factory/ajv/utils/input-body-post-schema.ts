@@ -23,7 +23,7 @@ export function inputBodyPostSchema(
     camelToKebab(getEntityName(entity))
   );
 
-  const relDataType = {
+  const relDataType: Record<string, any> = {
     type: 'object',
     properties: {
       data: {
@@ -34,8 +34,6 @@ export function inputBodyPostSchema(
           },
           id: {
             type: 'string',
-            pattern: '^\\d+$',
-            description: 'Use string should be as number string',
           },
         },
         required: ['type', 'id'],
@@ -104,6 +102,14 @@ export function inputBodyPostSchema(
   };
 
   const relationships = Object.keys(relationsField).reduce((acum, item) => {
+    if (
+      Reflect.getMetadata('design:type', entity['prototype'], item) === Number
+    ) {
+      relDataType.properties.data.properties.id.pattern = '^\\d+$';
+      relDataType.properties.data.properties.id.description =
+        'Use string should be as number string';
+    }
+
     const resultSchema = {
       ...relDataType.properties.data,
       properties: {

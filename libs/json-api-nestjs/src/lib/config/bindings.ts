@@ -50,7 +50,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         decorator: Query,
@@ -72,7 +72,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
     ],
   },
@@ -97,7 +97,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         decorator: Body,
@@ -114,7 +114,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -132,7 +132,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -154,7 +154,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         property: PARAMS_RELATION_NAME,
@@ -176,7 +176,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [idPipeMixin],
+        mixins: [],
       },
       {
         property: PARAMS_RELATION_NAME,
