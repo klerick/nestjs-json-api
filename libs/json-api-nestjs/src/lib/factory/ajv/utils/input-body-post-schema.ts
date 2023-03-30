@@ -13,6 +13,7 @@ export function inputBodyPostSchema(
     relationType: {
       [key: string]: Function | string;
     };
+    relationUuids: { [key: string]: { [key: string]: boolean } };
   }
 ): typeof inputBodySchemaJson {
   const json: typeof inputBodySchemaJson = JSON.parse(
@@ -23,7 +24,7 @@ export function inputBodyPostSchema(
     camelToKebab(getEntityName(entity))
   );
 
-  const relDataType = {
+  const relDataType: Record<string, any> = {
     type: 'object',
     properties: {
       data: {
@@ -103,13 +104,41 @@ export function inputBodyPostSchema(
     ...attributes,
   };
 
+  const uuidRelations = arrayPropsConfig.relationUuids || {};
   const relationships = Object.keys(relationsField).reduce((acum, item) => {
+    const currentRelDataType = {
+      [item]: {
+        ...relDataType,
+        properties: {
+          ...relDataType.properties,
+          data: {
+            ...relDataType.properties.data,
+            properties: {
+              ...relDataType.properties.data.properties,
+              id: {
+                ...relDataType.properties.data.properties.id,
+                pattern: uuidRelations[item]?.id
+                  ? '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                  : '^\\d+$',
+                ...(uuidRelations[item]?.id
+                  ? {
+                      minLength: 36,
+                      maxLength: 36,
+                    }
+                  : {}),
+              },
+            },
+          },
+        },
+      },
+    };
+
     const resultSchema = {
-      ...relDataType.properties.data,
+      ...currentRelDataType[item].properties.data,
       properties: {
-        ...relDataType.properties.data.properties,
+        ...currentRelDataType[item].properties.data.properties,
         type: {
-          ...relDataType.properties.data.properties.type,
+          ...currentRelDataType[item].properties.data.properties.type,
           ...(arrayPropsConfig.relationType[item]
             ? {
                 enum: [
@@ -124,9 +153,9 @@ export function inputBodyPostSchema(
     };
 
     acum[item] = {
-      ...relDataType,
+      ...currentRelDataType[item],
       properties: {
-        ...relDataType.properties,
+        ...currentRelDataType[item].properties,
         data:
           Reflect.getMetadata('design:type', entity['prototype'], item) ===
           Array
@@ -138,6 +167,7 @@ export function inputBodyPostSchema(
             : resultSchema,
       },
     };
+
     return acum;
   }, {});
 

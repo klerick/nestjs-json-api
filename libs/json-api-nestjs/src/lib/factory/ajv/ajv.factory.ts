@@ -26,8 +26,10 @@ export function AjvCallFactory(
 
   for (const entity of options.entities) {
     const arrayProps: { [key: string]: boolean } = {};
+    const uuidProps: { [key: string]: boolean } = {};
     const relationArrayProps: { [key: string]: { [key: string]: boolean } } =
       {};
+    const relationUuids: { [key: string]: { [key: string]: boolean } } = {};
     const repository = dataSource.getRepository(entity);
     const relations = repository.metadata.relations.map((i) => {
       return i.propertyName;
@@ -36,6 +38,7 @@ export function AjvCallFactory(
       .filter((i) => !relations.includes(i.propertyName))
       .map((i) => {
         arrayProps[i.propertyName] = i.isArray;
+        uuidProps[i.propertyName] = i.generationStrategy === 'uuid';
         return i.propertyName;
       });
     const relationType = repository.metadata.relations.reduce((acum, i) => {
@@ -63,6 +66,15 @@ export function AjvCallFactory(
           relationArrayProps[item.propertyName] =
             relationArrayProps[item.propertyName] || {};
           relationArrayProps[item.propertyName][i.propertyName] = i.isArray;
+
+          relationUuids[item.propertyName] =
+            relationUuids[item.propertyName] || {};
+
+          if (i.isPrimary) {
+            relationUuids[item.propertyName][i.propertyName] =
+              i.generationStrategy === 'uuid';
+          }
+
           return i.propertyName;
         });
       const fakeObject = columns.reduce<Record<string, string>>(
@@ -110,6 +122,7 @@ export function AjvCallFactory(
           arrayProps,
           relationArrayProps,
           relationType,
+          relationUuids,
         }
       ),
       `inputBodyPostSchema-${schemaName}`
@@ -122,8 +135,10 @@ export function AjvCallFactory(
         `inputBodyPatchSchema-${schemaName}`,
         {
           arrayProps,
+          uuidProps,
           relationArrayProps,
           relationType,
+          relationUuids,
         }
       ),
       `inputBodyPatchSchema-${schemaName}`
