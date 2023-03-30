@@ -114,7 +114,7 @@ const Bindings: BindingsConfig = {
       {
         property: PARAMS_RESOURCE_ID,
         decorator: Param,
-        mixins: [],
+        mixins: [idPipeMixin],
       },
       {
         property: PARAMS_RELATION_NAME,
