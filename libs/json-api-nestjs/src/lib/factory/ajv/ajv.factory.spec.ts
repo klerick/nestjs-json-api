@@ -242,7 +242,7 @@ describe('AJV factory', () => {
       properties: {
         id: {
           type: 'string',
-          description: 'Use string should be as number string',
+          description: 'Use string should be as uuid string',
           pattern:
             '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
           maxLength: 36,
