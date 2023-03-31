@@ -24,7 +24,7 @@ export function inputBodyPostSchema(
     camelToKebab(getEntityName(entity))
   );
 
-  const relDataType: Record<string, any> = {
+  const baseRelDataType: Record<string, any> = {
     type: 'object',
     properties: {
       data: {
@@ -106,17 +106,17 @@ export function inputBodyPostSchema(
 
   const uuidRelations = arrayPropsConfig.relationUuids || {};
   const relationships = Object.keys(relationsField).reduce((acum, item) => {
-    const currentRelDataType = {
+    const relDataType = {
       [item]: {
-        ...relDataType,
+        ...baseRelDataType,
         properties: {
-          ...relDataType.properties,
+          ...baseRelDataType.properties,
           data: {
-            ...relDataType.properties.data,
+            ...baseRelDataType.properties.data,
             properties: {
-              ...relDataType.properties.data.properties,
+              ...baseRelDataType.properties.data.properties,
               id: {
-                ...relDataType.properties.data.properties.id,
+                ...baseRelDataType.properties.data.properties.id,
                 pattern: uuidRelations[item]?.id
                   ? '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
                   : '^\\d+$',
@@ -134,11 +134,11 @@ export function inputBodyPostSchema(
     };
 
     const resultSchema = {
-      ...currentRelDataType[item].properties.data,
+      ...relDataType[item].properties.data,
       properties: {
-        ...currentRelDataType[item].properties.data.properties,
+        ...relDataType[item].properties.data.properties,
         type: {
-          ...currentRelDataType[item].properties.data.properties.type,
+          ...relDataType[item].properties.data.properties.type,
           ...(arrayPropsConfig.relationType[item]
             ? {
                 enum: [
@@ -153,9 +153,9 @@ export function inputBodyPostSchema(
     };
 
     acum[item] = {
-      ...currentRelDataType[item],
+      ...relDataType[item],
       properties: {
-        ...currentRelDataType[item].properties,
+        ...relDataType[item].properties,
         data:
           Reflect.getMetadata('design:type', entity['prototype'], item) ===
           Array
