@@ -10,7 +10,7 @@ import { BodyInputPatchPipe } from './body-input-patch/body-input-patch.pipe';
 import { ParseRelationshipNamePipe } from './parse-relationship-name/parse-relationship-name.pipe';
 import { BodyRelationshipPipe } from './body-relationship/body-relationship.pipe';
 import { BodyRelationshipPatchPipe } from './body-relationship-patch/body-relationship-patch.pipe';
-import { Entity, PipeMixin } from '../../types';
+import { ConfigParam, Entity, PipeMixin } from '../../types';
 import { nameIt } from '../../helper';
 import { IdSchemaPipe } from './query-schema/id-schema.pipe';
 
@@ -96,6 +96,10 @@ export function bodyRelationshipPatchPipeMixin(): PipeMixin {
   return BodyRelationshipPatchPipe;
 }
 
-export function idPipeMixin(entity: Entity, connectionName: string): PipeMixin {
-  return factoryMixin(entity, connectionName, IdSchemaPipe);
+export function idPipeMixin(
+  entity: Entity,
+  connectionName: string,
+  config: ConfigParam
+): PipeMixin {
+  return config.pipeForId;
 }
