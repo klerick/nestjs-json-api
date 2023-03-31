@@ -126,6 +126,9 @@ export function inputBodyPostSchema(
                       maxLength: 36,
                     }
                   : {}),
+                description: uuidRelations[item]?.id
+                  ? 'Use string should be as uuid string'
+                  : 'Use string should be as number string',
               },
             },
           },

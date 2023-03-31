@@ -228,6 +228,34 @@ describe('AJV factory', () => {
       required: ['type', 'id'],
     });
 
+    expect(
+      dataProperty['relationships']['properties']['notes']['properties'][
+        'data'
+      ]['type']
+    ).toBe('array');
+    expect(
+      dataProperty['relationships']['properties']['notes']['properties'][
+        'data'
+      ]['items']
+    ).toEqual({
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'Use string should be as number string',
+          pattern:
+            '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+          maxLength: 36,
+          minLength: 36,
+        },
+        type: {
+          type: 'string',
+          enum: ['notes'],
+        },
+      },
+      required: ['type', 'id'],
+    });
+
     expect(Object.keys(dataProperty['relationships']['properties'])).toEqual(
       relationField
     );

@@ -16,6 +16,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+create extension "uuid-ossp";
+
 --
 -- Name: comment_kind_enum; Type: TYPE; Schema: public; Owner: -
 --
@@ -103,32 +105,13 @@ ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
 --
 
 CREATE TABLE public.notes (
-    id integer NOT NULL,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     text text NOT NULL,
     created_by integer,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
-
---
--- Name: notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.notes_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: notes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 
 
 --
@@ -422,13 +405,6 @@ ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.com
 
 
 --
--- Name: notes id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.notes ALTER COLUMN id SET DEFAULT nextval('public.notes_id_seq'::regclass);
-
-
---
 -- Name: migrations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -507,13 +483,6 @@ ALTER TABLE ONLY public.addresses
 ALTER TABLE ONLY public.comments
     ADD CONSTRAINT "PK_8bf68bc960f2b69e818bdb90dcb" PRIMARY KEY (id);
 
-
---
--- Name: notes PK_notes; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.notes
-    ADD CONSTRAINT "PK_notes" PRIMARY KEY (id);
 
 --
 -- Name: migrations PK_8c82d7f526340ab734260ea46be; Type: CONSTRAINT; Schema: public; Owner: -
