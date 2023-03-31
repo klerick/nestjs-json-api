@@ -27,7 +27,6 @@ export interface ModuleOptions {
   providers?: NestProvider[];
   options?: Partial<ConfigParam>;
   imports?: NestImport[];
-  pipeForId?: PipeMixin;
 }
 
 export interface BaseModuleOptions {

@@ -34,7 +34,6 @@ export class JsonApiModule {
         config: {
           ...ConfigParamDefault,
           ...options.options,
-          pipeForId: options.pipeForId
         },
       });
       module.imports = [commonModule, ...module.imports];
