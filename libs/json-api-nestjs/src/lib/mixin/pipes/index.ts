@@ -12,7 +12,6 @@ import { BodyRelationshipPipe } from './body-relationship/body-relationship.pipe
 import { BodyRelationshipPatchPipe } from './body-relationship-patch/body-relationship-patch.pipe';
 import { ConfigParam, Entity, PipeMixin } from '../../types';
 import { nameIt } from '../../helper';
-import { IdSchemaPipe } from './query-schema/id-schema.pipe';
 
 function factoryMixin(entity: Entity, connectionName: string, pipe: PipeMixin) {
   const entityName =
