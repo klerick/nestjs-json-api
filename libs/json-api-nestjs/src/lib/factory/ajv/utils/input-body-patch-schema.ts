@@ -8,10 +8,12 @@ export function inputBodyPatchSchema(
   schemaName: string,
   arrayPropsConfig: {
     arrayProps: { [key: string]: boolean };
+    uuidProps: { [key: string]: boolean };
     relationArrayProps: { [key: string]: { [key: string]: boolean } };
     relationType: {
       [key: string]: Function | string;
     };
+    relationUuids: { [key: string]: { [key: string]: boolean } };
   }
 ): ReturnType<typeof inputBodyPostSchema> {
   const json = inputBodyPostSchema(
@@ -21,13 +23,18 @@ export function inputBodyPatchSchema(
     schemaName,
     arrayPropsConfig
   );
-  const patternObject: Record<string, string> = {};
-  if (
-    Reflect.getMetadata('design:type', entity['prototype'], 'id') === Number
-  ) {
-    patternObject.pattern = '^\\d+$';
-    patternObject.description = 'Use string should be as number string';
+  const patternObject: Record<string, string | number> = {};
+  patternObject.pattern = '^\\d+$';
+  patternObject.description = 'Use string should be as number string';
+
+  if (arrayPropsConfig.uuidProps.id) {
+    patternObject.pattern =
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$';
+    patternObject.maxLength = 36;
+    patternObject.minLength = 36;
+    patternObject.description = 'Use string should be as uuid string';
   }
+
   json.properties.data.properties = {
     ...{
       id: {

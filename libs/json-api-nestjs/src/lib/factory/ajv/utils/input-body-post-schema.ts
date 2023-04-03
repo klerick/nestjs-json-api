@@ -13,6 +13,7 @@ export function inputBodyPostSchema(
     relationType: {
       [key: string]: Function | string;
     };
+    relationUuids: { [key: string]: { [key: string]: boolean } };
   }
 ): typeof inputBodySchemaJson {
   const json: typeof inputBodySchemaJson = JSON.parse(
@@ -23,7 +24,7 @@ export function inputBodyPostSchema(
     camelToKebab(getEntityName(entity))
   );
 
-  const relDataType = {
+  const baseRelDataType: Record<string, any> = {
     type: 'object',
     properties: {
       data: {
@@ -103,13 +104,44 @@ export function inputBodyPostSchema(
     ...attributes,
   };
 
+  const uuidRelations = arrayPropsConfig.relationUuids || {};
   const relationships = Object.keys(relationsField).reduce((acum, item) => {
+    const relDataType = {
+      [item]: {
+        ...baseRelDataType,
+        properties: {
+          ...baseRelDataType.properties,
+          data: {
+            ...baseRelDataType.properties.data,
+            properties: {
+              ...baseRelDataType.properties.data.properties,
+              id: {
+                ...baseRelDataType.properties.data.properties.id,
+                pattern: uuidRelations[item]?.id
+                  ? '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                  : '^\\d+$',
+                ...(uuidRelations[item]?.id
+                  ? {
+                      minLength: 36,
+                      maxLength: 36,
+                    }
+                  : {}),
+                description: uuidRelations[item]?.id
+                  ? 'Use string should be as uuid string'
+                  : 'Use string should be as number string',
+              },
+            },
+          },
+        },
+      },
+    };
+
     const resultSchema = {
-      ...relDataType.properties.data,
+      ...relDataType[item].properties.data,
       properties: {
-        ...relDataType.properties.data.properties,
+        ...relDataType[item].properties.data.properties,
         type: {
-          ...relDataType.properties.data.properties.type,
+          ...relDataType[item].properties.data.properties.type,
           ...(arrayPropsConfig.relationType[item]
             ? {
                 enum: [
@@ -124,9 +156,9 @@ export function inputBodyPostSchema(
     };
 
     acum[item] = {
-      ...relDataType,
+      ...relDataType[item],
       properties: {
-        ...relDataType.properties,
+        ...relDataType[item].properties,
         data:
           Reflect.getMetadata('design:type', entity['prototype'], item) ===
           Array
@@ -138,6 +170,7 @@ export function inputBodyPostSchema(
             : resultSchema,
       },
     };
+
     return acum;
   }, {});
 

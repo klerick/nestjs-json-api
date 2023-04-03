@@ -12,8 +12,8 @@ import { Users, IUsers } from '.';
 
 @Entity('notes')
 export class Notes {
-  @PrimaryGeneratedColumn()
-  public id: number;
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
 
   @IsNotEmpty()
   @Column({
