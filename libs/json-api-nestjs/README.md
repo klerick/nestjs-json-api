@@ -83,6 +83,7 @@ import {ExampleService} from '../../service/example/example.service';
 @JsonApi(Users, {
   allowMethod: excludeMethod(['deleteRelationship']),
   requiredSelectField: true,
+  overrideName: 'user',
 })
 export class ExtendUserController extends JsonBaseController<Users> {
   @InjectService() public service: JsonApiService<Users>;

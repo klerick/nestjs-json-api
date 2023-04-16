@@ -24,7 +24,7 @@ export function setSwaggerDecorator(
     const entityName =
       entity instanceof Function ? entity.name : entity.options.name;
 
-    ApiTags(config['overrideName'] || `${camelToKebab(entityName)}`)(
+    ApiTags(config?.['overrideName'] || `${camelToKebab(entityName)}`)(
       controller
     );
   }
