@@ -46,9 +46,19 @@ BaseModuleClass.forRoot = function (options): DynamicModule {
   const controllerClass =
     controller ||
     nameIt(getProviderName(entity, JSON_API_CONTROLLER_POSTFIX), class {});
+
+  const decoratorOptions: DecoratorOptions = Reflect.getMetadata(
+    JSON_API_DECORATOR_OPTIONS,
+    controllerClass
+  );
+
+  const resourceName = decoratorOptions?.overrideName
+    ? decoratorOptions.overrideName
+    : `${camelToKebab(entityName)}`;
+
   const transformService = transformMixin(entity, connectionName);
   const serviceClass = typeormMixin(entity, connectionName, transformService);
-  Controller(`${camelToKebab(entityName)}`)(controllerClass);
+  Controller(resourceName)(controllerClass);
   UseInterceptors(ErrorInterceptors)(controllerClass);
   Inject(serviceClass)(controllerClass.prototype, 'serviceMixin');
   const properties = Reflect.getMetadata(
@@ -73,10 +83,7 @@ BaseModuleClass.forRoot = function (options): DynamicModule {
       controllerClass
     );
   }
-  const decoratorOptions: DecoratorOptions = Reflect.getMetadata(
-    JSON_API_DECORATOR_OPTIONS,
-    controllerClass
-  );
+
   const moduleConfig: ConfigParam = {
     ...ConfigParamDefault,
     ...options.config,

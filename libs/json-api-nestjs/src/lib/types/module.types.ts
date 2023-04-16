@@ -18,6 +18,7 @@ export interface ConfigParam {
   debug: boolean;
   maxExecutionTime: number;
   pipeForId: PipeMixin;
+  overrideName?: string;
 }
 
 export interface ModuleOptions {

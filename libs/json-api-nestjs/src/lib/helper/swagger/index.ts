@@ -23,7 +23,12 @@ export function setSwaggerDecorator(
   if (!apiTag) {
     const entityName =
       entity instanceof Function ? entity.name : entity.options.name;
-    ApiTags(camelToKebab(entityName))(controller);
+
+    const resourceName = config.overrideName
+      ? config.overrideName
+      : `${camelToKebab(entityName)}`;
+
+    ApiTags(resourceName)(controller);
   }
   ApiExtraModels(FilterOperand)(controller);
   ApiExtraModels(createApiModels(entity))(controller);
