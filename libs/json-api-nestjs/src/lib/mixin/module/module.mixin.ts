@@ -18,7 +18,6 @@ import {
   getProviderName,
   camelToKebab,
 } from '../../helper';
-import { JsonBaseController } from '../controller';
 import { typeormMixin, transformMixin } from '../';
 import {
   JSON_API_DECORATOR_OPTIONS,
@@ -52,13 +51,11 @@ BaseModuleClass.forRoot = function (options): DynamicModule {
     controllerClass
   );
 
-  const resourceName = decoratorOptions?.overrideName
-    ? decoratorOptions.overrideName
-    : `${camelToKebab(entityName)}`;
-
   const transformService = transformMixin(entity, connectionName);
   const serviceClass = typeormMixin(entity, connectionName, transformService);
-  Controller(resourceName)(controllerClass);
+  Controller(decoratorOptions['overrideName'] || `${camelToKebab(entityName)}`)(
+    controllerClass
+  );
   UseInterceptors(ErrorInterceptors)(controllerClass);
   Inject(serviceClass)(controllerClass.prototype, 'serviceMixin');
   const properties = Reflect.getMetadata(
