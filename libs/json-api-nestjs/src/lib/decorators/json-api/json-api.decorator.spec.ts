@@ -52,11 +52,11 @@ describe('InjectServiceDecorator', () => {
     );
   });
 
-  it('should save options in class and correctly set overrideName', () => {
+  it('should save options in class and correctly set overrideRoute', () => {
     const testedEntity = class SomeEntity {};
     const apiOptions: DecoratorOptions = {
       allowMethod: ['getAll', 'deleteRelationship'],
-      overrideName: '123'
+      overrideRoute: '123'
     };
 
     @JsonApi(testedEntity, apiOptions)
