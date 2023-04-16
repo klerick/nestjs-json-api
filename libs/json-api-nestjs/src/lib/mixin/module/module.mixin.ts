@@ -53,7 +53,7 @@ BaseModuleClass.forRoot = function (options): DynamicModule {
 
   const transformService = transformMixin(entity, connectionName);
   const serviceClass = typeormMixin(entity, connectionName, transformService);
-  Controller(decoratorOptions?.['overrideName'] || `${camelToKebab(entityName)}`)(
+  Controller(decoratorOptions?.['overrideRoute'] || `${camelToKebab(entityName)}`)(
     controllerClass
   );
   UseInterceptors(ErrorInterceptors)(controllerClass);
