@@ -51,4 +51,18 @@ describe('InjectServiceDecorator', () => {
       Object.keys(Bindings).filter((k) => !example.includes(k))
     );
   });
+
+  it('should save options in class and correctly set overrideRoute', () => {
+    const testedEntity = class SomeEntity {};
+    const apiOptions: DecoratorOptions = {
+      allowMethod: ['getAll', 'deleteRelationship'],
+      overrideRoute: '123'
+    };
+
+    @JsonApi(testedEntity, apiOptions)
+    class SomeClass {}
+
+    const data = Reflect.getMetadata(JSON_API_DECORATOR_OPTIONS, SomeClass);
+    expect(data).toEqual(apiOptions);
+  });
 });
