@@ -154,6 +154,23 @@ describe('GetOne methode test', () => {
     }
   });
 
+  it('should be correct if route is overriden', async () => {
+    expect.assertions(2);
+    configParam.overrideRoute = 'overridden';
+
+    const response = await typeormService.getOne({
+      query: defaultField,
+      route: { id: params },
+    });
+
+    expect(response.data['relationships'].addresses.links.related).toContain(
+      'overridden'
+    );
+    expect(response.data['relationships'].addresses.links.self).toContain(
+      'overridden'
+    );
+  });
+
   it('should be error if item not exist', async () => {
     expect.assertions(1);
     configParam.requiredSelectField = false;

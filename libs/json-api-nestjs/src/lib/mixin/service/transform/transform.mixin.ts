@@ -165,7 +165,7 @@ export class TransformMixinService<T> {
     include: string[] = [],
     table = this.currentResourceName
   ): ResourceData<T> {
-    const urlTable = camelToKebab(table);
+    const urlTable = this.config?.['overrideRoute'] || camelToKebab(table);
     const attributes = {} as Attributes<Omit<T, 'id'>>;
     const relationships = {} as Partial<Relationships<T>>;
 
