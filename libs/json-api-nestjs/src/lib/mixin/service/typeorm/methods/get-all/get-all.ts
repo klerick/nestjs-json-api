@@ -180,7 +180,7 @@ export async function getAll<T>(
   for (let i = 0; i < expressionObjectForRelation.length; i++) {
     const {expression, params, selectInclude} =
       expressionObjectForRelation[i];
-    if (selectInclude && !include.includes(selectInclude as any)) {
+    if (selectInclude && !(include || []).includes(selectInclude as any)) {
       resultBuilder.leftJoin(
         `${preparedResourceName}.${selectInclude}`,
         selectInclude
