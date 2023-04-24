@@ -317,14 +317,19 @@ describe('GetAll methode test', () => {
       },
     });
 
-    expect(joinSpy).toBeCalledTimes(2);
+    expect(joinSpy).toBeCalledTimes(3);
     expect(joinSpy).toHaveBeenNthCalledWith(
       1,
+      `${aliasString}.comments`,
+      'comments'
+    );
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      2,
       `${aliasString}.manager`,
       'manager'
     );
     expect(joinSpy).toHaveBeenNthCalledWith(
-      2,
+      3,
       `${aliasString}.addresses`,
       'addresses'
     );
@@ -353,7 +358,7 @@ describe('GetAll methode test', () => {
     expect(result.meta.totalItems).toBe(0);
     expect(result.meta.pageSize).toBe(page.size);
 
-    expect(resultJoinSpy).toBeCalledTimes(2);
+    expect(resultJoinSpy).toBeCalledTimes(4);
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       1,
       `${aliasString}.${include[0]}`,
@@ -469,14 +474,19 @@ describe('GetAll methode test', () => {
       },
     });
 
-    expect(joinSpy).toBeCalledTimes(2);
+    expect(joinSpy).toBeCalledTimes(3);
     expect(joinSpy).toHaveBeenNthCalledWith(
       1,
+      `${alisString}.comments`,
+      'comments'
+    );
+    expect(joinSpy).toHaveBeenNthCalledWith(
+      2,
       `${alisString}.manager`,
       'manager'
     );
     expect(joinSpy).toHaveBeenNthCalledWith(
-      2,
+      3,
       `${alisString}.addresses`,
       'addresses'
     );

@@ -1,22 +1,22 @@
-import { BadRequestException } from '@nestjs/common';
-import { OrderByCondition } from 'typeorm/find-options/OrderByCondition';
+import {BadRequestException} from '@nestjs/common';
+import {OrderByCondition} from 'typeorm/find-options/OrderByCondition';
 
-import { TypeormMixinService } from '../../typeorm.mixin';
-import { ServiceOptions, SortType } from '../../../../../types';
-import { ResourceObject } from '../../../../../types-common';
+import {TypeormMixinService} from '../../typeorm.mixin';
+import {ServiceOptions, SortType} from '../../../../../types';
+import {ResourceObject} from '../../../../../types-common';
 
-import { snakeToCamel } from '../../../../../helper';
+import {snakeToCamel} from '../../../../../helper';
 
 export async function getAll<T>(
   this: TypeormMixinService<T>,
   options: ServiceOptions<T>
 ): Promise<ResourceObject<T>> {
   const startTime = Date.now();
-  const { filter, include, sort, page, fields } = options.query;
+  const {filter, include, sort, page, fields} = options.query;
   if (this.config.requiredSelectField && fields === null) {
     throw new BadRequestException([
       {
-        source: { parameter: '/fields' },
+        source: {parameter: '/fields'},
         detail: 'Fields params in query is required',
       },
     ]);
@@ -54,7 +54,7 @@ export async function getAll<T>(
       fieldsSelect.add(`${rel}.${propsName}`);
     }
 
-    const { target, ...other } = fields;
+    const {target, ...other} = fields;
     const targetArray =
       [...target, this.repository.metadata.primaryColumns[0].propertyName] ||
       [];
@@ -69,7 +69,7 @@ export async function getAll<T>(
     });
   }
 
-  const { target, relation } = filter;
+  const {target, relation} = filter;
 
   const expressionObjectForRelation = relation
     ? this.UtilsMethode.applyQueryFilterRelation(
@@ -94,14 +94,14 @@ export async function getAll<T>(
   const joinForCommonQuery = {};
 
   for (let i = 0; i < expressionObjectLength; i++) {
-    const { expression, params, selectInclude } = expressionObject[i];
+    const {expression, params, selectInclude} = expressionObject[i];
     if (selectInclude) {
       joinForCommonQuery[`${preparedResourceName}.${selectInclude}`] =
         selectInclude;
     }
     builder[i === 0 ? 'where' : 'andWhere'](expression);
     if (params) {
-      builder.setParameters(params ? { [params.name]: params.val } : {});
+      builder.setParameters(params ? {[params.name]: params.val} : {});
     }
   }
   for (let i = 0; i < includeLength; i++) {
@@ -116,7 +116,7 @@ export async function getAll<T>(
   builder.select(`${preparedResourceName}.${primaryColumn}`, subQueryIdAlias);
 
   if (sort) {
-    const { target, ...otherSort } = sort;
+    const {target, ...otherSort} = sort;
     const targetOrder = Object.entries<SortType>(
       target || {}
     ).reduce<OrderByCondition>((acum, [key, val]) => {
@@ -172,19 +172,27 @@ export async function getAll<T>(
 
   const resultBuilder = resultBuilderQuery
     .select([...fieldsSelect])
-    .whereInIds(resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]));
+  const ids = resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]);
+  if (ids.length > 0) {
+    resultBuilder.whereInIds(resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]));
+  }
 
   for (let i = 0; i < expressionObjectForRelation.length; i++) {
-    const { expression, params, selectInclude } =
+    const {expression, params, selectInclude} =
       expressionObjectForRelation[i];
-    if (selectInclude) {
+    if (selectInclude && !include.includes(selectInclude as any)) {
       resultBuilder.leftJoin(
         `${preparedResourceName}.${selectInclude}`,
         selectInclude
       );
     }
-    resultBuilder.andWhere(expression);
-    resultBuilder.setParameters(params ? { [params.name]: params.val } : {});
+    if (i === 0 && ids.length === 0) {
+      resultBuilder.where(expression);
+    } else {
+      resultBuilder.andWhere(expression);
+    }
+
+    resultBuilder.setParameters(params ? {[params.name]: params.val} : {});
   }
 
   const result = await resultBuilder.getRawMany();
@@ -206,7 +214,7 @@ export async function getAll<T>(
       pageNumber: page.number,
       totalItems: count,
       pageSize: page.size,
-      ...(this.config.debug ? { debug } : {}),
+      ...(this.config.debug ? {debug} : {}),
     },
     data,
     included,

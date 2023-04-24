@@ -267,32 +267,18 @@ export class UtilsMethode {
               break;
             }
             case 'one-to-many': {
-              if (paramsField !== null) {
-                resultExpression.push({
-                  expression: `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
-                    operand
-                    ].replace('EXPRESSION', paramsField)}`,
-                  params: {
-                    val: value,
-                    name: paramsField,
-                  },
-                  selectInclude: relationProperty,
-                });
-                break;
-              }
-              const query = builder
-                .subQuery()
-                .select(`${resourceName}.${inverseSidePropertyPath}`)
-                .from(target, resourceName)
-                .where(
-                  `${resourceName}.${relationFieldProperty.toString()} ${currentOperandMap[
-                    operand
-                    ].replace('EXPRESSION', paramsField)}`
-                )
-                .getQuery();
               resultExpression.push({
-                expression: `${preparedResourceName}.id IN ${query}`,
-                params: null,
+                expression: `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
+                  operand
+                  ].replace('EXPRESSION', paramsField)}`,
+                params:
+                  paramsField === null
+                    ? null
+                    : {
+                      val: value,
+                      name: paramsField,
+                    },
+                selectInclude: relationProperty,
               });
               break;
             }

@@ -483,7 +483,8 @@ describe('Utils methode test', () => {
             )}`
           )
           .getQuery();
-        const check = `${alias}.id IN (${resultQuery})`;
+        // const check = `${alias}.id IN (${resultQuery})`;
+        const check = `comments.kind = :params_comments.kind_0`;
         expect(expression[i].expression).toBe(check);
         expect(expression[i].params.val).toBe(
           filter[relName][fieldName][operand]
