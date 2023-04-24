@@ -268,7 +268,7 @@ describe('Utils methode test', () => {
           isActive: { [FilterOperand.gte]: 'test' },
           lastName: { [FilterOperand.in]: ['test', 'test'] },
           createdAt: { [FilterOperand.like]: 'test' },
-          updatedAt: { [FilterOperand.lt]: 'test' },
+          updatedAt: { [FilterOperand.lt]: 'test', [FilterOperand.gt]: 'test' },
           id: { [FilterOperand.lte]: 'test' },
         },
       };
@@ -306,30 +306,34 @@ describe('Utils methode test', () => {
       );
 
       const params = Object.keys(filter.manager);
+      let increment = 0;
       for (let i = 0; i < params.length; i++) {
         const alias = 'manager';
-        const paramsName = UtilsMethode.getParamName(
-          `${alias}.${params[i]}`,
-          i
-        );
-        const operand = Object.keys(filter.manager[params[i]])[0];
-        const checkExpression = OperandsMap[operand].replace(
-          'EXPRESSION',
-          paramsName
-        );
-        expect(expression[i].expression).toBe(
-          `${alias}.${params[i]} ${checkExpression}`
-        );
-        expect(expression[i].params.name).toBe(paramsName);
-        if (operand === FilterOperand.like) {
-          expect(expression[i].params.val).toBe(
-            `%${filter.manager[params[i]][operand]}%`
+        for (const operand of Object.keys(filter.manager[params[i]])){
+          const paramsName = UtilsMethode.getParamName(
+            `${alias}.${params[i]}`,
+            increment
           );
-        } else {
-          expect(expression[i].params.val).toBe(
-            filter.manager[params[i]][operand]
+          const checkExpression = OperandsMap[operand].replace(
+            'EXPRESSION',
+            paramsName
           );
+          expect(expression[increment].expression).toBe(
+            `${alias}.${params[i]} ${checkExpression}`
+          );
+          expect(expression[increment].params.name).toBe(paramsName);
+          if (operand === FilterOperand.like) {
+            expect(expression[increment].params.val).toBe(
+              `%${filter.manager[params[i]][operand]}%`
+            );
+          } else {
+            expect(expression[increment].params.val).toBe(
+              filter.manager[params[i]][operand]
+            );
+          }
+          increment++
         }
+
         expect(expression[i].selectInclude).toBe('manager');
       }
 

@@ -71,21 +71,23 @@ export async function getAll<T>(
 
   const { target, relation } = filter;
 
+  const expressionObjectForRelation = relation
+    ? this.UtilsMethode.applyQueryFilterRelation(
+      builder,
+      relation,
+      this.repository.metadata
+    )
+    : [];
+
   const expressionObject = [
     ...(target
       ? this.UtilsMethode.applyQueryFiltersTarget(
-          builder,
-          target,
-          this.repository.metadata
-        )
+        builder,
+        target,
+        this.repository.metadata
+      )
       : []),
-    ...(relation
-      ? this.UtilsMethode.applyQueryFilterRelation(
-          builder,
-          relation,
-          this.repository.metadata
-        )
-      : []),
+    ...expressionObjectForRelation,
   ];
   const expressionObjectLength = expressionObject.length;
   const includeLength = include ? include.length : 0;
@@ -168,10 +170,24 @@ export async function getAll<T>(
     .setParameters(builder.getParameters())
     .getRawMany<T>();
 
-  const result = await resultBuilderQuery
+  const resultBuilder = resultBuilderQuery
     .select([...fieldsSelect])
-    .whereInIds(resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]))
-    .getRawMany();
+    .whereInIds(resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]));
+
+  for (let i = 0; i < expressionObjectForRelation.length; i++) {
+    const { expression, params, selectInclude } =
+      expressionObjectForRelation[i];
+    if (selectInclude) {
+      resultBuilder.leftJoin(
+        `${preparedResourceName}.${selectInclude}`,
+        selectInclude
+      );
+    }
+    resultBuilder.andWhere(expression);
+    resultBuilder.setParameters(params ? { [params.name]: params.val } : {});
+  }
+
+  const result = await resultBuilder.getRawMany();
 
   const callQuery = Date.now() - startTime;
 

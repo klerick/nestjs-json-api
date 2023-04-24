@@ -143,7 +143,7 @@ export class UtilsMethode {
               resultExpression.push({
                 expression: `${preparedResourceName}.${field.toString()} ${OperandMapForNull[
                   operand
-                ].replace(
+                  ].replace(
                   'EXPRESSION',
                   UtilsMethode.getParamName(
                     `${preparedResourceName}.${field}`,
@@ -158,7 +158,7 @@ export class UtilsMethode {
           resultExpression.push({
             expression: `${preparedResourceName}.${field.toString()} ${OperandsMap[
               operand
-            ].replace(
+              ].replace(
               'EXPRESSION',
               UtilsMethode.getParamName(`${preparedResourceName}.${field}`, i)
             )}`,
@@ -203,110 +203,118 @@ export class UtilsMethode {
       const resourceName = snakeToCamel(name);
       let relationFieldProperty: keyof Filter<T>['relation'][typeof relationProperty];
       for (relationFieldProperty in filter[relationProperty]) {
-        const operand = Object.keys(
+        for (const operand of Object.keys(
           filter[relationProperty][relationFieldProperty]
-        ).pop();
-        const value =
-          operand === FilterOperand.like
-            ? `%${filter[relationProperty][relationFieldProperty][operand]}%`
-            : filter[relationProperty][relationFieldProperty][operand];
-
-        const currentOperandMap =
-          value.toString().toLocaleLowerCase() === 'null'
-            ? OperandMapForNull
-            : OperandsMap;
-        const paramsField =
-          value.toString().toLocaleLowerCase() === 'null'
-            ? null
-            : UtilsMethode.getParamName(
+        )) {
+          const value =
+            operand === FilterOperand.like
+              ? `%${filter[relationProperty][relationFieldProperty][operand]}%`
+              : filter[relationProperty][relationFieldProperty][operand];
+          const currentOperandMap =
+            value.toString().toLocaleLowerCase() === 'null'
+              ? OperandMapForNull
+              : OperandsMap;
+          const paramsField =
+            value.toString().toLocaleLowerCase() === 'null'
+              ? null
+              : UtilsMethode.getParamName(
                 `${relationProperty}.${relationFieldProperty.toString()}`,
                 i
               );
-        switch (relation.relationType) {
-          case 'many-to-many': {
-            const { inverseJoinColumns, joinColumns } =
-              relation.isManyToManyOwner ? relation : relation.inverseRelation;
-            const relationProps = relation.isManyToManyOwner
-              ? relation
-              : relation.inverseRelation;
-            const { joinTableName } = relationProps;
-            const { databaseName: queryJoinPropsName } =
-              relation.isManyToManyOwner
-                ? inverseJoinColumns[0]
-                : joinColumns[0];
-            const { databaseName: selectJoinPropsName } =
-              relation.isManyToManyOwner
-                ? joinColumns[0]
-                : inverseJoinColumns[0];
-            const onQuery = `${joinTableName}.${queryJoinPropsName} = ${relationProperty}.${primaryColumn}`;
-            const selectQuery = `${joinTableName}.${selectJoinPropsName}`;
+          switch (relation.relationType) {
+            case 'many-to-many': {
+              const { inverseJoinColumns, joinColumns } =
+                relation.isManyToManyOwner
+                  ? relation
+                  : relation.inverseRelation;
+              const relationProps = relation.isManyToManyOwner
+                ? relation
+                : relation.inverseRelation;
+              const { joinTableName } = relationProps;
+              const { databaseName: queryJoinPropsName } =
+                relation.isManyToManyOwner
+                  ? inverseJoinColumns[0]
+                  : joinColumns[0];
+              const { databaseName: selectJoinPropsName } =
+                relation.isManyToManyOwner
+                  ? joinColumns[0]
+                  : inverseJoinColumns[0];
+              const onQuery = `${joinTableName}.${queryJoinPropsName} = ${relationProperty}.${primaryColumn}`;
+              const selectQuery = `${joinTableName}.${selectJoinPropsName}`;
 
-            const query = builder
-              .subQuery()
-              .select(selectQuery)
-              .from(joinTableName, joinTableName)
-              .leftJoin(resourceName, relationProperty, onQuery)
-              .where(
-                `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
+              const query = builder
+                .subQuery()
+                .select(selectQuery)
+                .from(joinTableName, joinTableName)
+                .leftJoin(resourceName, relationProperty, onQuery)
+                .where(
+                  `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
+                    operand
+                    ].replace('EXPRESSION', paramsField)}`
+                )
+                .getQuery();
+              resultExpression.push({
+                expression: `${preparedResourceName}.id IN ${query}`,
+                params:
+                  paramsField === null
+                    ? null
+                    : {
+                      val: value,
+                      name: paramsField,
+                    },
+              });
+
+              break;
+            }
+            case 'one-to-many': {
+              if (paramsField !== null) {
+                resultExpression.push({
+                  expression: `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
+                    operand
+                    ].replace('EXPRESSION', paramsField)}`,
+                  params: {
+                    val: value,
+                    name: paramsField,
+                  },
+                  selectInclude: relationProperty,
+                });
+                break;
+              }
+              const query = builder
+                .subQuery()
+                .select(`${resourceName}.${inverseSidePropertyPath}`)
+                .from(target, resourceName)
+                .where(
+                  `${resourceName}.${relationFieldProperty.toString()} ${currentOperandMap[
+                    operand
+                    ].replace('EXPRESSION', paramsField)}`
+                )
+                .getQuery();
+              resultExpression.push({
+                expression: `${preparedResourceName}.id IN ${query}`,
+                params: null,
+              });
+              break;
+            }
+            default:
+              resultExpression.push({
+                expression: `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
                   operand
-                ].replace('EXPRESSION', paramsField)}`
-              )
-              .getQuery();
-            resultExpression.push({
-              expression: `${preparedResourceName}.id IN ${query}`,
-              params:
-                paramsField === null
-                  ? null
-                  : {
+                  ].replace('EXPRESSION', paramsField)}`,
+                params:
+                  paramsField === null
+                    ? null
+                    : {
                       val: value,
                       name: paramsField,
                     },
-            });
-
-            break;
+                selectInclude: relationProperty,
+              });
+              break;
           }
-          case 'one-to-many': {
-            const query = builder
-              .subQuery()
-              .select(`${resourceName}.${inverseSidePropertyPath}`)
-              .from(target, resourceName)
-              .where(
-                `${resourceName}.${relationFieldProperty.toString()} ${currentOperandMap[
-                  operand
-                ].replace('EXPRESSION', paramsField)}`
-              )
-              .getQuery();
 
-            resultExpression.push({
-              expression: `${preparedResourceName}.id IN ${query}`,
-              params:
-                paramsField === null
-                  ? null
-                  : {
-                      val: value,
-                      name: paramsField,
-                    },
-            });
-            break;
-          }
-          default:
-            resultExpression.push({
-              expression: `${relationProperty}.${relationFieldProperty.toString()} ${currentOperandMap[
-                operand
-              ].replace('EXPRESSION', paramsField)}`,
-              params:
-                paramsField === null
-                  ? null
-                  : {
-                      val: value,
-                      name: paramsField,
-                    },
-              selectInclude: relationProperty,
-            });
-            break;
+          i++;
         }
-
-        i++;
       }
     }
     return resultExpression;
@@ -380,8 +388,8 @@ export class UtilsMethode {
       ) {
         const detail = isArray
           ? `Resource '${relationsTypeName}' with ids '${idsToAdd.join(
-              ','
-            )}' does not exist`
+            ','
+          )}' does not exist`
           : `Resource '${relationsTypeName}' with id '${idsToAdd[0]}' does not exist`;
         throw new NotFoundException({
           detail,
