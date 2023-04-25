@@ -173,29 +173,24 @@ export async function getAll<T>(
   const resultBuilder = resultBuilderQuery
     .select([...fieldsSelect])
   const ids = resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]);
+  let result = [];
   if (ids.length > 0) {
     resultBuilder.whereInIds(resultIds.map((i) => i[`${countAlias}_${primaryColumn}`]));
-  }
-
-  for (let i = 0; i < expressionObjectForRelation.length; i++) {
-    const {expression, params, selectInclude} =
-      expressionObjectForRelation[i];
-    if (selectInclude && !(include || []).includes(selectInclude as any)) {
-      resultBuilder.leftJoin(
-        `${preparedResourceName}.${selectInclude}`,
-        selectInclude
-      );
-    }
-    if (i === 0 && ids.length === 0) {
-      resultBuilder.where(expression);
-    } else {
+    for (let i = 0; i < expressionObjectForRelation.length; i++) {
+      const {expression, params, selectInclude} =
+        expressionObjectForRelation[i];
+      if (selectInclude && !(include || []).includes(selectInclude as any)) {
+        resultBuilder.leftJoin(
+          `${preparedResourceName}.${selectInclude}`,
+          selectInclude
+        );
+      }
       resultBuilder.andWhere(expression);
+      resultBuilder.setParameters(params ? {[params.name]: params.val} : {});
     }
-
-    resultBuilder.setParameters(params ? {[params.name]: params.val} : {});
   }
 
-  const result = await resultBuilder.getRawMany();
+  result = await resultBuilder.getRawMany();
 
   const callQuery = Date.now() - startTime;
 
