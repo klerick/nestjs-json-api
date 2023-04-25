@@ -358,7 +358,7 @@ describe('GetAll methode test', () => {
     expect(result.meta.totalItems).toBe(0);
     expect(result.meta.pageSize).toBe(page.size);
 
-    expect(resultJoinSpy).toBeCalledTimes(4);
+    expect(resultJoinSpy).toBeCalledTimes(2);
     expect(resultJoinSpy).toHaveBeenNthCalledWith(
       1,
       `${aliasString}.${include[0]}`,
