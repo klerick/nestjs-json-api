@@ -188,9 +188,8 @@ export async function getAll<T>(
       resultBuilder.andWhere(expression);
       resultBuilder.setParameters(params ? {[params.name]: params.val} : {});
     }
+    result = await resultBuilder.getRawMany();
   }
-
-  result = await resultBuilder.getRawMany();
 
   const callQuery = Date.now() - startTime;
 
