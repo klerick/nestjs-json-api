@@ -155,13 +155,15 @@ describe('GetOne methode test', () => {
   });
 
   it('should be correct if route is overriden', async () => {
-    expect.assertions(2);
+    expect.assertions(3);
     configParam.overrideRoute = 'overridden';
 
     const response = await typeormService.getOne({
       query: defaultField,
       route: { id: params },
     });
+
+    expect(response.data['type']).toContain('users');
 
     expect(response.data['relationships'].addresses.links.related).toContain(
       'overridden'
