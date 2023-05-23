@@ -165,7 +165,8 @@ export class TransformMixinService<T> {
     include: string[] = [],
     table = this.currentResourceName
   ): ResourceData<T> {
-    const urlTable = this.config?.['overrideRoute'] || camelToKebab(table);
+    const urlTable = camelToKebab(table);
+    const routePath = this.config?.['overrideRoute'] || camelToKebab(table);
     const attributes = {} as Attributes<Omit<T, 'id'>>;
     const relationships = {} as Partial<Relationships<T>>;
 
@@ -214,13 +215,13 @@ export class TransformMixinService<T> {
           ...(include.includes(field) && builtData.data ? builtData : {}),
           links: {
             self: this.getLink(
-              urlTable,
+              routePath,
               data[this.relationPrimaryField.get(field)],
               'relationships',
               camelToKebab(field)
             ),
             related: this.getLink(
-              urlTable,
+              routePath,
               data[this.relationPrimaryField.get(field)],
               camelToKebab(field)
             ),
@@ -240,12 +241,12 @@ export class TransformMixinService<T> {
       relationships[itemRelation as string] = {
         links: {
           self: this.getLink(
-            urlTable,
+            routePath,
             data[idNameField],
             'relationships',
             field
           ),
-          related: this.getLink(urlTable, data[idNameField], field),
+          related: this.getLink(routePath, data[idNameField], field),
         },
       };
     }
@@ -255,7 +256,7 @@ export class TransformMixinService<T> {
       attributes,
       relationships,
       links: {
-        self: this.getLink(urlTable, data[idNameField]),
+        self: this.getLink(routePath, data[idNameField]),
       },
     };
   }
