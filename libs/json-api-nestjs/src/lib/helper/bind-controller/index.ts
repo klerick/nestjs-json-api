@@ -45,6 +45,13 @@ export function bindController(
       // @ts-ignore
       return implementationResultFunction.call(this, ...args);
     };
+    Reflect.getMetadataKeys(implementationResultFunction).forEach((metadataKey) => {
+      Reflect.defineMetadata(
+        metadataKey,
+        Reflect.getMetadata(metadataKey, implementationResultFunction),
+        controller.prototype[name]
+      );
+    });
 
     const descriptor = Object.getOwnPropertyDescriptor(
       controller.prototype,
