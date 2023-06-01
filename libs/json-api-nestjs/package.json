@@ -35,8 +35,10 @@
     "./package.json": "./package.json"
   },
   "typesVersions": {
-    "*":{
-      "filter-operand": ["./src/lib/types-common/operand.d.ts"]
+    "*": {
+      "filter-operand": [
+        "./src/lib/types-common/operand.d.ts"
+      ]
     }
   }
 }

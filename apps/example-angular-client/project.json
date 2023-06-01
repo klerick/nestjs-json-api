@@ -82,7 +82,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "apps/example-angular-client/**/*.ts",
@@ -91,8 +91,8 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/example-angular-client"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/example-angular-client"],
       "options": {
         "jestConfig": "apps/example-angular-client/jest.config.ts",
         "passWithNoTests": true

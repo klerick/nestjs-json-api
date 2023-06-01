@@ -8,11 +8,9 @@
       "executor": "./dist/libs/semrel:release",
       "dependsOn": [
         {
-          "projects": "self",
           "target": "buildSemRel"
         },
         {
-          "projects": "self",
           "target": "release"
         }
       ],
@@ -26,7 +24,6 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ],
@@ -64,21 +61,20 @@
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/json-api-nestjs/**/*.ts"]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/json-api-nestjs"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/json-api-nestjs"],
       "options": {
         "jestConfig": "libs/json-api-nestjs/jest.config.ts",
         "passWithNoTests": true
