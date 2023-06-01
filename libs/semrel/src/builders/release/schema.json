@@ -1,4 +1,6 @@
 {
+  "version": 2,
+  "outputCapture": "direct-nodejs",
   "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Deploy",
   "description": "Deploy",
@@ -38,7 +40,9 @@
                 "default": false
               }
             },
-            "required": ["name"]
+            "required": [
+              "name"
+            ]
           }
         ]
       },
@@ -47,8 +51,14 @@
         "master",
         "next",
         "next-major",
-        { "name": "beta", "prerelease": true },
-        { "name": "alpha", "prerelease": true }
+        {
+          "name": "beta",
+          "prerelease": true
+        },
+        {
+          "name": "alpha",
+          "prerelease": true
+        }
       ]
     },
     "gitlab": {
@@ -82,7 +92,9 @@
                     "description": "Short description of the file displayed on the GitLab release. Ignored if path matches more than one file"
                   }
                 },
-                "required": ["path"]
+                "required": [
+                  "path"
+                ]
               }
             }
           }

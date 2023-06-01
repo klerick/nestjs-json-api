@@ -95,7 +95,7 @@ export class JsonApiUtilsService {
       for (const relKey in relation) {
         const relationProps = Reflect.get(relation, relKey);
         for (const key in relationProps) {
-          const filterItem = relationProps[key];
+          const filterItem = (relationProps as any)[key];
           for (const operand in filterItem) {
             httpParams = httpParams.set(
               `filter[${relKey}.${key}][${operand}]`,
@@ -118,7 +118,7 @@ export class JsonApiUtilsService {
       }
       for (const key in relation) {
         const fields = Reflect.get(relation, key);
-        if (fields.length > 0) {
+        if (fields && fields.length > 0) {
           httpParams = httpParams.set(
             `fields[${key}]`,
             [...new Set(fields)].join(',')

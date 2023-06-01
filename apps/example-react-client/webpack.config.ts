@@ -1,5 +1,5 @@
 import { Configuration, RuleSetRule } from 'webpack';
-import getWebpackConfig from '@nrwl/react/plugins/webpack';
+import getWebpackConfig from '@nx/react/plugins/webpack';
 import { AngularWebpackPlugin } from '@ngtools/webpack';
 import { ExecutorContext } from 'nx/src/config/misc-interfaces';
 import { resolve } from 'path';
