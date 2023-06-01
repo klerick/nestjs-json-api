@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
       - uses: actions/cache@v2
         with:
           path: ~/.npm
