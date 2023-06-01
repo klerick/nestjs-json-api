@@ -4,5 +4,3 @@ export { excludeMethod } from './lib/config/bindings';
 export * from './lib/types';
 export * from './lib/types-common';
 export * from './lib/mixin/controller';
-
-
