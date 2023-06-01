@@ -5,11 +5,8 @@
   "projectType": "library",
   "targets": {
     "deploy": {
-      "executor": "./dist/libs/semrel:release",
+      "executor": "semrel:release",
       "dependsOn": [
-        {
-          "target": "buildSemRel"
-        },
         {
           "target": "release"
         }

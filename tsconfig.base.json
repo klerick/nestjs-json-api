@@ -19,7 +19,8 @@
       "database/entity": ["libs/database/src/entity.ts"],
       "json-api-nestjs": ["dist/libs/json-api-nestjs/src"],
       "json-api-nestjs-sdk": ["dist/libs/json-api-nestjs-sdk"],
-      "json-api-nestjs/filter-operand": ["dist/libs/json-api-nestjs"]
+      "json-api-nestjs/filter-operand": ["dist/libs/json-api-nestjs"],
+      "semrel": ["libs/semrel"]
     }
   },
   "exclude": ["node_modules", "tmp"]
