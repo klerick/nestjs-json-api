@@ -79,6 +79,7 @@ export class BodyInputPostPipe<Entity> implements PipeTransform {
 
     const validationErrors = await classValidate(temporaryEntity, {
       skipUndefinedProperties: false,
+      forbidUnknownValues: false
     });
 
     if (validationErrors.length > 0) {

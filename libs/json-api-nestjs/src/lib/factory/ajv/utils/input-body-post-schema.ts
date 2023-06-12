@@ -88,14 +88,7 @@ export function inputBodyPostSchema(
             type: 'string',
           };
       }
-      acum[item] = arrayPropsConfig.arrayProps[item]
-        ? {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-          }
-        : dataType;
+      acum[item] = arrayPropsConfig.arrayProps[item] === false ? dataType : arrayPropsConfig.arrayProps[item];
       return acum;
     }, {});
 
