@@ -25,7 +25,7 @@ export function AjvCallFactory(
   const AjvCallInst = new AjvCall({ allErrors: true });
 
   for (const entity of options.entities) {
-    const arrayProps: { [key: string]: boolean } = {};
+    const arrayProps: { [key: string]: boolean | any} = {};
     const uuidProps: { [key: string]: boolean } = {};
     const relationArrayProps: { [key: string]: { [key: string]: boolean } } =
       {};
@@ -38,6 +38,21 @@ export function AjvCallFactory(
       .filter((i) => !relations.includes(i.propertyName))
       .map((i) => {
         arrayProps[i.propertyName] = i.isArray;
+        if (i.isArray) {
+          arrayProps[i.propertyName] = {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          };
+        }
+        if (i.type === 'enum') {
+          arrayProps[i.propertyName] = {
+            type: 'string',
+            enum: i.enum
+          };
+        }
+
         uuidProps[i.propertyName] = i.generationStrategy === 'uuid';
         return i.propertyName;
       });

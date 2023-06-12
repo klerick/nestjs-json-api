@@ -8,7 +8,7 @@ import AjvCall from 'ajv';
 import { AjvCallFactory } from './ajv.factory';
 import { GLOBAL_MODULE_OPTIONS_TOKEN } from '../../constants';
 import { ModuleOptions, QueryParams } from '../../types';
-import { mockDBTestModule, entities, Users } from '../../mock-utils';
+import { mockDBTestModule, entities, Users, Comments } from '../../mock-utils';
 
 describe('AJV factory', () => {
   let options: ModuleOptions;
@@ -264,4 +264,20 @@ describe('AJV factory', () => {
       propsColumns
     );
   });
+
+  it('Should be correct dchema for enum field', () => {
+    const transformQuerySchema = ajvCall.getSchema<QueryParams<Comments>>(
+      `inputBodyPostSchema-${Comments.name}`
+    );
+    const {enum: enumData} = dataSource.getRepository(Comments).metadata.columns.find(i => i.propertyName === 'kind');
+    const dataProperty =
+      transformQuerySchema.schema['properties']['data']['properties']['attributes']['properties'];
+    expect(dataProperty).toHaveProperty('kind');
+    expect(dataProperty['kind']).toHaveProperty('type');
+    expect(dataProperty['kind']).toHaveProperty('enum');
+    expect(Array.isArray(dataProperty['kind']['enum'])).toEqual(true);
+    expect(dataProperty['kind']['enum']).toEqual(enumData);
+
+
+  })
 });
