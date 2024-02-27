@@ -1,0 +1,140 @@
+# json-api-nestjs-sdk
+
+The plugin of Angular for help work with JSON API over [json-api-nestjs](https://www.npmjs.com/package/json-api-nestjs)
+
+
+## Installation
+
+```bash $ 
+npm install json-api-nestjs-sdk 
+```
+
+## Example
+
+Once the installation process is complete, we can import the **JsonApiJs**.
+
+```typescript  
+import {
+  adapterForAxios,
+  FilterOperand,
+  JsonApiJs,
+  JsonSdkPromise,
+} from 'json-api-nestjs-sdk';
+import { faker } from '@faker-js/faker';
+import axios from 'axios';
+
+import {Users} from 'database'
+
+const axiosAdapter = adapterForAxios(axios);
+
+const jsonConfig: JsonConfig = {
+  adapter: axiosAdapter,
+  apiHost: 'http://localhost:3000',
+  apiPrefix: 'api',
+  dateFields: ['createdAt', 'updatedAt'],
+  operationUrl: 'operation',
+}
+
+const jsonSdk = JsonApiJs(
+  jsonConfig,
+  true //by default all methods return Observable but you return promise
+);
+
+await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      id: { [FilterOperand.in]: usersId.map((i) => `${i}`) },
+    },
+  },
+  include: ['addresses', 'comments', 'roles', 'manager'],
+});
+
+
+// Atomic Operation
+
+const address = new Addresses();
+
+address.city = faker.string.alpha(50);
+address.state = faker.string.alpha(50);
+address.country = faker.string.alpha(50);
+address.id = 10000;
+
+const manager = getUser();
+manager.id = 10001;
+manager.addresses = address;
+
+const roles = new Roles();
+roles.id = 10002;
+roles.name = faker.string.alpha(50);
+roles.key = faker.string.alpha(50);
+
+const user = getUser();
+user.addresses = address;
+user.manager = manager;
+user.roles = [roles];
+
+const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
+  .atomicFactory()
+  .postOne(address)
+  .postOne(manager)
+  .postOne(roles)
+  .postOne(user)
+  .run();
+
+
+```
+or you can use Angular module:
+```typescript
+import { JsonApiAngular, AtomicFactory } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
+import { JsonApiSdkService } from 'json-api-nestjs-sdk';
+
+@Component({
+  standalone: true,
+  selector: 'nestjs-json-api-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+})
+export class AppComponent {
+  private JsonApiSdkService = inject(JsonApiSdkService);
+  private atomicFactory = inject(AtomicFactory);
+}
+
+const angularConfig: JsonSdkConfig = {
+  apiHost: 'http://localhost:4200',
+  idKey: 'id',
+  apiPrefix: 'api',
+  operationUrl: 'operation',
+}
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      JsonApiAngular.forRoot(angularConfig)
+    ),
+  ],
+}).catch((err) =>
+  console.error(err)
+);
+
+
+
+```
+
+## Configuration params
+
+```typescript  
+type JsonSdkConfig = {
+  apiHost: string; // url for api
+  apiPrefix?: string; // prefex for api - api/v1/....
+  idKey?: string; // name for id field
+  idIsNumber?: boolean; // use parseInt for id field
+  operationUrl?: string; // url for atomic operation
+  dateFields: string[] // array of dateField for create date object - ;
+}  
+
+type JsonConfig = JsonSdkConfig & {
+  adapter?: HttpInnerClient; // by default use fetch for http request but you can change it
+}
+```
+* You can see interface of [HttpInnerClient](https://github.com/klerick/nestjs-json-api/blob/master/libs/json-api/json-api-nestjs-sdk/src/lib/types/http-inner-client.ts)
+* More example you can see [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk) or [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-front/src/app/app.component.ts)

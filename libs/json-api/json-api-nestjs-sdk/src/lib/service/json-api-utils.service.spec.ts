@@ -1,0 +1,515 @@
+import { JsonApiUtilsService } from './json-api-utils.service';
+import { JsonApiSdkConfig, QueryParams } from '../types';
+import { HttpParams } from '../utils';
+
+describe('JsonApiUtilsService', () => {
+  let service: JsonApiUtilsService;
+  const mockJsonApiSdkConfig: JsonApiSdkConfig = {
+    apiHost: 'http://localhost:3000',
+    apiPrefix: 'api/v1',
+    idKey: 'id',
+    idIsNumber: true,
+    dateFields: [],
+  };
+
+  beforeEach(async () => {
+    service = new JsonApiUtilsService(mockJsonApiSdkConfig);
+  });
+
+  it('should correctly construct the URL for the resource', () => {
+    const resource = 'MyResource';
+    const expectedUrl = 'http://localhost:3000/api/v1/my-resource';
+    const url = service.getUrlForResource(resource);
+    expect(url).toEqual(expectedUrl);
+  });
+
+  it('should call all helper functions with correct parameters', () => {
+    // Mock the helper functions
+    const includeSpy = jest
+      // @ts-ignore
+      .spyOn(service, 'getIncludeParam')
+      // @ts-ignore
+      .mockReturnValue(new HttpParams());
+
+    const sortSpy = jest
+      // @ts-ignore
+      .spyOn(service, 'getSortParam')
+      // @ts-ignore
+      .mockReturnValue(new HttpParams());
+
+    const pageSpy = jest
+      // @ts-ignore
+      .spyOn(service, 'getPageParam')
+      // @ts-ignore
+      .mockReturnValue(new HttpParams());
+
+    const fieldSpy = jest
+      // @ts-ignore
+      .spyOn(service, 'getFieldParam')
+      // @ts-ignore
+      .mockReturnValue(new HttpParams());
+
+    const filterSpy = jest
+      // @ts-ignore
+      .spyOn(service, 'getFilterParam')
+      // @ts-ignore
+      .mockReturnValue(new HttpParams());
+
+    const testParams = {
+      include: 'test-include',
+      sort: 'test-sort',
+      page: 'test-page',
+      fields: 'test-fields',
+      filter: 'test-filter',
+    };
+
+    service.getQueryStringParams(testParams as any);
+
+    expect(includeSpy).toHaveBeenCalledWith(
+      testParams.include,
+      expect.any(HttpParams)
+    );
+    expect(sortSpy).toHaveBeenCalledWith(
+      testParams.sort,
+      expect.any(HttpParams)
+    );
+    expect(pageSpy).toHaveBeenCalledWith(
+      testParams.page,
+      expect.any(HttpParams)
+    );
+    expect(fieldSpy).toHaveBeenCalledWith(
+      testParams.fields,
+      expect.any(HttpParams)
+    );
+    expect(filterSpy).toHaveBeenCalledWith(
+      testParams.filter,
+      expect.any(HttpParams)
+    );
+  });
+
+  describe('getIncludeParam', () => {
+    it('should set include parameter when valid array is passed', () => {
+      const includeArray: string[] = ['param1', 'param2'];
+      const httpParams = new HttpParams();
+      const queryParams: QueryParams<any> = {
+        include: includeArray,
+      };
+
+      const httpParamsWithIncludes = service['getIncludeParam'](
+        queryParams.include,
+        httpParams
+      );
+      expect(httpParamsWithIncludes.get('include')).toEqual(
+        includeArray.join(',')
+      );
+    });
+
+    it('should return same HttpParams instance when include array is empty or not an array', () => {
+      const httpParams = new HttpParams();
+      const queryParams: QueryParams<any> = {
+        include: [],
+      };
+
+      let result = service['getIncludeParam'](queryParams.include, httpParams);
+      expect(result).toEqual(httpParams);
+
+      queryParams.include = null as any;
+      result = service['getIncludeParam'](queryParams.include, httpParams);
+      expect(result).toEqual(httpParams);
+
+      queryParams.include = {} as any;
+      result = service['getIncludeParam'](queryParams.include, httpParams);
+      expect(result).toEqual(httpParams);
+    });
+  });
+  describe('getSortParam', () => {
+    it('should return the HttpParams with the sort parameters', () => {
+      let httpParams = new HttpParams();
+
+      const sortParams = {
+        target: {
+          id: 'ASC',
+        },
+        relation: {
+          name: 'DESC',
+        },
+      };
+
+      httpParams = service['getSortParam'](sortParams, httpParams);
+
+      expect(httpParams.get('sort')).toBe('id,-relation.name');
+    });
+
+    it('should return the HttpParams with the sort parameters when target is empty', () => {
+      let httpParams = new HttpParams();
+
+      const sortParams = {
+        target: {},
+        relation: {
+          name: 'DESC',
+        },
+      };
+
+      httpParams = service['getSortParam'](sortParams, httpParams);
+
+      expect(httpParams.get('sort')).toBe('-relation.name');
+    });
+
+    it('should return the HttpParams with sort parameters when target does not exist', () => {
+      let httpParams = new HttpParams();
+
+      const sortParams = {
+        relation: {
+          name: 'DESC',
+        },
+      };
+
+      httpParams = service['getSortParam'](sortParams, httpParams);
+
+      expect(httpParams.get('sort')).toBe('-relation.name');
+    });
+
+    it('should return the original HttpParams when sort is undefined', () => {
+      const httpParams = new HttpParams().set('test', 'value');
+
+      const resultParams = service['getSortParam'](undefined, httpParams);
+
+      expect(resultParams.get('sort')).toBeNull();
+      expect(resultParams.get('test')).toBe('value');
+    });
+
+    it('should return the original HttpParams when sort is an empty object', () => {
+      const httpParams = new HttpParams().set('test', 'value');
+
+      const resultParams = service['getSortParam']({}, httpParams);
+
+      expect(resultParams.get('sort')).toBeNull();
+      expect(resultParams.get('test')).toBe('value');
+    });
+  });
+  describe('getPageParam', () => {
+    it('should return httpParams as it is if page is undefined, not an object, or an empty object', () => {
+      const httpParams = new HttpParams();
+      let page;
+      expect(service['getPageParam'](page, httpParams)).toEqual(httpParams);
+
+      page = 'not an object';
+      expect(service['getPageParam'](page as any, httpParams)).toEqual(
+        httpParams
+      );
+
+      page = {};
+      expect(service['getPageParam'](page as any, httpParams)).toEqual(
+        httpParams
+      );
+    });
+
+    it('should set page[number] to 1 if number is not defined in page', () => {
+      const httpParams = new HttpParams();
+      const page = { size: 50 } as QueryParams<any>['page']; // only size is supplied here
+      const result = service['getPageParam'](page, httpParams);
+      expect(result.get('page[number]')).toEqual('1');
+      expect(result.get('page[size]')).toEqual('50');
+    });
+
+    it('should set page[number] and page[size] from page if they are defined', () => {
+      const httpParams = new HttpParams();
+      const page: QueryParams<any>['page'] = { number: 3, size: 30 };
+      const result = service['getPageParam'](page, httpParams);
+      expect(result.get('page[number]')).toEqual('3');
+      expect(result.get('page[size]')).toEqual('30');
+    });
+
+    it('should not set page[size] if it is not defined in page', () => {
+      const httpParams = new HttpParams();
+      const page = { number: 2 } as QueryParams<any>['page']; // only number is supplied here
+      const result = service['getPageParam'](page, httpParams);
+      expect(result.get('page[number]')).toEqual('2');
+      expect(result.get('page[size]')).toEqual(null);
+    });
+  });
+  describe('getFieldParam', () => {
+    it('should return original httpParams when field is empty or not an object', () => {
+      const originalParams = new HttpParams();
+      const result = service['getFieldParam'](undefined, originalParams);
+      expect(result).toEqual(originalParams);
+    });
+
+    it('should correctly set httpParams with target field', () => {
+      const fields = { target: ['prop1', 'prop2'] };
+      const originalParams = new HttpParams();
+      const result = service['getFieldParam'](fields as any, originalParams);
+      expect(result.get('fields[target]')).toBe('prop1,prop2');
+    });
+
+    it('should correctly set httpParams with other fields', () => {
+      const fields = { relation: ['prop1', 'prop2'] };
+      const originalParams = new HttpParams();
+      const result = service['getFieldParam'](fields, originalParams);
+      expect(result.get('fields[relation]')).toBe('prop1,prop2');
+      expect(result.get('fields[target]')).toBe(null);
+    });
+  });
+  describe('getFilterParam', () => {
+    it('should return the same HttpParams when the filter is an empty object', () => {
+      const httpParams = new HttpParams();
+      const filter = {};
+
+      const result = service['getFilterParam'](filter as any, httpParams);
+
+      expect(result).toEqual(httpParams);
+    });
+
+    //It correctly adds parameters to HttpParams from a filter
+    it('should correctly add parameters from a simple non-nested filter', () => {
+      const httpParams = new HttpParams();
+      const filter = { target: { name: { eq: 'John' } } };
+
+      const result = service['getFilterParam'](filter, httpParams);
+
+      expect(result.keys()).toContain('filter[name][eq]');
+      expect(result.get('filter[name][eq]')).toEqual('John');
+    });
+
+    it('should correctly add array parameters from a simple non-nested filter', () => {
+      const httpParams = new HttpParams();
+      const filter = { target: { name: { in: ['John', 'Tom'] } } };
+
+      const result = service['getFilterParam'](filter, httpParams);
+
+      expect(result.keys()).toContain('filter[name][in]');
+      expect(result.get('filter[name][in]')).toEqual('John,Tom');
+    });
+
+    it('should correctly add parameters from a nested filter', () => {
+      const httpParams = new HttpParams();
+      const filter = { child: { name: { eq: 'John' } } };
+
+      const result = service['getFilterParam'](filter as any, httpParams);
+
+      expect(result.keys()).toContain('filter[child.name][eq]');
+      expect(result.get('filter[child.name][eq]')).toEqual('John');
+    });
+
+    it('should correctly add array parameters from a nested filter', () => {
+      const httpParams = new HttpParams();
+      const filter = { child: { name: { in: ['John', 'Tom'] } } };
+
+      const result = service['getFilterParam'](filter as any, httpParams);
+
+      expect(result.keys()).toContain('filter[child.name][in]');
+      expect(result.get('filter[child.name][in]')).toEqual('John,Tom');
+    });
+  });
+
+  describe('createEntityInstance', () => {
+    it('Should return instance of entity', () => {
+      const entityInstance = service['createEntityInstance']('test') as any;
+
+      expect(typeof entityInstance).toBe('object');
+      expect(entityInstance.constructor.name).toBe('Test');
+    });
+  });
+
+  describe('findIncludeEntity', () => {
+    const dummyItem = {
+      type: 'testType',
+      id: '1',
+    } as any;
+
+    it('should return undefined when no matching included item is found', () => {
+      const included = [
+        {
+          id: 'differentId',
+          type: 'differentType',
+          attributes: {},
+        },
+      ] as any;
+
+      const result = service['findIncludeEntity'](dummyItem, included);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should return an entity object when matching included item is found without attributes', () => {
+      const included = [
+        {
+          id: '1',
+          type: 'testType',
+        },
+      ] as any;
+
+      const result: any = service['findIncludeEntity'](dummyItem, included);
+      expect(result).toBeDefined();
+      expect(result[mockJsonApiSdkConfig.idKey] as any).toBe(1);
+    });
+
+    it('should return an entity object when matching included item is found with attributes', () => {
+      const included = [
+        {
+          id: '1',
+          type: 'testType',
+          attributes: { attr1: 'value1', attr2: 'value2' },
+        },
+      ] as any;
+
+      const result: any = service['findIncludeEntity'](dummyItem, included);
+
+      expect(result).toBeDefined();
+      expect(result[mockJsonApiSdkConfig.idKey]).toBe(1);
+      expect(result.attr1).toBe('value1');
+      expect(result.attr2).toBe('value2');
+    });
+  });
+
+  describe('Testing convertResponseData function', () => {
+    const someData = () => ({
+      data: [
+        {
+          type: 'type1',
+          id: '1',
+          attributes: {
+            attr1: 'value1',
+            attr2: 'value2',
+          },
+          relationships: {
+            relationship1: {
+              data: {
+                type: 'type2',
+                id: '2',
+              },
+            },
+          },
+        },
+      ],
+      included: [],
+    });
+
+    it('should handle data without relationships', () => {
+      const response = service['convertResponseData'](
+        someData() as any,
+        []
+      ) as any;
+      expect(response[0].constructor.name).toBe('Type1');
+      expect(response[0][mockJsonApiSdkConfig.idKey]).toBe(1);
+      expect(response[0]).toHaveProperty('attr1');
+      expect(response[0]).toHaveProperty('attr2');
+      expect(response[0]).not.toHaveProperty('relationship1');
+    });
+    it('should handle data with existing relationships', () => {
+      const data = {
+        ...someData(),
+        included: [
+          {
+            type: 'type2',
+            id: '2',
+            attributes: {
+              attr1: 'value1',
+              attr2: 'value2',
+            },
+          },
+        ],
+      } as any;
+      const response = service['convertResponseData'](data, [
+        'relationship1',
+      ]) as any;
+      expect(response[0].constructor.name).toBe('Type1');
+      expect(response[0][mockJsonApiSdkConfig.idKey]).toBe(1);
+      expect(response[0]).toHaveProperty('attr1');
+      expect(response[0]).toHaveProperty('attr2');
+      expect(response[0]).toHaveProperty('relationship1');
+      expect(response[0]['relationship1'][mockJsonApiSdkConfig.idKey]).toBe(2);
+    });
+  });
+
+  it('should generate body correctly', () => {
+    class TestEntity {
+      id = '1';
+      name = 'Test';
+      name1 = true;
+      name2 = 1;
+      name3 = null;
+      relatedEntity = new (class RelatedEntity {
+        id = '2';
+        type = 'relatedEntity';
+      })();
+      relatedEntities = [
+        new (class RelatedEntities {
+          id = '3';
+          type = 'relatedEntities';
+        })(),
+      ];
+    }
+
+    const testEntity = new TestEntity();
+    const result = service.generateBody(testEntity);
+
+    expect(result).toEqual({
+      attributes: {
+        name: 'Test',
+        name1: true,
+        name2: 1,
+        name3: null,
+      },
+      relationships: {
+        relatedEntity: {
+          type: 'related-entity',
+          id: '2',
+        },
+        relatedEntities: [
+          {
+            type: 'related-entities',
+            id: '3',
+          },
+        ],
+      },
+    });
+  });
+
+  it('should get result for array relation correctly', () => {
+    const body = [
+      { id: '1', type: 'test' },
+      { id: '2', type: 'test' },
+    ] as any;
+    const result = service['getResultForRelation']({ data: body } as any);
+    expect(result).toEqual([body[0].id, body[1].id]);
+  });
+
+  it('should get result for relation correctly', () => {
+    const body = { id: '1', type: 'test' } as any;
+    const result = service['getResultForRelation']({ data: body } as any);
+    expect(result).toEqual(body.id);
+  });
+
+  it('should generate relationships body correctly', () => {
+    class TestEntity {
+      id = '1';
+      type = 'Test';
+    }
+
+    const testEntity = new TestEntity();
+    const result = service.generateRelationshipsBody(testEntity);
+
+    expect(result).toEqual({
+      id: testEntity.id,
+      type: 'test-entity',
+    });
+  });
+
+  it('should generate relationships body correctly', () => {
+    class TestEntity {
+      id = '1';
+      type = 'Test';
+    }
+
+    const testEntity = new TestEntity();
+    const result = service.generateRelationshipsBody([testEntity]);
+
+    expect(result).toEqual([
+      {
+        id: testEntity.id,
+        type: 'test-entity',
+      },
+    ]);
+  });
+});
