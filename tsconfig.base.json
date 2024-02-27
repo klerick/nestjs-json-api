@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "database": ["libs/database/src/index.ts"],
+      "json-api-nestjs": ["libs/json-api/json-api-nestjs/src/index.ts"],
+      "json-api-nestjs-sdk": ["libs/json-api/json-api-nestjs-sdk/src/index.ts"],
+      "json-shared-type": ["libs/json-api/json-shared-type/src/index.ts"],
+      "shared-utils": ["libs/shared-utils/src/index.ts"],
+      "json-api-nestjs-sdk/json-api-nestjs-sdk.module": ["libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
