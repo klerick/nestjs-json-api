@@ -1,0 +1,22 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Npm install
+        uses: ./.github/actions
+      # This line is needed for nx affected to work when CI is running on a PR
+      - run: git branch --track main origin/main
+      - run: npx nx affected -t lint test build --parallel=3 --exclude='test-npm'
+#      - run: npm nx affected -t e2e-ci --parallel=1
+#      - run: npm nx affected -t deploy --no-agents
