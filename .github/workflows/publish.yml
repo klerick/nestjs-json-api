@@ -25,7 +25,10 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
-      - run: npx nx affected -t build --parallel=3 --exclude='test-npm' --base=origin/main~1 --head=origin/main
+      - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
       - name: Publish packages
         run: npx nx release publish
         shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
