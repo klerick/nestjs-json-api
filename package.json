@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "nx test",
     "typeorm": "ts-node -r tsconfig-paths/register --project libs/database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/database/src/lib/config-cli.ts",
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
