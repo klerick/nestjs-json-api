@@ -1,14 +1,10 @@
-name: Bump-version
+name: Create Releases
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
+  workflow_dispatch:
+
 jobs:
   build-and-test:
     name: "Build and test"
-    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
@@ -17,35 +13,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Restore cached npm dependencies
-        id: cache-dependencies-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress # needed for the Cypress binary
-          key: ${{ runner.os }}npm-dependencies-${{ hashFiles('package-lock.json') }}
-      - run:  npm ci
-      - name: Cache npm dependencies
-        id: cache-dependencies-save
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress # needed for the Cypress binary
-          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v4
-        with:
-          main-branch-name: "main"
+      - name: Npm install
+        uses: ./.github/actions
       - run: npx nx affected -t lint test build --parallel=3 --exclude='test-npm' --base=origin/main~1 --head=origin/main
-
 #      - run: npm nx affected -t e2e-ci --parallel=1
 #      - run: npm nx affected -t deploy --no-agents
+
   bump-version:
     name: "Bump version"
     needs:
@@ -65,27 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Restore cached npm dependencies
-        id: cache-dependencies-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress # needed for the Cypress binary
-          key: ${{ runner.os }}npm-dependencies-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
-      - name: Cache npm dependencies
-        id: cache-dependencies-save
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress # needed for the Cypress binary
-          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v4
-        with:
-          main-branch-name: "main"
+      - name: Checkout and install
+        uses: ./.github/actions
       - name: Bump version
         run: |
           git config user.name 'Alex H'
