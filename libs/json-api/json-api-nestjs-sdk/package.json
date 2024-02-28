@@ -17,6 +17,7 @@
   },
   "private": false,
   "license": "MIT",
+  "main": "./src/index.js",
   "files": [
     "cjs/**",
     "mjs/**"
