@@ -5,7 +5,6 @@ import {
   ManyToMany,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, Length, IsOptional, IsEmpty } from 'class-validator';
 
 import { Users, IUsers } from '.';
 
@@ -16,8 +15,6 @@ export class Roles {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @IsOptional()
-  @Length(3, 128)
   @Column({
     type: 'varchar',
     length: 128,
@@ -26,8 +23,6 @@ export class Roles {
   })
   public name!: string;
 
-  @IsNotEmpty()
-  @Length(3, 128)
   @Column({
     type: 'varchar',
     length: 128,
@@ -36,7 +31,6 @@ export class Roles {
   })
   public key!: string;
 
-  @IsOptional()
   @Column({
     name: 'is_default',
     type: 'boolean',
@@ -44,7 +38,6 @@ export class Roles {
   })
   public isDefault!: boolean;
 
-  @IsEmpty()
   @Column({
     name: 'created_at',
     type: 'timestamp',
@@ -53,7 +46,6 @@ export class Roles {
   })
   public createdAt!: Date;
 
-  @IsEmpty()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',

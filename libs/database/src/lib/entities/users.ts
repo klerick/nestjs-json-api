@@ -9,13 +9,6 @@ import {
   Column,
   UpdateDateColumn,
 } from 'typeorm';
-import {
-  Length,
-  IsNotEmpty,
-  IsOptional,
-  IsEmpty,
-  IsBoolean,
-} from 'class-validator';
 
 import {
   Addresses,
@@ -35,8 +28,6 @@ export class Users {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @IsNotEmpty()
-  @Length(5, 100)
   @Column({
     type: 'varchar',
     length: 100,
@@ -45,8 +36,6 @@ export class Users {
   })
   public login!: string;
 
-  @IsOptional()
-  @Length(5, 100)
   @Column({
     name: 'first_name',
     type: 'varchar',
@@ -56,8 +45,6 @@ export class Users {
   })
   public firstName!: string;
 
-  @IsOptional()
-  @Length(5, 100)
   @Column({
     name: 'last_name',
     type: 'varchar',
@@ -67,8 +54,6 @@ export class Users {
   })
   public lastName!: string;
 
-  @IsOptional()
-  @IsBoolean()
   @Column({
     name: 'is_active',
     type: 'boolean',
@@ -78,7 +63,6 @@ export class Users {
   })
   public isActive!: boolean;
 
-  @IsEmpty()
   @Column({
     name: 'created_at',
     type: 'timestamp',
@@ -87,7 +71,6 @@ export class Users {
   })
   public createdAt!: Date;
 
-  @IsEmpty()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
@@ -97,14 +80,12 @@ export class Users {
   public updatedAt!: Date;
 
   @OneToOne(() => Addresses, (item) => item.id)
-  @IsNotEmpty()
   @JoinColumn({
     name: 'addresses_id',
   })
   public addresses!: IAddresses;
 
   @OneToOne(() => Users, (item) => item.id)
-  @IsOptional()
   @JoinColumn({
     name: 'manager_id',
   })

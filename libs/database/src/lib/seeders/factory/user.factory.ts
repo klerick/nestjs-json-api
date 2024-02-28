@@ -5,7 +5,7 @@ import {
   SingleSubfactory,
 } from '@jorgebodega/typeorm-factory';
 import { DataSource } from 'typeorm';
-import { faker, Sex } from '@faker-js/faker';
+import { faker, Sex, Faker } from '@faker-js/faker';
 
 import { Users } from '../../entities';
 import { AddressesFactory, CommentsFactory } from '.';
@@ -18,18 +18,18 @@ export class UserFactory extends Factory<Users> {
 
   protected entity = Users;
   protected attrs(): FactorizedAttrs<Users> {
-    const gender: Sex = this.genderList[faker.datatype.number(1)];
-    const firstName = faker.name.firstName(gender);
-    const lastName = faker.name.lastName(gender);
+    const gender: Sex = this.genderList[faker.number.int(1)];
 
+    const firstName = faker.person.firstName(gender);
+    const lastName = faker.person.lastName(gender);
     return {
-      login: faker.internet.userName(firstName, lastName),
+      login: faker.internet.userName({ firstName, lastName }),
       isActive: faker.datatype.boolean(),
       firstName: firstName,
       lastName: lastName,
       comments: new CollectionSubfactory(
         new CommentsFactory(this.dataSource),
-        faker.datatype.number(10)
+        faker.number.int(100)
       ),
       addresses: new SingleSubfactory(new AddressesFactory(this.dataSource)),
     };

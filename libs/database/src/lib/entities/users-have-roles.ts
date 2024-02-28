@@ -4,14 +4,12 @@ import {
   Column,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, IsEmpty } from 'class-validator';
 
 @Entity('users_have_roles')
 export class UsersHaveRoles {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @IsNotEmpty()
   @Column({
     name: 'user_id',
     type: 'int',
@@ -20,7 +18,6 @@ export class UsersHaveRoles {
   })
   public userId!: number;
 
-  @IsNotEmpty()
   @Column({
     name: 'role_id',
     type: 'int',
@@ -29,7 +26,6 @@ export class UsersHaveRoles {
   })
   public roleId!: number;
 
-  @IsEmpty()
   @Column({
     name: 'created_at',
     type: 'timestamp',
@@ -38,7 +34,6 @@ export class UsersHaveRoles {
   })
   public createdAt!: Date;
 
-  @IsEmpty()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',

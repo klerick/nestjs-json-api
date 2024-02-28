@@ -8,9 +8,9 @@ export class AddressesFactory extends Factory<Addresses> {
   protected entity = Addresses;
   protected attrs(): FactorizedAttrs<Addresses> {
     return {
-      city: faker.address.city(),
-      state: faker.address.state(),
-      country: faker.address.country(),
+      city: faker.location.city(),
+      state: faker.location.state(),
+      country: faker.location.country(),
     };
   }
 

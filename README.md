@@ -15,8 +15,8 @@
    Tools to implement JSON API, such as, end point, query params, body params, validation and transformation response.
 </p>
 
-- *[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api-nestjs)* - plugin for create CRUD overs JSON API
-- *[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api-nestjs-sdk)* - tool for client, call api over *json-api-nestjs*
+- *[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)* - plugin for create CRUD overs JSON API
+- *[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-sdk)* - tool for client, call api over *json-api-nestjs*
 - *json-api-nestjs-acl* - tool for acl over *json-api-nestjs*(coming soon...)
 ## Installation
 

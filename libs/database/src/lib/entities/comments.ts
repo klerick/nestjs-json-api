@@ -6,7 +6,6 @@ import {
   ManyToOne,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsEmpty, IsNotEmpty, IsEnum } from 'class-validator';
 
 export enum CommentKind {
   Comment = 'COMMENT',
@@ -23,15 +22,12 @@ export class Comments {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @IsNotEmpty()
   @Column({
     type: 'text',
     nullable: false,
   })
   public text!: string;
 
-  @IsNotEmpty()
-  @IsEnum(CommentKind)
   @Column({
     type: 'enum',
     enum: CommentKind,
@@ -39,7 +35,6 @@ export class Comments {
   })
   public kind!: CommentKind;
 
-  @IsEmpty()
   @Column({
     name: 'created_at',
     type: 'timestamp',
@@ -48,7 +43,6 @@ export class Comments {
   })
   public createdAt!: Date;
 
-  @IsEmpty()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
@@ -58,7 +52,6 @@ export class Comments {
   public updatedAt!: Date;
 
   @ManyToOne(() => Users, (item) => item.id)
-  @IsNotEmpty()
   @JoinColumn({
     name: 'created_by',
   })

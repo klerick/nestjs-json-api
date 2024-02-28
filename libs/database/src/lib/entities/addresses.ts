@@ -5,7 +5,6 @@ import {
   Entity,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsEmpty, IsOptional, Length } from 'class-validator';
 
 import { Users, IUsers } from '.';
 
@@ -16,8 +15,6 @@ export class Addresses {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @IsOptional()
-  @Length(3, 70)
   @Column({
     type: 'varchar',
     length: 70,
@@ -26,8 +23,6 @@ export class Addresses {
   })
   public city!: string;
 
-  @IsOptional()
-  @Length(3, 70)
   @Column({
     type: 'varchar',
     length: 70,
@@ -36,8 +31,6 @@ export class Addresses {
   })
   public state!: string;
 
-  @IsOptional()
-  @Length(3, 68)
   @Column({
     type: 'varchar',
     length: 68,
@@ -46,7 +39,6 @@ export class Addresses {
   })
   public country!: string;
 
-  @IsEmpty()
   @Column({
     name: 'created_at',
     type: 'timestamp',
@@ -55,7 +47,6 @@ export class Addresses {
   })
   public createdAt!: Date;
 
-  @IsEmpty()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',

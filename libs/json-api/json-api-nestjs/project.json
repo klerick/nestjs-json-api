@@ -1,0 +1,38 @@
+{
+  "name": "json-api-nestjs",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/json-api/json-api-nestjs/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/json-api/json-api-nestjs",
+        "tsConfig": "libs/json-api/json-api-nestjs/tsconfig.lib.json",
+        "packageJson": "libs/json-api/json-api-nestjs/package.json",
+        "main": "libs/json-api/json-api-nestjs/src/index.ts",
+        "assets": ["libs/json-api/json-api-nestjs/*.md"],
+        "external": "none",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "buildableProjectDepsInPackageJsonType": "peerDependencies"
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/json-api/json-api-nestjs/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

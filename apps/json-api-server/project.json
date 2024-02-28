@@ -1,0 +1,24 @@
+{
+  "name": "json-api-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/json-api-server/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "json-api-server:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "json-api-server:build:development"
+        },
+        "production": {
+          "buildTarget": "json-api-server:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
