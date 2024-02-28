@@ -1,0 +1,31 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: [ "Create Releases" ]
+    types:
+      - completed
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+  NPM_CONFIG_PROVENANCE: true
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      actions: "read"
+      id-token: "write" # needed for provenance data generation
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Npm install
+        uses: ./.github/actions
+      - run: npx nx affected -t build --parallel=3 --exclude='test-npm' --base=origin/main~1 --head=origin/main
+      - name: Publish packages
+        run: npx nx release publish
+        shell: bash
