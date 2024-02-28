@@ -15,7 +15,8 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
-      - run: npx nx affected -t test build upload-badge --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=origin/master
+      - run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=origin/master
+      - run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=origin/master
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
