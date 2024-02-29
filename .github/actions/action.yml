@@ -28,8 +28,6 @@ runs:
       with:
         path: |
           node_modules
-          .nx
-          .angular
           ~/.cache/Cypress # needed for the Cypress binary
         key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
