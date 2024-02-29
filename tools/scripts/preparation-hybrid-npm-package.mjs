@@ -43,15 +43,13 @@ invariant(
   outputPath,
   `Could not find "build.options.outputPath" of project "${name}". Is project.json configured  correctly?`
 );
-console.log(outputPath);
 process.chdir(outputPath);
 
 const mjsJson = readJson();
-console.log(JSON.stringify(mjsJson, null, "\t"));
 const angularModule = './json-api-nestjs-sdk.module';
 const angularPath = mjsJson.exports[angularModule]
 
-mjsJson.module = addTypeToPath(mjsJson.module)
+mjsJson.module = addTypeToPath(mjsJson.main)
 mjsJson.main = addTypeToPath(mjsJson.main, 'cjs')
 mjsJson.es2015 = mjsJson.module
 mjsJson.types = "./mjs/src/index.d.ts";
