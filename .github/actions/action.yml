@@ -10,26 +10,26 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
-#    - name: Restore cached npm dependencies
-#      id: cache-dependencies-restore
-#      uses: actions/cache/restore@v4
-#      with:
-#        path: |
-#          node_modules
-#          ~/.cache/Cypress # needed for the Cypress binary
-#        key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
+    - name: Restore cached npm dependencies
+      id: cache-dependencies-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          node_modules
+          ~/.cache/Cypress # needed for the Cypress binary
+        key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
     - name: Npm install
       if: steps.cache.outputs.cache-hit != 'true'
       run: npm ci
       shell: bash
-#    - name: Cache npm dependencies
-#      id: cache-dependencies-save
-#      uses: actions/cache/save@v4
-#      with:
-#        path: |
-#          node_modules
-#          ~/.cache/Cypress # needed for the Cypress binary
-#        key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
+    - name: Cache npm dependencies
+      id: cache-dependencies-save
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          node_modules
+          ~/.cache/Cypress # needed for the Cypress binary
+        key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
       uses: nrwl/nx-set-shas@v4
       with:

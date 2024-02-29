@@ -22,7 +22,7 @@ const percentage = coverage['total']['statements']['pct'];
 const filename = name
 const content = {"schemaVersion":1,"label":"Test Coverage","message":`${percentage}%`,"color":"green","namedLogo":"jest"}
 const body = JSON.stringify({ files: { [filename]: { content } } });
-
+console.log(body);
 const gistUrl = new URL(process.env['GIST_ID'], 'https://api.github.com/gists/');
 const headers = new Headers([
   ["Content-Type", "application/json"],
@@ -30,10 +30,12 @@ const headers = new Headers([
   ["User-Agent", "Schneegans"],
   ["Authorization", `token ${process.env['GIST_SECRET']}`],
 ]);
-console.log(process.env['GIST_SECRET'], process.env['GIST_ID'])
+
+console.log(process.env['GIST_SECRET'])
+
 (async function(){
   const result = await fetch(gistUrl, {
-    method: "POST",
+    method: "PATCH",
     headers,
     body,
   }).then(r => r.json())
