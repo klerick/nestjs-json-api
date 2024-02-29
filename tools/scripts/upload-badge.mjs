@@ -33,11 +33,8 @@ const headers = new Headers([
 
 console.log(process.env['GIST_SECRET'])
 
-(async function(){
-  const result = await fetch(gistUrl, {
-    method: "PATCH",
-    headers,
-    body,
-  }).then(r => r.json())
-  console.log(result);
-})()
+const result = await fetch(gistUrl, {
+  method: "PATCH",
+  headers,
+  body,
+}).then(r => r.json()).then(r => console.log(r))
