@@ -18,8 +18,12 @@ jobs:
       - name: Get git hash
         run: |
           echo "COMMIT=$(echo ${$(git log --grep="chore(release): publish" --date-order --max-count=1 --pretty=format:"%h")})"
-      - run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=${COMMIT} --head=origin/master
-      - run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=${COMMIT} --head=origin/master
+      - run: |
+          git log --grep="chore(release): publish"
+      - name: Test and build
+        run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=${COMMIT} --head=origin/master
+      - name: Upload test coverage badge
+        run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=${COMMIT} --head=origin/master
         env:
           GIST_SECRET: ${{ secrets.GIST_SECRET }}
           GIST_ID: ${{ secrets.GIST_ID }}
