@@ -17,9 +17,8 @@ jobs:
         uses: ./.github/actions
       - name: Get git hash
         run: |
-          echo "COMMIT=$(echo ${$(git log --grep="chore(release): publish" --date-order --max-count=1 --pretty=format:"%h")})"
-      - run: |
-          git log --grep="chore(release): publish"
+          echo "export COMMIT=$(echo ${$(git show-ref --tags --hash | tail -n 1)})"
+      - run: git show-ref --tags --hash | tail -n 1
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source' --base=${COMMIT} --head=origin/master
       - name: Upload test coverage badge
