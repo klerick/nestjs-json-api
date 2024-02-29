@@ -30,7 +30,7 @@ runs:
 #          node_modules
 #          ~/.cache/Cypress # needed for the Cypress binary
 #        key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
-#    - name: Derive appropriate SHAs for base and head for `nx affected` commands
-#      uses: nrwl/nx-set-shas@v4
-#      with:
-#        main-branch-name: "master"
+    - name: Derive appropriate SHAs for base and head for `nx affected` commands
+      uses: nrwl/nx-set-shas@v4
+      with:
+        main-branch-name: "master"
