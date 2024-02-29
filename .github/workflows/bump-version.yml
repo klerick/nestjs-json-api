@@ -21,7 +21,7 @@ jobs:
           echo "NX_BASE=$(echo ${COMMIT})" >> $GITHUB_ENV
       - run: git show-ref --tags --hash | tail -n 1
       - name: Test and build
-        run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
+        run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
       - name: Upload test coverage badge
         run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
         env:
