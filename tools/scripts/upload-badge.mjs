@@ -30,7 +30,7 @@ const headers = new Headers([
   ["User-Agent", "Schneegans"],
   ["Authorization", `token ${process.env['GIST_SECRET']}`],
 ]);
-
+console.log(process.env['GIST_SECRET'], process.env['GIST_ID'])
 (async function(){
   const result = await fetch(gistUrl, {
     method: "POST",
