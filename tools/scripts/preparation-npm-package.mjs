@@ -18,7 +18,6 @@ function cleanEmptyFoldersRecursively(folder) {
   }
 
   if (files.length === 0) {
-    console.log("removing: ", folder);
     rmdirSync(folder);
   }
 }
