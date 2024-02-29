@@ -47,7 +47,7 @@ console.log(outputPath);
 process.chdir(outputPath);
 
 const mjsJson = readJson();
-console.log(mjsJson);
+console.log(JSON.stringify(mjsJson, null, "\t"));
 const angularModule = './json-api-nestjs-sdk.module';
 const angularPath = mjsJson.exports[angularModule]
 
