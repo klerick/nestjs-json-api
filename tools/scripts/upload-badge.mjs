@@ -44,6 +44,8 @@ const headers = new Headers([
   if (status === 200) {
     console.log('Badge has been updated')
   } else {
+    console.log(gistUrl.toString());
+    console.log(JSON.stringify([...headers.entries()]))
     console.warn('Badge has not been updated')
   }
 })();
