@@ -19,13 +19,17 @@ jobs:
         run: |
           COMMIT=$(git show-ref --tags --hash | tail -n 1)
           echo "NX_BASE=$(echo ${COMMIT})" >> $GITHUB_ENV
+      - name: Set GIST_SECRET to env
+        run: |
+          echo "GIST_SECRET=${{ secrets.GIST_SECRET }}" >> $GITHUB_ENV
+          echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
       - name: Upload test coverage badge
         run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
-        env:
-          GIST_SECRET: ${{ secrets.GIST_SECRET }}
-          GIST_ID: ${{ secrets.GIST_ID }}
+#        env:
+#          GIST_SECRET: ${{ secrets.GIST_SECRET }}
+#          GIST_ID: ${{ secrets.GIST_ID }}
   #      - run: npm nx affected -t e2e-ci --parallel=1
   #      - run: npm nx affected -t deploy --no-agents
 
