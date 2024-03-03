@@ -43,7 +43,7 @@
         }
       ],
       "options": {
-        "outputPath": "libs/json-api/json-api-nestjs-sdk",
+        "outputPath": "libs/json-api/json-api-nestjs",
         "commands": [
           "node tools/scripts/upload-badge.mjs json-api-nestjs"
         ],
