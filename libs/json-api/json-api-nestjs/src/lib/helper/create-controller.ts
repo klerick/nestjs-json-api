@@ -27,7 +27,9 @@ export function createController(
   const entityName =
     entity instanceof Function ? entity.name : entity.options.name;
 
-  if (!JsonBaseController.isPrototypeOf(controllerClass)) {
+  if (
+    !Object.prototype.isPrototypeOf.call(JsonBaseController, controllerClass)
+  ) {
     throw new Error(
       `Controller "${controller?.name}" should be inherited of "JsonBaseController"`
     );
