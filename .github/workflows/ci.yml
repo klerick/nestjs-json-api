@@ -26,6 +26,6 @@ jobs:
           path: |
             .nx
             .angular
-          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
+          key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
 #      - run: npm nx affected -t e2e-ci --parallel=1
 #      - run: npm nx affected -t deploy --no-agents
