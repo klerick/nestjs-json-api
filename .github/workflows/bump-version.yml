@@ -34,7 +34,7 @@ jobs:
           path: |
             .nx
             .angular
-          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
+          key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
 #        env:
 #          GIST_SECRET: ${{ secrets.GIST_SECRET }}
 #          GIST_ID: ${{ secrets.GIST_ID }}
