@@ -60,14 +60,16 @@ mjsJson.exports['.'] = {
   es2015: mjsJson.es2015,
   default: mjsJson.es2015,
 }
-
-mjsJson.exports[angularModule] = {
-  types: './mjs/src/json-api-nestjs-sdk.module.d.ts',
-  node: addTypeToPath(angularPath, 'cjs'),
-  require: addTypeToPath(angularPath, 'cjs'),
-  es2015: addTypeToPath(angularPath),
-  default: addTypeToPath(angularPath),
+if (mjsJson.namne === 'json-api-nestjs-sdk') {
+  mjsJson.exports[angularModule] = {
+    types: './mjs/src/json-api-nestjs-sdk.module.d.ts',
+    node: addTypeToPath(angularPath, 'cjs'),
+    require: addTypeToPath(angularPath, 'cjs'),
+    es2015: addTypeToPath(angularPath),
+    default: addTypeToPath(angularPath),
+  }
 }
+
 
 writeFileSync(`package.json`, JSON.stringify(mjsJson, null, 2));
 writeFileSync(

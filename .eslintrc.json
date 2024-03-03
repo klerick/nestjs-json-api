@@ -8,7 +8,7 @@
           "error",
           {
             "enforceBuildableLibDependency": true,
-            "allow": [],
+            "allow": ["json-shared-type", "shared-utils"],
             "depConstraints": [
               {
                 "sourceTag": "*",
