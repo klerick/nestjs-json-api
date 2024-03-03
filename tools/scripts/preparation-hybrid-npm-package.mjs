@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, renameSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync, unlinkSync } from 'fs';
 import {sep, join} from 'path'
 
 import devkit from '@nx/devkit';
@@ -78,3 +78,4 @@ unlinkSync(join('mjs', 'package.json'))
 unlinkSync(join('cjs', 'package.json'))
 unlinkSync(join('mjs', 'README.md'))
 unlinkSync(join('cjs', 'README.md'))
+
