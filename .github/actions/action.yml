@@ -13,6 +13,8 @@ runs:
       with:
         path: |
           node_modules
+          .nx
+          .angular
           ~/.cache/Cypress # needed for the Cypress binary
         key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
     - name: Npm install

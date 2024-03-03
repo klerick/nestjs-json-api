@@ -17,6 +17,15 @@ jobs:
         uses: ./.github/actions
       # This line is needed for nx affected to work when CI is running on a PR
       - run: git branch --track main origin/master
-      - run: npx nx affected -t lint test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
+      - name: Test and build
+        run: npx nx affected -t lint test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
+      - name: Cache npm dependencies
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+            .angular
+          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
 #      - run: npm nx affected -t e2e-ci --parallel=1
 #      - run: npm nx affected -t deploy --no-agents
