@@ -5,7 +5,7 @@
     "node": ">= 16.0.0"
   },
   "type": "commonjs",
-  "description": "JsonAPi Plugin for NestJs",
+  "description": "JsonApi Plugin for NestJs",
   "contributors": [
     {
       "email": "klerick666@gmain.com",

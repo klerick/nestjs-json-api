@@ -46,13 +46,15 @@ invariant(
 process.chdir(outputPath);
 
 const mjsJson = readJson();
-const angularModule = './json-api-nestjs-sdk.module';
-const angularPath = mjsJson.exports[angularModule]
+const angularModule = 'json-api-nestjs-sdk.module';
+const angularModulePath = `./${angularModule}`;
+const angularPath = mjsJson.exports[angularModulePath]
 
 mjsJson.module = addTypeToPath(mjsJson.main)
 mjsJson.main = addTypeToPath(mjsJson.main, 'cjs')
 mjsJson.es2015 = mjsJson.module
 mjsJson.types = "./mjs/src/index.d.ts";
+mjsJson.exports[angularModulePath] = addTypeToPath(angularPath)
 mjsJson.exports['.'] = {
   types: mjsJson.types,
   node: mjsJson.main,
@@ -60,16 +62,19 @@ mjsJson.exports['.'] = {
   es2015: mjsJson.es2015,
   default: mjsJson.es2015,
 }
-if (mjsJson.namne === 'json-api-nestjs-sdk') {
-  mjsJson.exports[angularModule] = {
-    types: './mjs/src/json-api-nestjs-sdk.module.d.ts',
-    node: addTypeToPath(angularPath, 'cjs'),
-    require: addTypeToPath(angularPath, 'cjs'),
-    es2015: addTypeToPath(angularPath),
-    default: addTypeToPath(angularPath),
+mjsJson.peerDependencies = {
+  ...mjsJson.dependencies,
+  ...mjsJson.peerDependencies
+}
+mjsJson.typesVersions = {
+  "*": {
+    [angularModule]: [
+      mjsJson.exports[angularModulePath].replace('.js', '.d.ts')
+    ]
   }
 }
-
+delete mjsJson.type
+delete mjsJson.dependencies
 
 writeFileSync(`package.json`, JSON.stringify(mjsJson, null, 2));
 writeFileSync(
