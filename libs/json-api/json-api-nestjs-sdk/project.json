@@ -4,21 +4,33 @@
   "sourceRoot": "libs/json-api/json-api-nestjs-sdk/src",
   "projectType": "library",
   "targets": {
+    "compile-for-angular": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/json-api/json-api-nestjs-sdk/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig-mjs.lib.json"
+        },
+        "development": {
+          "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig-mjs.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
       "executor": "nx:run-commands",
       "dependsOn": [
-        {
-          "target": "build-mjs"
-        },
-        {
-          "target": "build-cjs"
-        }
+        "build-cjs"
       ],
       "options": {
         "outputPath": "dist/libs/json-api/json-api-nestjs-sdk",
         "commands": [
           "node tools/scripts/preparation-hybrid-npm-package.mjs json-api-nestjs-sdk",
-          "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk"
+          "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk",
+          "node tools/scripts/prepare-for-angular.mjs"
         ],
         "cwd": "./",
         "parallel": false
@@ -27,6 +39,9 @@
     "build-cjs": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
+      "dependsOn": [
+        "build-mjs"
+      ],
       "options": {
         "outputPath": "dist/libs/json-api/json-api-nestjs-sdk/cjs",
         "main": "libs/json-api/json-api-nestjs-sdk/src/index.ts",
@@ -35,7 +50,9 @@
         "external": "none",
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "additionalEntryPoints": ["libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"],
+        "additionalEntryPoints": [
+          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+        ],
         "generateExportsField": true
       }
     },
@@ -50,7 +67,9 @@
         "external": "none",
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "additionalEntryPoints": ["libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"],
+        "additionalEntryPoints": [
+          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+        ],
         "generateExportsField": true
       }
     },
@@ -79,10 +98,8 @@
         }
       ],
       "options": {
-        "outputPath": "libs/json-api/json-api-nestjs-sdk",
-        "commands": [
-          "node tools/scripts/upload-badge.mjs json-api-nestjs-sdk"
-        ],
+        "outputPath": "{workspaceRoot}/libs/json-api/json-api-nestjs-sdk",
+        "commands": ["node tools/scripts/upload-badge.mjs json-api-nestjs-sdk"],
         "cwd": "./",
         "parallel": false
       }
