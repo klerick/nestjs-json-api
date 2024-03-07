@@ -16,7 +16,13 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
-      # This line is needed for nx affected to work when CI is running on a PR
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-${GITHUB_REF}
       - run: git branch --track main origin/master
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
@@ -26,8 +32,7 @@ jobs:
         with:
           path: |
             .nx
-            .angular
-          key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
   run-e2e-test:
     runs-on: ubuntu-latest
     name: Try run e2e test
