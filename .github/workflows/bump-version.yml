@@ -29,7 +29,7 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-master"
+          key: ${{ runner.os }}-nx-master
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
       - name: Upload test coverage badge
@@ -76,7 +76,7 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-master"
+          key: ${{ runner.os }}-nx-master
       - run: git branch --track main origin/master
       - run: npm run typeorm migration:run
       - run: npm run seed:run
@@ -109,7 +109,7 @@ jobs:
         run: |
           git config user.name 'Alex H'
           git config user.email 'klerick666@gmail.com'
-          npx nx release --skip-publish --dry-run
+          npx nx release --skip-publish
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}

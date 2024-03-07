@@ -1,10 +1,11 @@
 name: Publish
 
 on:
-  workflow_run:
-    workflows: [ "Create Releases" ]
-    types:
-      - completed
+#  workflow_run:
+#    workflows: [ "Create Releases" ]
+#    types:
+#      - completed
+   workflow_dispatch:
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
   NPM_CONFIG_PROVENANCE: true
@@ -25,10 +26,24 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-master
       - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
       - name: Publish packages
-        run: npx nx release publish
+        run: npx nx release publish --dry-run
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+      - name: Save cached .nx
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}

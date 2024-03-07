@@ -25,7 +25,7 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}"
+          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}
       - run: git branch --track main origin/master
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
@@ -74,7 +74,7 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}"
+          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}
       - run: git branch --track main origin/master
       - run: npm run typeorm migration:run
       - run: npm run seed:run
