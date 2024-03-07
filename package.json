@@ -6,7 +6,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/database/src/lib/config-cli.ts",
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
-    "seed:run": "ts-node -r tsconfig-paths/register --project libs/database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/database/src/lib/config-cli.ts seed libs/database/src/lib/seeders/root.seeder.ts",
+    "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/database/src/lib/config-cli.ts seed libs/database/src/lib/seeders/root.seeder.ts",
     "demo:json-api": "nx run json-api-server:serve:development"
   },
   "private": true,
@@ -50,6 +50,8 @@
     "@angular/compiler-cli": "17.2.2",
     "@angular/language-service": "17.2.2",
     "@faker-js/faker": "^8.4.1",
+    "@jorgebodega/typeorm-factory": "^1.4.0",
+    "@jorgebodega/typeorm-seeding": "^6.0.1",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.0.2",
     "@nx/angular": "18.0.7",
@@ -92,4 +94,3 @@
     "webpack-cli": "^5.1.4"
   }
 }
-
