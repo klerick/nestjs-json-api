@@ -62,4 +62,4 @@ jobs:
       - run: git branch --track main origin/master
       - run: npm run typeorm migration:run
       - run: npm run seed:run
-      - run: npm nx affected -t e2e-ci --parallel=1
+      - run: npx nx affected -t e2e-ci --parallel=1
