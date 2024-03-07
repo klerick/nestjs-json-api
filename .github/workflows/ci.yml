@@ -19,11 +19,6 @@ jobs:
       - name: Get branch names.
         id: branch-names
         uses: tj-actions/branch-names@v8
-
-      - name: Running on the default branch.
-        if: steps.branch-names.outputs.is_default == 'true'
-        run: |
-          echo "Running on default: ${{ steps.branch-names.outputs.current_branch }}"
       - name: Restore cached .nx
         id: cache-nx-restore
         uses: actions/cache/restore@v4
@@ -70,7 +65,24 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}"
       - run: git branch --track main origin/master
       - run: npm run typeorm migration:run
       - run: npm run seed:run
       - run: npx nx affected -t e2e --parallel=1
+      - name: Save cached .nx
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
