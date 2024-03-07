@@ -22,11 +22,11 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-${GITHUB_REF}
+          key: ${{ runner.os }}-nx-${{GITHUB_REF}}
       - run: git branch --track main origin/master
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
-      - name: Cache npm dependencies
+      - name: Save cached .nx
         id: cache-dependencies-save
         uses: actions/cache/save@v4
         with:
