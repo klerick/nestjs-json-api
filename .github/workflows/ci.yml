@@ -16,15 +16,21 @@ jobs:
           fetch-depth: 0
       - name: Npm install
         uses: ./.github/actions
-      - name: Branch name
-        run: echo running on branch ${GITHUB_REF##*/}
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
+
+      - name: Running on the default branch.
+        if: steps.branch-names.outputs.is_default == 'true'
+        run: |
+          echo "Running on default: ${{ steps.branch-names.outputs.current_branch }}"
       - name: Restore cached .nx
         id: cache-nx-restore
         uses: actions/cache/restore@v4
         with:
           path: |
             .nx
-          key: ${{ runner.os }}-nx-${GITHUB_REF##*/}
+          key: ${{ runner.os }}-nx-${{ steps.branch-names.outputs.current_branch }}"
       - run: git branch --track main origin/master
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
