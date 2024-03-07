@@ -28,8 +28,6 @@ jobs:
             .nx
             .angular
           key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
-#      - run: npm nx affected -t e2e-ci --parallel=1
-#      - run: npm nx affected -t deploy --no-agents
   run-e2e-test:
     runs-on: ubuntu-latest
     name: Try run e2e test
@@ -62,4 +60,4 @@ jobs:
       - run: git branch --track main origin/master
       - run: npm run typeorm migration:run
       - run: npm run seed:run
-      - run: npx nx affected -t e2e-ci --parallel=1
+      - run: npx nx affected -t e2e --parallel=1
