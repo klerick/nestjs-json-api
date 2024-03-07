@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn, Table } from 'typeorm';
 
-export class CreateAddressesTable1607701632000 implements MigrationInterface {
+export class CreateAddressesTable1607701631900 implements MigrationInterface {
   protected readonly tableName = 'addresses';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

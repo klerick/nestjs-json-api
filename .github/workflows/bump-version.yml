@@ -23,28 +23,75 @@ jobs:
         run: |
           echo "GIST_SECRET=${{ secrets.GIST_SECRET }}" >> $GITHUB_ENV
           echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-master"
       - name: Test and build
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
       - name: Upload test coverage badge
         run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
-      - name: Cache npm dependencies
+      - name: Save cached .nx
         id: cache-dependencies-save
         uses: actions/cache/save@v4
         with:
           path: |
             .nx
-            .angular
-          key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
-#        env:
-#          GIST_SECRET: ${{ secrets.GIST_SECRET }}
-#          GIST_ID: ${{ secrets.GIST_ID }}
-  #      - run: npm nx affected -t e2e-ci --parallel=1
-  #      - run: npm nx affected -t deploy --no-agents
-
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
+  run-e2e-test:
+    runs-on: ubuntu-latest
+    name: Try run e2e test
+    needs:
+      - build-and-test
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: json-api-db
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Npm install
+        uses: ./.github/actions
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-master"
+      - run: git branch --track main origin/master
+      - run: npm run typeorm migration:run
+      - run: npm run seed:run
+      - run: npx nx affected -t e2e --parallel=1
+      - name: Save cached .nx
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
   bump-version:
     name: "Bump version"
     needs:
-      - build-and-test
+      - run-e2e-test
     runs-on: ubuntu-latest
     permissions:
       contents: "write"

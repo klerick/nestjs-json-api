@@ -34,7 +34,6 @@ export class ErrorInterceptors<E extends Entity> implements NestInterceptor {
   ): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       catchError((error) => {
-        console.log(error);
         if (error instanceof QueryFailedError) {
           return throwError(() => this.prepareDataBaseError(error));
         }

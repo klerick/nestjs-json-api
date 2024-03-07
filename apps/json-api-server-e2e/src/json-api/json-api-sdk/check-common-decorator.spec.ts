@@ -1,27 +1,24 @@
-import {
-  adapterForAxios,
-  FilterOperand,
-  JsonApiJs,
-  JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
-import axios, { AxiosError } from 'axios';
+import { INestApplication } from '@nestjs/common';
+import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { AxiosError } from 'axios';
 import { Users } from 'database';
+
+import { run, creatSdk } from '../utils/run-ppplication';
+
+let app: INestApplication;
+
+beforeAll(async () => {
+  app = await run();
+});
+
+afterAll(async () => {
+  await app.close();
+});
 
 describe('Check common decorator', () => {
   let jsonSdk: JsonSdkPromise;
-  const axiosAdapter = adapterForAxios(axios);
   beforeEach(async () => {
-    jsonSdk = JsonApiJs(
-      {
-        adapter: axiosAdapter,
-        apiHost: 'http://localhost:3000',
-        apiPrefix: 'api',
-        dateFields: ['createdAt', 'updatedAt'],
-        operationUrl: 'operation',
-        idIsNumber: false,
-      },
-      true
-    );
+    jsonSdk = creatSdk();
   });
 
   afterEach(async () => {});

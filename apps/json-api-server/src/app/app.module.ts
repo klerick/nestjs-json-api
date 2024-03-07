@@ -3,6 +3,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { DatabaseModule } from 'database';
 import { ResourcesModule } from './resources/resources.module';
+import * as process from 'process';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { ResourcesModule } from './resources/resources.module';
     ResourcesModule,
     LoggerModule.forRoot({
       pinoHttp: {
-        level: 'debug',
+        level: process.env['NODE_ENV'] === 'test' ? 'silent' : 'debug',
       },
     }),
   ],
