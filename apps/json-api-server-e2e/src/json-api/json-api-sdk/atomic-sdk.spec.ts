@@ -1,13 +1,19 @@
-import {
-  adapterForAxios,
-  FilterOperand,
-  JsonApiJs,
-  JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
-import axios from 'axios';
+import { INestApplication } from '@nestjs/common';
+import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
 import { Addresses, CommentKind, Comments, Roles, Users } from 'database';
 import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';
+import { run, creatSdk } from '../utils/run-ppplication';
+
+let app: INestApplication;
+
+beforeAll(async () => {
+  app = await run();
+});
+
+afterAll(async () => {
+  await app.close();
+});
 
 describe('Atomic method:', () => {
   let jsonSdk: JsonSdkPromise;
@@ -16,18 +22,7 @@ describe('Atomic method:', () => {
   let commentsArray: Comments[];
   let usersId: number[];
   beforeEach(async () => {
-    const axiosAdapter = adapterForAxios(axios);
-
-    jsonSdk = JsonApiJs(
-      {
-        adapter: axiosAdapter,
-        apiHost: 'http://localhost:3000',
-        apiPrefix: 'api',
-        dateFields: ['createdAt', 'updatedAt'],
-        operationUrl: 'operation',
-      },
-      true
-    );
+    jsonSdk = creatSdk();
 
     const addressesPromise = Array.from(new Array(2)).map(() => {
       const address = new Addresses();

@@ -1,29 +1,28 @@
-import {
-  adapterForAxios,
-  FilterOperand,
-  JsonApiJs,
-  JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
+import { INestApplication } from '@nestjs/common';
+import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
 import { BookList, Users } from 'database';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { faker } from '@faker-js/faker';
 import { lastValueFrom } from 'rxjs';
+import { creatSdk, run, axiosAdapter } from '../utils/run-ppplication';
+
+let app: INestApplication;
+
+beforeAll(async () => {
+  app = await run();
+});
+
+afterAll(async () => {
+  await app.close();
+});
 
 describe('Other call type:', () => {
   let jsonSdk: JsonSdkPromise;
-  const axiosAdapter = adapterForAxios(axios);
+
   beforeEach(async () => {
-    jsonSdk = JsonApiJs(
-      {
-        adapter: axiosAdapter,
-        apiHost: 'http://localhost:3000',
-        apiPrefix: 'api',
-        dateFields: ['createdAt', 'updatedAt'],
-        operationUrl: 'operation',
-        idIsNumber: false,
-      },
-      true
-    );
+    jsonSdk = creatSdk({
+      idIsNumber: false,
+    });
   });
 
   afterEach(async () => {});
@@ -52,7 +51,6 @@ describe('Other call type:', () => {
         jsonSdk.jsonApiUtilsService.convertResponseData(newBookSource);
 
       expect(newBook.id).toBeDefined();
-
       const bookResultSource = await lastValueFrom(
         axiosAdapter.get<BookList>(`${url}/${newBook.id}`)
       );

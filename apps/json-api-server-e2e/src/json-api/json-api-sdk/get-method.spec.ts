@@ -1,14 +1,20 @@
+import { INestApplication } from '@nestjs/common';
 import { Addresses, CommentKind, Comments, Roles, Users } from 'database';
 import { faker } from '@faker-js/faker';
 
-import {
-  adapterForAxios,
-  FilterOperand,
-  JsonApiJs,
-  JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
-import axios from 'axios';
+import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
 import { getUser } from '../utils/data-utils';
+import { creatSdk, run } from '../utils/run-ppplication';
+
+let app: INestApplication;
+
+beforeAll(async () => {
+  app = await run();
+});
+
+afterAll(async () => {
+  await app.close();
+});
 
 describe('GET method:', () => {
   let jsonSdk: JsonSdkPromise;
@@ -18,17 +24,7 @@ describe('GET method:', () => {
   let commentsArray: Comments[];
 
   beforeAll(async () => {
-    const axiosAdapter = adapterForAxios(axios);
-
-    jsonSdk = JsonApiJs(
-      {
-        adapter: axiosAdapter,
-        apiHost: 'http://localhost:3000',
-        apiPrefix: 'api',
-        dateFields: ['createdAt', 'updatedAt'],
-      },
-      true
-    );
+    jsonSdk = creatSdk();
 
     const addressesPromise = Array.from(new Array(2)).map(() => {
       const address = new Addresses();

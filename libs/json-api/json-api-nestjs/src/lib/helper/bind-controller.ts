@@ -42,7 +42,7 @@ export function bindController(
       if (!allowMethod.includes(name)) continue;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(controller, name)) {
+    if (!Object.prototype.hasOwnProperty.call(controller.prototype, name)) {
       // need uniq descriptor for correct work swagger
       Reflect.defineProperty(controller.prototype, name, {
         value: function (

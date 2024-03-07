@@ -1,11 +1,19 @@
+import { INestApplication } from '@nestjs/common';
 import { Addresses, CommentKind, Comments, Users } from 'database';
 import { faker } from '@faker-js/faker';
-import {
-  adapterForAxios,
-  JsonApiJs,
-  JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
-import axios from 'axios';
+import { JsonSdkPromise } from 'json-api-nestjs-sdk';
+
+import { creatSdk, run } from '../utils/run-ppplication';
+
+let app: INestApplication;
+
+beforeAll(async () => {
+  app = await run();
+});
+
+afterAll(async () => {
+  await app.close();
+});
 
 describe('PATCH method:', () => {
   let jsonSdk: JsonSdkPromise;
@@ -19,17 +27,7 @@ describe('PATCH method:', () => {
   let newCommentsAfterSave: Comments;
 
   beforeEach(async () => {
-    const axiosAdapter = adapterForAxios(axios);
-
-    jsonSdk = JsonApiJs(
-      {
-        adapter: axiosAdapter,
-        apiHost: 'http://localhost:3000',
-        apiPrefix: 'api',
-        dateFields: ['createdAt', 'updatedAt'],
-      },
-      true
-    );
+    jsonSdk = creatSdk();
 
     address = new Addresses();
     address.city = faker.string.alpha(50);
