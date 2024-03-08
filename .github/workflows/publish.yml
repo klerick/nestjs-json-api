@@ -36,7 +36,7 @@ jobs:
       - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
       - run: ls -l ./dist/libs/json-api/json-api-nestjs-sdk
       - name: Publish packages
-        run: npx nx release publish --dry-run
+        run: npx nx release publish
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
