@@ -12,7 +12,7 @@ env:
 
 jobs:
   publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Publish
     runs-on: ubuntu-latest
     permissions:
