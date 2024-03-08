@@ -34,6 +34,7 @@ jobs:
             .nx
           key: ${{ runner.os }}-nx-master
       - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database'
+      - run: ls -l ./dist/libs/json-api/json-api-nestjs-sdk
       - name: Publish packages
         run: npx nx release publish --dry-run
         shell: bash

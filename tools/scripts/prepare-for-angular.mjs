@@ -15,7 +15,8 @@ promisify(exec)(
   `nx run json-api-nestjs-sdk:compile-for-angular`
 ).then(r => {
   writeFileSync(LIB_ANGULAR_MODULE_PATH, readFileSync(ANGULAR_MODULE_PATH))
-  console.log(readFileSync(LIB_ANGULAR_MODULE_PATH));
+  console.log(LIB_ANGULAR_MODULE_PATH);
+  console.log(readFileSync(LIB_ANGULAR_MODULE_PATH).toString());
 }).finally(() => {
   unlinkSync(TEMP_FILE_PATH)
 })
