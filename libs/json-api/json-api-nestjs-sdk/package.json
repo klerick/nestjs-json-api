@@ -19,8 +19,7 @@
   "license": "MIT",
   "main": "./src/index.js",
   "files": [
-    "cjs/**",
-    "mjs/**"
+    "**/*"
   ],
   "keywords": [
     "nestjs",

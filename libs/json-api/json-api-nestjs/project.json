@@ -48,6 +48,11 @@
         "parallel": false,
         "outputPath": "{workspaceRoot}/libs/json-api/json-api-nestjs"
       }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/json-api/json-api-nestjs"
+      }
     }
   },
   "tags": []

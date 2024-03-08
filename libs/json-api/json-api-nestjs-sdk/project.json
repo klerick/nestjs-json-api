@@ -103,6 +103,11 @@
         "cwd": "./",
         "parallel": false
       }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/json-api/json-api-nestjs-sdk"
+      }
     }
   },
   "tags": []
