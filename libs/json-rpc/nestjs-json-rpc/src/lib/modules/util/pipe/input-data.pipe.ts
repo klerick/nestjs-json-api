@@ -1,4 +1,4 @@
-import { Inject, PipeTransform } from '@nestjs/common';
+import { Inject, Injectable, PipeTransform } from '@nestjs/common';
 
 import { ZOD_INPUT_DATA } from '../../../constants';
 import {
@@ -9,6 +9,7 @@ import {
 } from '../../../types';
 import { createError, RpcError } from '../../../utils';
 
+@Injectable()
 export class InputDataPipe
   implements PipeTransform<unknown, PayloadRpcArray | PayloadRpc>
 {

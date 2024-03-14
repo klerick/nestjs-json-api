@@ -1,10 +1,11 @@
 import { Inject, Module, OnApplicationBootstrap } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { MAP_HANDLER } from '../../constants';
 import { mapHandlerStoreProvider, AsyncIterate } from '../../providers';
 
 import { HandlerService, ExplorerService } from './service';
-import { ModuleRef } from '@nestjs/core';
 import { zodInputDataProvider } from '../../providers/zod-input-data.provider';
+import { InputDataPipe } from './pipe/input-data.pipe';
 
 @Module({
   controllers: [],
@@ -14,8 +15,15 @@ import { zodInputDataProvider } from '../../providers/zod-input-data.provider';
     ExplorerService,
     AsyncIterate,
     zodInputDataProvider,
+    InputDataPipe,
   ],
-  exports: [mapHandlerStoreProvider, HandlerService, AsyncIterate],
+  exports: [
+    mapHandlerStoreProvider,
+    HandlerService,
+    AsyncIterate,
+    zodInputDataProvider,
+    InputDataPipe,
+  ],
 })
 export class UtilModule implements OnApplicationBootstrap {
   @Inject(MAP_HANDLER) private readonly mapHandler!: Map<string, unknown>;

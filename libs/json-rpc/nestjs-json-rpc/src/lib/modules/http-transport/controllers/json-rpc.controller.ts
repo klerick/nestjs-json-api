@@ -2,7 +2,7 @@ import { Body, Controller, Inject, Post, UseFilters } from '@nestjs/common';
 import { HandlerService } from '../../util/service';
 import { InputDataPipe } from '../../util/pipe/input-data.pipe';
 import { PayloadRpcData, RpcResult } from '../../../types';
-import { RpcErrorObject } from '../../../types/error-payloade';
+import { RpcErrorObject } from '../../../types';
 import { RpcErrorExceptionFilter } from '../filter/rpc-error-exception.filter';
 
 @Controller('/')

@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { InputDataPipe } from './input-data.pipe';
 import { ErrorCodeType, PayloadRpcData } from '../../../types';
 import { zodInputDataProvider } from '../../../providers/zod-input-data.provider';
-import { RpcError } from '@klerick/nestjs-json-rpc';
+import { RpcError } from '../../../utils';
 import { ErrorCode } from '../../../constants';
 
 describe('input-data.pipe', () => {
