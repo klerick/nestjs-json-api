@@ -25,7 +25,7 @@ import {
   MAP_HANDLER,
 } from '../../../constants';
 import { IterateFactory } from '../../../providers';
-import { RpcErrorObject } from '../../../types/error-payloade';
+import { RpcErrorObject } from '../../../types';
 
 type toString<T> = T extends string ? T : never;
 
@@ -84,7 +84,7 @@ export class HandlerService {
       }
       return result;
     } else {
-      return this.callRpc(data, 1);
+      return this.callRpc(data, data.id);
     }
   }
 
@@ -99,6 +99,7 @@ export class HandlerService {
         id,
       };
     } catch (e) {
+      console.log(e);
       if (e instanceof RpcError) {
         return fromRpcErrorToRpcErrorObject(e, id);
       }
@@ -182,9 +183,17 @@ export class HandlerService {
       if (pipe) {
         pipe = await this.getPipeByType(pipe);
       }
+      let metatype: ArgumentMetadata = {
+        type: 'custom',
+        data: '',
+        metatype: undefined,
+      };
+      if (paramsType && paramsType[index]) {
+        metatype = paramsType[index];
+      }
       return {
         pipe,
-        metatype: paramsType[index],
+        metatype,
         params,
         index,
       };
@@ -204,8 +213,8 @@ export class HandlerService {
       } catch (e) {
         throw createError(
           e instanceof BadRequestException
-            ? ErrorCodeType.InvalidRequest
-            : ErrorCodeType.ServerError,
+            ? ErrorCodeType.InvalidParams
+            : ErrorCodeType.InternalError,
           (e as Error).message,
           `Argument: #${index}`
         );

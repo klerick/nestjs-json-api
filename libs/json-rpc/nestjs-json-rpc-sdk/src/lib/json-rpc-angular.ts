@@ -1,5 +1,4 @@
 import {
-  Component,
   inject,
   InjectionToken,
   ModuleWithProviders,

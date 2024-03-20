@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NestjsJsonRpcModule, TransportType } from '@klerick/nestjs-json-rpc';
+import { RpcService } from './service/rpc.service';
 
 @Module({
   imports: [
@@ -8,6 +9,6 @@ import { NestjsJsonRpcModule, TransportType } from '@klerick/nestjs-json-rpc';
       transport: TransportType.HTTP,
     }),
   ],
-  // providers: [ContestRpc, ParseIntArrayPipe, LineUpSchemaPipe],
+  providers: [RpcService],
 })
 export class RpcModule {}

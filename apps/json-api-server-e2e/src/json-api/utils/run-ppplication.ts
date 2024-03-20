@@ -1,13 +1,19 @@
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
 import { adapterForAxios, JsonApiJs } from 'json-api-nestjs-sdk';
+import {
+  RpcFactory,
+  axiosTransportFactory,
+  RpcConfig,
+} from '@klerick/nestjs-json-rpc-sdk';
+import { RpcService } from '@nestjs-json-api/type-for-rpc';
 import axios from 'axios';
 import { Logger } from 'nestjs-pino';
 
 import { AppModule } from '../../../../json-api-server/src/app/app.module';
 
 import { JsonConfig } from '../../../../../libs/json-api/json-api-nestjs-sdk/src/lib/types';
+import { TransportType } from '@klerick/nestjs-json-rpc-sdk';
 
 export const axiosAdapter = adapterForAxios(axios);
 let saveApp: INestApplication;
@@ -42,6 +48,22 @@ export const creatSdk = (config: Partial<JsonConfig> = {}) =>
       dateFields: ['createdAt', 'updatedAt'],
       operationUrl: 'operation',
       ...config,
+    },
+    true
+  );
+
+export type MapperRpc = {
+  RpcService: RpcService;
+};
+
+export const creatRpcSdk = (config: Partial<RpcConfig> = {}) =>
+  RpcFactory<MapperRpc>(
+    {
+      ...config,
+      rpcHost: `http://localhost:${port}`,
+      rpcPath: `${globalPrefix}/rpc`,
+      transport: TransportType.HTTP,
+      httpAgentFactory: axiosTransportFactory(axios),
     },
     true
   );

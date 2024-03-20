@@ -4,4 +4,7 @@ export {
   fromRpcErrorToRpcErrorObject,
   createError,
   RpcError,
+  createErrorCustomError,
 } from './lib/utils';
+
+export { RpcHandler, RpcParamsPipe } from './lib/decorators';
