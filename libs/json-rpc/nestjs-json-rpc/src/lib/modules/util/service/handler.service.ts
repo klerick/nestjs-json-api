@@ -99,7 +99,6 @@ export class HandlerService {
         id,
       };
     } catch (e) {
-      console.log(e);
       if (e instanceof RpcError) {
         return fromRpcErrorToRpcErrorObject(e, id);
       }

@@ -254,7 +254,7 @@ describe('handler.service', () => {
         });
       } catch (e) {
         expect(e).toBeInstanceOf(RpcError);
-        expect((e as RpcError).code).toBe(-32600);
+        expect((e as RpcError).code).toBe(-32602);
       }
     });
     it('Should be other error error', async () => {
