@@ -1,0 +1,23 @@
+{
+  "name": "nestjs-json-rpc-sdk",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/json-rpc/nestjs-json-rpc-sdk/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
+        "main": "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts",
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.lib.json",
+        "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"]
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs nestjs-json-rpc-sdk {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    }
+  },
+  "tags": []
+}

@@ -2,7 +2,22 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { JsonApiSdkService } from 'json-api-nestjs-sdk';
 import { AtomicFactory } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
+import {
+  JSON_RPC,
+  RPC_BATCH,
+  Rpc,
+} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
+
 import { switchMap } from 'rxjs';
+
+interface TestRpc {
+  test(a: number, b: number): Promise<number>;
+  test2(firstArg: string, secondArg: number): Promise<string>;
+}
+
+type RpcMap = {
+  TestRpc: TestRpc;
+};
 
 @Component({
   standalone: true,
@@ -14,14 +29,19 @@ import { switchMap } from 'rxjs';
 export class AppComponent implements OnInit {
   private JsonApiSdkService = inject(JsonApiSdkService);
   private atomicFactory = inject(AtomicFactory);
+  private rpc = inject<Rpc<RpcMap>>(JSON_RPC);
+  private rpcBatch = inject(RPC_BATCH);
 
   ngOnInit(): void {
-    // this.JsonApiSdkService.getAll(class Users {}, {
-    //   page: {
-    //     size: 2,
-    //     number: 1,
-    //   },
-    // }).subscribe((r) => console.log(r));
+    const rpc1 = this.rpc.TestRpc.test(1, 2);
+    const rpc2 = this.rpc.TestRpc.test2('string', 2);
+    this.rpcBatch(rpc2, rpc1).subscribe(([r2, r1]) => console.log(r1, r2));
+    this.JsonApiSdkService.getAll(class Users {}, {
+      page: {
+        size: 2,
+        number: 1,
+      },
+    }).subscribe((r) => console.log(r));
 
     class Addresses {
       id = 1;
