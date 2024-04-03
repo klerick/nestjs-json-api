@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { LoopFunc, PayloadRpc, ReturnTransportCall, Transport } from '../types';
 import { generateBody, generateBodyMethod } from './body';
-import { idRequest } from '../factory/id-request';
+import { idRequest } from '../factory';
 import { parseResponse, throwRpcError } from './pipe';
 
 export class WrapperCall<T extends LoopFunc> extends Observable<

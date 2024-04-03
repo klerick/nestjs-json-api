@@ -1,5 +1,5 @@
 import { ErrorCode } from '../constants';
-import { RpcErrorData, RpcErrorObject } from '../types/error-payloade';
+import { RpcErrorData, RpcErrorObject } from '../types';
 import { ErrorCodeType } from '../types';
 
 export class RpcError extends Error {
@@ -66,4 +66,13 @@ export function fromRpcErrorToRpcErrorObject(
     },
     id: error.id ? error.id : id,
   };
+}
+
+export function getBodyError(exception: Error): RpcErrorObject {
+  if (exception instanceof RpcError) {
+    return fromRpcErrorToRpcErrorObject(exception);
+  }
+  return fromRpcErrorToRpcErrorObject(
+    createError(ErrorCodeType.ServerError, exception.message)
+  );
 }

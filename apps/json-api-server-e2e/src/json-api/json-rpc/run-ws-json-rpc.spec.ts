@@ -5,7 +5,7 @@ import {
   RpcError,
 } from '@klerick/nestjs-json-rpc-sdk';
 
-import { creatRpcSdk, MapperRpc, run } from '../utils/run-application';
+import { creatWsRpcSdk, MapperRpc, run } from '../utils/run-application';
 
 let app: INestApplication;
 
@@ -17,12 +17,12 @@ afterAll(async () => {
   await app.close();
 });
 
-describe('Run json rpc:', () => {
+describe('Run ws json rpc:', () => {
   let rpc: ResultRpcFactoryPromise<MapperRpc>['rpc'];
   let rpcBatch: ResultRpcFactoryPromise<MapperRpc>['rpcBatch'];
   let rpcForBatch: ResultRpcFactoryPromise<MapperRpc>['rpcForBatch'];
   beforeEach(() => {
-    ({ rpc, rpcBatch, rpcForBatch } = creatRpcSdk());
+    ({ rpc, rpcBatch, rpcForBatch } = creatWsRpcSdk());
   });
 
   describe('Should be correct response', () => {

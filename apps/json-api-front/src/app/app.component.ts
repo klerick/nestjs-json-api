@@ -8,15 +8,11 @@ import {
   Rpc,
 } from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
 
+import { RpcService as IRpcService } from '@nestjs-json-api/type-for-rpc';
 import { switchMap } from 'rxjs';
 
-interface TestRpc {
-  test(a: number, b: number): Promise<number>;
-  test2(firstArg: string, secondArg: number): Promise<string>;
-}
-
 type RpcMap = {
-  TestRpc: TestRpc;
+  RpcService: IRpcService;
 };
 
 @Component({
@@ -33,9 +29,15 @@ export class AppComponent implements OnInit {
   private rpcBatch = inject(RPC_BATCH);
 
   ngOnInit(): void {
-    const rpc1 = this.rpc.TestRpc.test(1, 2);
-    const rpc2 = this.rpc.TestRpc.test2('string', 2);
+    const rpc1 = this.rpc.RpcService.someMethode(1);
+
+    const rpc2 = this.rpc.RpcService.methodeWithObjectParams({
+      a: 1,
+      b: 1,
+    });
+
     this.rpcBatch(rpc2, rpc1).subscribe(([r2, r1]) => console.log(r1, r2));
+
     this.JsonApiSdkService.getAll(class Users {}, {
       page: {
         size: 2,
@@ -74,9 +76,9 @@ export class AppComponent implements OnInit {
 
     const tmpUsers = new Users();
     tmpUsers.id = 1;
-    // this.JsonApiSdkService.getRelationships(tmpUsers, 'addresses').subscribe(
-    //   (r) => console.log(r)
-    // );
+    this.JsonApiSdkService.getRelationships(tmpUsers, 'addresses').subscribe(
+      (r) => console.log(r)
+    );
 
     const roles = new Roles();
     roles.id = 10000;

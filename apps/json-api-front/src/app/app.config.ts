@@ -4,6 +4,7 @@ import {
   JsonRpcAngular,
   TransportType,
 } from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
+import io from 'socket.io-client';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,9 +18,12 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(
       JsonRpcAngular.forRoot({
-        transport: TransportType.HTTP,
+        transport: TransportType.WS,
         rpcPath: 'rpc',
-        rpcHost: 'http://localhost:4200',
+        rpcHost: 'ws://localhost:4200',
+        useWsNativeSocket: true,
+        // useWsNativeSocket: false,
+        // webSocketCtor: io('http://localhost:3000', { path: '/rpc' }),
       })
     ),
   ],

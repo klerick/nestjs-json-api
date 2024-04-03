@@ -1,25 +1,12 @@
-import { Observable } from 'rxjs';
 import { Transport } from './rpc';
 import { HttpAgentFactory, LoopFunc } from './utils';
+
+import type { Socket } from 'socket.io-client';
 
 export enum TransportType {
   HTTP,
   WS,
 }
-
-// export type RpcHttpConfig = {
-//   rpcPath: string;
-//   rpcHost: string;
-//   transport: TransportType.HTTP;
-//   httpAgent?: <T>(data: T) => Promise<T>;
-// };
-
-// export type HttpConfig = {
-//   transport: TransportType.HTTP,
-//   rpcPath: string;
-//   rpcHost: string;
-//   httpAgent?: <T>(data: T) => Promise<T>;
-// };
 
 export type RpcMainHttpConfig = {
   transport: TransportType.HTTP;
@@ -33,11 +20,22 @@ export type RpcTransportHttpConfig = {
 
 export type RpcHttpConfig = RpcMainHttpConfig & RpcTransportHttpConfig;
 
+type UseNativeSocket =
+  | {
+      useWsNativeSocket: true;
+      rpcPath: string;
+      rpcHost: string;
+      webSocketCtor?: {
+        new (url: string, protocols?: string | string[]): any;
+      };
+    }
+  | {
+      useWsNativeSocket: false;
+      webSocketCtor: Socket;
+    };
+
 export type RpcWsConfig = {
   transport: TransportType.WS;
-  rpcPath: string;
-  rpcHost: string;
-  rpcPort: number;
-};
+} & UseNativeSocket;
 
 export type RpcConfig = RpcHttpConfig | RpcWsConfig;

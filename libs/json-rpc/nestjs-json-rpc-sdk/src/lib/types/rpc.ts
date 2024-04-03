@@ -4,6 +4,8 @@ import { LoopFunc, ReturnGenericType } from './utils';
 
 export type JsonRpcVersion = '2.0';
 
+export type WsEvent = 'rpc';
+
 export type PayloadRpc<T extends LoopFunc> = {
   jsonrpc: JsonRpcVersion;
   method: string;

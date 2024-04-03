@@ -1,15 +1,9 @@
 import { ArgumentsHost } from '@nestjs/common';
 
 import { RpcErrorExceptionFilter } from './rpc-error-exception.filter';
-import {
-  createError,
-  fromRpcErrorToRpcErrorObject,
-  RpcError,
-} from '../../../utils';
+import { createError, fromRpcErrorToRpcErrorObject } from '../../../utils';
 import { ErrorCodeType } from '../../../types';
 
-import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import Response = ts.server.protocol.Response;
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 
 describe('rpc-error-exception.filter', () => {

@@ -4,6 +4,7 @@ import {
   Provider,
   Type,
 } from '@nestjs/common';
+import { GatewayMetadata } from '@nestjs/websockets/interfaces';
 
 export enum TransportType {
   HTTP,
@@ -15,6 +16,11 @@ export type HttpTransportConfig = {
   path: string;
 };
 
+export type WSTransportConfig = {
+  transport: TransportType.WS;
+  wsConfig: GatewayMetadata;
+};
+
 export type CommonRpcConfig = {
   providers?: Provider[];
   imports?: Array<
@@ -22,4 +28,7 @@ export type CommonRpcConfig = {
   >;
 };
 
-export type JsonRpcConfig = CommonRpcConfig & HttpTransportConfig;
+export type JsonRpcHttpConfig = CommonRpcConfig & HttpTransportConfig;
+export type JsonRpcWsConfig = CommonRpcConfig & WSTransportConfig;
+
+export type JsonRpcConfig = JsonRpcHttpConfig | JsonRpcWsConfig;

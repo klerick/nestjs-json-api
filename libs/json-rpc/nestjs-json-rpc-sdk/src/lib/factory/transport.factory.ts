@@ -1,13 +1,14 @@
-import { fromFetch } from 'rxjs/fetch';
 import {
   RpcConfig,
   Transport,
   TransportType,
   RpcHttpConfig,
+  RpcWsConfig,
   LoopFunc,
-  PayloadRpc,
-  RpcResult,
 } from '../types';
+import { fetchTransportFactory } from './fetch-transport.factory';
+import { wsTransportFactory } from './ws-transport.factory';
+import { ioTransportFactory } from './io-transport.factory';
 
 function httpTransport<T extends LoopFunc>(
   config: RpcHttpConfig
@@ -17,12 +18,16 @@ function httpTransport<T extends LoopFunc>(
     return config.httpAgentFactory(url);
   }
 
-  return (body: PayloadRpc<T>) =>
-    fromFetch<RpcResult<T>>(url, {
-      method: 'post',
-      body: JSON.stringify(body),
-      selector: (r) => r.json(),
-    });
+  return fetchTransportFactory(url);
+}
+
+function wsTransport<T extends LoopFunc>(config: RpcWsConfig): Transport<T> {
+  if (config.useWsNativeSocket) {
+    const url = new URL(config.rpcPath, config.rpcHost).toString();
+    return wsTransportFactory(url, config.webSocketCtor);
+  }
+
+  return ioTransportFactory(config.webSocketCtor);
 }
 
 export function transportFactory<T extends LoopFunc>(
@@ -32,7 +37,7 @@ export function transportFactory<T extends LoopFunc>(
     case TransportType.HTTP:
       return httpTransport(rpcConfig);
     case TransportType.WS:
-      throw new Error('Unknown transport');
+      return wsTransport(rpcConfig);
     default:
       throw new Error('Unknown transport');
   }

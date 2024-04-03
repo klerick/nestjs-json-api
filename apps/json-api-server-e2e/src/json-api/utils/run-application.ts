@@ -7,13 +7,15 @@ import {
   RpcConfig,
 } from '@klerick/nestjs-json-rpc-sdk';
 import { RpcService } from '@nestjs-json-api/type-for-rpc';
+import { TransportType } from '@klerick/nestjs-json-rpc-sdk';
 import axios from 'axios';
 import { Logger } from 'nestjs-pino';
+import { WebSocket } from 'ws';
 
 import { AppModule } from '../../../../json-api-server/src/app/app.module';
 
 import { JsonConfig } from '../../../../../libs/json-api/json-api-nestjs-sdk/src/lib/types';
-import { TransportType } from '@klerick/nestjs-json-rpc-sdk';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 export const axiosAdapter = adapterForAxios(axios);
 let saveApp: INestApplication;
@@ -32,6 +34,7 @@ export const run = async () => {
   app.useLogger(app.get(Logger));
   // const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(globalPrefix);
+  app.useWebSocketAdapter(new WsAdapter(app));
   await app.init();
   await app.listen(port);
 
@@ -61,9 +64,21 @@ export const creatRpcSdk = (config: Partial<RpcConfig> = {}) =>
     {
       ...config,
       rpcHost: `http://localhost:${port}`,
-      rpcPath: `${globalPrefix}/rpc`,
+      rpcPath: `/rpc`,
       transport: TransportType.HTTP,
       httpAgentFactory: axiosTransportFactory(axios),
+    },
+    true
+  );
+
+export const creatWsRpcSdk = (config: Partial<RpcConfig> = {}) =>
+  RpcFactory<MapperRpc>(
+    {
+      transport: TransportType.WS,
+      useWsNativeSocket: true,
+      webSocketCtor: WebSocket,
+      rpcHost: `http://localhost:${port}`,
+      rpcPath: `/rpc`,
     },
     true
   );
