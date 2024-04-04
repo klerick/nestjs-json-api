@@ -65,7 +65,7 @@ export const creatRpcSdk = (config: Partial<RpcConfig> = {}) =>
     {
       ...config,
       rpcHost: `http://localhost:${port}`,
-      rpcPath: `/rpc`,
+      rpcPath: `/api/rpc`,
       transport: TransportType.HTTP,
       httpAgentFactory: axiosTransportFactory(axios),
     },
