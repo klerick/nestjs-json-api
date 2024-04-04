@@ -8,7 +8,7 @@
 
 # json-api-nestjs-sdk
 
-The plugin of Angular for help work with JSON API over [json-api-nestjs](https://www.npmjs.com/package/json-api-nestjs)
+The plugin of client for help work with JSON API over [json-api-nestjs](https://www.npmjs.com/package/json-api-nestjs)
 
 
 ## Installation

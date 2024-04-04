@@ -13,7 +13,7 @@ import {
   exports: [],
 })
 export class NestjsJsonRpcModule {
-  static forRootAsync(options: JsonRpcConfig): DynamicModule {
+  static forRoot(options: JsonRpcConfig): DynamicModule {
     const providers: Provider[] = [];
     const { transport } = options;
     switch (options.transport) {

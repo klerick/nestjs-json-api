@@ -1,10 +1,9 @@
-import { PayloadRpc, RpcResult, Transport } from './rpc';
+import { Transport } from './rpc';
 import { HttpAgentFactory, LoopFunc } from './utils';
 
 import type { Socket } from 'socket.io-client';
 import { Subject } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/internal/observable/dom/WebSocketSubject';
-import { WsResponse } from '../factory/ws-transport.factory';
 
 export enum TransportType {
   HTTP,
@@ -23,20 +22,6 @@ export type RpcTransportHttpConfig = {
 
 export type RpcHttpConfig = RpcMainHttpConfig & RpcTransportHttpConfig;
 
-type UseNativeSocket =
-  | {
-      useWsNativeSocket: true;
-      rpcPath: string;
-      rpcHost: string;
-      webSocketCtor?: {
-        new (url: string, protocols?: string | string[]): any;
-      };
-    }
-  | {
-      useWsNativeSocket: false;
-      webSocketCtor: Socket;
-    };
-
 export type RpcNativeSocketFactory = {
   rpcPath: string;
   rpcHost: string;
@@ -46,9 +31,7 @@ export type RpcNativeSocketFactory = {
 };
 
 export type RpcNativeSocketInstance = {
-  nativeSocketInstance: WebSocketSubject<
-    WsResponse<PayloadRpc<LoopFunc> | RpcResult<LoopFunc>>
-  >;
+  nativeSocketInstance: WebSocketSubject<any>;
 };
 
 export type RpcNativeSocketTrue = {
