@@ -16,6 +16,7 @@ import { AppModule } from '../../../../json-api-server/src/app/app.module';
 
 import { JsonConfig } from '../../../../../libs/json-api/json-api-nestjs-sdk/src/lib/types';
 import { WsAdapter } from '@nestjs/platform-ws';
+import { Subject } from 'rxjs';
 
 export const axiosAdapter = adapterForAxios(axios);
 let saveApp: INestApplication;
@@ -70,15 +71,16 @@ export const creatRpcSdk = (config: Partial<RpcConfig> = {}) =>
     },
     true
   );
-
+export const destroySubject = new Subject<boolean>();
 export const creatWsRpcSdk = (config: Partial<RpcConfig> = {}) =>
   RpcFactory<MapperRpc>(
     {
       transport: TransportType.WS,
       useWsNativeSocket: true,
-      webSocketCtor: WebSocket,
+      nativeSocketImplementation: WebSocket,
       rpcHost: `http://localhost:${port}`,
       rpcPath: `/rpc`,
+      destroySubject,
     },
     true
   );

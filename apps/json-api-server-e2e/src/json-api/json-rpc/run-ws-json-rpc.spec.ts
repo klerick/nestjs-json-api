@@ -5,7 +5,12 @@ import {
   RpcError,
 } from '@klerick/nestjs-json-rpc-sdk';
 
-import { creatWsRpcSdk, MapperRpc, run } from '../utils/run-application';
+import {
+  creatWsRpcSdk,
+  MapperRpc,
+  run,
+  destroySubject,
+} from '../utils/run-application';
 
 let app: INestApplication;
 
@@ -14,6 +19,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  destroySubject.next(true);
+  destroySubject.complete();
   await app.close();
 });
 

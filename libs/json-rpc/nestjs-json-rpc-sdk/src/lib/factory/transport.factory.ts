@@ -5,10 +5,18 @@ import {
   RpcHttpConfig,
   RpcWsConfig,
   LoopFunc,
+  PayloadRpc,
+  RpcResult,
 } from '../types';
 import { fetchTransportFactory } from './fetch-transport.factory';
-import { wsTransportFactory } from './ws-transport.factory';
+import {
+  webSocketFactory,
+  WsResponse,
+  wsTransportFactory,
+} from './ws-transport.factory';
 import { ioTransportFactory } from './io-transport.factory';
+import { Subject } from 'rxjs';
+import { WebSocketSubject } from 'rxjs/internal/observable/dom/WebSocketSubject';
 
 function httpTransport<T extends LoopFunc>(
   config: RpcHttpConfig
@@ -22,12 +30,28 @@ function httpTransport<T extends LoopFunc>(
 }
 
 function wsTransport<T extends LoopFunc>(config: RpcWsConfig): Transport<T> {
+  const destroyFactory = config.destroySubject || new Subject();
   if (config.useWsNativeSocket) {
-    const url = new URL(config.rpcPath, config.rpcHost).toString();
-    return wsTransportFactory(url, config.webSocketCtor);
+    let nativeSocketInstance: WebSocketSubject<
+      WsResponse<PayloadRpc<LoopFunc> | RpcResult<LoopFunc>>
+    >;
+    if ('nativeSocketInstance' in config) {
+      nativeSocketInstance = config.nativeSocketInstance;
+    } else {
+      const url = new URL(config.rpcPath, config.rpcHost).toString();
+      nativeSocketInstance = webSocketFactory(
+        url,
+        config.nativeSocketImplementation
+      );
+    }
+
+    return wsTransportFactory(
+      nativeSocketInstance,
+      config.destroySubject || new Subject<boolean>()
+    );
   }
 
-  return ioTransportFactory(config.webSocketCtor);
+  return ioTransportFactory(config.ioSocketInstance, destroyFactory);
 }
 
 export function transportFactory<T extends LoopFunc>(
