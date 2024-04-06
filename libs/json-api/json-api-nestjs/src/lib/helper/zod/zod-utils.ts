@@ -14,14 +14,15 @@ export const stringLongerThan =
 
 export const arrayItemStringLongerThan =
   (length = 0) =>
-  (array: [string, ...string[]]) => {
+  (array: [string | null, ...(string | null)[]]) => {
     const checkFunction = stringLongerThan(length);
-    return !array.some((i) => !checkFunction(i));
+    return !array.some((i) => i !== null && !checkFunction(i));
   };
 
 export const stringMustBe =
   (type: TypeField = TypeField.string) =>
-  (inputString: string) => {
+  (inputString: string | null) => {
+    if (inputString === null) return true;
     switch (type) {
       case TypeField.boolean:
         return inputString === 'true' || inputString === 'false';

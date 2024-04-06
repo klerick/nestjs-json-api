@@ -220,6 +220,14 @@ describe('Check "filter" zod schema', () => {
       },
       relation: null,
     };
+    const check9: FilterQuerySchema = {
+      target: {
+        createdAt: {
+          eq: 'null',
+        },
+      },
+      relation: null,
+    };
 
     const checkArray = [
       check1,
@@ -235,6 +243,10 @@ describe('Check "filter" zod schema', () => {
       const result = filterQuerySchema.parse(check);
       expect(result).toEqual(check);
     }
+    const result = filterQuerySchema.parse(check9);
+    expect(result.target!.createdAt!.eq).toEqual(null);
+    result.target!.createdAt!.eq = 'null';
+    expect(result).toEqual(check9);
   });
 
   it('Invalid schema', () => {
