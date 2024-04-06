@@ -59,6 +59,20 @@ export class AppModule {
 ```
 `wsConfig` - is GatewayMetadata from `@nestjs/websockets/interfaces`;
 
+***!!!!***: - NestJs by default using **socket.io** adapter, if you want to use native WebSocket, you should use  **WsAdapter**
+```typescript
+import { WsAdapter } from '@nestjs/platform-ws';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app/app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useWebSocketAdapter(new WsAdapter(app));
+  app.init()
+  await app.listen(3000);
+}
+```
+
 To allow service to your RPC server, you should create class and add to providers the root **AppModule**.
 
 ```typescript
@@ -103,6 +117,7 @@ export class AppModule {
 }
 ```
 `@RpcHandler` - decorator which mark class as RPC service
+
 `@RpcParamsPipe` - decorator for validate input data, 
 
 
@@ -112,7 +127,7 @@ After it, you can call you RPC service:
   POST /rpc
 ```
 
-- **body** - Create new User and add link to address
+- **body** - for http request
 
 ```json
 {"jsonrpc": "2.0", "method": "RpcService.methodeWithObjectParams", "params": {"a": 23}, "id": 1}

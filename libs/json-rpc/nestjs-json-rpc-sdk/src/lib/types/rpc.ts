@@ -13,8 +13,6 @@ export type PayloadRpc<T extends LoopFunc> = {
   id: number;
 };
 
-export type IdRequest = () => number;
-
 export type RpcResultObject<T extends LoopFunc> = {
   jsonrpc: JsonRpcVersion;
   result: ReturnGenericType<T>;

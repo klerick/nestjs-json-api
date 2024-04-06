@@ -27,6 +27,25 @@
         "codeCoverage": true,
         "coverageReporters": ["json-summary"]
       }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": ["node tools/scripts/upload-badge.mjs nestjs-json-rpc"],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/libs/json-rpc/nestjs-json-rpc"
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/json-rpc/nestjs-json-rpc"
+      }
     }
   },
   "tags": []

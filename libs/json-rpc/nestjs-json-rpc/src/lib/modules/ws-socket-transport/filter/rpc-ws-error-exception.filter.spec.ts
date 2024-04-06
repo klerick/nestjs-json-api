@@ -10,7 +10,10 @@ import { WS_EVENT_NAME } from '../constants';
 
 describe('rpc-ws-error-exception.filter', () => {
   describe('WebSocket', () => {
-    const WebSocketInst = new WebSocket('http://0.0.0.0', {});
+    const WebSocketInst = new WebSocket(
+      'wss://demo.piesocket.com/v3/channel_123',
+      {}
+    );
     let argumentsHost: ArgumentsHost;
     let getClient: () => WebSocket;
 

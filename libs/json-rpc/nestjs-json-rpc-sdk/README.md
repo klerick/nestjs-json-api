@@ -20,7 +20,7 @@ npm install @klerick/nestjs-json-rpc-sdk
 ## Example
 
 Once the installation process is complete, we can import the **RpcFactory**.
-For example, we have RPC serve which have service which implement this interface: 
+For example, we have RPC server which have service which implement this interface: 
 
 ```typescript
 export type InputType = {
@@ -34,9 +34,9 @@ export type OutputType = {
 };
 
 export interface RpcService {
-  someMethode(firstArg: number): Promise<number>;
-  someOtherMethode(firstArg: number, secondArgument: number): Promise<string>;
-  methodeWithObjectParams(a: InputType): Promise<OutputType>;
+  someMethod(firstArg: number): Promise<number>;
+  someOtherMethod(firstArg: number, secondArgument: number): Promise<string>;
+  methodWithObjectParams(a: InputType): Promise<OutputType>;
 }
 ```
 
@@ -53,10 +53,10 @@ const { rpc, rpcBatch } = RpcFactory(
   false
 );
 
-rpc.RpcService.someMethode(1).sibcribe(r => console.log(r))
+rpc.RpcService.someMethod(1).sibcribe(r => console.log(r))
 
-const call1 = rpcForBatch.RpcService.someMethode(1);
-const call2 = rpcForBatch.RpcService.methodeWithObjectParams({
+const call1 = rpcForBatch.RpcService.someMethod(1);
+const call2 = rpcForBatch.RpcService.methodWithObjectParams({
   a: 1,
   b: 2,
 });
@@ -66,7 +66,7 @@ rpcBatch(call1, call2).sibcribe(([result1, result2]) => console.log(result1, res
 ```
 That's all:)
 
-You can use typescript type checking:
+You can use typescript for type checking:
 ```typescript 
 import {
   RpcFactory,
@@ -87,7 +87,11 @@ const { rpc, rpcBatch } = RpcFactory<MapperRpc>(
   false
 );
 //TS2345: Argument of type string is not assignable to parameter of type number
-const call = rpcForBatch.RpcService.someMethode('inccorectParam');
+const call = rpcForBatch.RpcService.someMethod('inccorectParam');
+//TS2339: Property IncorrectService does not exist on type MapperRpc
+const call2 = rpcForBatch.IncorrectService.someMethod(1);
+//TS2339: Property incorrectMethod does not exist on type RpcService
+const call3 = rpcForBatch.RpcService.incorrectMethod(1);
 
 ```
 
@@ -111,6 +115,22 @@ const { rpc, rpcBatch } = RpcFactory<MapperRpc>(
   false
 );
 ```
+Or you can implement your personal factory.
+
+You should implement **HttpAgentFactory** type
+
+```typescript
+
+type Transport<T extends LoopFunc> = (
+  body: PayloadRpc<T>
+) => Observable<RpcResult<T>>;
+
+type HttpAgentFactory<T extends LoopFunc> = (
+  url: string
+) => Transport<T>;
+```
+
+
 
 if you want to use **Promise** instead of **Observer** 
 
@@ -129,12 +149,12 @@ const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
     transport: TransportType.HTTP,
     httpAgentFactory: axiosTransportFactory(axios),
   },
-  false
+  true // need true for use promise as result
 );
-const result = await rpcForBatch.RpcService.someMethode(1)
+const result = await rpcForBatch.RpcService.someMethod(1)
 
-const call1 = rpcForBatch.RpcService.someMethode(1);
-const call2 = rpcForBatch.RpcService.methodeWithObjectParams({
+const call1 = rpcForBatch.RpcService.someMethod(1);
+const call2 = rpcForBatch.RpcService.methodWithObjectParams({
   a: 1,
   b: 2,
 });
@@ -144,20 +164,21 @@ const [result1, result2] = await rpcBatch(call1, call2);
 
 For use **WebSocket**
 ```typescript 
-import axios from 'axios';
 import {
   RpcFactory,
 } from '@klerick/nestjs-json-rpc-sdk';
-import { WebSocket } from 'ws';
+import { WebSocket as ws } from 'ws';
 import { webSocket } from 'rxjs/webSocket';
+
 const someUrl = 'ws://localhost:4200/rpc'
 const destroySubject = new Subject<boolean>();
 const nativeSocketInstance = webSocket<any>(destroySubject);
-const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
+
+const { rpc, rpcBatch } = RpcFactory<MapperRpc>(
   {
     transport: TransportType.WS,
     useWsNativeSocket: true, // - Will be use native WebSocket
-    //nativeSocketImplementation: WebSocket, - if you use NodeJS you can use other implementation
+    //nativeSocketImplementation: ws, - if you use NodeJS you can use other implementation
     rpcHost: `http://localhost:4200`,
     rpcPath: `/rpc`,
     destroySubject, // - If you need close connection you need call destroySubject.next(true),
@@ -168,7 +189,6 @@ const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
 ```
 You can use **socket.io**
 ```typescript 
-import axios from 'axios';
 import {
   RpcFactory,
 } from '@klerick/nestjs-json-rpc-sdk';
@@ -178,10 +198,10 @@ import { io } from 'socket.io-client';
 const someUrl = 'ws://localhost:4200'
 const destroySubject = new Subject<boolean>();
 const ioSocketInstance = io(someUrl, { path: '/rpc' })
-const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
+const { rpc, rpcBatch } = RpcFactory<MapperRpc>(
   {
     transport: TransportType.WS,
-    useWsNativeSocket: false, // - Will be use native WebSocket
+    useWsNativeSocket: false, // - Will be use socket.io
     destroySubject, // - If you need close connection you need call destroySubject.next(true),
     ioSocketInstance
   },
@@ -189,7 +209,7 @@ const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
 );
 ```
 
-You can use module for Angular:
+You can use Angular module:
 
 ```typescript 
 
@@ -199,6 +219,7 @@ import {
   TransportType,
 } from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module'
 import { Subject } from 'rxjs';
+import { io } from 'socket.io-client';
 import {
   JSON_RPC,
   RPC_BATCH,
