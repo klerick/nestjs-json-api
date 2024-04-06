@@ -26,7 +26,6 @@ import {
 } from '../../constants';
 import { TypeormUtilsService } from './typeorm-utils.service';
 import {
-  ObjectTyped,
   PostData,
   PostRelationshipData,
   Query,
@@ -253,7 +252,7 @@ describe('TypeormUtilsService', () => {
         `test for ${filterOperand}`;
       const valueTestArray = (
         filterOperand: FilterOperand.nin | FilterOperand.in
-      ) => [valueTest(filterOperand)];
+      ): [string, ...string[]] => [valueTest(filterOperand)];
 
       const query = getDefaultQuery<Users>();
       query.filter.target = {
@@ -429,9 +428,10 @@ describe('TypeormUtilsService', () => {
         createdAt: {
           [FilterOperand.eq]: 'test1',
           [FilterOperand.ne]: 'test2',
-          [FilterOperand.nin]: ['test3'],
+          [FilterOperand.nin]: ['test3'] as [string, ...string[]],
         },
       };
+
       query.filter.relation = {
         roles: conditional,
       };
