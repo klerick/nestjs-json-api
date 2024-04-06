@@ -2,10 +2,12 @@ import {
   z,
   ZodArray,
   ZodEffects,
+  ZodLiteral,
   ZodNullable,
   ZodObject,
   ZodOptional,
   ZodString,
+  ZodUnion,
 } from 'zod';
 import {
   arrayItemStringLongerThan,
@@ -41,15 +43,21 @@ import {
   ZodFilterRelationSchema,
 } from '../zod-input-query-schema/filter';
 
-type ZodForString = ZodEffects<ZodString>;
-const zodForString: ZodForString = z.string().refine(stringLongerThan(), {
-  message: 'String should be not empty',
-});
+type ZodForString = ZodUnion<
+  [ZodEffects<ZodLiteral<'null'>, null, 'null'>, ZodEffects<ZodString>]
+>;
+
+const zodForString: ZodForString = z.union([
+  z.literal('null').transform(() => null),
+  z.string().refine(stringLongerThan(), {
+    message: 'String should be not empty',
+  }),
+]);
 
 type ZodForStringArray = ZodEffects<
   ZodArray<ZodForString, 'atleastone'>,
-  string[],
-  string[]
+  [string | null, ...(string | null)[]],
+  [string, ...string[]]
 >;
 const zodForStringArray: ZodForStringArray = zodForString
   .array()
