@@ -87,11 +87,11 @@ const { rpc, rpcBatch } = RpcFactory<MapperRpc>(
   false
 );
 //TS2345: Argument of type string is not assignable to parameter of type number
-const call = rpcForBatch.RpcService.someMethod('inccorectParam');
+const call = rpc.RpcService.someMethod('inccorectParam');
 //TS2339: Property IncorrectService does not exist on type MapperRpc
-const call2 = rpcForBatch.IncorrectService.someMethod(1);
+const call2 = rpc.IncorrectService.someMethod(1);
 //TS2339: Property incorrectMethod does not exist on type RpcService
-const call3 = rpcForBatch.RpcService.incorrectMethod(1);
+const call3 = rpc.RpcService.incorrectMethod(1);
 
 ```
 
@@ -151,7 +151,7 @@ const { rpc, rpcBatch, rpcForBatch } = RpcFactory<MapperRpc>(
   },
   true // need true for use promise as result
 );
-const result = await rpcForBatch.RpcService.someMethod(1)
+const result = await rpc.RpcService.someMethod(1)
 
 const call1 = rpcForBatch.RpcService.someMethod(1);
 const call2 = rpcForBatch.RpcService.methodWithObjectParams({

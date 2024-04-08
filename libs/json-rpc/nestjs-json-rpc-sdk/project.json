@@ -4,19 +4,98 @@
   "sourceRoot": "libs/json-rpc/nestjs-json-rpc-sdk/src",
   "projectType": "library",
   "targets": {
+    "compile-for-angular": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/json-rpc/nestjs-json-rpc-sdk/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
+        },
+        "development": {
+          "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-cjs"
+      ],
+      "options": {
+        "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
+        "commands": [
+          "node tools/scripts/preparation-hybrid-npm-package.mjs nestjs-json-rpc-sdk",
+          "node tools/scripts/preparation-npm-package.mjs nestjs-json-rpc-sdk",
+          "node tools/scripts/prepare-for-angular.mjs nestjs-json-rpc-sdk json-rpc-angular",
+          "cp tmp/angular-lib/nestjs-json-rpc-sdk/esm2022/json-rpc/nestjs-json-rpc-sdk/src/lib/angular/json-rpc-angular.module.mjs dist/libs/json-rpc/nestjs-json-rpc-sdk/mjs/src/lib/angular/json-rpc-angular.module.js"
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "build-cjs": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "dependsOn": [
+        "build-mjs"
+      ],
+      "options": {
+        "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk/cjs",
+        "main": "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts",
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.lib.json",
+        "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"],
+        "external": "none",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "additionalEntryPoints": [
+          "libs/json-rpc/nestjs-json-rpc-sdk/src/json-rpc-sdk.module.ts"
+        ],
+        "generateExportsField": true
+      }
+    },
+    "build-mjs": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
+        "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk/mjs",
         "main": "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts",
-        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.lib.json",
-        "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"]
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json",
+        "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"],
+        "external": "none",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "additionalEntryPoints": [
+          "libs/json-rpc/nestjs-json-rpc-sdk/src/json-rpc-sdk.module.ts"
+        ],
+        "generateExportsField": true
       }
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs nestjs-json-rpc-sdk {args.ver} {args.tag}",
       "dependsOn": ["build"]
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "outputPath": "{workspaceRoot}/libs/json-rpc/nestjs-json-rpc-sdk",
+        "commands": ["node tools/scripts/upload-badge.mjs nestjs-json-rpc-sdk"],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/json-rpc/nestjs-json-rpc-sdk"
+      }
     }
   },
   "tags": []

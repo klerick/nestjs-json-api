@@ -1,7 +1,12 @@
 import { InjectionToken } from '@angular/core';
-import { LoopFunc, RpcBatch, RpcReturnList, Transport } from '../types';
+import {
+  LoopFunc,
+  RpcBatch,
+  RpcReturnList,
+  Transport,
+  JsonRpcAngularConfig,
+} from '../types';
 
-import { JsonRpcAngularConfig } from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
 import {
   angularTransportFactory,
   rpcBatchFactory,
