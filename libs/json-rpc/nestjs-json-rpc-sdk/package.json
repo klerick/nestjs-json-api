@@ -1,6 +1,6 @@
 {
   "name": "@klerick/nestjs-json-rpc-sdk",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "engines": {
     "node": ">= 16.0.0"
   },

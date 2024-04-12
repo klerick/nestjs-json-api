@@ -87,8 +87,24 @@ writeFileSync(
   'README.md',
   readFileSync(join('mjs', 'README.md').toString()),
 )
-unlinkSync(join('mjs', 'package.json'))
-unlinkSync(join('cjs', 'package.json'))
-unlinkSync(join('mjs', 'README.md'))
-unlinkSync(join('cjs', 'README.md'))
+try {
+  unlinkSync(join('cjs', 'package.json'))
 
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('mjs', 'package.json'))
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('mjs', 'README.md'))
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('cjs', 'README.md'))
+} catch (e) {
+
+}

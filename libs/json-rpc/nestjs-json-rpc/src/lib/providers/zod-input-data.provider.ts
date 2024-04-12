@@ -1,4 +1,4 @@
-import { ValueProvider } from '@angular/core';
+import { ValueProvider } from '@nestjs/common';
 import { ZOD_INPUT_DATA } from '../constants';
 import { ZPayloadRpc } from '../types';
 

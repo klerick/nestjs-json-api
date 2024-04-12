@@ -10,9 +10,11 @@
       "options": {
         "outputPath": "dist/libs/json-rpc/nestjs-json-rpc",
         "tsConfig": "libs/json-rpc/nestjs-json-rpc/tsconfig.lib.json",
-        "packageJson": "libs/json-rpc/nestjs-json-rpc/package.json",
         "main": "libs/json-rpc/nestjs-json-rpc/src/index.ts",
-        "assets": ["libs/json-rpc/nestjs-json-rpc/*.md"]
+        "assets": ["libs/json-rpc/nestjs-json-rpc/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true,
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true
       }
     },
     "publish": {
