@@ -31,6 +31,8 @@ jobs:
             .nx
           key: ${{ runner.os }}-nx-master
       - name: Test and build
+        env:
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
         run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
       - name: Upload test coverage badge
         run: npx nx affected -t upload-badge --parallel=3 --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source'
