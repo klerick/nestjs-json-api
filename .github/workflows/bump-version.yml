@@ -11,102 +11,107 @@ on:
         required: false
         type: boolean
         default: false
+      dry-run:
+        description: 'Is dry run?'
+        required: false
+        type: boolean
+        default: false
 jobs:
-#  build-and-test:
-#    name: "Build and test"
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: "read"
-#      actions: "read"
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#      - name: Npm install
-#        uses: ./.github/actions
-#      - name: Get git hash
-#        run: |
-#          COMMIT=$(git show-ref --tags --hash | tail -n 1)
-#          echo "NX_BASE=$(echo ${COMMIT})" >> $GITHUB_ENV
-#      - name: Set GIST_SECRET to env
-#        run: |
-#          echo "GIST_SECRET=${{ secrets.GIST_SECRET }}" >> $GITHUB_ENV
-#          echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
-#      - name: Restore cached .nx
-#        id: cache-nx-restore
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: |
-#            .nx
-#          key: ${{ runner.os }}-nx-master
-#      - name: Test
-#        env:
-#          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
-#        run: npx nx affected -t test --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
-#      - name: Build
-#        env:
-#          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
-#        run: npx nx affected -t build --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
-#      - name: Upload test coverage badge
-#        run: npx nx affected -t upload-badge --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
-#      - name: Save cached .nx
-#        id: cache-dependencies-save
-#        uses: actions/cache/save@v4
-#        with:
-#          path: |
-#            .nx
-#          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
-#  run-e2e-test:
-#    runs-on: ubuntu-latest
-#    name: Try run e2e test
-#    needs:
-#      - build-and-test
-#    services:
-#      # Label used to access the service container
-#      postgres:
-#        # Docker Hub image
-#        image: postgres
-#        # Provide the password for postgres
-#        env:
-#          POSTGRES_PASSWORD: postgres
-#          POSTGRES_DB: json-api-db
-#        # Set health checks to wait until postgres has started
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#        ports:
-#          # Maps tcp port 5432 on service container to the host
-#          - 5432:5432
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#      - name: Npm install
-#        uses: ./.github/actions
-#      - name: Restore cached .nx
-#        id: cache-nx-restore
-#        uses: actions/cache/restore@v4
-#        with:
-#          path: |
-#            .nx
-#          key: ${{ runner.os }}-nx-master
-#      - run: git branch --track main origin/master
-#      - run: npm run typeorm migration:run
-#      - run: npm run seed:run
-#      - run: npx nx affected -t e2e --parallel=1
-#      - name: Save cached .nx
-#        id: cache-dependencies-save
-#        uses: actions/cache/save@v4
-#        with:
-#          path: |
-#            .nx
-#          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
+  build-and-test:
+    name: "Build and test"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      actions: "read"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Npm install
+        uses: ./.github/actions
+      - name: Get git hash
+        run: |
+          COMMIT=$(git show-ref --tags --hash | tail -n 1)
+          echo "NX_BASE=$(echo ${COMMIT})" >> $GITHUB_ENV
+      - name: Set GIST_SECRET to env
+        run: |
+          echo "GIST_SECRET=${{ secrets.GIST_SECRET }}" >> $GITHUB_ENV
+          echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-master
+      - name: Test
+        env:
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
+        run: npx nx affected -t test --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
+      - name: Build
+        env:
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
+        run: npx nx affected -t build --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
+      - name: Upload test coverage badge
+        run: npx nx affected -t upload-badge --exclude='json-api-front,json-api-server,shared-utils,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
+      - name: Save cached .nx
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
+  run-e2e-test:
+    runs-on: ubuntu-latest
+    name: Try run e2e test
+    needs:
+      - build-and-test
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: json-api-db
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Npm install
+        uses: ./.github/actions
+      - name: Restore cached .nx
+        id: cache-nx-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx
+          key: ${{ runner.os }}-nx-master
+      - run: git branch --track main origin/master
+      - run: npm run typeorm migration:run
+      - run: npm run seed:run
+      - run: npx nx affected -t e2e --parallel=1
+      - name: Save cached .nx
+        id: cache-dependencies-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .nx
+          key: ${{ steps.cache-nx-restore.outputs.cache-primary-key }}
   bump-version:
     name: "Bump version"
-#    needs:
-#      - run-e2e-test
+    needs:
+      - run-e2e-test
     runs-on: ubuntu-latest
     permissions:
       contents: "write"
@@ -125,7 +130,7 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          npx nx release --skip-publish --first-release=${{ github.event.inputs.first-release }} --projects=${{ github.event.inputs.projects }} --dry-run
+          npx nx release --skip-publish --first-release=${{ github.event.inputs.first-release }} --projects=${{ github.event.inputs.projects }} --dry-run=${{ github.event.inputs.dry-run }}
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
