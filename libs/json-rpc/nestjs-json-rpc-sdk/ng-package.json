@@ -2,6 +2,6 @@
   "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../../tmp/angular-lib/nestjs-json-rpc-sdk",
   "lib": {
-    "entryFile": "../../index.ts"
+    "entryFile": "./src/json-rpc-sdk.module.ts"
   }
 }
