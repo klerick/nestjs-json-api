@@ -63,7 +63,11 @@
       ]
     },
     "test": {
-      "cache": true
+      "cache": true,
+      "options": {
+        "codeCoverage": true,
+        "coverageReporters": ["json-summary"]
+      }
     },
     "@nx/angular:ng-packagr-lite": {
       "cache": true,
@@ -105,7 +109,8 @@
       "!json-api-server",
       "!json-api-front",
       "!shared-utils",
-      "!database"
+      "!database",
+      "!type-for-rpc"
     ],
     "version": {
       "conventionalCommits": true
