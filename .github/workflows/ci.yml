@@ -30,7 +30,7 @@ jobs:
       - name: Test and build
         env:
           NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
-        run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc'
+        run: npx nx affected -t test build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,json-shared-type,database,@nestjs-json-api/source,type-for-rpc' --passWithNoTests
       - name: Save cached .nx
         id: cache-dependencies-save
         uses: actions/cache/save@v4
