@@ -125,7 +125,7 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          npx nx release --skip-publish=${{ github.event.inputs.first-release }} --projects=${{ github.event.inputs.projects }} --dry-run
+          npx nx release --skip-publish --first-release==${{ github.event.inputs.first-release }} --projects=${{ github.event.inputs.projects }} --dry-run
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
