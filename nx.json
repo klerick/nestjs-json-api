@@ -63,11 +63,7 @@
       ]
     },
     "test": {
-      "cache": true,
-      "options": {
-        "codeCoverage": true,
-        "coverageReporters": ["json-summary"]
-      }
+      "cache": true
     },
     "@nx/angular:ng-packagr-lite": {
       "cache": true,
