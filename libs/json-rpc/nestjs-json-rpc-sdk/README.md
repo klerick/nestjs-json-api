@@ -1,7 +1,7 @@
 <p align='center'>
-  <a href="https://www.npmjs.com/package/json-api-nestjs" target="_blank"><img src="https://img.shields.io/npm/v/@klerick/nestjs-json-rpc-sdk.svg" alt="NPM Version" /></a>
-  <a href="https://www.npmjs.com/package/json-api-nestjs" target="_blank"><img src="https://img.shields.io/npm/l/@klerick/nestjs-json-rpc-sdk.svg" alt="Package License" /></a>
-  <a href="https://www.npmjs.com/package/json-api-nestjs" target="_blank"><img src="https://img.shields.io/npm/dm/@klerick/nestjs-json-rpc-sdk.svg" alt="NPM Downloads" /></a>
+  <a href="https://www.npmjs.com/package/@klerick/nestjs-json-rpc-sdk" target="_blank"><img src="https://img.shields.io/npm/v/@klerick/nestjs-json-rpc-sdk.svg" alt="NPM Version" /></a>
+  <a href="https://www.npmjs.com/package/@klerick/nestjs-json-rpc-sdk" target="_blank"><img src="https://img.shields.io/npm/l/@klerick/nestjs-json-rpc-sdk.svg" alt="Package License" /></a>
+  <a href="https://www.npmjs.com/package/@klerick/nestjs-json-rpc-sdk" target="_blank"><img src="https://img.shields.io/npm/dm/@klerick/nestjs-json-rpc-sdk.svg" alt="NPM Downloads" /></a>
   <a href="http://commitizen.github.io/cz-cli/" target="_blank"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly" /></a>
   <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/klerick/397d521f54660656f2fd6195ec482581/raw/nestjs-json-rpc-sdk.json" alt="Coverage Badge" />
 </p>
