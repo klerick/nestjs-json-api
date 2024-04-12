@@ -109,7 +109,10 @@
       "!type-for-rpc"
     ],
     "version": {
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "generatorOptions": {
+        "fallbackCurrentVersionResolver": "1.0.0"
+      }
     }
   }
 }
