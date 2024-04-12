@@ -141,4 +141,3 @@ or RPC call Batch
   {"jsonrpc": "2.0", "method": "RpcService.someOtherMethode", "params": [1, 2], "id": 2}
 ]
 ```
-
