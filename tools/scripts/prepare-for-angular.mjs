@@ -34,12 +34,7 @@ promisify(exec)(
 ).then(r => {
   writeFileSync(LIB_ANGULAR_MODULE_PATH, readFileSync(ANGULAR_MODULE_PATH))
 }).finally(() => {
-  try {
-    unlinkSync(TEMP_FILE_PATH)
-  } catch (e) {
-
-  }
-
+  unlinkSync(TEMP_FILE_PATH)
 })
 
 
