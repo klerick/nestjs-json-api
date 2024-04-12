@@ -45,9 +45,15 @@ invariant(
 );
 process.chdir(outputPath);
 
+const angularModuleMap = {
+  'nestjs-json-rpc-sdk': 'json-rpc-sdk.module',
+  'json-api-nestjs-sdk': 'json-api-nestjs-sdk.module'
+}
+
 const mjsJson = readJson();
-const angularModule = 'json-api-nestjs-sdk.module';
+const angularModule = angularModuleMap[name];
 const angularModulePath = `./${angularModule}`;
+
 const angularPath = mjsJson.exports[angularModulePath]
 
 mjsJson.module = addTypeToPath(mjsJson.main)
@@ -81,8 +87,24 @@ writeFileSync(
   'README.md',
   readFileSync(join('mjs', 'README.md').toString()),
 )
-unlinkSync(join('mjs', 'package.json'))
-unlinkSync(join('cjs', 'package.json'))
-unlinkSync(join('mjs', 'README.md'))
-unlinkSync(join('cjs', 'README.md'))
+try {
+  unlinkSync(join('cjs', 'package.json'))
 
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('mjs', 'package.json'))
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('mjs', 'README.md'))
+} catch (e) {
+
+}
+try {
+  unlinkSync(join('cjs', 'README.md'))
+} catch (e) {
+
+}

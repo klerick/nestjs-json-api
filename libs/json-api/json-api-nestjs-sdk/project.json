@@ -30,7 +30,7 @@
         "commands": [
           "node tools/scripts/preparation-hybrid-npm-package.mjs json-api-nestjs-sdk",
           "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk",
-          "node tools/scripts/prepare-for-angular.mjs"
+          "node tools/scripts/prepare-for-angular.mjs json-api-nestjs-sdk json-api-angular"
         ],
         "cwd": "./",
         "parallel": false

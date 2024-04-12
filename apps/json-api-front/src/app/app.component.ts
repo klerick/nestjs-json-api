@@ -2,7 +2,18 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { JsonApiSdkService } from 'json-api-nestjs-sdk';
 import { AtomicFactory } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
+import {
+  JSON_RPC,
+  RPC_BATCH,
+  Rpc,
+} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
+
+import { RpcService as IRpcService } from '@nestjs-json-api/type-for-rpc';
 import { switchMap } from 'rxjs';
+
+type RpcMap = {
+  RpcService: IRpcService;
+};
 
 @Component({
   standalone: true,
@@ -14,14 +25,25 @@ import { switchMap } from 'rxjs';
 export class AppComponent implements OnInit {
   private JsonApiSdkService = inject(JsonApiSdkService);
   private atomicFactory = inject(AtomicFactory);
+  private rpc = inject<Rpc<RpcMap>>(JSON_RPC);
+  private rpcBatch = inject(RPC_BATCH);
 
   ngOnInit(): void {
-    // this.JsonApiSdkService.getAll(class Users {}, {
-    //   page: {
-    //     size: 2,
-    //     number: 1,
-    //   },
-    // }).subscribe((r) => console.log(r));
+    const rpc1 = this.rpc.RpcService.someMethode(1);
+
+    const rpc2 = this.rpc.RpcService.methodeWithObjectParams({
+      a: 1,
+      b: 1,
+    });
+
+    this.rpcBatch(rpc2, rpc1).subscribe(([r2, r1]) => console.log(r1, r2));
+
+    this.JsonApiSdkService.getAll(class Users {}, {
+      page: {
+        size: 2,
+        number: 1,
+      },
+    }).subscribe((r) => console.log(r));
 
     class Addresses {
       id = 1;
@@ -54,9 +76,9 @@ export class AppComponent implements OnInit {
 
     const tmpUsers = new Users();
     tmpUsers.id = 1;
-    // this.JsonApiSdkService.getRelationships(tmpUsers, 'addresses').subscribe(
-    //   (r) => console.log(r)
-    // );
+    this.JsonApiSdkService.getRelationships(tmpUsers, 'addresses').subscribe(
+      (r) => console.log(r)
+    );
 
     const roles = new Roles();
     roles.id = 10000;

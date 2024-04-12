@@ -1,0 +1,30 @@
+{
+  "name": "@klerick/nestjs-json-rpc-sdk",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">= 16.0.0"
+  },
+  "description": "Client for RPS server, which use @klerick/nestjs-json-rpc",
+  "contributors": [
+    {
+      "email": "klerick666@gmain.com",
+      "name": "Aleksandr Kharkovey"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klerick/nestjs-json-api.git"
+  },
+  "private": false,
+  "license": "MIT",
+  "main": "./src/index.js",
+  "files": [
+    "**/*"
+  ],
+  "keywords": [
+    "nestjs",
+    "nest",
+    "RPC",
+    "JSON-RPC"
+  ]
+}

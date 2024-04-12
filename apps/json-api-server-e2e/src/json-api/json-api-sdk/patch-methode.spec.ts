@@ -3,7 +3,7 @@ import { Addresses, CommentKind, Comments, Users } from 'database';
 import { faker } from '@faker-js/faker';
 import { JsonSdkPromise } from 'json-api-nestjs-sdk';
 
-import { creatSdk, run } from '../utils/run-ppplication';
+import { creatSdk, run } from '../utils/run-application';
 
 let app: INestApplication;
 

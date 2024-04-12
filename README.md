@@ -9,6 +9,8 @@
 
 - *[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)* - plugin for create CRUD overs JSON API
 - *[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-sdk)* - tool for client, call api over *json-api-nestjs*
+- *[nestjs-json-rpc](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc)* - plugin for create RPC server using [JSON-RPC](https://www.jsonrpc.org/)
+- *[nestjs-json-rpc-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc-sdk)* - tool for client, call RPC server *nestjs-json-rpc*
 - *json-api-nestjs-acl* - tool for acl over *json-api-nestjs*(coming soon...)
 ## Installation
 

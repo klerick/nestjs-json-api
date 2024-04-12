@@ -15,6 +15,16 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@klerick/nestjs-json-rpc": [
+        "libs/json-rpc/nestjs-json-rpc/src/index.ts"
+      ],
+      "@klerick/nestjs-json-rpc-sdk": [
+        "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts"
+      ],
+      "@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module": [
+        "libs/json-rpc/nestjs-json-rpc-sdk/src/json-rpc-sdk.module.ts"
+      ],
+      "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
       "database": ["libs/database/src/index.ts"],
       "json-api-nestjs": ["libs/json-api/json-api-nestjs/src/index.ts"],
       "json-api-nestjs-sdk": ["libs/json-api/json-api-nestjs-sdk/src/index.ts"],

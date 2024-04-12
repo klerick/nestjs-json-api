@@ -3,7 +3,7 @@ import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
 import { AxiosError } from 'axios';
 import { Users } from 'database';
 
-import { run, creatSdk } from '../utils/run-ppplication';
+import { run, creatSdk } from '../utils/run-application';
 
 let app: INestApplication;
 

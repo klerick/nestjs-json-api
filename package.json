@@ -7,7 +7,8 @@
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
     "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/database/src/lib/config-cli.ts seed libs/database/src/lib/seeders/root.seeder.ts",
-    "demo:json-api": "nx run json-api-server:serve:development"
+    "demo:json-api": "nx run json-api-server:serve:development",
+    "demo:json-api-front": "nx run json-api-front:serve:development"
   },
   "private": true,
   "dependencies": {
@@ -24,14 +25,18 @@
     "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",
     "@nestjs/platform-express": "10.3.3",
+    "@nestjs/platform-socket.io": "^10.3.7",
+    "@nestjs/platform-ws": "^10.3.7",
     "@nestjs/swagger": "^7.3.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@nestjs/websockets": "^10.3.7",
     "axios": "1.6.7",
     "nestjs-pino": "4.0.0",
     "pg": "8.11.3",
     "pino-http": "9.0.0",
     "reflect-metadata": "0.2.1",
     "rxjs": "^7.8.0",
+    "socket.io-client": "^4.7.5",
     "tslib": "^2.3.0",
     "typeorm": "^0.3.20",
     "uuid": "^9.0.1",
@@ -92,5 +97,8 @@
     "typescript": "~5.3.2",
     "verdaccio": "^5.0.4",
     "webpack-cli": "^5.1.4"
+  },
+  "nx": {
+    "includedScripts": []
   }
 }

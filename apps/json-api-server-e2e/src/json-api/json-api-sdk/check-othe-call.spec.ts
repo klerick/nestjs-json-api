@@ -4,7 +4,7 @@ import { BookList, Users } from 'database';
 import { AxiosError } from 'axios';
 import { faker } from '@faker-js/faker';
 import { lastValueFrom } from 'rxjs';
-import { creatSdk, run, axiosAdapter } from '../utils/run-ppplication';
+import { creatSdk, run, axiosAdapter } from '../utils/run-application';
 
 let app: INestApplication;
 
