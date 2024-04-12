@@ -33,16 +33,18 @@ const headers = new Headers([
 
 
 (async function(){
-  const status = await fetch(gistUrl, {
+  const [status, bodyResult] = await fetch(gistUrl, {
     method: "PATCH",
     headers,
     body,
-  }).then(r => r.status)
+  }).then(r => Promise.all([
+    r.status, r.json()
+  ]))
   if (status === 200) {
-    console.log('Badge has been updated')
+    console.log('Badge has been updated: '+ `${percentage}%`)
   } else {
     console.log(gistUrl.toString());
-    console.log(JSON.stringify([...headers.entries()]))
+    console.log(JSON.stringify(bodyResult));
     console.warn('Badge has not been updated')
   }
 })();
