@@ -5,16 +5,16 @@ import {
   PROPERTY_DEPS_METADATA,
 } from '@nestjs/common/constants';
 import { createController } from './create-controller';
-import { JsonBaseController } from '../controllers/json-base.controller';
+import { Users } from '../mock-utils';
+import { JsonBaseController } from '../mixin/controller/json-base.controller';
 import {
   JSON_API_CONTROLLER_POSTFIX,
-  ORM_SERVICE,
-  ORM_SERVICE_PROPS,
-} from '../../../constants';
+  JSON_API_DECORATOR_ENTITY,
+  TYPEORM_SERVICE,
+  TYPEORM_SERVICE_PROPS,
+} from '../constants';
 import { InjectService, JsonApi } from '../decorators';
-import { ErrorInterceptors, LogTimeInterceptors } from '../interceptors';
-
-class Users {}
+import { ErrorInterceptors, LogTimeInterceptors } from '../mixin/interceptors';
 
 describe('createController', () => {
   it('Should be error', () => {
@@ -49,15 +49,23 @@ describe('createController', () => {
     const result = createController(Users);
     const result2 = createController(Users, TestController);
     const result3 = createController(Users, TestController2);
-
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result)).toBe('users');
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result)).toEqual(
+      Users
+    );
 
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result2)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result2)).toBe('users');
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result2)).toEqual(
+      Users
+    );
 
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result3)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result3)).toBe(overrideRoute);
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result3)).toEqual(
+      Users
+    );
   });
 
   it('Check inject typeorm, service', () => {
@@ -84,13 +92,13 @@ describe('createController', () => {
     expect(intecept).not.toBe(undefined);
     expect(intecept[0]).toEqual(LogTimeInterceptors);
     expect(intecept[1]).toEqual(ErrorInterceptors);
-    expect(check[0].key).toBe(ORM_SERVICE_PROPS);
-    expect(check[0].type).toEqual(ORM_SERVICE);
+    expect(check[0].key).toBe(TYPEORM_SERVICE_PROPS);
+    expect(check[0].type).toEqual(TYPEORM_SERVICE);
 
     expect(check1[0].key).toBe('tmp');
-    expect(check1[0].type).toEqual(ORM_SERVICE);
+    expect(check1[0].type).toEqual(TYPEORM_SERVICE);
 
-    expect(check1[1].key).toBe(ORM_SERVICE_PROPS);
-    expect(check1[1].type).toEqual(ORM_SERVICE);
+    expect(check1[1].key).toBe(TYPEORM_SERVICE_PROPS);
+    expect(check1[1].type).toEqual(TYPEORM_SERVICE);
   });
 });
