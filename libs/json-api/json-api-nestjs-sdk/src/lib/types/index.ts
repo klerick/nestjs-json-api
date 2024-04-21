@@ -45,9 +45,9 @@ type MainData<E> = {
 export type PostData<E> = {
   data: MainData<E>;
 };
-
 export type PatchData<E> = {
-  data: { id: string } & MainData<E>;
+  data: { id: string } & Omit<MainData<E>, 'attributes'> &
+    Partial<Pick<MainData<E>, 'attributes'>>;
 };
 export type RelationData = { id: string; type: string };
 export type RelationBodyData = {

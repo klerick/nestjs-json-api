@@ -573,9 +573,24 @@ describe('zod-helper', () => {
           attributes,
         },
       };
+      const check3 = {
+        data: {
+          id: '1',
+          type: 'users',
+          relationships,
+        },
+      };
 
       expect(zodInputPatchSchemaTest.parse(check)).toEqual(check);
       expect(zodInputPatchSchemaTest.parse(check2)).toEqual(check2);
+      expect(zodInputPatchSchemaTest.parse(check3)).toEqual({
+        data: {
+          id: '1',
+          type: 'users',
+          relationships,
+          attributes: {},
+        },
+      });
     });
 
     it('should be not ok', () => {
@@ -608,7 +623,13 @@ describe('zod-helper', () => {
           },
         },
       };
-      const arrayCheck = [check1, check2, check3];
+      const check4 = {
+        data: {
+          id: '1',
+          type: 'users',
+        },
+      };
+      const arrayCheck = [check1, check2, check3, check4];
       expect.assertions(arrayCheck.length);
       for (const item of arrayCheck) {
         try {

@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { z, ZodObject } from 'zod';
+import { z, ZodObject, ZodUnion } from 'zod';
 import { QueryField } from 'json-shared-type';
 
 import {
@@ -45,6 +45,7 @@ import {
 
 import {
   PatchShape,
+  PatchShapeDefault,
   zodPatchRelationshipsSchema,
 } from './zod-input-patch-schema';
 
@@ -93,7 +94,12 @@ export type PostData<E extends Entity> = z.infer<ZodInputPostSchema<E>>['data'];
 
 export type ZodInputPatchSchema<E extends Entity> = ZodObject<
   {
-    data: ZodObject<PatchShape<E>, 'strict'>;
+    data: ZodUnion<
+      [
+        ZodObject<PatchShapeDefault<E>, 'strict'>,
+        ZodObject<PatchShape<E>, 'strict'>
+      ]
+    >;
   },
   'strict'
 >;
@@ -236,7 +242,8 @@ export const zodInputPatchSchema = <E extends Entity>(
       {} as FieldWithType<E>
     );
   const typeName = camelToKebab(getEntityName(repository.target));
-  const postShape: PatchShape<E> = {
+
+  const patchShapeDefault: PatchShapeDefault<E> = {
     id: zodIdSchema(primaryType),
     type: zodTypeSchema(typeName),
     attributes: zodAttributesSchema(fieldWithType),
@@ -247,9 +254,25 @@ export const zodInputPatchSchema = <E extends Entity>(
     ).optional(),
   };
 
+  const patchShape: PatchShape<E> = {
+    id: zodIdSchema(primaryType),
+    type: zodTypeSchema(typeName),
+    attributes: zodAttributesSchema(fieldWithType)
+      .optional()
+      .default({} as any),
+    relationships: zodPatchRelationshipsSchema(
+      relationArrayProps,
+      relationPopsName,
+      primaryColumnType
+    ),
+  };
+
   return z
     .object({
-      data: z.object(postShape).strict(),
+      data: z.union([
+        z.object(patchShapeDefault).strict(),
+        z.object(patchShape).strict(),
+      ]),
     })
     .strict();
 };
