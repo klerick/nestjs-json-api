@@ -11,7 +11,6 @@ import {
   QueryParamsForOneItem,
   RelationBodyData,
   ResourceObject,
-  ResourceObjectRelationships,
   ReturnIfArray,
 } from '../types';
 import { EntityArray, getTypeForReq } from '../utils';
@@ -172,7 +171,7 @@ export class JsonApiSdkService {
       data: {
         id: entity[this.jsonApiSdkConfig.idKey].toString(),
         type: getTypeForReq(entity.constructor.name),
-        attributes,
+        ...(Object.keys(attributes).length > 0 ? { attributes } : {}),
         ...(Object.keys(relationships).length > 0 ? { relationships } : {}),
       },
     };
