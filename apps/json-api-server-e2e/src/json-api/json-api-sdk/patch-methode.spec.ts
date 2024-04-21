@@ -102,4 +102,43 @@ describe('PATCH method:', () => {
 
     await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
   });
+
+  it('Should be update empty attributes with relations', async () => {
+    const newAddress = new Addresses();
+    newAddress.city = faker.location.city();
+    newAddress.state = faker.location.state();
+    newAddress.country = faker.location.country();
+
+    const newComments = new Comments();
+    newComments.text = faker.string.alpha();
+    newComments.kind = CommentKind.Comment;
+
+    const newAddressAfterSave = await jsonSdk.jonApiSdkService.postOne(
+      newAddress
+    );
+
+    const newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(
+      newComments
+    );
+
+    userAfterSave.addresses = newAddressAfterSave;
+    userAfterSave.comments = [newCommentsAfterSave];
+
+    const userWithEmptyAttr = new Users();
+    userWithEmptyAttr.id = userAfterSave.id;
+    userWithEmptyAttr.addresses = newAddressAfterSave;
+    userWithEmptyAttr.comments = [newCommentsAfterSave];
+
+    await jsonSdk.jonApiSdkService.patchOne(userWithEmptyAttr);
+    const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
+      Users,
+      userWithEmptyAttr.id,
+      { include: ['addresses', 'comments'] }
+    );
+    expect(userAfterUpdate.addresses).toEqual(newAddressAfterSave);
+    newCommentsAfterSave.updatedAt = userAfterUpdate.comments[0].updatedAt;
+    expect(userAfterUpdate.comments[0]).toEqual(newCommentsAfterSave);
+
+    await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
+  });
 });

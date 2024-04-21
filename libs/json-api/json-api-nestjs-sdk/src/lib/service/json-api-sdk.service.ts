@@ -11,7 +11,6 @@ import {
   QueryParamsForOneItem,
   RelationBodyData,
   ResourceObject,
-  ResourceObjectRelationships,
   ReturnIfArray,
 } from '../types';
 import { EntityArray, getTypeForReq } from '../utils';
