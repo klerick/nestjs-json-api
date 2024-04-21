@@ -1,3 +1,19 @@
+## 7.0.2 (2024-04-21)
+
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Fix validation ([e5e9936](https://github.com/klerick/nestjs-json-api/commit/e5e9936))
+
+- **json-api-nestjs:** Fix validate for patch method ([40b0303](https://github.com/klerick/nestjs-json-api/commit/40b0303))
+
+- **json-api-nestjs:** Fix validate for patch method ([2caa2d8](https://github.com/klerick/nestjs-json-api/commit/2caa2d8))
+
+
+### ❤️  Thank You
+
+- Alex H
+
 ## 7.0.1 (2024-04-06)
 
 

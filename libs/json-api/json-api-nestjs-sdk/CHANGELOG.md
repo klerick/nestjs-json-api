@@ -1,3 +1,23 @@
+## 7.0.1 (2024-04-21)
+
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Fix validate for patch method ([40b0303](https://github.com/klerick/nestjs-json-api/commit/40b0303))
+
+- **json-api-nestjs:** Fix validate for patch method ([2caa2d8](https://github.com/klerick/nestjs-json-api/commit/2caa2d8))
+
+- **json-api-nestjs:** Allow empty atributes for sdk ([c3cc4a5](https://github.com/klerick/nestjs-json-api/commit/c3cc4a5))
+
+- **json-api-nestjs:** Allow empty atributes for sdk ([3101fca](https://github.com/klerick/nestjs-json-api/commit/3101fca))
+
+- **json-api-nestjs-sdk:** Allow empty atrributes for sdk ([c4b2675](https://github.com/klerick/nestjs-json-api/commit/c4b2675))
+
+
+### ❤️  Thank You
+
+- Alex H
+
 # 7.0.0 (2024-03-08)
 
 
