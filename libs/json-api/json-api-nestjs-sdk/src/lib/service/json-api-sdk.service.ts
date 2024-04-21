@@ -171,7 +171,7 @@ export class JsonApiSdkService {
       data: {
         id: entity[this.jsonApiSdkConfig.idKey].toString(),
         type: getTypeForReq(entity.constructor.name),
-        ...(Object.keys(attributes).length > 0 ? { attributes } : {}),
+        attributes,
         ...(Object.keys(relationships).length > 0 ? { relationships } : {}),
       },
     };
