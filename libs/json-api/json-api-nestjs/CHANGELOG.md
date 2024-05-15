@@ -1,3 +1,15 @@
+## 7.0.3 (2024-05-15)
+
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Resource Relationship not allowing data key. ([f648422](https://github.com/klerick/nestjs-json-api/commit/f648422))
+
+
+### ❤️  Thank You
+
+- Alex H
+
 ## 7.0.2 (2024-04-21)
 
 
