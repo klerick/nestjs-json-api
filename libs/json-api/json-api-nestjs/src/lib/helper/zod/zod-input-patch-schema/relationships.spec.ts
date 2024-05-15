@@ -40,7 +40,6 @@ describe('zodRelationshipsSchema', () => {
   };
 
   let relationshipsSchema: ZodPatchRelationshipsSchema<Users>;
-  type RelationshipsSchema = z.infer<ZodPatchRelationshipsSchema<Users>>;
   beforeAll(() => {
     relationshipsSchema = zodPatchRelationshipsSchema(
       relationArrayProps,
@@ -50,7 +49,7 @@ describe('zodRelationshipsSchema', () => {
   });
 
   it('Should be ok', () => {
-    const check: RelationshipsSchema = {
+    const check = {
       comments: [
         {
           type: 'comments',
@@ -72,12 +71,44 @@ describe('zodRelationshipsSchema', () => {
         },
       ],
     };
-    const check2: RelationshipsSchema = {
+    const check2 = {
       comments: [],
       manager: null,
     };
+    const check3 = {
+      comments: {
+        data: [
+          {
+            type: 'comments',
+            id: '1',
+          },
+        ],
+      },
+      userGroup: {
+        data: {
+          type: 'user-groups',
+          id: '1',
+        },
+      },
+      manager: {
+        data: {
+          type: 'users',
+          id: '1',
+        },
+      },
+      notes: {
+        data: [
+          {
+            type: 'notes',
+            id: 'id',
+          },
+        ],
+      },
+    };
+
     expect(relationshipsSchema.parse(check)).toEqual(check);
     expect(relationshipsSchema.parse(check2)).toEqual(check2);
+    expect(relationshipsSchema.parse(check3)).toEqual(check);
   });
 
   it('should be not ok', () => {

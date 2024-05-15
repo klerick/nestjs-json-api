@@ -40,7 +40,6 @@ describe('zodRelationshipsSchema', () => {
   };
 
   let relationshipsSchema: ZodRelationshipsSchema<Users>;
-  type RelationshipsSchema = z.infer<ZodRelationshipsSchema<Users>>;
   beforeAll(() => {
     relationshipsSchema = zodRelationshipsSchema(
       relationArrayProps,
@@ -50,7 +49,7 @@ describe('zodRelationshipsSchema', () => {
   });
 
   it('Should be ok', () => {
-    const check: RelationshipsSchema = {
+    const check = {
       comments: [
         {
           type: 'comments',
@@ -72,7 +71,38 @@ describe('zodRelationshipsSchema', () => {
         },
       ],
     };
+    const check2 = {
+      comments: {
+        data: [
+          {
+            type: 'comments',
+            id: '1',
+          },
+        ],
+      },
+      userGroup: {
+        data: {
+          type: 'user-groups',
+          id: '1',
+        },
+      },
+      manager: {
+        data: {
+          type: 'users',
+          id: '1',
+        },
+      },
+      notes: {
+        data: [
+          {
+            type: 'notes',
+            id: 'id',
+          },
+        ],
+      },
+    };
     expect(relationshipsSchema.parse(check)).toEqual(check);
+    expect(relationshipsSchema.parse(check2)).toEqual(check);
   });
 
   it('should be not ok', () => {

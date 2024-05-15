@@ -45,7 +45,17 @@ export const zodPatchRelationshipsSchema = <E extends Entity>(
       ).optional();
       return {
         ...acum,
-        [props]: dataItem,
+        [props]: z.union([
+          dataItem,
+          z
+            .object({ data: dataItem })
+            .strict()
+            .refine(nonEmptyObject())
+            .transform((i) => {
+              const { data } = i;
+              return data;
+            }),
+        ]),
       };
     },
     {} as ShapeRelationships<E>
