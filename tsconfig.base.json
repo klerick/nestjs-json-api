@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@klerick/nestjs-acl-permissions": [
+        "libs/acl-permissions/nestjs-acl-permissions/src/index.ts"
+      ],
       "@klerick/nestjs-json-rpc": [
         "libs/json-rpc/nestjs-json-rpc/src/index.ts"
       ],

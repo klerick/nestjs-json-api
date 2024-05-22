@@ -22,6 +22,7 @@
     "@angular/platform-browser": "17.2.2",
     "@angular/platform-browser-dynamic": "17.2.2",
     "@angular/router": "17.2.2",
+    "@casl/ability": "^6.7.1",
     "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",
     "@nestjs/platform-express": "10.3.3",
