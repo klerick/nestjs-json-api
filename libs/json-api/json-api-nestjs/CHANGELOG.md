@@ -1,3 +1,15 @@
+## 7.0.4 (2024-10-27)
+
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Add filter by null ([3af99ff](https://github.com/klerick/nestjs-json-api/commit/3af99ff))
+
+
+### ❤️  Thank You
+
+- Alex H
+
 ## 7.0.3 (2024-05-15)
 
 
