@@ -247,6 +247,64 @@ describe('TypeormUtilsService', () => {
   });
 
   describe('getFilterExpressionForTarget', () => {
+    it('expression for target field with null', () => {
+
+      const nullableField = 'id'
+      const notNullableField = 'login'
+      const query = getDefaultQuery<Users>();
+      query.filter.target = {
+        [nullableField]: {
+          [FilterOperand.eq]: null,
+        },
+        [notNullableField]: {
+          [FilterOperand.ne]: null,
+        },
+      };
+
+      function guardField<R extends any>(
+        filter: any,
+        field: any
+      ): asserts field is keyof R {
+        if (filter && !(field in filter))
+          throw new Error('field not exist in query filter');
+      }
+
+      const result =
+        typeormUtilsServiceUser.getFilterExpressionForTarget(query);
+      const mainAliasCheck = 'Users';
+
+
+      for (const item of result) {
+        const { params, alias, expression, selectInclude } = item;
+        expect(selectInclude).toBe(undefined);
+        if (!alias) {
+          expect(alias).not.toBe(undefined);
+          throw new Error('alias in undefined for result');
+        }
+        const [mainAlias, field] = alias.split('.');
+        expect(mainAlias).toBe(mainAliasCheck);
+        guardField(query.filter.target, field);
+        const filterName: any = query.filter.target[field];
+        if (!filterName) {
+          expect(filterName).not.toBe(undefined);
+          throw new Error('filterName in undefined from query');
+        }
+
+        expect(params).toBe(undefined)
+
+        if (field === nullableField) {
+          expect(expression).toBe('IS NULL');
+          continue;
+        }
+
+        if (field === notNullableField) {
+          expect(expression).toBe('IS NOT NULL');
+          continue;
+        }
+
+        throw new Error('filed is incorrect');
+      }
+    })
     it('expression for target field', () => {
       const valueTest = (filterOperand: FilterOperand) =>
         `test for ${filterOperand}`;

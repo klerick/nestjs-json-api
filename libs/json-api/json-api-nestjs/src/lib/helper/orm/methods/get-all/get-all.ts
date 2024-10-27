@@ -250,7 +250,7 @@ export async function getAll<E extends Entity>(
     );
   }
   const resultData = await resultQuery.getMany();
-
+  console.log(resultData);
   const { included, data } =
     this.transformDataService.transformData(resultData);
   return {

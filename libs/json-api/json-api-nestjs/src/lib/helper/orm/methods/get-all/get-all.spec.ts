@@ -33,7 +33,7 @@ import {
   TransformDataService,
   TypeormUtilsService,
 } from '../../../../mixin/service';
-import { Equal, Repository } from 'typeorm';
+import { Equal, IsNull, Repository } from 'typeorm';
 import { EntityPropsMapService } from '../../../../service';
 
 function getDefaultQuery<R extends Entity>() {
@@ -233,6 +233,21 @@ describe('getAll', () => {
 
       addresses = await addressesRepository.find();
       comments = await commentsRepository.find();
+    });
+
+    it('Target props with null', async () => {
+      const spyOnTransformData = jest.spyOn(
+        transformDataService,
+        'transformData'
+      );
+
+      const query = getDefaultQuery<Users>();
+      query.filter.target = {
+        id: { eq: '1' },
+        firstName: {eq: null},
+      };
+      await typeormService.getAll(query);
+      expect(spyOnTransformData).toHaveBeenCalledTimes(0);
     });
 
     it('Target props', async () => {
