@@ -243,6 +243,22 @@ export class TypeormUtilsService<E extends Entity> {
         const paramsName = this.getParamName(fieldWithAlias);
 
         if (!isTargetField(this._relationFields, fieldName)) {
+
+          if (
+            (operand === FilterOperand.ne || operand === FilterOperand.eq) &&
+            (valueConditional === 'null' || valueConditional === null)
+          ) {
+            const expression = OperandMapExpressionForNull[operand].replace(
+              EXPRESSION,
+              paramsName
+            );
+            resultExpression.push({
+              alias: fieldWithAlias,
+              expression,
+            });
+            continue;
+          }
+
           const expression = OperandsMapExpression[operand].replace(
             EXPRESSION,
             paramsName
