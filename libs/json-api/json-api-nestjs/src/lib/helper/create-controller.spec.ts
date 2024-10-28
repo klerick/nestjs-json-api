@@ -9,6 +9,7 @@ import { Users } from '../mock-utils';
 import { JsonBaseController } from '../mixin/controller/json-base.controller';
 import {
   JSON_API_CONTROLLER_POSTFIX,
+  JSON_API_DECORATOR_ENTITY,
   TYPEORM_SERVICE,
   TYPEORM_SERVICE_PROPS,
 } from '../constants';
@@ -48,15 +49,23 @@ describe('createController', () => {
     const result = createController(Users);
     const result2 = createController(Users, TestController);
     const result3 = createController(Users, TestController2);
-
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result)).toBe('users');
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result)).toEqual(
+      Users
+    );
 
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result2)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result2)).toBe('users');
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result2)).toEqual(
+      Users
+    );
 
     expect(Reflect.getMetadata(CONTROLLER_WATERMARK, result3)).toBe(true);
     expect(Reflect.getMetadata(PATH_METADATA, result3)).toBe(overrideRoute);
+    expect(Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, result3)).toEqual(
+      Users
+    );
   });
 
   it('Check inject typeorm, service', () => {

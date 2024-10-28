@@ -4,6 +4,7 @@ import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-clas
 import { camelToKebab, getProviderName, nameIt } from './utils';
 import {
   JSON_API_CONTROLLER_POSTFIX,
+  JSON_API_DECORATOR_ENTITY,
   JSON_API_DECORATOR_OPTIONS,
   TYPEORM_SERVICE,
   TYPEORM_SERVICE_PROPS,
@@ -23,6 +24,10 @@ export function createController(
       getProviderName(entity, JSON_API_CONTROLLER_POSTFIX),
       JsonBaseController
     );
+
+  if (!Reflect.hasMetadata(JSON_API_DECORATOR_ENTITY, controllerClass)) {
+    Reflect.defineMetadata(JSON_API_DECORATOR_ENTITY, entity, controllerClass);
+  }
 
   const entityName =
     entity instanceof Function ? entity.name : entity.options.name;
