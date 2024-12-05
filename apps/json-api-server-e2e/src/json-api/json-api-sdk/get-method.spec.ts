@@ -5,6 +5,7 @@ import { faker } from '@faker-js/faker';
 import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
 import { getUser } from '../utils/data-utils';
 import { creatSdk, run } from '../utils/run-application';
+import { AxiosError } from 'axios';
 
 let app: INestApplication;
 
@@ -90,9 +91,10 @@ describe('GET method:', () => {
         return Promise.all(tmp);
       })
     );
+    await Promise.all(addressArray);
     await Promise.all(
-      [...usersArray, ...addressArray, ...commentsArray, ...rolesArray].map(
-        (i) => jsonSdk.jonApiSdkService.deleteOne(i)
+      [...usersArray, ...commentsArray, ...rolesArray].map((i) =>
+        jsonSdk.jonApiSdkService.deleteOne(i)
       )
     );
   });
