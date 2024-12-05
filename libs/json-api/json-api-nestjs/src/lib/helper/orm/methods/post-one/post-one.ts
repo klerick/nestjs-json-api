@@ -1,22 +1,29 @@
-import { DeepPartial, Equal } from 'typeorm';
+import { DeepPartial } from 'typeorm';
 import {
   Entity,
   ResourceObject,
   TypeormServiceObject,
 } from '../../../../types';
 import { PostData } from '../../../zod';
-import { RelationshipsResult } from '../../../../mixin/service';
-import { ObjectTyped } from '../../../utils';
 
 export async function postOne<E extends Entity>(
   this: TypeormServiceObject<E>,
   inputData: PostData<E>
 ): Promise<ResourceObject<E>> {
-  const { attributes, relationships } = inputData;
+  const { attributes, relationships, id } = inputData;
+
+  const idObject = id
+    ? { [this.typeormUtilsService.currentPrimaryColumn.toString()]: id }
+    : {};
+
+  const attributesObject = {
+    ...attributes,
+    ...idObject,
+  } as DeepPartial<E>;
 
   const entityTarget = this.repository.manager.create(
     this.repository.target,
-    attributes as DeepPartial<E>
+    attributesObject
   );
 
   const saveData = await this.typeormUtilsService.saveEntityData(
