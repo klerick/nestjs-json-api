@@ -23,24 +23,10 @@ $ npm run seed:run
 ## Running the example app
 
 ```bash
-# build plugin
-$ npm run json-api-nestjs:build
-
 # dev server
-$ npm run example:serve
+$ npm run demo:json-api
 
 ```
-
-## Test
-
-```bash
-# unit tests
-$ nx test json-api-nestjs
-
-# test coverage
-$ nx test json-api-nestjs --coverage
-```
-
 ## License
 
 The plugin is [MIT licensed](LICENSE).
