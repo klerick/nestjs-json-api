@@ -6,7 +6,10 @@ import {
   PipeTransform,
   Type,
 } from '@nestjs/common';
-import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
+import {
+  INTERCEPTORS_METADATA,
+  ROUTE_ARGS_METADATA,
+} from '@nestjs/common/constants';
 import { Module } from '@nestjs/core/injector/module';
 import { ArgumentMetadata } from '@nestjs/common/interfaces/features/pipe-transform.interface';
 import { ModuleRef } from '@nestjs/core';
@@ -14,9 +17,14 @@ import { DataSource } from 'typeorm';
 
 import { ParamsForExecute } from '../types';
 import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
-import { ASYNC_ITERATOR_FACTORY, KEY_MAIN_INPUT_SCHEMA } from '../constants';
+import {
+  ASYNC_ITERATOR_FACTORY,
+  KEY_MAIN_INPUT_SCHEMA,
+  OPTIONS,
+} from '../constants';
 import { IterateFactory } from '../factory';
 import {
+  ConfigParam,
   ResourceObject,
   ResourceObjectRelationships,
   TypeFromType,
@@ -42,11 +50,19 @@ export class ExecuteService {
   @Inject(ASYNC_ITERATOR_FACTORY) private asyncIteratorFactory!: IterateFactory<
     ExecuteService['runOneOperation']
   >;
+  @Inject(OPTIONS) private options!: ConfigParam;
 
   async run(params: ParamsForExecute[], tmpIds: (string | number)[]) {
+    if (
+      this.options.runInTransaction &&
+      typeof this.options.runInTransaction === 'function'
+    ) {
+      return this.options.runInTransaction('READ UNCOMMITTED', () => {
+        return this.executeOperations(params, tmpIds);
+      });
+    }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction('READ UNCOMMITTED');
-
     try {
       const resultArray = await this.executeOperations(params, tmpIds);
       await queryRunner.commitTransaction();

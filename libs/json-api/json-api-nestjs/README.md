@@ -69,6 +69,11 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
+    useSoftDelete?: boolean // Use soft delete
+    runInTransaction?: <Func extends (...args: any) => any>(
+      isolationLevel: IsolationLevel,
+      fn: Func
+    ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
   };
 }
 ```
