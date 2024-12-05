@@ -1,11 +1,14 @@
+export {
+  JsonApiAngular,
+  AtomicFactory,
+  provideJsonApi,
+  JSON_API_SDK_CONFIG,
+  getProviders,
+} from './lib/json-api-angular';
 export { JsonApiUtilsService, JsonApiSdkService } from './lib/service';
-export * from './lib/json-api-js';
-export { adapterForAxios } from './lib/utils';
 export {
   FilterOperand,
   ResourceObject,
   AtomicOperations,
-  Operands,
-  QueryField,
-  QueryParams,
+  JsonSdkConfig,
 } from './lib/types';

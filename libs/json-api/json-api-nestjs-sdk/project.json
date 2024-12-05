@@ -51,7 +51,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+          "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }
@@ -68,7 +68,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+          "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }

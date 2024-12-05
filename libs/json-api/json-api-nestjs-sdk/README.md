@@ -93,8 +93,7 @@ const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
 ```
 or you can use Angular module:
 ```typescript
-import { JsonApiAngular, AtomicFactory } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
-import { JsonApiSdkService } from 'json-api-nestjs-sdk';
+import { JsonApiAngular, AtomicFactory, JsonApiSdkService } from 'json-api-nestjs-sdk/ngModule';
 
 @Component({
   standalone: true,

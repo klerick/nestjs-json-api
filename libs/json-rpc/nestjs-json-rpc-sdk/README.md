@@ -217,7 +217,7 @@ import {
   JsonRpcAngular,
   JsonRpcAngularConfig,
   TransportType,
-} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module'
+} from '@klerick/nestjs-json-rpc-sdk/ngModule'
 import { Subject } from 'rxjs';
 import { io } from 'socket.io-client';
 import {
