@@ -4,7 +4,12 @@ import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { DataSource } from 'typeorm';
 import { ExecuteService, isZodError } from './execute.service';
 import { IterateFactory } from '../factory';
-import { ASYNC_ITERATOR_FACTORY, KEY_MAIN_INPUT_SCHEMA } from '../constants';
+import {
+  ASYNC_ITERATOR_FACTORY,
+  KEY_MAIN_INPUT_SCHEMA,
+  MAP_CONTROLLER_INTERCEPTORS,
+  OPTIONS,
+} from '../constants';
 import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
 import {
   HttpException,
@@ -13,13 +18,14 @@ import {
   ParseBoolPipe,
 } from '@nestjs/common';
 import { ParamsForExecute } from '../types';
+import { AsyncLocalStorage } from 'async_hooks';
 
 describe('ExecuteService', () => {
   let service: ExecuteService;
   let dataSource: DataSource;
   let moduleRef: ModuleRef;
   let asyncIteratorFactory: IterateFactory;
-
+  let mapControllerInterceptors = new Map();
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -37,10 +43,22 @@ describe('ExecuteService', () => {
           },
         },
         {
+          provide: OPTIONS,
+          useValue: {},
+        },
+        {
           provide: ASYNC_ITERATOR_FACTORY,
           useValue: {
             createIterator: () => {},
           },
+        },
+        {
+          provide: MAP_CONTROLLER_INTERCEPTORS,
+          useValue: mapControllerInterceptors,
+        },
+        {
+          provide: AsyncLocalStorage,
+          useValue: new AsyncLocalStorage(),
         },
       ],
     }).compile();
@@ -49,6 +67,7 @@ describe('ExecuteService', () => {
     dataSource = module.get<DataSource>(CURRENT_DATA_SOURCE_TOKEN);
     moduleRef = module.get<ModuleRef>(ModuleRef);
     asyncIteratorFactory = module.get<IterateFactory>(ASYNC_ITERATOR_FACTORY);
+    mapControllerInterceptors.clear();
   });
 
   it('should be defined', () => {
@@ -118,10 +137,15 @@ describe('ExecuteService', () => {
           methodName: 'someMethod',
         },
       ] as unknown as ParamsForExecute[];
+      const callback = jest.fn().mockReturnValue({ value: 'test' });
+      const mapController = {
+        someMethod: callback,
+      };
+      jest
+        .spyOn(service as any, 'getControllerInstance')
+        .mockReturnValue(mapController);
 
-      jest.spyOn(service as any, 'getControllerInstance').mockReturnValue({
-        someMethod: jest.fn().mockReturnValue({ value: 'test' }),
-      });
+      mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
       let callCount = 0;
       jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
         [Symbol.asyncIterator]: () =>
@@ -150,9 +174,15 @@ describe('ExecuteService', () => {
         },
       ] as unknown as ParamsForExecute[];
 
-      jest.spyOn(service as any, 'getControllerInstance').mockReturnValue({
-        someMethod: jest.fn().mockReturnValue('not an object'),
-      });
+      const callback = jest.fn().mockReturnValue('not an object');
+      const mapController = {
+        someMethod: callback,
+      };
+      jest
+        .spyOn(service as any, 'getControllerInstance')
+        .mockReturnValue(mapController);
+
+      mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
 
       let callCount = 0;
       jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
@@ -182,11 +212,17 @@ describe('ExecuteService', () => {
         },
       ] as unknown as ParamsForExecute[];
 
-      jest.spyOn(service as any, 'getControllerInstance').mockReturnValue({
-        someMethod: jest.fn().mockImplementation(() => {
-          throw new HttpException('Test exception', 400);
-        }),
+      const callback = jest.fn().mockImplementation(() => {
+        throw new HttpException('Test exception', 400);
       });
+      const mapController = {
+        someMethod: callback,
+      };
+      jest
+        .spyOn(service as any, 'getControllerInstance')
+        .mockReturnValue(mapController);
+
+      mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
 
       let callCount = 0;
       jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({

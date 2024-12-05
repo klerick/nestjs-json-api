@@ -56,6 +56,8 @@ describe('EntityPropsMapService', () => {
       'id',
       'login',
       'firstName',
+      'testReal',
+      'testArrayNull',
       'lastName',
       'isActive',
       'createdAt',

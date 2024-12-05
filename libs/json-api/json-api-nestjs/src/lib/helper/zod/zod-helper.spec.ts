@@ -432,11 +432,14 @@ describe('zod-helper', () => {
   });
   describe('test zodInputPostSchema', () => {
     it('should be ok', () => {
+      const real = 123.123;
       const date = new Date();
       const attributes = {
         lastName: 'sdfsdf',
         isActive: true,
         testDate: date.toISOString(),
+        testReal: [`${real}`],
+        testArrayNull: null,
       };
       const relationships = {
         notes: [
@@ -459,6 +462,13 @@ describe('zod-helper', () => {
           attributes,
         },
       };
+      const check3 = {
+        data: {
+          id: '1',
+          type: 'users',
+          attributes,
+        },
+      };
 
       const checkResult = {
         data: {
@@ -466,6 +476,7 @@ describe('zod-helper', () => {
           attributes: {
             ...attributes,
             ['testDate']: date,
+            testReal: [real],
           },
           relationships,
         },
@@ -476,12 +487,25 @@ describe('zod-helper', () => {
           attributes: {
             ...attributes,
             ['testDate']: date,
+            testReal: [real],
+          },
+        },
+      };
+      const checkResult3 = {
+        data: {
+          id: '1',
+          type: 'users',
+          attributes: {
+            ...attributes,
+            ['testDate']: date,
+            testReal: [real],
           },
         },
       };
 
       expect(zodInputPostSchemaTest.parse(check)).toEqual(checkResult);
       expect(zodInputPostSchemaTest.parse(check2)).toEqual(checkResult2);
+      expect(zodInputPostSchemaTest.parse(check3)).toEqual(checkResult3);
     });
 
     it('should be not ok', () => {

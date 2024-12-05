@@ -86,11 +86,25 @@ describe('Atomic method:', () => {
       );
     }
 
-    await Promise.all(
-      [...usersArray, ...addressArray, ...commentsArray, ...rolesArray].map(
-        (i) => jsonSdk.jonApiSdkService.deleteOne(i)
-      )
-    );
+    for (const item of [
+      ...usersArray,
+      ...addressArray,
+      ...commentsArray,
+      ...rolesArray,
+    ]) {
+      await jsonSdk.jonApiSdkService.deleteOne(item);
+    }
+  });
+
+  it('Try check intreceptor', async () => {
+    const newUser = getUser();
+    newUser.addresses = addressArray[0];
+    try {
+      const result = await jsonSdk.atomicFactory().postOne(newUser).run();
+      usersId.push(result[0].id);
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('Should be correct work', async () => {

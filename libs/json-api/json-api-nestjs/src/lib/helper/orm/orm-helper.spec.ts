@@ -35,6 +35,7 @@ import {
   getPrimaryColumnsForRelation,
   getIsArrayRelation,
   getTypeForAllProps,
+  getPropsFromDb,
 } from './orm-helper';
 import { ObjectTyped } from '../utils';
 
@@ -76,7 +77,6 @@ describe('zod-helper', () => {
 
   it('getField', async () => {
     const { relations, field } = getField(userRepository);
-
     const userFieldProps = Object.getOwnPropertyNames(
       user
     ) as EntityProps<Users>[];
@@ -171,8 +171,14 @@ describe('zod-helper', () => {
   it('getArrayPropsForEntity', () => {
     const result = getArrayPropsForEntity(userRepository);
     const check: ArrayPropsForEntity<Users> = {
-      target: {},
-      manager: {},
+      target: {
+        testReal: true,
+        testArrayNull: true,
+      },
+      manager: {
+        testReal: true,
+        testArrayNull: true,
+      },
       comments: {},
       notes: {},
       userGroup: {},
@@ -254,5 +260,14 @@ describe('zod-helper', () => {
     expect(result.testDate).toBe(TypeField.date);
     expect(result.comments.id).toBe(TypeField.number);
     expect(result.notes.id).toBe(TypeField.string);
+  });
+
+  it('getPropsFromDb', () => {
+    const result = getPropsFromDb(userRepository);
+    expect(result['testReal']).toEqual({
+      type: 'real',
+      isArray: true,
+      isNullable: false,
+    });
   });
 });

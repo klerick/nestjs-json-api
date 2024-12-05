@@ -1,7 +1,7 @@
 import { z, ZodError } from 'zod';
 import { zodAttributesSchema, ZodAttributesSchema } from './attributes';
 import { Addresses, Users } from '../../../mock-utils';
-import { FieldWithType, TypeField } from '../../orm';
+import { FieldWithType, PropsForField, TypeField } from '../../orm';
 
 describe('attributes', () => {
   let schemaUsers: ZodAttributesSchema<Users>;
@@ -18,6 +18,20 @@ describe('attributes', () => {
       login: TypeField.string,
       testDate: TypeField.date,
       updatedAt: TypeField.date,
+      testReal: TypeField.array,
+      testArrayNull: TypeField.array,
+    };
+    const propsDb: PropsForField<Users> = {
+      id: { type: Number, isArray: false, isNullable: false },
+      login: { type: 'varchar', isArray: false, isNullable: false },
+      firstName: { type: 'varchar', isArray: false, isNullable: true },
+      testReal: { type: 'real', isArray: true, isNullable: false },
+      testArrayNull: { type: 'real', isArray: true, isNullable: true },
+      lastName: { type: 'varchar', isArray: false, isNullable: true },
+      isActive: { type: 'boolean', isArray: false, isNullable: true },
+      createdAt: { type: 'timestamp', isArray: false, isNullable: true },
+      testDate: { type: 'timestamp', isArray: false, isNullable: true },
+      updatedAt: { type: 'timestamp', isArray: false, isNullable: true },
     };
     const fieldTypeAddresses: FieldWithType<Addresses> = {
       id: TypeField.number,
@@ -28,14 +42,18 @@ describe('attributes', () => {
       updatedAt: TypeField.date,
       country: TypeField.string,
     };
-    schemaUsers = zodAttributesSchema<Users>(fieldTypeUsers);
-    schemaAddresses = zodAttributesSchema<Addresses>(fieldTypeAddresses);
+    schemaUsers = zodAttributesSchema<Users>(fieldTypeUsers, propsDb);
+    schemaAddresses = zodAttributesSchema<Addresses>(
+      fieldTypeAddresses,
+      {} as PropsForField<Addresses>
+    );
   });
 
   it('should be ok', () => {
     const check: SchemaTypeUsers = {
       isActive: true,
       lastName: 'sdsdf',
+      testReal: [123.123, 123.123],
     };
     const check2: SchemaTypeAddresses = {
       arrayField: ['test', 'test'],

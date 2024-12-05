@@ -32,6 +32,8 @@ describe('Check "filter" zod schema', () => {
       'testDate',
       'isActive',
       'lastName',
+      'testArrayNull',
+      'testReal',
       'firstName',
       'login',
       'updatedAt',
@@ -47,6 +49,8 @@ describe('Check "filter" zod schema', () => {
     'testDate',
     'isActive',
     'lastName',
+    'testArrayNull',
+    'testReal',
     'firstName',
     'login',
     'updatedAt',
@@ -54,7 +58,10 @@ describe('Check "filter" zod schema', () => {
     'id',
   ];
 
-  const usersPropsArray: PropsArray<Users> = {};
+  const usersPropsArray: PropsArray<Users> = {
+    testArrayNull: true,
+    testReal: true,
+  };
   const rolesPropsArray: PropsArray<Roles> = {};
   const userGroupPropsArray: PropsArray<UserGroups> = {};
   const commentsPropsArray: PropsArray<Comments> = {};
@@ -70,6 +77,8 @@ describe('Check "filter" zod schema', () => {
     lastName: TypeField.string,
     isActive: TypeField.boolean,
     createdAt: TypeField.date,
+    testReal: TypeField.array,
+    testArrayNull: TypeField.array,
     testDate: TypeField.date,
     updatedAt: TypeField.date,
     addresses: {
@@ -86,6 +95,8 @@ describe('Check "filter" zod schema', () => {
       login: TypeField.string,
       firstName: TypeField.string,
       lastName: TypeField.string,
+      testReal: TypeField.array,
+      testArrayNull: TypeField.array,
       isActive: TypeField.boolean,
       createdAt: TypeField.date,
       testDate: TypeField.date,
