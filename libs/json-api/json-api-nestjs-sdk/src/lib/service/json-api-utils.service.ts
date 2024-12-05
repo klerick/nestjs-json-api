@@ -144,9 +144,19 @@ export class JsonApiUtilsService {
           httpParams = httpParams.set(
             `filter[${key}][${operand}]`,
             Array.isArray(filter)
-              ? filter.join(',')
+              ? filter
+                  .map((f) =>
+                    this.jsonApiSdkConfig.dateFields.includes(key) &&
+                    f instanceof Date
+                      ? f.toJSON()
+                      : f.toString()
+                  )
+                  .join(',')
               : filter === null
               ? 'null'
+              : this.jsonApiSdkConfig.dateFields.includes(key) &&
+                filter instanceof Date
+              ? filter.toJSON()
               : filter.toString()
           );
         }
@@ -175,6 +185,14 @@ export class JsonApiUtilsService {
   ): E;
   convertResponseData<E>(
     body: ResourceObject<E, 'array'>,
+    includeEntity?: QueryParams<E>['include']
+  ): E[];
+  convertResponseData<E, M>(
+    body: ResourceObject<E, 'object', M>,
+    includeEntity?: QueryParams<E>['include']
+  ): E;
+  convertResponseData<E, M>(
+    body: ResourceObject<E, 'array', M>,
     includeEntity?: QueryParams<E>['include']
   ): E[];
   convertResponseData<E>(
@@ -241,7 +259,7 @@ export class JsonApiUtilsService {
     return result;
   }
 
-  private createEntityInstance<E>(name: string): E {
+  createEntityInstance<E>(name: string): E {
     const entityName = kebabToCamel(name);
     return Function('return new class ' + entityName + '{}')();
   }
@@ -297,9 +315,8 @@ export class JsonApiUtilsService {
 
     const relationships = ObjectTyped.entries(entity)
       .filter(([key, val]) => {
-        if (key === 'id') return false;
+        if (key === ID_KEY) return false;
         const item = Array.isArray(val) ? val[0] : val;
-        // console.log(key, val, isRelation(item));
         return isRelation(item);
       })
       .reduce((acum, [key, val]) => {
