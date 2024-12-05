@@ -300,6 +300,8 @@ CREATE TABLE public.users (
     first_name character varying,
     last_name character varying,
     is_active boolean DEFAULT false,
+    test_real real[],
+    test_array_null real[],
     manager_id integer,
     addresses_id integer,
     user_groups_id integer,

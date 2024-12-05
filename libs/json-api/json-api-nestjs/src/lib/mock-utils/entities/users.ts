@@ -38,6 +38,22 @@ export class Users {
   public firstName!: string;
 
   @Column({
+    name: 'test_real',
+    type: 'real',
+    array: true,
+    default: [],
+  })
+  public testReal!: number[];
+
+  @Column({
+    name: 'test_array_null',
+    type: 'real',
+    array: true,
+    nullable: true,
+  })
+  public testArrayNull!: number[] | null;
+
+  @Column({
     name: 'last_name',
     type: 'varchar',
     length: 100,

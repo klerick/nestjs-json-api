@@ -3,15 +3,17 @@ import {
   importProvidersFrom,
   InjectionToken,
 } from '@angular/core';
-import { JsonApiAngular } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
+import { JsonApiAngular, provideJsonApi } from 'json-api-nestjs-sdk/ngModule';
 import {
   JsonRpcAngular,
   JsonRpcAngularConfig,
   TransportType,
-} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
+  provideJsonRpc,
+} from '@klerick/nestjs-json-rpc-sdk/ngModule';
 import { Subject } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { io } from 'socket.io-client';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 const destroySubject = new Subject<boolean>();
 setTimeout(() => {

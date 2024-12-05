@@ -29,6 +29,7 @@ import {
   HttpExceptionMethodFilter,
 } from '../../service/http-exception.filter';
 import { GuardService, EntityName } from '../../service/guard.service';
+import { AtomicInterceptor } from '../../service/atomic.interceptor';
 
 @UseGuards(GuardService)
 @UseFilters(new HttpExceptionFilter())
@@ -52,6 +53,7 @@ export class ExtendUserController extends JsonBaseController<Users> {
     return super.patchRelationship(id, relName, input);
   }
 
+  // @UseInterceptors(AtomicInterceptor)
   postOne(inputData: PostData<Users>): Promise<ResourceObject<Users>> {
     return super.postOne(inputData);
   }

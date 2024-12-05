@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -13,8 +13,8 @@ export type IPods = Pods;
 
 @Entity('pods')
 export class Pods {
-  @PrimaryGeneratedColumn()
-  public id!: number;
+  @PrimaryColumn()
+  public id!: string;
 
   @Column({
     type: 'varchar',

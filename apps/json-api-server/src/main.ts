@@ -25,7 +25,10 @@ async function bootstrap() {
   SwaggerModule.setup(
     'swagger',
     app,
-    () => SwaggerModule.createDocument(app, config),
+    () => ({
+      ...SwaggerModule.createDocument(app, config),
+      openapi: '3.1.0',
+    }),
     {}
   );
   await app.init();
