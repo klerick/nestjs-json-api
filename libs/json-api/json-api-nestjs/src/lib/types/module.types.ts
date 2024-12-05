@@ -20,6 +20,7 @@ export type ExtractNestType<ArrayType> =
 export interface ConfigParam {
   requiredSelectField: boolean;
   debug: boolean;
+  useSoftDelete: boolean;
   pipeForId: PipeMixin;
   operationUrl?: string;
   overrideRoute?: string;
