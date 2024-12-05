@@ -7,6 +7,7 @@ import {
   EntityProps,
   EntityPropsArray,
   EntityRelation,
+  IsArray,
   TypeCast,
   TypeOfArray,
   UnionToTuple,
@@ -79,7 +80,7 @@ export enum TypeField {
 export type TypeForId = Extract<TypeField, TypeField.number | TypeField.string>;
 
 export type FieldWithType<E extends Entity> = {
-  [K in EntityProps<E>]: E[K] extends unknown[]
+  [K in EntityProps<E>]: IsArray<E[K]> extends true
     ? TypeField.array
     : E[K] extends Date
     ? TypeField.date

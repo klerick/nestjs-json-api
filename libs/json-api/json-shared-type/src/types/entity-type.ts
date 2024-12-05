@@ -4,6 +4,7 @@ export type EntityField =
   | boolean
   | string[]
   | number[]
+  | null
   | Date;
 
 export type EntityProps<T> = {

@@ -243,7 +243,6 @@ export class TypeormUtilsService<E extends Entity> {
         const paramsName = this.getParamName(fieldWithAlias);
 
         if (!isTargetField(this._relationFields, fieldName)) {
-
           if (
             (operand === FilterOperand.ne || operand === FilterOperand.eq) &&
             (valueConditional === 'null' || valueConditional === null)
@@ -525,7 +524,7 @@ export class TypeormUtilsService<E extends Entity> {
       )) {
         const [props, type] = ObjectTyped.entries(item)[0];
         if (type !== null) {
-          target[props] = type;
+          target[props] = type as any;
         } else {
           target[props] = null as any;
         }
