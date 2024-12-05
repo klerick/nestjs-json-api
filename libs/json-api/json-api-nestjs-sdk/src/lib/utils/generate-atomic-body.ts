@@ -38,6 +38,11 @@ export class GenerateAtomicBody<
     private jsonApiSdkConfig: JsonApiSdkConfig
   ) {}
   private bodyData!: BodyType;
+  private skipEmpty = true;
+
+  get isSkipEmpty(): boolean {
+    return this.skipEmpty;
+  }
 
   private setToBody(op: Operation, entity: Entity, relationType?: Rel) {
     const type = getTypeForReq(entity.constructor.name);
@@ -88,13 +93,13 @@ export class GenerateAtomicBody<
 
     this.setToBody(Operation.update, entity);
   }
-  deleteOne(entity: Entity): void {
+  deleteOne(entity: Entity, skipEmpty: boolean): void {
     if (!entity[this.jsonApiSdkConfig.idKey]) {
       new Error(
         'Resource params should be instance of resource with id params'
       );
     }
-
+    this.skipEmpty = skipEmpty;
     this.setToBody(Operation.remove, entity);
   }
   patchRelationships(entity: Entity, relationType: Rel): void {

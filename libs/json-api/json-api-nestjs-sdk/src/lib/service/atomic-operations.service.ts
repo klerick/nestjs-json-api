@@ -47,6 +47,17 @@ export class AtomicOperationsService<T extends unknown[]>
       this.jsonApiSdkConfig.operationUrl
     );
 
+    const indexDeleteIfNotSkipEmpty = atomicBody
+      .reduce<number[]>((acum, item, index) => {
+        if (
+          item.op === 'remove' &&
+          !this.generateAtomicBody[index].isSkipEmpty
+        ) {
+          acum.push(index);
+        }
+        return acum;
+      }, [])
+      .sort((a, b) => a - b);
     return this.httpInnerClient.post<T>(operationUrl, body).pipe(
       map((r) => r[KEY_MAIN_OUTPUT_SCHEMA]),
       map(
@@ -56,14 +67,39 @@ export class AtomicOperationsService<T extends unknown[]>
               ? this.jsonApiUtilsService.getResultForRelation(item)
               : this.jsonApiUtilsService.convertResponseData(item)
           ) as T
+      ),
+      map((r) =>
+        indexDeleteIfNotSkipEmpty.reduce(
+          (acc, index, currentIndex) => {
+            acc.splice(index + currentIndex, 0, 'EMPTY');
+            return acc;
+          },
+          [...r] as T
+        )
       )
     );
   }
 
-  public deleteOne<Entity extends EntityObject>(
+  deleteOne<Entity extends EntityObject>(
     entity: Entity
-  ): AtomicOperations<T> {
-    return this.setToBody('deleteOne', entity);
+  ): AtomicOperations<[...T]>;
+  deleteOne<Entity extends EntityObject>(
+    entity: Entity,
+    skipEmpty: true
+  ): AtomicOperations<[...T]>;
+  deleteOne<Entity extends EntityObject>(
+    entity: Entity,
+    skipEmpty: false
+  ): AtomicOperations<[...T, 'EMPTY']>;
+  deleteOne<Entity extends EntityObject>(
+    entity: Entity,
+    skipEmpty?: boolean
+  ): AtomicOperations<[...T, 'EMPTY'] | [...T]> {
+    return this.setToBody(
+      'deleteOne',
+      entity,
+      skipEmpty === undefined ? true : skipEmpty
+    );
   }
 
   public patchOne<Entity extends EntityObject>(
@@ -110,6 +146,11 @@ export class AtomicOperationsService<T extends unknown[]>
     entity: Entity
   ): AtomicOperations<T>;
   private setToBody<Entity extends EntityObject>(
+    operationType: Extract<keyof AtomicVoidOperation, 'deleteOne'>,
+    entity: Entity,
+    skipEmpty: boolean
+  ): AtomicOperations<[...T, 'EMPTY']>;
+  private setToBody<Entity extends EntityObject>(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteOne'>,
     entity: Entity
   ): AtomicOperations<[...T, Entity]>;
@@ -135,30 +176,40 @@ export class AtomicOperationsService<T extends unknown[]>
   >(
     operationType: keyof AtomicVoidOperation,
     entity: Entity,
-    relationType?: Rel
+    relationType?: Rel | boolean
   ):
     | AtomicOperations<[...T, Entity]>
     | AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>
-    | AtomicOperations<[...T]> {
+    | AtomicOperations<[...T]>
+    | AtomicOperations<[...T, 'EMPTY']> {
     const atomicBody = new GenerateAtomicBody<Entity, Rel>(
       this.jsonApiUtilsService,
       this.jsonApiSdkConfig
     );
-    switch (operationType) {
-      case 'postRelationships':
-      case 'patchRelationships':
-      case 'deleteRelationships':
-        if (relationType) atomicBody[operationType](entity, relationType);
-        break;
-      default:
-        atomicBody[operationType](entity);
-        break;
+
+    if (typeof relationType === 'boolean') {
+      if (operationType === 'deleteOne') {
+        atomicBody[operationType](entity, relationType);
+      }
+    } else {
+      switch (operationType) {
+        case 'postRelationships':
+        case 'patchRelationships':
+        case 'deleteRelationships':
+          if (relationType) atomicBody[operationType](entity, relationType);
+          break;
+        default:
+          atomicBody[operationType](entity, true);
+          break;
+      }
     }
+
     this.addBody(atomicBody);
 
     return this as unknown as
       | AtomicOperations<[...T, Entity]>
       | AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>
-      | AtomicOperations<T>;
+      | AtomicOperations<T>
+      | AtomicOperations<[...T, 'EMPTY']>;
   }
 }

@@ -168,5 +168,121 @@ describe('atomicOperationService', () => {
         patchUser.addresses.id,
       ]);
     });
+    it('Should be return factory with skip false', async () => {
+      const postAddress = new Addresses();
+      postAddress.id = 1;
+      const patchUser = new Users();
+      patchUser.id = 1;
+
+      const deleteUser = new Users();
+      deleteUser.id = 2;
+      const patchRelationshipsBookList = new BookList();
+      patchRelationshipsBookList.id = 'id';
+      patchRelationshipsBookList.users = [patchUser];
+
+      const deleteRelationshipsAddress = new Addresses();
+      deleteRelationshipsAddress.id = 2;
+      deleteRelationshipsAddress.user = deleteUser;
+
+      patchUser.addresses = postAddress;
+
+      const spyHttpInnerClient = jest
+        .spyOn(httpInnerClient, 'post')
+        .mockImplementation(() =>
+          of({
+            [KEY_MAIN_OUTPUT_SCHEMA]: [
+              {
+                meta: {},
+                data: {
+                  type: 'users',
+                  id: patchUser.id,
+                  attributes: {},
+                },
+              },
+              {
+                meta: {},
+                data: {
+                  type: 'addresses',
+                  id: postAddress.id,
+                  attributes: {},
+                },
+              },
+              {
+                meta: {},
+                data: [
+                  {
+                    type: 'users',
+                    id: patchUser.id,
+                    attributes: {},
+                  },
+                ],
+              },
+              {
+                meta: {},
+                data: {
+                  type: 'addresses',
+                  id: postAddress.id,
+                  attributes: {},
+                },
+              },
+            ],
+          })
+        );
+
+      const result$ = atomicOperationsService
+        .patchOne(patchUser)
+        .deleteOne(deleteUser, false)
+        .postOne(postAddress)
+        .patchRelationships(patchRelationshipsBookList, 'users')
+        .postRelationships(patchUser, 'addresses')
+        .deleteRelationships(deleteRelationshipsAddress, 'user')
+        .run();
+
+      const result = await lastValueFrom(result$);
+      expect(spyHttpInnerClient).toBeCalledTimes(1);
+      const pathUserResult = new Users();
+      pathUserResult.id = patchUser.id;
+      expect(result).toEqual([
+        pathUserResult,
+        'EMPTY',
+        postAddress,
+        [patchRelationshipsBookList.users[0].id],
+        patchUser.addresses.id,
+      ]);
+    });
+  });
+  it('Should be return factory with skip false only delete', async () => {
+    const postAddress = new Addresses();
+    postAddress.id = 1;
+    const patchUser = new Users();
+    patchUser.id = 1;
+
+    const deleteUser = new Users();
+    deleteUser.id = 2;
+    const patchRelationshipsBookList = new BookList();
+    patchRelationshipsBookList.id = 'id';
+    patchRelationshipsBookList.users = [patchUser];
+
+    const deleteRelationshipsAddress = new Addresses();
+    deleteRelationshipsAddress.id = 2;
+    deleteRelationshipsAddress.user = deleteUser;
+
+    patchUser.addresses = postAddress;
+
+    const spyHttpInnerClient = jest
+      .spyOn(httpInnerClient, 'post')
+      .mockImplementation(() =>
+        of({
+          [KEY_MAIN_OUTPUT_SCHEMA]: [],
+        })
+      );
+
+    const result$ = atomicOperationsService.deleteOne(deleteUser, false).run();
+
+    const result = await lastValueFrom(result$);
+    expect(spyHttpInnerClient).toBeCalledTimes(1);
+    const pathUserResult = new Users();
+    pathUserResult.id = patchUser.id;
+    expect(result).toEqual(['EMPTY']);
   });
 });

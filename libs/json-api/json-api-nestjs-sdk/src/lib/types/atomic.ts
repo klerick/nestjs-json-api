@@ -17,9 +17,19 @@ export interface AtomicMainOperations<T extends unknown[]> {
   patchOne<Entity extends EntityObject>(
     entity: Entity
   ): AtomicOperations<[...T, Entity]>;
+
   deleteOne<Entity extends EntityObject>(
     entity: Entity
   ): AtomicOperations<[...T]>;
+  deleteOne<Entity extends EntityObject>(
+    entity: Entity,
+    skipEmpty: true
+  ): AtomicOperations<[...T]>;
+  deleteOne<Entity extends EntityObject>(
+    entity: Entity,
+    skipEmpty: false
+  ): AtomicOperations<[...T, 'EMPTY']>;
+
   patchRelationships<
     Entity extends EntityObject,
     Rel extends EntityRelation<Entity>

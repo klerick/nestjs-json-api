@@ -173,7 +173,7 @@ describe('GenerateAtomicBody', () => {
       entity.text = 'text';
       entity.users = [user];
 
-      expect(() => generateAtomicBody.deleteOne(entity)).toThrowError();
+      expect(() => generateAtomicBody.deleteOne(entity, true)).toThrowError();
     });
 
     it('should not throw error if entity contains id', () => {
@@ -188,7 +188,7 @@ describe('GenerateAtomicBody', () => {
         ref: { type: 'book-list', id: entity.id },
       };
 
-      generateAtomicBody.deleteOne(entity);
+      generateAtomicBody.deleteOne(entity, true);
       const result = generateAtomicBody.getBody();
       expect(result).toEqual(expectedBodyData);
     });
@@ -202,7 +202,7 @@ describe('GenerateAtomicBody', () => {
       entity.text = 'text';
       entity.users = [user];
 
-      expect(() => generateAtomicBody.deleteOne(entity)).toThrowError();
+      expect(() => generateAtomicBody.deleteOne(entity, true)).toThrowError();
     });
 
     it('should not throw error if entity contains id', () => {
