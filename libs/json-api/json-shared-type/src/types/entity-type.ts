@@ -1,6 +1,7 @@
 export type EntityField =
   | string
   | number
+  | bigint
   | boolean
   | string[]
   | number[]
