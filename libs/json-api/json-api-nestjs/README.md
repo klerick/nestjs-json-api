@@ -409,4 +409,20 @@ but [Atomic operation](https://jsonapi.org/ext/atomic/) allow for one request.
 
 ```
 **tmpId** - is params for operation **add**, should be unique for all operations.
+If you have Interceptor you can check call it from **AtomicOperation**
 
+
+
+```ts
+@Injectable()
+export class AtomicInterceptor<T> implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler<T>): Observable<T> {
+    const isAtomic = context.getArgByIndex(3)
+    if (isAtomic) {
+      console.log('call from atomic operation')
+    }
+    return next.handle();
+  }
+}
+```
+**isAtomic** - is array of params of method
