@@ -29,15 +29,7 @@
         "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
         "commands": [
           "node tools/scripts/preparation-hybrid-npm-package.mjs nestjs-json-rpc-sdk",
-          "node tools/scripts/preparation-npm-package.mjs nestjs-json-rpc-sdk",
-          {
-            "command": "nx run nestjs-json-rpc-sdk:compile-for-angular",
-            "forwardAllArgs": false
-          },
-          {
-            "command": "cp tmp/angular-lib/nestjs-json-rpc-sdk/esm2022/lib/angular/json-rpc-angular.module.mjs dist/libs/json-rpc/nestjs-json-rpc-sdk/mjs/src/lib/angular/json-rpc-angular.module.js",
-            "forwardAllArgs": false
-          }
+          "node tools/scripts/preparation-npm-package.mjs nestjs-json-rpc-sdk"
         ],
         "cwd": "./",
         "parallel": false

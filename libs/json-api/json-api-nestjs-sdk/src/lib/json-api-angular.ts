@@ -1,14 +1,5 @@
-import {
-  NgModule,
-  ModuleWithProviders,
-  inject,
-  makeEnvironmentProviders,
-} from '@angular/core';
-import {
-  HttpClient,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { inject, makeEnvironmentProviders } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { HttpInnerClient, JsonSdkConfig } from './types';
 import { AtomicFactory, JSON_API_SDK_CONFIG } from './token';
 import { resultConfig } from './utils';
@@ -56,18 +47,5 @@ export const getProviders = (config: JsonSdkConfig) => [
 
 export const provideJsonApi = (config: JsonSdkConfig) =>
   makeEnvironmentProviders(getProviders(config));
-
-@NgModule({
-  imports: [],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
-})
-export class JsonApiAngular {
-  static forRoot(config: JsonSdkConfig): ModuleWithProviders<JsonApiAngular> {
-    return {
-      ngModule: JsonApiAngular,
-      providers: getProviders(config),
-    };
-  }
-}
 
 export { AtomicFactory, JSON_API_SDK_CONFIG } from './token';

@@ -93,7 +93,11 @@ const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
 ```
 or you can use Angular module:
 ```typescript
-import { JsonApiAngular, AtomicFactory, JsonApiSdkService } from 'json-api-nestjs-sdk/ngModule';
+import { provideJsonApi, AtomicFactory, JsonApiSdkService } from 'json-api-nestjs-sdk/ngModule';
+import {
+  provideHttpClient,
+  withFetch,
+} from '@angular/common/http';
 
 @Component({
   standalone: true,
@@ -115,9 +119,8 @@ const angularConfig: JsonSdkConfig = {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
-      JsonApiAngular.forRoot(angularConfig)
-    ),
+    provideHttpClient(withFetch()),
+    provideJsonApi(angularConfig)
   ],
 }).catch((err) =>
   console.error(err)

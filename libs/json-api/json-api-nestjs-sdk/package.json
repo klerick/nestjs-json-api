@@ -4,7 +4,7 @@
   "engines": {
     "node": ">= 16.0.0"
   },
-  "description": "JsonAPi Plugin for NestJs",
+  "description": "Helper for client JsonAPi Plugin for NestJs",
   "contributors": [
     {
       "email": "klerick666@gmain.com",
@@ -28,5 +28,12 @@
     "json-api",
     "typeorm",
     "CRUD"
-  ]
+  ],
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0 <20.0.0",
+    "@angular/core": ">=19.0.0 <20.0.0",
+    "axios": "^1.6.0",
+    "reflect-metadata": "^0.1.13",
+    "tslib": "^2.3.0"
+  }
 }

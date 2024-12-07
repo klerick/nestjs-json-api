@@ -1,5 +1,4 @@
 export {
-  JsonApiAngular,
   AtomicFactory,
   provideJsonApi,
   JSON_API_SDK_CONFIG,
