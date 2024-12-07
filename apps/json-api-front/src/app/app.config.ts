@@ -1,11 +1,6 @@
+import { ApplicationConfig, InjectionToken } from '@angular/core';
+import { provideJsonApi } from 'json-api-nestjs-sdk/ngModule';
 import {
-  ApplicationConfig,
-  importProvidersFrom,
-  InjectionToken,
-} from '@angular/core';
-import { JsonApiAngular, provideJsonApi } from 'json-api-nestjs-sdk/ngModule';
-import {
-  JsonRpcAngular,
   JsonRpcAngularConfig,
   TransportType,
   provideJsonRpc,
@@ -13,7 +8,7 @@ import {
 import { Subject } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { io } from 'socket.io-client';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 const destroySubject = new Subject<boolean>();
 setTimeout(() => {
@@ -60,21 +55,18 @@ const ioConfig: JsonRpcAngularConfig = {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(
-      JsonApiAngular.forRoot({
-        apiHost: 'http://localhost:4200',
-        idKey: 'id',
-        apiPrefix: 'api',
-        operationUrl: 'operation',
-      })
-    ),
-    importProvidersFrom(
-      JsonRpcAngular.forRoot(
-        // httpConfig
-        // wsConfig
-        // wsConfigWithToken,
-        ioConfig
-      )
+    provideHttpClient(withFetch()),
+    provideJsonApi({
+      apiHost: 'http://localhost:4200',
+      idKey: 'id',
+      apiPrefix: 'api',
+      operationUrl: 'operation',
+    }),
+    provideJsonRpc(
+      // httpConfig
+      // wsConfig
+      // wsConfigWithToken,
+      ioConfig
     ),
   ],
 };

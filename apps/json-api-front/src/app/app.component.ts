@@ -16,11 +16,11 @@ type RpcMap = {
 };
 
 @Component({
-  standalone: true,
   imports: [NxWelcomeComponent],
   selector: 'nestjs-json-api-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  standalone: true,
 })
 export class AppComponent implements OnInit {
   private JsonApiSdkService = inject(JsonApiSdkService);
