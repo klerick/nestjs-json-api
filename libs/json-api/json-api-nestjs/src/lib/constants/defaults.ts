@@ -19,4 +19,5 @@ export const ConfigParamDefault: ConfigParam = {
   debug: true,
   requiredSelectField: true,
   pipeForId: ParseIntPipe,
+  useSoftDelete: false,
 };

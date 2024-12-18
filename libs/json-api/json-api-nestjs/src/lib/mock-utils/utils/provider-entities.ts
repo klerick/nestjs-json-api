@@ -7,6 +7,7 @@ import {
   Comments,
   Entities,
   Notes,
+  Pods,
   Roles,
   UserGroups,
 } from '../entities';
@@ -52,6 +53,10 @@ export function getRepository(module: TestingModule) {
     getRepositoryToken(UserGroups, DEFAULT_CONNECTION_NAME)
   );
 
+  const podsRepository = module.get<Repository<Pods>>(
+    getRepositoryToken(Pods, DEFAULT_CONNECTION_NAME)
+  );
+
   return {
     userRepository,
     addressesRepository,
@@ -59,5 +64,6 @@ export function getRepository(module: TestingModule) {
     commentsRepository,
     rolesRepository,
     userGroupRepository,
+    podsRepository,
   };
 }

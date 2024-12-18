@@ -29,9 +29,7 @@
         "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
         "commands": [
           "node tools/scripts/preparation-hybrid-npm-package.mjs nestjs-json-rpc-sdk",
-          "node tools/scripts/preparation-npm-package.mjs nestjs-json-rpc-sdk",
-          "nx run nestjs-json-rpc-sdk:compile-for-angular",
-          "cp tmp/angular-lib/nestjs-json-rpc-sdk/esm2022/lib/angular/json-rpc-angular.module.mjs dist/libs/json-rpc/nestjs-json-rpc-sdk/mjs/src/lib/angular/json-rpc-angular.module.js"
+          "node tools/scripts/preparation-npm-package.mjs nestjs-json-rpc-sdk"
         ],
         "cwd": "./",
         "parallel": false
@@ -52,7 +50,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-rpc/nestjs-json-rpc-sdk/src/json-rpc-sdk.module.ts"
+          "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }
@@ -69,7 +67,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-rpc/nestjs-json-rpc-sdk/src/json-rpc-sdk.module.ts"
+          "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }

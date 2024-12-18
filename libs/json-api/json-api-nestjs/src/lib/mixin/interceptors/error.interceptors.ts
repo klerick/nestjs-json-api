@@ -79,7 +79,7 @@ export class ErrorInterceptors<E extends Entity> implements NestInterceptor {
       const { errorCode, errorMsg, detail } = this.preparePostgresError(
         error.driverError
       );
-      console.log(errorCode);
+
       if (PostgresError[errorCode]) {
         return PostgresError[errorCode](
           this.repository.metadata,

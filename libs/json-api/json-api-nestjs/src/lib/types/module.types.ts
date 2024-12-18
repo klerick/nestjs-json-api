@@ -1,6 +1,7 @@
 import { ModuleMetadata, Type, PipeTransform } from '@nestjs/common';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 import { ObjectLiteral } from 'typeorm/common/ObjectLiteral';
+import { IsolationLevel } from 'typeorm/driver/types/IsolationLevel';
 
 export type NestController = ModuleMetadata['controllers'];
 export type NestProvider = ModuleMetadata['providers'];
@@ -20,9 +21,14 @@ export type ExtractNestType<ArrayType> =
 export interface ConfigParam {
   requiredSelectField: boolean;
   debug: boolean;
+  useSoftDelete: boolean;
   pipeForId: PipeMixin;
   operationUrl?: string;
   overrideRoute?: string;
+  runInTransaction?: <Func extends (...args: any) => any>(
+    isolationLevel: IsolationLevel,
+    fn: Func
+  ) => ReturnType<Func>;
 }
 
 export interface ModuleOptions {

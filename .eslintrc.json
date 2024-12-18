@@ -33,6 +33,12 @@
         "jest": true
       },
       "rules": {}
+    },
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@angular-eslint/prefer-standalone": "off"
+      }
     }
   ],
   "extends": ["./.eslintrc.base.json"]

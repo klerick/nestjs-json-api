@@ -50,8 +50,16 @@ export type ResourceData<T> = MainData & {
   links: Omit<Links, 'related'>;
 };
 
-export type ResourceObject<T, R extends 'object' | 'array' = 'object'> = {
-  meta: R extends 'array' ? PageProps & DebugMetaProps : DebugMetaProps;
+export type MetaProps<T, R = null> = R extends null ? T : T & R;
+
+export type ResourceObject<
+  T,
+  R extends 'object' | 'array' = 'object',
+  M = null
+> = {
+  meta: R extends 'array'
+    ? MetaProps<PageProps & DebugMetaProps, M>
+    : MetaProps<DebugMetaProps, M>;
   data: R extends 'array' ? ResourceData<T>[] : ResourceData<T>;
   included?: Include<T>[];
 };

@@ -155,7 +155,7 @@ describe('patchOne', () => {
     await typeormService.postOne(inputData);
     backaUp = db.backup();
     const changeUser = await userRepository.findOneBy({
-      login: inputData.attributes.login,
+      login: inputData.attributes.login as string,
     });
     if (!changeUser) {
       throw new Error('not found mock data');

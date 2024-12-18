@@ -214,10 +214,14 @@ You can use Angular module:
 ```typescript 
 
 import {
-  JsonRpcAngular,
+  provideJsonRpc,
   JsonRpcAngularConfig,
   TransportType,
-} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module'
+} from '@klerick/nestjs-json-rpc-sdk/ngModule'
+import {
+  provideHttpClient,
+  withFetch,
+} from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { io } from 'socket.io-client';
 import {
@@ -275,9 +279,8 @@ const ioConfig: JsonRpcAngularConfig = {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
-      JsonRpcAngular.forRoot(httpConfig)
-    ),
+    provideHttpClient(withFetch()),
+    provideJsonRpc(httpConfig),
   ],
 }).catch((err) =>
   console.error(err)

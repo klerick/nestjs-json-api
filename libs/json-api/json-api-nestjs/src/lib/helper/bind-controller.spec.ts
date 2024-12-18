@@ -35,6 +35,7 @@ describe('bindController', () => {
       requiredSelectField: false,
       pipeForId: ParseIntPipe,
       debug: false,
+      useSoftDelete: false,
     };
     bindController(Controller, Users, DEFAULT_CONNECTION_NAME, config);
 
@@ -99,6 +100,7 @@ describe('bindController', () => {
       requiredSelectField: false,
       pipeForId: ParseIntPipe,
       debug: false,
+      useSoftDelete: false,
     };
     bindController(Controller, Users, DEFAULT_CONNECTION_NAME, config);
     expect(Object.getOwnPropertyNames(Controller.prototype)).toEqual([
@@ -131,6 +133,7 @@ describe('bindController', () => {
       requiredSelectField: false,
       pipeForId: SomePipes,
       debug: false,
+      useSoftDelete: false,
     };
     bindController(Controller, Users, DEFAULT_CONNECTION_NAME, config);
 

@@ -93,10 +93,12 @@ export class OperationController {
     }
 
     const result = await this.executeService.run(paramForCall, tmpIds);
-    if (result.length === 0) return void 0;
 
     return {
-      [KEY_MAIN_OUTPUT_SCHEMA]: result.map((i) => ({ data: i.data })),
+      [KEY_MAIN_OUTPUT_SCHEMA]: result.map((i) => ({
+        data: i.data,
+        ...(i.meta ? { meta: i.meta } : {}),
+      })),
     };
   }
 }

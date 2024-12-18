@@ -1,6 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { ModulesContainer } from '@nestjs/core';
-import { MAP_ENTITY, MAP_CONTROLLER_ENTITY } from '../constants';
+import {
+  MAP_ENTITY,
+  MAP_CONTROLLER_ENTITY,
+  OPTIONS,
+  MAP_CONTROLLER_INTERCEPTORS,
+} from '../constants';
 import { Operation } from '../utils';
 import { ExplorerService } from './explorer.service';
 
@@ -30,6 +35,14 @@ describe('ExplorerService', () => {
         {
           provide: MAP_CONTROLLER_ENTITY,
           useValue: new Map([[EntityName, ControllerName]]),
+        },
+        {
+          provide: MAP_CONTROLLER_INTERCEPTORS,
+          useValue: new Map(),
+        },
+        {
+          provide: OPTIONS,
+          useValue: {},
         },
       ],
     }).compile();

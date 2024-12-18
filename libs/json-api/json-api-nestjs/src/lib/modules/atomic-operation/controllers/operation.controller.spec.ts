@@ -22,11 +22,14 @@ import {
   MAP_CONTROLLER_ENTITY,
   MAP_ENTITY,
   ZOD_INPUT_OPERATION,
+  MAP_CONTROLLER_INTERCEPTORS,
+  OPTIONS,
 } from '../constants';
 
 import { CurrentDataSourceProvider } from '../../../factory';
 import { DEFAULT_CONNECTION_NAME } from '../../../constants';
 import { OperationMethode } from '../types';
+import { AsyncLocalStorage } from 'async_hooks';
 
 describe('OperationController', () => {
   let db: IMemoryDb;
@@ -59,6 +62,18 @@ describe('OperationController', () => {
         {
           provide: ZOD_INPUT_OPERATION,
           useValue: {},
+        },
+        {
+          provide: OPTIONS,
+          useValue: {},
+        },
+        {
+          provide: MAP_CONTROLLER_INTERCEPTORS,
+          useValue: {},
+        },
+        {
+          provide: AsyncLocalStorage,
+          useValue: new AsyncLocalStorage(),
         },
       ],
     }).compile();

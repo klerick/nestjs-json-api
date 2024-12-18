@@ -9,7 +9,6 @@ import {
   SUB_QUERY_ALIAS_FOR_PAGINATION,
 } from '../../../../constants';
 import { ResourceObject } from '../../../../types/response';
-import { da } from '@faker-js/faker';
 
 type OrderByCondition = Record<string, 'ASC' | 'DESC'>;
 
@@ -250,7 +249,6 @@ export async function getAll<E extends Entity>(
     );
   }
   const resultData = await resultQuery.getMany();
-  console.log(resultData);
   const { included, data } =
     this.transformDataService.transformData(resultData);
   return {

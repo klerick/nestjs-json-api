@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { JsonApiSdkService } from 'json-api-nestjs-sdk';
-import { AtomicFactory } from 'json-api-nestjs-sdk/json-api-nestjs-sdk.module';
+import { AtomicFactory } from 'json-api-nestjs-sdk/ngModule';
 import {
   JSON_RPC,
   RPC_BATCH,
   Rpc,
-} from '@klerick/nestjs-json-rpc-sdk/json-rpc-sdk.module';
+} from '@klerick/nestjs-json-rpc-sdk/ngModule';
 
 import { RpcService as IRpcService } from '@nestjs-json-api/type-for-rpc';
 import { switchMap } from 'rxjs';
@@ -16,11 +16,11 @@ type RpcMap = {
 };
 
 @Component({
-  standalone: true,
   imports: [NxWelcomeComponent],
   selector: 'nestjs-json-api-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  standalone: true,
 })
 export class AppComponent implements OnInit {
   private JsonApiSdkService = inject(JsonApiSdkService);

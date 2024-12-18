@@ -29,8 +29,7 @@
         "outputPath": "dist/libs/json-api/json-api-nestjs-sdk",
         "commands": [
           "node tools/scripts/preparation-hybrid-npm-package.mjs json-api-nestjs-sdk",
-          "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk",
-          "node tools/scripts/prepare-for-angular.mjs json-api-nestjs-sdk json-api-angular"
+          "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk"
         ],
         "cwd": "./",
         "parallel": false
@@ -51,7 +50,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+          "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }
@@ -68,7 +67,7 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
-          "libs/json-api/json-api-nestjs-sdk/src/json-api-nestjs-sdk.module.ts"
+          "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
         ],
         "generateExportsField": true
       }

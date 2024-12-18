@@ -33,9 +33,12 @@ export function getTypeForReq(str: string): string {
 }
 
 export function isRelation(val: any): boolean {
-  return !(
+  const result = !(
     val === null ||
     !val ||
     ['String', 'Boolean', 'Number', 'Date'].includes(val.constructor.name)
   );
+
+  if (!result) return result;
+  return ID_KEY in val;
 }

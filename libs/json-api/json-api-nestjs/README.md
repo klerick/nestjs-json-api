@@ -69,6 +69,11 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
+    useSoftDelete?: boolean // Use soft delete
+    runInTransaction?: <Func extends (...args: any) => any>(
+      isolationLevel: IsolationLevel,
+      fn: Func
+    ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
   };
 }
 ```
@@ -404,4 +409,20 @@ but [Atomic operation](https://jsonapi.org/ext/atomic/) allow for one request.
 
 ```
 **tmpId** - is params for operation **add**, should be unique for all operations.
+If you have Interceptor you can check call it from **AtomicOperation**
 
+
+
+```ts
+@Injectable()
+export class AtomicInterceptor<T> implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler<T>): Observable<T> {
+    const isAtomic = context.getArgByIndex(3)
+    if (isAtomic) {
+      console.log('call from atomic operation')
+    }
+    return next.handle();
+  }
+}
+```
+**isAtomic** - is array of params of method

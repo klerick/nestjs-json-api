@@ -1,9 +1,11 @@
 export type EntityField =
   | string
   | number
+  | bigint
   | boolean
   | string[]
   | number[]
+  | null
   | Date;
 
 export type EntityProps<T> = {

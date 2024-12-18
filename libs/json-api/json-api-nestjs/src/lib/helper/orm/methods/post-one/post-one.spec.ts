@@ -10,6 +10,7 @@ import {
   getRepository,
   mockDBTestModule,
   Notes,
+  Pods,
   providerEntities,
   pullAllData,
   Roles,
@@ -40,6 +41,10 @@ describe('postOne', () => {
   let backaUp: IBackup;
   let typeormService: TypeormService<Users>;
   let transformDataService: TransformDataService<Users>;
+  let podsRepository: Repository<Pods>;
+
+  let typeormServicePods: TypeormService<Pods>;
+  let transformDataServicePods: TransformDataService<Pods>;
 
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -82,6 +87,26 @@ describe('postOne', () => {
       ],
     }).compile();
 
+    const modulePods: TestingModule = await Test.createTestingModule({
+      imports: [mockDBTestModule(db)],
+      providers: [
+        ...providerEntities(getDataSourceToken()),
+        CurrentDataSourceProvider(DEFAULT_CONNECTION_NAME),
+        {
+          provide: CONTROL_OPTIONS_TOKEN,
+          useValue: {
+            requiredSelectField: false,
+            debug: false,
+          },
+        },
+        EntityRepositoryFactory(Pods),
+        TypeormUtilsService,
+        TransformDataService,
+        TypeormServiceFactory(Pods),
+        EntityPropsMapService,
+      ],
+    }).compile();
+
     ({
       userRepository,
       addressesRepository,
@@ -89,6 +114,7 @@ describe('postOne', () => {
       commentsRepository,
       rolesRepository,
       userGroupRepository,
+      podsRepository,
     } = getRepository(module));
     await pullAllData(
       userRepository,
@@ -102,6 +128,10 @@ describe('postOne', () => {
     typeormService = module.get<TypeormService<Users>>(TYPEORM_SERVICE);
     transformDataService =
       module.get<TransformDataService<Users>>(TransformDataService);
+
+    typeormServicePods = modulePods.get<TypeormService<Pods>>(TYPEORM_SERVICE);
+    transformDataServicePods =
+      modulePods.get<TransformDataService<Pods>>(TransformDataService);
 
     notes = await notesRepository.find();
     users = await userRepository.find();
@@ -145,6 +175,32 @@ describe('postOne', () => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
     backaUp.restore();
+  });
+
+  it('should be ok without relation and with id', async () => {
+    const spyOnTransformData = jest
+      .spyOn(transformDataServicePods, 'transformData')
+      .mockImplementationOnce(() => ({
+        data: {} as any,
+      }));
+    const { relationships, ...other } = inputData;
+    const id = '5';
+    const returnData = await typeormServicePods.postOne({
+      id,
+      type: 'pods',
+      attributes: {
+        name: 'test',
+      },
+    });
+    const result = await podsRepository.findOneBy({
+      id,
+    });
+
+    expect(spyOnTransformData).toBeCalledWith({
+      ...result,
+      id,
+    });
+    expect(returnData).not.toHaveProperty('included');
   });
 
   it('should be ok without relation', async () => {

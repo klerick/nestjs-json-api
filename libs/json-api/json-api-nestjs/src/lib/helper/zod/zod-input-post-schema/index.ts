@@ -8,8 +8,10 @@ import {
   zodRelationshipsSchema,
   ZodRelationshipsSchema,
 } from './relationships';
+import { ZodIdSchema } from './id';
 
 export type PostShape<E extends Entity> = {
+  id: ZodOptional<ZodIdSchema>;
   attributes: ZodAttributesSchema<E>;
   type: ZodTypeSchema<string>;
   relationships: ZodOptional<ZodRelationshipsSchema<E>>;

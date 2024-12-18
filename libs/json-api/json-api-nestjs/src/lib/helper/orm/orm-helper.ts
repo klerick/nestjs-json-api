@@ -7,6 +7,7 @@ import {
   EntityProps,
   EntityPropsArray,
   EntityRelation,
+  IsArray,
   TypeCast,
   TypeOfArray,
   UnionToTuple,
@@ -14,6 +15,7 @@ import {
 } from '../../types';
 import { getEntityName, ObjectTyped } from '../utils';
 import { guardKeyForPropertyTarget } from './orm-type-asserts';
+import { ColumnType } from 'typeorm/driver/types/ColumnTypes';
 
 export enum PropsNameResultField {
   field = 'field',
@@ -72,12 +74,13 @@ export enum TypeField {
   number = 'number',
   boolean = 'boolean',
   string = 'string',
+  object = 'object',
 }
 
 export type TypeForId = Extract<TypeField, TypeField.number | TypeField.string>;
 
 export type FieldWithType<E extends Entity> = {
-  [K in EntityProps<E>]: E[K] extends unknown[]
+  [K in EntityProps<E>]: IsArray<E[K]> extends true
     ? TypeField.array
     : E[K] extends Date
     ? TypeField.date
@@ -85,6 +88,8 @@ export type FieldWithType<E extends Entity> = {
     ? TypeField.number
     : E[K] extends boolean
     ? TypeField.boolean
+    : E[K] extends object
+    ? TypeField.object
     : TypeField.string;
 };
 
@@ -186,6 +191,9 @@ export const getFieldWithType = <E extends Entity>(
         break;
       case Boolean:
         typeProps = TypeField.boolean;
+        break;
+      case Object:
+        typeProps = TypeField.object;
         break;
       default:
         typeProps = TypeField.string;
@@ -343,7 +351,9 @@ export const fromRelationTreeToArrayName = <E extends Entity>(
 export type AllFieldWithTpe<E extends Entity> = FieldWithType<E> & {
   [K in EntityRelation<E>]: E[K] extends (infer U extends Entity)[]
     ? FieldWithType<U>
-    : E[K] extends Entity ? FieldWithType<E[K]> : never;
+    : E[K] extends Entity
+    ? FieldWithType<E[K]>
+    : never;
 };
 
 export const getTypeForAllProps = <E extends Entity>(
@@ -362,4 +372,27 @@ export const getTypeForAllProps = <E extends Entity>(
     ...targetField,
     ...relationField,
   };
+};
+
+export type PropsFieldItem = {
+  type: ColumnType;
+  isArray: boolean;
+  isNullable: boolean;
+};
+
+export type PropsForField<E extends Entity> = {
+  [K in EntityProps<E>]: PropsFieldItem;
+};
+
+export const getPropsFromDb = <E extends Entity>(
+  repository: Repository<E>
+): PropsForField<E> => {
+  return repository.metadata.columns.reduce((acum, i) => {
+    acum[i.propertyName as EntityProps<E>] = {
+      type: i.type,
+      isArray: i.isArray,
+      isNullable: i.isNullable,
+    };
+    return acum;
+  }, {} as PropsForField<E>);
 };

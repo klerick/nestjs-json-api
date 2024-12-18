@@ -51,6 +51,9 @@ export async function pullUser(userPero: Repository<Users>) {
     lastName: user.lastName,
     firstName: user.firstName,
   });
+  user.testReal = [faker.number.float({ fractionDigits: 4 })];
+  user.testArrayNull = null;
+
   user.testDate = faker.date.anytime();
 
   return userPero.save(user);

@@ -15,6 +15,7 @@ import {
   getTypePrimaryColumn,
   getTypeForAllProps,
   FieldWithType,
+  getPropsFromDb,
 } from '../orm';
 import { Entity } from '../../types';
 
@@ -193,6 +194,7 @@ export const zodInputPostSchema = <E extends Entity>(
   const relationArrayProps = getRelationTypeArray(repository);
   const relationPopsName = getRelationTypeName(repository);
   const primaryColumnType = getRelationTypePrimaryColumn(repository);
+  const primaryType = getTypePrimaryColumn(repository);
   const fieldWithType = ObjectTyped.entries(getFieldWithType(repository))
     .filter(
       ([key]) => key !== repository.metadata.primaryColumns[0].propertyName
@@ -205,9 +207,13 @@ export const zodInputPostSchema = <E extends Entity>(
       {} as FieldWithType<E>
     );
   const typeName = camelToKebab(getEntityName(repository.target));
+
+  const propsDb = getPropsFromDb(repository);
+
   const postShape: PostShape<E> = {
+    id: zodIdSchema(primaryType).optional(),
     type: zodTypeSchema(typeName),
-    attributes: zodAttributesSchema(fieldWithType),
+    attributes: zodAttributesSchema(fieldWithType, propsDb),
     relationships: zodRelationshipsSchema(
       relationArrayProps,
       relationPopsName,
@@ -242,11 +248,12 @@ export const zodInputPatchSchema = <E extends Entity>(
       {} as FieldWithType<E>
     );
   const typeName = camelToKebab(getEntityName(repository.target));
+  const propsDb = getPropsFromDb(repository);
 
   const patchShapeDefault: PatchShapeDefault<E> = {
     id: zodIdSchema(primaryType),
     type: zodTypeSchema(typeName),
-    attributes: zodAttributesSchema(fieldWithType),
+    attributes: zodAttributesSchema(fieldWithType, propsDb),
     relationships: zodPatchRelationshipsSchema(
       relationArrayProps,
       relationPopsName,
@@ -257,7 +264,7 @@ export const zodInputPatchSchema = <E extends Entity>(
   const patchShape: PatchShape<E> = {
     id: zodIdSchema(primaryType),
     type: zodTypeSchema(typeName),
-    attributes: zodAttributesSchema(fieldWithType)
+    attributes: zodAttributesSchema(fieldWithType, propsDb)
       .optional()
       .default({} as any),
     relationships: zodPatchRelationshipsSchema(

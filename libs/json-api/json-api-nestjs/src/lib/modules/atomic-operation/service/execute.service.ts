@@ -6,23 +6,39 @@ import {
   PipeTransform,
   Type,
 } from '@nestjs/common';
-import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
+import {
+  INTERCEPTORS_METADATA,
+  ROUTE_ARGS_METADATA,
+} from '@nestjs/common/constants';
 import { Module } from '@nestjs/core/injector/module';
 import { ArgumentMetadata } from '@nestjs/common/interfaces/features/pipe-transform.interface';
-import { ModuleRef } from '@nestjs/core';
+import { ApplicationConfig, ModuleRef, NestContainer } from '@nestjs/core';
 import { DataSource } from 'typeorm';
 
-import { ParamsForExecute } from '../types';
+import { MapControllerInterceptor, ParamsForExecute } from '../types';
 import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
-import { ASYNC_ITERATOR_FACTORY, KEY_MAIN_INPUT_SCHEMA } from '../constants';
+import {
+  ASYNC_ITERATOR_FACTORY,
+  KEY_MAIN_INPUT_SCHEMA,
+  MAP_CONTROLLER_INTERCEPTORS,
+  OPTIONS,
+} from '../constants';
 import { IterateFactory } from '../factory';
 import {
+  ConfigParam,
   ResourceObject,
   ResourceObjectRelationships,
   TypeFromType,
   ValidateQueryError,
 } from '../../../types';
 import { ObjectTyped } from '../../../helper';
+import {
+  InterceptorsConsumer,
+  InterceptorsContextCreator,
+} from '@nestjs/core/interceptors';
+import { Controller } from '@nestjs/common/interfaces';
+import { lastValueFrom } from 'rxjs';
+import { AsyncLocalStorage } from 'async_hooks';
 
 export function isZodError(
   param: string | unknown
@@ -38,15 +54,46 @@ export function isZodError(
 @Injectable()
 export class ExecuteService {
   @Inject(CURRENT_DATA_SOURCE_TOKEN) private readonly dataSource!: DataSource;
-  @Inject(ModuleRef) private readonly moduleRef!: ModuleRef;
+  @Inject(ModuleRef) private readonly moduleRef!: ModuleRef & {
+    container: NestContainer;
+    applicationConfig: ApplicationConfig;
+    _moduleKey: string;
+  };
   @Inject(ASYNC_ITERATOR_FACTORY) private asyncIteratorFactory!: IterateFactory<
     ExecuteService['runOneOperation']
   >;
+  @Inject(OPTIONS) private options!: ConfigParam;
+  @Inject(MAP_CONTROLLER_INTERCEPTORS)
+  private mapControllerInterceptor!: MapControllerInterceptor;
+
+  @Inject(AsyncLocalStorage) private asyncLocalStorage!: AsyncLocalStorage<any>;
+
+  private _interceptorsContextCreator!: InterceptorsContextCreator;
+
+  get interceptorsContextCreator() {
+    if (!this._interceptorsContextCreator) {
+      this._interceptorsContextCreator = new InterceptorsContextCreator(
+        this.moduleRef.container,
+        this.moduleRef.applicationConfig
+      );
+    }
+
+    return this._interceptorsContextCreator;
+  }
+
+  private interceptorsConsumer = new InterceptorsConsumer();
 
   async run(params: ParamsForExecute[], tmpIds: (string | number)[]) {
+    if (
+      this.options.runInTransaction &&
+      typeof this.options.runInTransaction === 'function'
+    ) {
+      return this.options.runInTransaction('READ UNCOMMITTED', () => {
+        return this.executeOperations(params, tmpIds);
+      });
+    }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction('READ UNCOMMITTED');
-
     try {
       const resultArray = await this.executeOperations(params, tmpIds);
       await queryRunner.commitTransaction();
@@ -63,7 +110,7 @@ export class ExecuteService {
 
   private async executeOperations(
     params: ParamsForExecute[],
-    tmpIds: (string | number)[]
+    tmpIds: (string | number)[] = []
   ) {
     const iterateParams = this.asyncIteratorFactory.createIterator(
       params as Parameters<ExecuteService['runOneOperation']>,
@@ -85,9 +132,39 @@ export class ExecuteService {
         const paramsForExecute = item as unknown as ParamsForExecute['params'];
 
         const itemReplace = this.replaceTmpIds(paramsForExecute, tmpIdsMap);
+        const body = itemReplace.at(-1);
+        const currentTmpId = tmpIds[i];
 
-        // @ts-ignore
-        const result = await controller[methodName](...itemReplace);
+        if (methodName === 'postOne' && currentTmpId && body) {
+          if (typeof body === 'object' && 'attributes' in body) {
+            body['id'] = `${currentTmpId}`;
+            itemReplace[itemReplace.length - 1];
+          }
+        }
+
+        const interceptors = this.getInterceptorsArray(
+          controller,
+          controller[methodName],
+          currentParams.module
+        );
+
+        const result$: any = await this.interceptorsConsumer.intercept(
+          interceptors,
+          [
+            ...Object.values(this.asyncLocalStorage.getStore() || {}),
+            itemReplace,
+          ],
+          controller,
+          // @ts-ignore
+          controller[methodName],
+          // @ts-ignore
+          async () => controller[methodName](...itemReplace)
+        );
+
+        const result =
+          interceptors.length === 0
+            ? await result$
+            : await lastValueFrom(result$);
 
         if (tmpIds[i] && result && !Array.isArray(result.data) && result.data) {
           tmpIdsMap[tmpIds[i]] = result.data.id;
@@ -102,6 +179,41 @@ export class ExecuteService {
       this.processException(e, i);
     }
     return resultArray;
+  }
+
+  private getInterceptorsArray(
+    controller: Controller,
+    callback: (...arg: any) => any,
+    module: ParamsForExecute['module']
+  ) {
+    let controllerFromMap = this.mapControllerInterceptor.get(controller);
+
+    if (!controllerFromMap) {
+      controllerFromMap = new Map();
+      this.mapControllerInterceptor.set(controller, controllerFromMap);
+    }
+
+    const interceptorsFromMap = controllerFromMap.get(callback);
+
+    if (interceptorsFromMap) {
+      return interceptorsFromMap;
+    }
+
+    const interceptorsForController = this.interceptorsContextCreator.create(
+      controller,
+      callback,
+      module.token
+    );
+
+    const interceptorsForMethode = new Set(
+      Reflect.getMetadata(INTERCEPTORS_METADATA, callback) || []
+    );
+
+    const resultInterceptors = interceptorsForController.filter((i) =>
+      interceptorsForMethode.has(i.constructor)
+    );
+    controllerFromMap.set(callback, resultInterceptors);
+    return resultInterceptors;
   }
 
   private replaceTmpIds<T extends ParamsForExecute['params']>(
@@ -146,6 +258,7 @@ export class ExecuteService {
         }
         return acum;
       },
+      // @ts-ignore
       { ...relationships }
     );
 

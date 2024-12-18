@@ -61,6 +61,4 @@ export type JSONValue =
   | { [x: string]: JSONValue }
   | Array<JSONValue>;
 
-export type IsArray<T> = T extends unknown[] ? true : false;
-
-export type IsPropertyIsArray<E, P extends EntityProps<E>> = IsArray<E[P]>;
+export type IsArray<T> = [Extract<T, unknown[]>] extends [never] ? false : true;

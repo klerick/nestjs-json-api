@@ -4,7 +4,7 @@
   "sourceRoot": "libs/json-api/json-api-nestjs/src",
   "projectType": "library",
   "targets": {
-    "build": {
+    "build-ts": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -16,6 +16,17 @@
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "generateExportsField": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-ts"
+      ],
+      "options": {
+        "commands": ["rm -rf dist/libs/json-api/json-api-nestjs/libs"],
+        "cwd": "./",
+        "parallel": false
       }
     },
     "publish": {

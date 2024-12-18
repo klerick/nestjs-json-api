@@ -1,6 +1,6 @@
 {
   "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "../../../tmp/angular-lib/json-api-nestjs-sdk",
+  "dest": "../../../tmp/angular-lib/ngModule",
   "lib": {
     "entryFile": "../../index.ts"
   }
