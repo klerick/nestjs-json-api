@@ -1,3 +1,18 @@
+# 8.0.0 (2024-12-18)
+
+### 🚀 Features
+
+- **json-api-nestjs:** Return meta info in atomic operation ([1b61fb3](https://github.com/klerick/nestjs-json-api/commit/1b61fb3))
+- **json-api-nestjs:** Allow set id from request for postOne ([6202c22](https://github.com/klerick/nestjs-json-api/commit/6202c22))
+- **json-api-nestjs:** Extend validate for array, json and datetime, use nullable if possible ([a8c6f83](https://github.com/klerick/nestjs-json-api/commit/a8c6f83))
+- **json-api-nestjs:** Allow call interceptor for each operation in atomic endpoint ([9e0f066](https://github.com/klerick/nestjs-json-api/commit/9e0f066))
+- **json-api-nestjs:** Add wrapper transaction options ([8e498a8](https://github.com/klerick/nestjs-json-api/commit/8e498a8))
+- **nestjs-json-rpc:** Add support soft delete ([c3b9322](https://github.com/klerick/nestjs-json-api/commit/c3b9322))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 7.0.4 (2024-10-27)
 
 

@@ -1,3 +1,13 @@
+# 2.0.0 (2024-12-18)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk,nestjs-json-rpc-sdk:** Change export ([7953371](https://github.com/klerick/nestjs-json-api/commit/7953371))
+
+### ❤️ Thank You
+
+- Alex H
+
 # 1.0.0 (2024-04-12)
 
 

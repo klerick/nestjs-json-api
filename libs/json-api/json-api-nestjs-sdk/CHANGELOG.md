@@ -1,3 +1,18 @@
+# 8.0.0 (2024-12-18)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk,nestjs-json-rpc-sdk:** Change export ([7953371](https://github.com/klerick/nestjs-json-api/commit/7953371))
+- **nestjs-json-rpc-sdk:** Skip empty element in response ([28d3efc](https://github.com/klerick/nestjs-json-api/commit/28d3efc))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** Fix check for relation and add type for meta data ([9bbe9fd](https://github.com/klerick/nestjs-json-api/commit/9bbe9fd))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 7.0.1 (2024-04-21)
 
 
