@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { entityForClass } from 'json-api-nestjs';
+import { entityForClass } from '@klerick/json-api-nestjs';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 

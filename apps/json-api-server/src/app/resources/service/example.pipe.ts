@@ -4,7 +4,7 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 
-import { Query } from 'json-api-nestjs';
+import { Query } from '@klerick/json-api-nestjs';
 import { Users } from 'database';
 
 export class ExamplePipe implements PipeTransform<Query<Users>, Query<Users>> {

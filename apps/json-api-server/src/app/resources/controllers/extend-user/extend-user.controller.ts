@@ -19,7 +19,7 @@ import {
   PatchRelationshipData,
   ResourceObjectRelationships,
   PostData,
-} from 'json-api-nestjs';
+} from '@klerick/json-api-nestjs';
 import { ExamplePipe } from '../../service/example.pipe';
 import { ExampleService } from '../../service/example.service';
 import { ControllerInterceptor } from '../../service/controller.interceptor';
