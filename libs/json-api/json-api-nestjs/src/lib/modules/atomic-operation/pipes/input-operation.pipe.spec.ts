@@ -1,0 +1,75 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { ZodError } from 'zod';
+import {
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
+
+import { InputOperationPipe } from './input-operation.pipe';
+
+import { KEY_MAIN_INPUT_SCHEMA, ZOD_INPUT_OPERATION } from '../constants';
+import { ZodInputOperation } from '../utils';
+
+describe('PatchInputPipe', () => {
+  let patchInputPipe: InputOperationPipe;
+  let zodInputOperation: ZodInputOperation;
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: ZOD_INPUT_OPERATION,
+          useValue: {
+            parse() {},
+          },
+        },
+        InputOperationPipe,
+      ],
+    }).compile();
+
+    patchInputPipe = module.get<InputOperationPipe>(InputOperationPipe);
+    zodInputOperation = module.get<ZodInputOperation>(ZOD_INPUT_OPERATION);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  it('It should be ok', () => {
+    const data = {
+      some: 'data',
+    };
+    const check = {
+      [KEY_MAIN_INPUT_SCHEMA]: data,
+    };
+    jest
+      .spyOn(zodInputOperation, 'parse')
+      .mockImplementationOnce(() => check as any);
+    expect(patchInputPipe.transform(check)).toEqual(data);
+  });
+
+  it('Should be not ok', () => {
+    jest.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
+      throw new ZodError([]);
+    });
+    expect.assertions(1);
+    try {
+      patchInputPipe.transform({});
+    } catch (e) {
+      expect(e).toBeInstanceOf(BadRequestException);
+    }
+  });
+
+  it('Should be 500', () => {
+    jest.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
+      throw new Error('Error mock');
+    });
+    expect.assertions(1);
+
+    try {
+      patchInputPipe.transform({});
+    } catch (e) {
+      expect(e).toBeInstanceOf(InternalServerErrorException);
+    }
+  });
+});

@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+#  api-gate:
+#    container_name: api-gate
+#    restart: always
+#    build: apps/api-gate/
+#    ports:
+#      - "3000:3000"
+  postgres:
+    image: postgres:15.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+  pgadmin:
+    container_name: 'pgadmin'
+    image: 'dpage/pgadmin4:latest'
+    hostname: pgadmin
+    depends_on:
+      - 'postgres'
+    environment:
+      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_DEFAULT_EMAIL=pg.admin@email.com
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - '8000:80'
+#  redis:
+#    image: redis:6.2-alpine
+#    restart: always
+#    ports:
+#      - '6379:6379'
+#    command: redis-server --save 20 1 --loglevel warning
+#    volumes:
+#      - redis:/data
+#  jaeger:
+#    image: jaegertracing/all-in-one:1.41
+#    ports:
+#      - "16686:16686"
+#      - "14268:14268"
+volumes:
+  db:
+    driver: local
+#  redis:
+#    driver: local
+  pgadmin:
+    driver: local
