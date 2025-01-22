@@ -2,10 +2,9 @@ import { INestApplication } from '@nestjs/common';
 import { Addresses, CommentKind, Comments, Roles, Users } from 'database';
 import { faker } from '@faker-js/faker';
 
-import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { getUser } from '../utils/data-utils';
 import { creatSdk, run } from '../utils/run-application';
-import { AxiosError } from 'axios';
 
 let app: INestApplication;
 

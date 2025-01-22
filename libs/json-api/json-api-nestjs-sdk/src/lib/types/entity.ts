@@ -1,4 +1,4 @@
-import { EntityField, EntityProps } from 'json-shared-type';
+import { EntityField, EntityProps } from '@klerick/json-api-nestjs-shared';
 
 export { EntityField, EntityProps };
 

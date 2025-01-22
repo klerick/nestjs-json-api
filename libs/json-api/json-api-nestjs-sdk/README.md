@@ -14,7 +14,7 @@ The plugin of client for help work with JSON API over [json-api-nestjs](https://
 ## Installation
 
 ```bash $ 
-npm install json-api-nestjs-sdk 
+npm install @klerick/json-api-nestjs-sdk 
 ```
 
 ## Example
@@ -27,7 +27,7 @@ import {
   FilterOperand,
   JsonApiJs,
   JsonSdkPromise,
-} from 'json-api-nestjs-sdk';
+} from '@klerick/json-api-nestjs-sdk';
 import { faker } from '@faker-js/faker';
 import axios from 'axios';
 
@@ -93,7 +93,11 @@ const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
 ```
 or you can use Angular module:
 ```typescript
-import { provideJsonApi, AtomicFactory, JsonApiSdkService } from 'json-api-nestjs-sdk/ngModule';
+import { 
+  provideJsonApi, 
+  AtomicFactory, 
+  JsonApiSdkService 
+} from '@klerick/json-api-nestjs-sdk/ngModule';
 import {
   provideHttpClient,
   withFetch,
