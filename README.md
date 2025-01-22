@@ -24,7 +24,7 @@ $ npm run seed:run
 
 ```bash
 # dev server
-$ npm run demo:json-api
+$ nx run json-api-server:serve:development
 
 ```
 ## License
