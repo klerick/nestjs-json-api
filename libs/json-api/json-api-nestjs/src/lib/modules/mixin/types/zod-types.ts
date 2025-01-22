@@ -114,6 +114,8 @@ export type AllFieldWithType<E extends Entity> = FieldWithType<E> & {
 
 export type PropsForField<E extends Entity> = {
   [K in EntityProps<E>]: PropsFieldItem;
+} & {
+  [K in EntityRelation<E>]: PropsFieldItem;
 };
 
 export type ColumnType<T = string> =

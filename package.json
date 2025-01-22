@@ -12,7 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@anatine/zod-nestjs": "^2.0.5",
     "@anatine/zod-openapi": "^2.2.3",
     "@angular/animations": "19.0.3",
     "@angular/common": "19.0.3",

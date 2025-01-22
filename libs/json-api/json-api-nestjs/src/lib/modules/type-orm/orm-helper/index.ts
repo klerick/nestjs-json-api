@@ -1,4 +1,8 @@
-import { EntityProps, ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import {
+  EntityProps,
+  EntityRelation,
+  ObjectTyped,
+} from '@klerick/json-api-nestjs-shared';
 import { Repository } from 'typeorm';
 
 import { ObjectLiteral } from '../../../types';
@@ -258,7 +262,7 @@ export const getPropsFromDb = <E extends ObjectLiteral>(
   repository: Repository<E>
 ): PropsForField<E> => {
   return repository.metadata.columns.reduce((acum, i) => {
-    const tmp = i.propertyName as unknown as EntityProps<E>;
+    const tmp = i.propertyName as unknown as EntityProps<E> & EntityRelation<E>;
     acum[tmp] = {
       type: i.type as ColumnType,
       isArray: i.isArray,

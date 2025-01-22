@@ -22,6 +22,7 @@ import {
   ZodInputPatchRelationshipSchema,
   ZodInputPostRelationshipSchema,
 } from './factory';
+import { SwaggerBindService } from './swagger';
 
 export class MixinModule {
   static forRoot(options: MixinOptions): DynamicModule {
@@ -75,6 +76,7 @@ export class MixinModule {
         ZodQuerySchema(),
         ZodPatchSchema(),
         ZodPostSchema(),
+        SwaggerBindService,
         ZodInputPatchRelationshipSchema,
         ZodInputPostRelationshipSchema,
       ],

@@ -1,3 +1,5 @@
+import { createEntityInstance } from '@klerick/json-api-nestjs-shared';
+
 import {
   Attributes,
   Entity as EntityObject,
@@ -260,8 +262,7 @@ export class JsonApiUtilsService {
   }
 
   createEntityInstance<E>(name: string): E {
-    const entityName = kebabToCamel(name);
-    return Function('return new class ' + entityName + '{}')();
+    return createEntityInstance<E>(name);
   }
 
   private findIncludeEntity<E, R extends MainData<EntityRelation<E>>>(

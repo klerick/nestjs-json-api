@@ -26,6 +26,12 @@ const propsDb: PropsForField<Users> = {
   createdAt: { type: 'timestamp', isArray: false, isNullable: true },
   testDate: { type: 'timestamp', isArray: false, isNullable: true },
   updatedAt: { type: 'timestamp', isArray: false, isNullable: true },
+  notes: { type: 'string', isArray: false, isNullable: true },
+  roles: { type: 'number', isArray: true, isNullable: true },
+  addresses: { type: 'number', isArray: true, isNullable: true },
+  userGroup: { type: 'number', isArray: false, isNullable: true },
+  manager: { type: 'number', isArray: false, isNullable: true },
+  comments: { type: 'number', isArray: true, isNullable: true },
 };
 const fieldTypeAddresses: FieldWithType<Addresses> = {
   id: TypeField.number,
