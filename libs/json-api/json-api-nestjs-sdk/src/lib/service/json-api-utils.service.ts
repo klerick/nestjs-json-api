@@ -338,7 +338,7 @@ export class JsonApiUtilsService {
         }
         return {
           ...acum,
-          [key]: data,
+          [key]: { data },
         };
       }, {} as Relationships<E>);
 
