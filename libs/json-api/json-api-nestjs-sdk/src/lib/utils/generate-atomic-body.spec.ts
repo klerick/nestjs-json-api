@@ -151,12 +151,14 @@ describe('GenerateAtomicBody', () => {
             text: entity.text,
           },
           relationships: {
-            users: [
-              {
-                id: `${user.id}`,
-                type: 'users',
-              },
-            ],
+            users: {
+              data: [
+                {
+                  id: `${user.id}`,
+                  type: 'users',
+                },
+              ],
+            },
           },
           type: 'book-list',
         },
