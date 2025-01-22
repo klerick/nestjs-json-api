@@ -1,6 +1,6 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { BookList } from 'database';
-import { JsonApi, JsonBaseController } from 'json-api-nestjs';
+import { JsonApi, JsonBaseController } from '@klerick/json-api-nestjs';
 
 @JsonApi(BookList, {
   pipeForId: ParseUUIDPipe,
