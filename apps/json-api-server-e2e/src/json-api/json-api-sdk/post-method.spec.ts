@@ -1,6 +1,6 @@
 import { Addresses, BookList, CommentKind, Comments, Users } from 'database';
 import { faker } from '@faker-js/faker';
-import { JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 
 import { creatSdk, run } from '../utils/run-application';
 import { INestApplication } from '@nestjs/common';

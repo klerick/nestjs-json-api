@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { adapterForAxios, JsonApiJs } from 'json-api-nestjs-sdk';
+import { adapterForAxios, JsonApiJs } from '@klerick/json-api-nestjs-sdk';
 import {
   RpcFactory,
   axiosTransportFactory,

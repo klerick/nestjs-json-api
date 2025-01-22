@@ -1,4 +1,4 @@
-import { TypeOfArray } from 'json-shared-type';
+import { TypeOfArray } from '@klerick/json-api-nestjs-shared';
 export { TypeOfArray };
 
 type IntersectionToObj<T> = {

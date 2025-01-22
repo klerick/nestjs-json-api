@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { Addresses, CommentKind, Comments, Roles, Users } from 'database';
 import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';

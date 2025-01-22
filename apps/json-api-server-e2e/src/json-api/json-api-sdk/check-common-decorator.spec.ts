@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { AxiosError } from 'axios';
 import { Users } from 'database';
 

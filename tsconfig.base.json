@@ -15,6 +15,18 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@klerick/json-api-nestjs": [
+        "libs/json-api/json-api-nestjs/src/index.ts"
+      ],
+      "@klerick/json-api-nestjs-sdk": [
+        "libs/json-api/json-api-nestjs-sdk/src/index.ts"
+      ],
+      "@klerick/json-api-nestjs-sdk/ngModule": [
+        "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
+      ],
+      "@klerick/json-api-nestjs-shared": [
+        "libs/json-api/json-api-nestjs-shared/src/index.ts"
+      ],
       "@klerick/nestjs-json-rpc": [
         "libs/json-rpc/nestjs-json-rpc/src/index.ts"
       ],
@@ -25,14 +37,7 @@
         "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
       ],
       "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
-      "database": ["libs/database/src/index.ts"],
-      "json-api-nestjs": ["libs/json-api/json-api-nestjs/src/index.ts"],
-      "json-api-nestjs-sdk": ["libs/json-api/json-api-nestjs-sdk/src/index.ts"],
-      "json-api-nestjs-sdk/ngModule": [
-        "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
-      ],
-      "json-shared-type": ["libs/json-api/json-shared-type/src/index.ts"],
-      "shared-utils": ["libs/shared-utils/src/index.ts"]
+      "database": ["libs/database/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
