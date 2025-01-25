@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { Query } from '@klerick/json-api-nestjs';
-import { Users } from 'database';
+import { Users } from '@nestjs-json-api/typeorm-database';
 
 export class ExamplePipe implements PipeTransform<Query<Users>, Query<Users>> {
   transform(value: Query<Users>, metadata: ArgumentMetadata): Query<Users> {

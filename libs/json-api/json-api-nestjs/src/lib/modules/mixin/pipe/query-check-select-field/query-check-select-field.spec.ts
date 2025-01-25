@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { QueryField } from '@klerick/json-api-nestjs-shared';
 
 import { QueryCheckSelectField } from './query-check-select-field';
-import { Users } from '../../../../mock-utils';
+import { Users } from '../../../../mock-utils/typeorm';
 import { CONTROL_OPTIONS_TOKEN } from '../../../../constants';
 import { Query } from '../../zod';
 import { ConfigParam, ObjectLiteral } from '../../../../types';

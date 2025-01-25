@@ -31,8 +31,10 @@ import {
 
 import { TypeormUtilsService } from './typeorm-utils.service';
 import { TransformDataService } from './transform-data.service';
-import { CONTROL_OPTIONS_TOKEN } from '../../../constants';
-import { CURRENT_ENTITY_REPOSITORY } from '../constants';
+import {
+  CONTROL_OPTIONS_TOKEN,
+  CURRENT_ENTITY_REPOSITORY,
+} from '../../../constants';
 import { TypeOrmParam } from '../type';
 
 export class TypeOrmService<E extends ObjectLiteral> implements OrmService<E> {

@@ -1,15 +1,9 @@
 import { zodIncludeQuery } from './include';
-import { ResultGetField } from '../../types';
-import { Users } from '../../../../mock-utils';
 
-const relationList: ResultGetField<Users>['relations'] = [
-  'userGroup',
-  'notes',
-  'comments',
-  'roles',
-  'manager',
-  'addresses',
-];
+import { Users } from '../../../../mock-utils/typeorm';
+
+import { relationList } from '../../../../utils/___test___/test.helper';
+
 const schema = zodIncludeQuery<Users>(relationList);
 
 describe('zodIncludeQuery', () => {

@@ -1,47 +1,13 @@
 import { zodFilterInputQuery } from './filter';
-import { Users } from '../../../../mock-utils';
-import { RelationTree, ResultGetField } from '../../types';
+import { Users } from '../../../../mock-utils/typeorm';
+import { ResultGetField } from '../../types';
 
-const userFields: ResultGetField<Users>['field'] = [
-  'updatedAt',
-  'testDate',
-  'createdAt',
-  'isActive',
-  'lastName',
-  'testArrayNull',
-  'testReal',
-  'firstName',
-  'login',
-  'id',
-];
+import {
+  userFieldsStructure,
+  userRelations,
+} from '../../../../utils/___test___/test.helper';
 
-const userRelations: RelationTree<Users> = {
-  addresses: [
-    'arrayField',
-    'country',
-    'state',
-    'city',
-    'updatedAt',
-    'createdAt',
-    'id',
-  ],
-  manager: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
-  ],
-  roles: ['isDefault', 'key', 'name', 'updatedAt', 'createdAt', 'id'],
-  comments: ['kind', 'text', 'updatedAt', 'createdAt', 'id'],
-  notes: ['text', 'updatedAt', 'createdAt', 'id'],
-  userGroup: ['label', 'id'],
-};
+const userFields: ResultGetField<Users>['field'] = userFieldsStructure['field'];
 
 describe('zodFilterInputQuery', () => {
   it('should return transformed result with relation and target when valid data is provided', () => {

@@ -10,11 +10,10 @@ import { ExecuteService, ExplorerService } from '../service';
 import { InputArray, Operation } from '../utils';
 import { JsonBaseController } from '../../mixin/controller/json-base.controller';
 import {
-  createAndPullSchemaBase,
   mockDBTestModule,
   providerEntities,
   Users,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 
 import {
   ASYNC_ITERATOR_FACTORY,
@@ -28,9 +27,12 @@ import {
 
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
-import { CURRENT_DATA_SOURCE_TOKEN } from '../../type-orm/constants';
 import { ObjectLiteral } from '../../../types';
-import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import {
+  CURRENT_DATA_SOURCE_TOKEN,
+  RUN_IN_TRANSACTION_FUNCTION,
+} from '../../../constants';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 describe('OperationController', () => {
   let db: IMemoryDb;

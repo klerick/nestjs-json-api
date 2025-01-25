@@ -1,41 +1,15 @@
 import { z, ZodError } from 'zod';
 
 import { zodRelationships, ZodRelationships } from './relationships';
-import { Users } from '../../../../mock-utils';
+import { Users } from '../../../../mock-utils/typeorm';
+
 import {
-  RelationPropsArray,
-  RelationPropsTypeName,
-  RelationPrimaryColumnType,
-  TypeField,
-} from '../../types';
+  relationArrayProps,
+  relationPopsName,
+  primaryColumnType,
+} from '../../../../utils/___test___/test.helper';
 
 describe('zodRelationships', () => {
-  const relationArrayProps: RelationPropsArray<Users> = {
-    roles: true,
-    userGroup: false,
-    notes: true,
-    addresses: false,
-    comments: true,
-    manager: false,
-  };
-  const relationPopsName: RelationPropsTypeName<Users> = {
-    roles: 'Roles',
-    userGroup: 'UserGroups',
-    notes: 'Notes',
-    addresses: 'Addresses',
-    comments: 'Comments',
-    manager: 'Users',
-  };
-
-  const primaryColumnType: RelationPrimaryColumnType<Users> = {
-    roles: TypeField.number,
-    userGroup: TypeField.number,
-    notes: TypeField.string,
-    addresses: TypeField.number,
-    comments: TypeField.number,
-    manager: TypeField.number,
-  };
-
   let relationshipsSchema: ZodRelationships<Users>;
 
   describe('POST', () => {

@@ -3,10 +3,9 @@ import { IMemoryDb } from 'pg-mem';
 import { getDataSourceToken } from '@nestjs/typeorm';
 
 import {
-  createAndPullSchemaBase,
   mockDBTestModule,
   providerEntities,
-} from '../../../../mock-utils';
+} from '../../../../mock-utils/typeorm';
 import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
@@ -15,7 +14,7 @@ import {
 } from '../../factory';
 import { DEFAULT_CONNECTION_NAME } from '../../../../constants';
 
-import { getRepository, pullUser, Users } from '../../../../mock-utils';
+import { getRepository, pullUser, Users } from '../../../../mock-utils/typeorm';
 
 import { Repository } from 'typeorm';
 import { CONTROL_OPTIONS_TOKEN, ORM_SERVICE } from '../../../../constants';
@@ -26,6 +25,7 @@ import {
   TransformDataService,
   TypeormUtilsService,
 } from '../../service';
+import { createAndPullSchemaBase } from '../../../../mock-utils';
 
 describe('deleteOne', () => {
   let db: IMemoryDb;

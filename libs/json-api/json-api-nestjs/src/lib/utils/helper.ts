@@ -4,34 +4,33 @@ import {
   AnyEntity,
   ConfigParam,
   EntityName,
-  ModuleOptions,
+  MicroOrmOptions,
   RequiredFromPartial,
   ResultModuleOptions,
+  TypeOrmConfigParam,
+  MicroOrmConfigParam,
+  TypeOrmOptions,
 } from '../types';
 import {
   DEFAULT_CONNECTION_NAME,
   JSON_API_DECORATOR_ENTITY,
 } from '../constants';
-import {
-  MicroOrmParam,
-  TypeOrmParam,
-  MicroOrmModule,
-  TypeOrmModule,
-  AtomicOperationModule,
-} from '../modules';
+import { TypeOrmParam, AtomicOperationModule, MicroOrmParam } from '../modules';
 import { MixinModule } from '../modules/mixin/mixin.module';
 import { Type } from '@nestjs/common/interfaces';
 import { RouterModule } from '@nestjs/core';
+import { DEFAULT_ARRAY_TYPE } from '../modules/micro-orm/constants';
 
 export function prepareConfig(
-  moduleOptions: ModuleOptions
-): ResultModuleOptions {
+  moduleOptions: TypeOrmOptions | MicroOrmOptions,
+  type: 'typeOrm' | 'microOrm'
+): Omit<ResultModuleOptions, 'type'> {
   const { options: inputOptions } = moduleOptions;
 
   let resulOptions:
-    | RequiredFromPartial<TypeOrmParam & ConfigParam>
-    | RequiredFromPartial<MicroOrmParam & ConfigParam>;
-  let resulType: typeof TypeOrmModule | typeof MicroOrmModule;
+    | RequiredFromPartial<TypeOrmConfigParam>
+    | RequiredFromPartial<MicroOrmConfigParam>;
+
   const configParam: RequiredFromPartial<ConfigParam> = {
     debug: !!inputOptions.debug,
     requiredSelectField: !!inputOptions.requiredSelectField,
@@ -40,34 +39,37 @@ export function prepareConfig(
     pipeForId: inputOptions.pipeForId || ParseIntPipe,
   };
 
-  moduleOptions.type = moduleOptions.type || TypeOrmModule;
-
-  if (moduleOptions.type === TypeOrmModule) {
+  if (type === 'typeOrm') {
     const { runInTransaction, useSoftDelete } =
       moduleOptions.options as Partial<ConfigParam & TypeOrmParam>;
 
-    resulType = TypeOrmModule;
     resulOptions = {
       ...configParam,
       useSoftDelete: useSoftDelete ? useSoftDelete : false,
       runInTransaction: runInTransaction ? runInTransaction : false,
-    } as ConfigParam & RequiredFromPartial<TypeOrmParam>;
+    };
   } else {
-    resulType = MicroOrmModule;
+    const { arrayType } = moduleOptions.options as Partial<
+      ConfigParam & MicroOrmParam
+    >;
+
     resulOptions = {
       ...configParam,
+      arrayType: [...DEFAULT_ARRAY_TYPE, ...(arrayType || [])],
     };
   }
 
   return {
-    connectionName: moduleOptions.connectionName || DEFAULT_CONNECTION_NAME,
+    connectionName:
+      type === 'typeOrm'
+        ? moduleOptions.connectionName || DEFAULT_CONNECTION_NAME
+        : (moduleOptions.connectionName as any),
     entities: moduleOptions.entities,
     imports: moduleOptions.imports || [],
     providers: moduleOptions.providers || [],
     controllers: moduleOptions.controllers || [],
-    type: resulType,
-    options: resulOptions,
-  } satisfies ResultModuleOptions;
+    options: resulOptions as any,
+  } satisfies Omit<ResultModuleOptions, 'type'>;
 }
 
 export function createMixinModule(

@@ -1,38 +1,7 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DynamicModule } from '@nestjs/common';
 import { DataType, IMemoryDb, newDb } from 'pg-mem';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-
-import {
-  Users,
-  Roles,
-  RequestsHavePodLocks,
-  Requests,
-  Pods,
-  Comments,
-  Addresses,
-  UserGroups,
-  Notes,
-} from './entities';
-import { DataSource } from 'typeorm';
-
 import { v4 } from 'uuid';
-
-export * from './entities';
-export * from './utils';
-
-export const entities = [
-  Users,
-  UserGroups,
-  Roles,
-  RequestsHavePodLocks,
-  Requests,
-  Pods,
-  Comments,
-  Addresses,
-  Notes,
-];
 
 export function createAndPullSchemaBase(): IMemoryDb {
   const dump = readFileSync(join(__dirname, 'db-for-test'), {
@@ -63,32 +32,4 @@ export function createAndPullSchemaBase(): IMemoryDb {
   });
   db.public.none(dump);
   return db;
-}
-export function mockDBTestModule(db: IMemoryDb): DynamicModule {
-  return TypeOrmModule.forRootAsync({
-    useFactory() {
-      return {
-        type: 'postgres',
-        // logging: true,
-        entities: [
-          Users,
-          UserGroups,
-          Roles,
-          RequestsHavePodLocks,
-          Requests,
-          Pods,
-          Comments,
-          Addresses,
-          Notes,
-        ],
-      };
-    },
-    async dataSourceFactory(options) {
-      const dataSource: DataSource = await db.adapters.createTypeormDataSource(
-        options
-      );
-
-      return dataSource;
-    },
-  });
 }

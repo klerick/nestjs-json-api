@@ -1,66 +1,15 @@
 import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
 import { zodQuery } from './index';
-import {
-  AllFieldWithType,
-  ArrayPropsForEntity,
-  RelationTree,
-  ResultGetField,
-  TypeField,
-} from '../../types';
-import { Users } from '../../../../mock-utils';
+import { ArrayPropsForEntity } from '../../types';
+import { Users } from '../../../../mock-utils/typeorm';
 import { InputQuery } from '../zod-input-query-schema';
 import { ASC } from '../../../../constants';
 
-const userFields: ResultGetField<Users> = {
-  field: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
-  ],
-  relations: [
-    'userGroup',
-    'notes',
-    'comments',
-    'roles',
-    'manager',
-    'addresses',
-  ],
-};
-
-const userRelations: RelationTree<Users> = {
-  addresses: [
-    'arrayField',
-    'country',
-    'state',
-    'city',
-    'updatedAt',
-    'createdAt',
-    'id',
-  ],
-  manager: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
-  ],
-  roles: ['isDefault', 'key', 'name', 'updatedAt', 'createdAt', 'id'],
-  comments: ['kind', 'text', 'updatedAt', 'createdAt', 'id'],
-  notes: ['text', 'updatedAt', 'createdAt', 'id'],
-  userGroup: ['label', 'id'],
-};
+import {
+  userFieldsStructure as userFields,
+  userRelations,
+  propsType,
+} from '../../../../utils/___test___/test.helper';
 
 const propsArray: ArrayPropsForEntity<Users> = {
   target: {
@@ -78,65 +27,6 @@ const propsArray: ArrayPropsForEntity<Users> = {
   comments: {},
   notes: {},
   roles: {},
-};
-
-const propsType: AllFieldWithType<Users> = {
-  updatedAt: TypeField.date,
-  testDate: TypeField.date,
-  createdAt: TypeField.date,
-  isActive: TypeField.boolean,
-  lastName: TypeField.string,
-  testArrayNull: TypeField.array,
-  testReal: TypeField.array,
-  firstName: TypeField.string,
-  login: TypeField.string,
-  id: TypeField.number,
-  addresses: {
-    arrayField: TypeField.array,
-    country: TypeField.string,
-    state: TypeField.string,
-    city: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.number,
-  },
-  manager: {
-    updatedAt: TypeField.date,
-    testDate: TypeField.date,
-    createdAt: TypeField.date,
-    isActive: TypeField.boolean,
-    lastName: TypeField.string,
-    testArrayNull: TypeField.array,
-    testReal: TypeField.array,
-    firstName: TypeField.string,
-    login: TypeField.string,
-    id: TypeField.number,
-  },
-  roles: {
-    isDefault: TypeField.boolean,
-    key: TypeField.string,
-    name: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.number,
-  },
-  comments: {
-    kind: TypeField.string,
-    text: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.number,
-  },
-  notes: {
-    text: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.string,
-  },
-  userGroup: {
-    label: TypeField.string,
-    id: TypeField.number,
-  },
 };
 
 const schemaQuery = zodQuery<Users>(

@@ -1,49 +1,12 @@
 import { zodSortQuery } from './sort';
 
-import { RelationTree, ResultGetField } from '../../types';
-import { Users } from '../../../../mock-utils';
 import { ASC, DESC } from '../../../../constants';
 
-const userFields: ResultGetField<Users>['field'] = [
-  'updatedAt',
-  'testDate',
-  'createdAt',
-  'isActive',
-  'lastName',
-  'testArrayNull',
-  'testReal',
-  'firstName',
-  'login',
-  'id',
-];
+import {
+  userFields,
+  userRelations,
+} from '../../../../utils/___test___/test.helper';
 
-const userRelations: RelationTree<Users> = {
-  addresses: [
-    'arrayField',
-    'country',
-    'state',
-    'city',
-    'updatedAt',
-    'createdAt',
-    'id',
-  ],
-  manager: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
-  ],
-  roles: ['isDefault', 'key', 'name', 'updatedAt', 'createdAt', 'id'],
-  comments: ['kind', 'text', 'updatedAt', 'createdAt', 'id'],
-  notes: ['text', 'updatedAt', 'createdAt', 'id'],
-  userGroup: ['label', 'id'],
-};
 const schema = zodSortQuery(userFields, userRelations);
 describe('zodSortQuery', () => {
   it('should create a Zod schema with target and relations', () => {

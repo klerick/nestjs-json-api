@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { QueryField } from '@klerick/json-api-nestjs-shared';
 import { QueryFiledInIncludePipe } from './query-filed-in-include.pipe';
-import { Users } from '../../../../mock-utils';
+import { Users } from '../../../../mock-utils/typeorm';
 import { Query } from '../../zod';
 
 describe('QueryFiledInIncludePipe', () => {

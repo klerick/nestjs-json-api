@@ -1,74 +1,20 @@
-import {
-  EntityProps,
-  FieldWithType,
-  PropsForField,
-  RelationPrimaryColumnType,
-  RelationPropsArray,
-  RelationPropsTypeName,
-  TypeField,
-  TypeForId,
-} from '../../types';
-import { Users } from '../../../../mock-utils';
-import { zodPost, PostData } from './';
+import { EntityProps, TypeField, TypeForId } from '../../types';
+import { Users } from '../../../../mock-utils/typeorm';
+import { zodPost } from './';
 import { ZodError } from 'zod';
 
+import {
+  fieldTypeUsers as fieldWithType,
+  propsDb,
+  relationArrayProps,
+  relationPopsName,
+  primaryColumnType,
+} from '../../../../utils/___test___/test.helper';
+
 const typeId: TypeForId = TypeField.number;
-const typeName = 'Users';
-const fieldWithType: FieldWithType<Users> = {
-  id: TypeField.number,
-  login: TypeField.string,
-  firstName: TypeField.string,
-  testReal: TypeField.array,
-  testArrayNull: TypeField.array,
-  lastName: TypeField.string,
-  isActive: TypeField.boolean,
-  createdAt: TypeField.date,
-  testDate: TypeField.date,
-  updatedAt: TypeField.date,
-};
-const propsDb: PropsForField<Users> = {
-  id: { type: 'number', isArray: false, isNullable: false },
-  login: { type: 'string', isArray: false, isNullable: false },
-  firstName: { type: 'string', isArray: false, isNullable: true },
-  testReal: { type: 'number', isArray: true, isNullable: false },
-  testArrayNull: { type: 'number', isArray: true, isNullable: true },
-  lastName: { type: 'string', isArray: false, isNullable: true },
-  isActive: { type: 'boolean', isArray: false, isNullable: true },
-  createdAt: { type: 'date', isArray: false, isNullable: true },
-  testDate: { type: 'date', isArray: false, isNullable: true },
-  updatedAt: { type: 'date', isArray: false, isNullable: true },
-  notes: { type: 'string', isArray: false, isNullable: true },
-  roles: { type: 'number', isArray: true, isNullable: true },
-  addresses: { type: 'number', isArray: true, isNullable: true },
-  userGroup: { type: 'number', isArray: false, isNullable: true },
-  manager: { type: 'number', isArray: false, isNullable: true },
-  comments: { type: 'number', isArray: true, isNullable: true },
-};
+
 const primaryColumn: EntityProps<Users> = 'id';
-const relationArrayProps: RelationPropsArray<Users> = {
-  roles: true,
-  comments: true,
-  notes: true,
-  addresses: false,
-  userGroup: false,
-  manager: false,
-};
-const relationPopsName: RelationPropsTypeName<Users> = {
-  roles: 'Roles',
-  comments: 'Comments',
-  notes: 'Notes',
-  addresses: 'Addresses',
-  userGroup: 'UserGroups',
-  manager: 'Users',
-};
-const primaryColumnType: RelationPrimaryColumnType<Users> = {
-  roles: TypeField.number,
-  userGroup: TypeField.number,
-  manager: TypeField.number,
-  addresses: TypeField.number,
-  comments: TypeField.number,
-  notes: TypeField.string,
-};
+
 const schema = zodPost(
   typeId,
   'users',

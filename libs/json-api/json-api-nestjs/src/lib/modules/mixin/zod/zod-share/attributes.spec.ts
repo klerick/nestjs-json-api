@@ -1,47 +1,13 @@
-import { z, ZodError } from 'zod';
+import { ZodError } from 'zod';
 import { zodAttributes, ZodAttributes, Attributes } from './attributes';
-import { Addresses, Users } from '../../../../mock-utils';
-import { FieldWithType, PropsForField, TypeField } from '../../types';
+import { Addresses, Users } from '../../../../mock-utils/typeorm';
+import { PropsForField } from '../../types';
 
-const fieldTypeUsers: FieldWithType<Users> = {
-  id: TypeField.number,
-  isActive: TypeField.boolean,
-  firstName: TypeField.string,
-  createdAt: TypeField.date,
-  lastName: TypeField.string,
-  login: TypeField.string,
-  testDate: TypeField.date,
-  updatedAt: TypeField.date,
-  testReal: TypeField.array,
-  testArrayNull: TypeField.array,
-};
-const propsDb: PropsForField<Users> = {
-  id: { type: Number, isArray: false, isNullable: false },
-  login: { type: 'varchar', isArray: false, isNullable: false },
-  firstName: { type: 'varchar', isArray: false, isNullable: true },
-  testReal: { type: 'real', isArray: true, isNullable: false },
-  testArrayNull: { type: 'real', isArray: true, isNullable: true },
-  lastName: { type: 'varchar', isArray: false, isNullable: true },
-  isActive: { type: 'boolean', isArray: false, isNullable: true },
-  createdAt: { type: 'timestamp', isArray: false, isNullable: true },
-  testDate: { type: 'timestamp', isArray: false, isNullable: true },
-  updatedAt: { type: 'timestamp', isArray: false, isNullable: true },
-  notes: { type: 'string', isArray: false, isNullable: true },
-  roles: { type: 'number', isArray: true, isNullable: true },
-  addresses: { type: 'number', isArray: true, isNullable: true },
-  userGroup: { type: 'number', isArray: false, isNullable: true },
-  manager: { type: 'number', isArray: false, isNullable: true },
-  comments: { type: 'number', isArray: true, isNullable: true },
-};
-const fieldTypeAddresses: FieldWithType<Addresses> = {
-  id: TypeField.number,
-  arrayField: TypeField.array,
-  state: TypeField.string,
-  city: TypeField.string,
-  createdAt: TypeField.date,
-  updatedAt: TypeField.date,
-  country: TypeField.string,
-};
+import {
+  fieldTypeUsers,
+  propsDb,
+  fieldTypeAddresses,
+} from '../../../../utils/___test___/test.helper';
 
 describe('attributes', () => {
   type SchemaTypeUsers = Attributes<Users>;

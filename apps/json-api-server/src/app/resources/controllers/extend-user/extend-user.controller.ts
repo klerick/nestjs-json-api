@@ -7,7 +7,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { Users } from 'database';
+
 import {
   JsonApi,
   JsonBaseController,
@@ -29,32 +29,35 @@ import {
   HttpExceptionMethodFilter,
 } from '../../service/http-exception.filter';
 import { GuardService, EntityName } from '../../service/guard.service';
+import { Users } from '../entity-orm';
 import { AtomicInterceptor } from '../../service/atomic.interceptor';
 
 @UseGuards(GuardService)
 @UseFilters(new HttpExceptionFilter())
 @UseInterceptors(ControllerInterceptor)
-@JsonApi(Users)
-export class ExtendUserController extends JsonBaseController<Users> {
-  @InjectService() public service: JsonApiService<Users>;
+@JsonApi(Users as any)
+export class ExtendUserController extends JsonBaseController<typeof Users> {
+  @InjectService() public service: JsonApiService<typeof Users>;
   @Inject(ExampleService) protected exampleService: ExampleService;
   getOne(
     id: string | number,
-    query: QueryType<Users>
-  ): Promise<ResourceObject<Users>> {
+    query: QueryType<typeof Users>
+  ): Promise<ResourceObject<typeof Users>> {
     return super.getOne(id, query);
   }
 
-  patchRelationship<Rel extends EntityRelation<Users>>(
+  patchRelationship<Rel extends EntityRelation<typeof Users>>(
     id: string | number,
     relName: Rel,
     input: PatchRelationshipData
-  ): Promise<ResourceObjectRelationships<Users, Rel>> {
+  ): Promise<ResourceObjectRelationships<typeof Users, Rel>> {
     return super.patchRelationship(id, relName, input);
   }
 
   // @UseInterceptors(AtomicInterceptor)
-  postOne(inputData: PostData<Users>): Promise<ResourceObject<Users>> {
+  postOne(
+    inputData: PostData<typeof Users>
+  ): Promise<ResourceObject<typeof Users>> {
     return super.postOne(inputData);
   }
 
@@ -62,8 +65,8 @@ export class ExtendUserController extends JsonBaseController<Users> {
   @UseFilters(HttpExceptionMethodFilter)
   @UseInterceptors(MethodInterceptor)
   getAll(
-    @Query(ExamplePipe) query: QueryType<Users>
-  ): Promise<ResourceObject<Users, 'array'>> {
+    @Query(ExamplePipe) query: QueryType<typeof Users>
+  ): Promise<ResourceObject<typeof Users, 'array'>> {
     return super.getAll(query);
   }
 

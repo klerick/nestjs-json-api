@@ -1,16 +1,13 @@
 import { zodFieldsInputQuery } from './fields';
 import { ResultGetField } from '../../types';
-import { Users } from '../../../../mock-utils';
+import { Users } from '../../../../mock-utils/typeorm';
+
+import { userFieldsStructure } from '../../../../utils/___test___/test.helper';
+
+const validRelationList: ResultGetField<Users>['relations'] =
+  userFieldsStructure['relations'];
 
 describe('zodFieldsInputQuerySchema', () => {
-  const validRelationList: ResultGetField<Users>['relations'] = [
-    'userGroup',
-    'notes',
-    'comments',
-    'roles',
-    'manager',
-    'addresses',
-  ];
   const schema = zodFieldsInputQuery<Users>(validRelationList);
 
   it('should validate successfully with a valid target and relation', () => {

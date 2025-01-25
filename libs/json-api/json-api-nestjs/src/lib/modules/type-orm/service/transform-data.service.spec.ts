@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import {
   Addresses,
   Comments,
-  createAndPullSchemaBase,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -15,13 +14,14 @@ import {
   Roles,
   UserGroups,
   Users,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 import { CurrentDataSourceProvider, CurrentEntityRepository } from '../factory';
 import { DEFAULT_CONNECTION_NAME } from '../../../constants';
 import { TransformDataService } from './transform-data.service';
 import { ApplicationConfig } from '@nestjs/core';
 import { VersioningType } from '@nestjs/common';
 import { EntityPropsMapService } from '../service';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 describe('TransformDataService', () => {
   let db: IMemoryDb;

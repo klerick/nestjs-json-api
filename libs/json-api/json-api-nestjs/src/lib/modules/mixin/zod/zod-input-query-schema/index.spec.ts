@@ -1,53 +1,15 @@
 import { QueryField, ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { zodInputQuery } from './index';
 
+import { ResultGetField, TupleOfEntityRelation } from '../../types';
+import { Users } from '../../../../mock-utils/typeorm';
+
 import {
-  RelationTree,
-  ResultGetField,
-  TupleOfEntityRelation,
-} from '../../types';
-import { Users } from '../../../../mock-utils';
+  userFieldsStructure,
+  userRelations,
+} from '../../../../utils/___test___/test.helper';
 
-const userFields: ResultGetField<Users>['field'] = [
-  'updatedAt',
-  'testDate',
-  'createdAt',
-  'isActive',
-  'lastName',
-  'testArrayNull',
-  'testReal',
-  'firstName',
-  'login',
-  'id',
-];
-
-const userRelations: RelationTree<Users> = {
-  addresses: [
-    'arrayField',
-    'country',
-    'state',
-    'city',
-    'updatedAt',
-    'createdAt',
-    'id',
-  ],
-  manager: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
-  ],
-  roles: ['isDefault', 'key', 'name', 'updatedAt', 'createdAt', 'id'],
-  comments: ['kind', 'text', 'updatedAt', 'createdAt', 'id'],
-  notes: ['text', 'updatedAt', 'createdAt', 'id'],
-  userGroup: ['label', 'id'],
-};
+const userFields: ResultGetField<Users>['field'] = userFieldsStructure['field'];
 
 const entityFieldsStructure = {
   field: userFields,

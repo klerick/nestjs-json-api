@@ -1,6 +1,6 @@
 import {
-  MicroOrmModule,
-  TypeOrmModule,
+  MicroOrmJsonApiModule,
+  TypeOrmJsonApiModule,
   TypeOrmParam,
   MicroOrmParam,
 } from '../modules';
@@ -8,22 +8,27 @@ import {
 import { ConfigParam, GeneralParam, ResultGeneralParam } from './config-param';
 import { RequiredFromPartial } from './util-types';
 
-export type ModuleOptions =
-  | (GeneralParam & {
-      type: typeof MicroOrmModule;
-      options: Partial<ConfigParam & MicroOrmParam>;
-    })
-  | (GeneralParam & {
-      type?: typeof TypeOrmModule;
-      options: Partial<ConfigParam & TypeOrmParam>;
-    });
+export type TypeOrmConfigParam = ConfigParam & TypeOrmParam;
+
+export type TypeOrmDefaultOptions = GeneralParam & {
+  options: Partial<TypeOrmConfigParam>;
+};
+export type TypeOrmOptions = GeneralParam & {
+  options: Partial<TypeOrmConfigParam>;
+};
+
+export type MicroOrmConfigParam = ConfigParam & MicroOrmParam;
+export type MicroOrmOptions = GeneralParam & {
+  options: Partial<MicroOrmConfigParam>;
+};
+
+export type ResultTypeOrmModuleOptions = ResultGeneralParam & {
+  type: typeof TypeOrmJsonApiModule;
+} & TypeOrmOptions & { options: RequiredFromPartial<TypeOrmConfigParam> };
+export type ResultMicroOrmModuleOptions = ResultGeneralParam & {
+  type: typeof MicroOrmJsonApiModule;
+} & MicroOrmOptions & { options: RequiredFromPartial<MicroOrmConfigParam> };
 
 export type ResultModuleOptions =
-  | (ResultGeneralParam & {
-      type: typeof MicroOrmModule;
-      options: RequiredFromPartial<ConfigParam & MicroOrmParam>;
-    })
-  | (ResultGeneralParam & {
-      type: typeof TypeOrmModule;
-      options: RequiredFromPartial<ConfigParam & TypeOrmParam>;
-    });
+  | ResultTypeOrmModuleOptions
+  | ResultMicroOrmModuleOptions;

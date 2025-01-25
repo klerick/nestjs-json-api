@@ -11,7 +11,6 @@ import { IMemoryDb } from 'pg-mem';
 
 import {
   mockDBTestModule,
-  createAndPullSchemaBase,
   pullUser,
   pullAllData,
   providerEntities,
@@ -22,7 +21,7 @@ import {
   Comments,
   Roles,
   UserGroups,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 
 import {
   getField,
@@ -40,6 +39,7 @@ import {
 } from './';
 
 import { PropsArray, ArrayPropsForEntity, TypeField } from '../../mixin/types';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 describe('type-orm-helper', () => {
   let userRepository: Repository<Users>;
@@ -149,7 +149,7 @@ describe('type-orm-helper', () => {
     const checkArray = fromRelationTreeToArrayName(relationField);
 
     for (const key of relations) {
-      let resultKey =
+      const resultKey =
         key === 'manager' ? 'Users' : key === 'userGroup' ? 'UserGroups' : key;
 
       const relationsRepo =
@@ -237,24 +237,6 @@ describe('type-orm-helper', () => {
     expect(getTypePrimaryColumn(userRepository)).toBe(TypeField.number);
     expect(getTypePrimaryColumn(notesRepository)).toBe(TypeField.string);
   });
-  //
-  // it('getPrimaryColumnsForRelation', () => {
-  //   const result = getPrimaryColumnsForRelation(userRepository);
-  //   expect(result.roles).toBe('id');
-  //   expect(result.manager).toBe('id');
-  // });
-  //
-  // it('geTisArrayRelation', () => {
-  //   const result = getIsArrayRelation(userRepository);
-  //   expect(result).toEqual({
-  //     addresses: false,
-  //     manager: false,
-  //     roles: true,
-  //     comments: true,
-  //     notes: true,
-  //     userGroup: false,
-  //   });
-  // });
 
   it('getTypeForAllProps', () => {
     const result = getTypeForAllProps(userRepository);

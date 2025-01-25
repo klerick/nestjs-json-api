@@ -1,14 +1,20 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 
-import { DatabaseModule } from 'database';
+import { TypeOrmDatabaseModule } from '@nestjs-json-api/typeorm-database';
+import { MicroOrmDatabaseModule } from '@nestjs-json-api/microorm-database';
 import { ResourcesModule } from './resources/resources.module';
 import { RpcModule } from './rpc/rpc.module';
 import * as process from 'process';
 
+const ormModule =
+  process.env['ORM_TYPE'] === 'typeorm'
+    ? TypeOrmDatabaseModule
+    : MicroOrmDatabaseModule;
+
 @Module({
   imports: [
-    DatabaseModule,
+    ormModule,
     ResourcesModule,
     RpcModule,
     LoggerModule.forRoot({

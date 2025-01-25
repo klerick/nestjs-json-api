@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import {
   Addresses,
   Comments,
-  createAndPullSchemaBase,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -16,7 +15,7 @@ import {
   Roles,
   UserGroups,
   Users,
-} from '../../../../mock-utils';
+} from '../../../../mock-utils/typeorm';
 import {
   CONTROL_OPTIONS_TOKEN,
   DEFAULT_CONNECTION_NAME,
@@ -36,6 +35,7 @@ import {
   TransformDataService,
   TypeormUtilsService,
 } from '../../service';
+import { createAndPullSchemaBase } from '../../../../mock-utils';
 
 describe('postOne', () => {
   let db: IMemoryDb;

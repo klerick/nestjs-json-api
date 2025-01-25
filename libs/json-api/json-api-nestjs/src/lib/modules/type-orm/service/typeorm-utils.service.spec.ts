@@ -4,7 +4,6 @@ import { getDataSourceToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import {
-  createAndPullSchemaBase,
   mockDBTestModule,
   providerEntities,
   UserGroups,
@@ -15,14 +14,16 @@ import {
   Notes,
   getRepository,
   pullAllData,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
 } from '../factory';
-import { CURRENT_ENTITY_REPOSITORY } from '../constants';
-import { DEFAULT_CONNECTION_NAME } from '../../../constants';
+import {
+  CURRENT_ENTITY_REPOSITORY,
+  DEFAULT_CONNECTION_NAME,
+} from '../../../constants';
 import { TypeormUtilsService } from './typeorm-utils.service';
 import { PostData, PostRelationshipData, Query } from '../../mixin/zod';
 import { QueryField, FilterOperand } from '@klerick/json-api-nestjs-shared';
@@ -36,6 +37,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 function getDefaultQuery<R extends Entity>() {
   const filter = {

@@ -5,7 +5,7 @@ import {
   PROPERTY_DEPS_METADATA,
 } from '@nestjs/common/constants';
 import { createController } from './create-controller';
-import { Users } from '../../../mock-utils';
+import { Users } from '../../../mock-utils/typeorm';
 import { JsonBaseController } from '../controller/json-base.controller';
 import {
   JSON_API_CONTROLLER_POSTFIX,

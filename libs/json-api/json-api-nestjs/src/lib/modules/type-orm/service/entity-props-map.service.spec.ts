@@ -3,15 +3,15 @@ import { IMemoryDb } from 'pg-mem';
 import { getDataSourceToken } from '@nestjs/typeorm';
 
 import {
-  createAndPullSchemaBase,
   mockDBTestModule,
   providerEntities,
   UserGroups,
   Users,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 import { CurrentDataSourceProvider } from '../factory';
 import { DEFAULT_CONNECTION_NAME } from '../../../constants';
 import { EntityPropsMapService } from './entity-props-map.service';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 describe('EntityPropsMapService', () => {
   let db: IMemoryDb;

@@ -7,7 +7,7 @@ import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
 
 import { bindController } from './bind-controller';
-import { Users } from '../../../mock-utils';
+import { Users } from '../../../mock-utils/typeorm';
 import { DEFAULT_CONNECTION_NAME } from '../../../constants';
 import {
   ParseIntPipe,

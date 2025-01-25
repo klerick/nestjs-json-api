@@ -7,7 +7,6 @@ import { IMemoryDb } from 'pg-mem';
 import {
   Addresses,
   Comments,
-  createAndPullSchemaBase,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -16,7 +15,7 @@ import {
   Roles,
   UserGroups,
   Users,
-} from '../../../../mock-utils';
+} from '../../../../mock-utils/typeorm';
 import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
@@ -40,6 +39,7 @@ import {
   TransformDataService,
   TypeormUtilsService,
 } from '../../service';
+import { createAndPullSchemaBase } from '../../../../mock-utils';
 
 function getDefaultQuery<R extends Entity>() {
   const filter = {

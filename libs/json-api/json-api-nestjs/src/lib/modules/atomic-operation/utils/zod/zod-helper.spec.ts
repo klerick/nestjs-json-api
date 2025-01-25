@@ -13,7 +13,7 @@ import {
   zodUpdate,
   ZodUpdate,
 } from './zod-helper';
-import { Users } from '../../../../mock-utils';
+import { Users } from '../../../../mock-utils/typeorm';
 import { FIELD_FOR_ENTITY } from '../../../../constants';
 import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
 import { MapController } from '../../types';

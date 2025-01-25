@@ -1,5 +1,5 @@
 export { JsonApiModule } from './lib/json-api.module';
-export { TypeOrmModule, MicroOrmModule } from './lib/modules';
+export { TypeOrmJsonApiModule, MicroOrmJsonApiModule } from './lib/modules';
 
 export { JsonApi, InjectService } from './lib/modules/mixin/decorators';
 export { OrmService as JsonApiService } from './lib/modules/mixin/types';

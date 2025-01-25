@@ -36,8 +36,13 @@
       "@klerick/nestjs-json-rpc-sdk/ngModule": [
         "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
       ],
+      "@nestjs-json-api/microorm-database": [
+        "libs/microorm-database/src/index.ts"
+      ],
       "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
-      "database": ["libs/database/src/index.ts"]
+      "@nestjs-json-api/typeorm-database": [
+        "libs/typeorm-database/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -12,12 +12,6 @@ import { TypeField } from '../types';
 
 describe('zod-utils', () => {
   describe('guardIsKeyOfObject', () => {
-    /**
-     * Function Description:
-     * The `guardIsKeyOfObject` function acts as a type guard that ensures the given `key`
-     * is a valid key of the provided object `R`. If the key exists in the object, the type check passes.
-     * Otherwise, it throws an error.
-     */
     it('should not throw an error if the key exists in the object', () => {
       const obj = { a: 1, b: 2, c: 3 };
       expect(() => guardIsKeyOfObject(obj, 'a')).not.toThrow();

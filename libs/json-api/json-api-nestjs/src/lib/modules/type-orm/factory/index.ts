@@ -4,10 +4,6 @@ import { camelToKebab, ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 
 import {
-  CURRENT_DATA_SOURCE_TOKEN,
-  CURRENT_ENTITY_REPOSITORY,
-} from '../constants';
-import {
   CURRENT_ENTITY_MANAGER_TOKEN,
   FIND_ONE_ROW_ENTITY,
   CHECK_RELATION_NAME,
@@ -16,6 +12,8 @@ import {
   FIELD_FOR_ENTITY,
   RUN_IN_TRANSACTION_FUNCTION,
   GLOBAL_MODULE_OPTIONS_TOKEN,
+  CURRENT_DATA_SOURCE_TOKEN,
+  CURRENT_ENTITY_REPOSITORY,
 } from '../../../constants';
 import {
   EntityProps,
@@ -48,7 +46,7 @@ import {
 
 import { TypeOrmService, TypeormUtilsService } from '../service';
 import { getEntityName } from '../../mixin/helper';
-import { TypeOrmModule } from '@klerick/json-api-nestjs';
+import { TypeOrmJsonApiModule } from '../type-orm-json-api.module';
 import { TypeOrmParam } from '../type';
 
 export function CurrentDataSourceProvider(
@@ -69,6 +67,17 @@ export function CurrentEntityManager(): FactoryProvider<EntityManager> {
   };
 }
 
+export function CurrentEntityRepository<E extends ObjectLiteral>(
+  entity: E
+): FactoryProvider<Repository<E>> {
+  return {
+    provide: CURRENT_ENTITY_REPOSITORY,
+    useFactory: (entityManager: EntityManager) =>
+      entityManager.getRepository(entity as unknown as EntityTarget<E>),
+    inject: [CURRENT_ENTITY_MANAGER_TOKEN],
+  };
+}
+
 export function GetFieldForEntity<E extends ObjectLiteral>(): FactoryProvider<
   GetFieldForEntity<E>
 > {
@@ -78,17 +87,6 @@ export function GetFieldForEntity<E extends ObjectLiteral>(): FactoryProvider<
       return (entity: EntityTarget<E>) =>
         getField(entityManager.getRepository(entity));
     },
-    inject: [CURRENT_ENTITY_MANAGER_TOKEN],
-  };
-}
-
-export function CurrentEntityRepository<E extends ObjectLiteral>(
-  entity: E
-): FactoryProvider<Repository<E>> {
-  return {
-    provide: CURRENT_ENTITY_REPOSITORY,
-    useFactory: (entityManager: EntityManager) =>
-      entityManager.getRepository(entity as unknown as EntityTarget<E>),
     inject: [CURRENT_ENTITY_MANAGER_TOKEN],
   };
 }
@@ -177,7 +175,7 @@ export function RunInTransactionFactory(): FactoryProvider<RunInTransaction> {
     inject: [GLOBAL_MODULE_OPTIONS_TOKEN, CURRENT_DATA_SOURCE_TOKEN],
     useFactory(
       options: ResultGeneralParam & {
-        type: typeof TypeOrmModule;
+        type: typeof TypeOrmJsonApiModule;
         options: RequiredFromPartial<ConfigParam & TypeOrmParam>;
       },
       dataSource: DataSource

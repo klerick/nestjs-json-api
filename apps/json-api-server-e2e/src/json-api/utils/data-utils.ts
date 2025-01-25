@@ -1,4 +1,4 @@
-import { Users } from 'database';
+import { Users } from '@nestjs-json-api/typeorm-database';
 import { faker } from '@faker-js/faker';
 
 export const getUser = () => {

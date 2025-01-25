@@ -23,7 +23,7 @@ import { ObjectLiteral } from '../../../types';
 //   PostgresErrorCode,
 // } from '../../helper';
 // import { HttpException } from '@nestjs/common';
-
+// #TODO need implement
 @Injectable()
 export class ErrorInterceptors<E extends ObjectLiteral>
   implements NestInterceptor

@@ -1,3 +1,3 @@
 export type MicroOrmParam = {
-  // testParam: boolean;
+  arrayType?: string[];
 };

@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataSource, EntityTarget } from 'typeorm';
 import { EntityRelation } from '@klerick/json-api-nestjs-shared';
 
-import { CURRENT_DATA_SOURCE_TOKEN } from '../constants';
 import { ObjectLiteral as Entity } from '../../../types';
 import {
   ResultGetField,
@@ -10,6 +9,7 @@ import {
   TupleOfEntityRelation,
 } from '../../mixin/types';
 import { getField } from '../orm-helper';
+import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
 
 @Injectable()
 export class EntityPropsMapService {

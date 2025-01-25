@@ -25,9 +25,9 @@ import {
 } from '../../../types';
 
 import { PatchData, PostData, Query } from '../../mixin/zod';
-import { CURRENT_ENTITY_REPOSITORY } from '../constants';
 import { TupleOfEntityRelation, EntityRelation } from '../../mixin/types';
 import { getEntityName } from '../../mixin/helper';
+import { CURRENT_ENTITY_REPOSITORY } from '../../../constants';
 
 type RelationAlias<E> = {
   [K in TupleOfEntityRelation<E>[number]]: string;

@@ -1,2 +1,2 @@
-export * from './micro-orm.module';
+export * from './micro-orm-json-api.module';
 export * from './type';

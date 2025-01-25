@@ -1,5 +1,11 @@
 import { INestApplication } from '@nestjs/common';
-import { Addresses, CommentKind, Comments, Roles, Users } from 'database';
+import {
+  Addresses,
+  CommentKind,
+  Comments,
+  Roles,
+  Users,
+} from '@nestjs-json-api/typeorm-database';
 import { faker } from '@faker-js/faker';
 
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
