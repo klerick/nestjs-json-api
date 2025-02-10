@@ -18,6 +18,7 @@ export class QueryPipe<E extends ObjectLiteral>
 
   transform(value: InputQuery<E>): Query<E> {
     try {
+      console.log(JSON.stringify(value));
       return this.zodQuerySchema.parse(value);
     } catch (e) {
       if (e instanceof ZodError) {

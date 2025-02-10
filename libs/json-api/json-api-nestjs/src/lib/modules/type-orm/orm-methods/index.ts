@@ -7,15 +7,3 @@ export { getRelationship } from './get-relationship/get-relationship';
 export { postRelationship } from './post-relationship/post-relationship';
 export { deleteRelationship } from './delete-relationship/delete-relationship';
 export { patchRelationship } from './patch-relationship/patch-relationship';
-
-// export const MethodsService = {
-//   getAll,
-//   getOne,
-//   deleteOne,
-//   postOne,
-//   patchOne,
-//   getRelationship,
-//   postRelationship,
-//   deleteRelationship,
-//   patchRelationship,
-// };

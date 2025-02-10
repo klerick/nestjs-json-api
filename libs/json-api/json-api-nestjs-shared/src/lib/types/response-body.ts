@@ -5,6 +5,7 @@ import {
   TypeOfArray,
   ValueOf,
 } from '.';
+import { Collection } from '@mikro-orm/core';
 
 export type PageProps = {
   totalItems: number;
@@ -30,8 +31,14 @@ export type Attributes<D> = {
   [P in EntityProps<D>]?: D[P] extends EntityField ? D[P] : TypeOfArray<D[P]>;
 };
 
+export type DataResult<E, S = string> = E extends unknown[]
+  ? MainData<S>[]
+  : E extends Collection<any>
+  ? MainData<S>[]
+  : MainData<S> | null;
+
 export type Data<E, S = string> = {
-  data?: E extends unknown[] ? MainData<S>[] : MainData<S> | null;
+  data?: DataResult<E, S>;
 };
 
 export type Relationships<T> = {

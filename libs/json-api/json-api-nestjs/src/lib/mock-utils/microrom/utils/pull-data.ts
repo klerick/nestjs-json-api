@@ -38,7 +38,7 @@ export async function pullNote() {
 export async function pullRole() {
   const role = new Roles();
   role.key = faker.string.alphanumeric(5);
-  role.name = faker.string.alphanumeric(5);
+  role.name = faker.word.words();
   return role;
 }
 
@@ -104,6 +104,7 @@ export async function pullAllData(em: EntityManager) {
 
   managerUser.addresses = address2;
   managerUser.userGroup = userGroup3;
+  managerUser.roles.add(role1, role2);
 
   await em.persistAndFlush([
     user,

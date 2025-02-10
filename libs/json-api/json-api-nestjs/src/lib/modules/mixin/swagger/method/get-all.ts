@@ -3,24 +3,25 @@ import { Type } from '@nestjs/common';
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 
 import { EntityClass, ObjectLiteral } from '../../../../types';
-import { EntityProps, ZodParams } from '../../types';
-import { errorSchema, jsonSchemaResponse } from '../utils';
+import { ZodEntityProps } from '../../types';
+import { errorSchema, getEntityMapProps, jsonSchemaResponse } from '../utils';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
 
 export function getAll<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ): void {
-  const { entityFieldsStructure, entityRelationStructure, primaryColumn } =
-    zodParams;
-  const { field, relations } = entityFieldsStructure;
-
-  const relationTree = ObjectTyped.entries(entityRelationStructure).reduce(
-    (acum, [name, filed]) => {
-      acum.push(...filed.map((i) => `${name.toLocaleString()}.${i}`));
+  const { props, relations, relationProperty, primaryColumnName } =
+    getEntityMapProps(mapEntity, entity);
+  const entityRelationStructure = {} as any;
+  const relationTree = ObjectTyped.entries(relationProperty).reduce(
+    (acum, [name, props]) => {
+      const relMap = getEntityMapProps(mapEntity, props.entityClass);
+      acum.push(...relMap.props.map((i) => `${name.toLocaleString()}.${i}`));
+      entityRelationStructure[name] = relMap.props;
       return acum;
     },
     [] as string[]
@@ -44,7 +45,7 @@ export function getAll<E extends ObjectLiteral>(
         summary: 'Select all field',
         description: 'Select field for target and relation',
         value: {
-          target: field.join(','),
+          target: props.join(','),
           ...ObjectTyped.entries(entityRelationStructure).reduce(
             (acum, [name, props]) => {
               acum[name.toString()] = props.join(',');
@@ -58,7 +59,7 @@ export function getAll<E extends ObjectLiteral>(
         summary: 'Select ids for target',
         description: 'Select ids for target',
         value: {
-          target: field.filter((i) => i === primaryColumn).join(','),
+          target: props.filter((i) => i === primaryColumnName).join(','),
         },
       },
     },
@@ -77,10 +78,10 @@ export function getAll<E extends ObjectLiteral>(
         summary: 'Several conditional',
         description: 'Get if relation is not null',
         value: {
-          [field[0]]: {
+          [props[0]]: {
             in: '1,2,3',
           },
-          [field[1]]: {
+          [props[1]]: {
             lt: '1',
           },
           [relationTree[0]]: {
@@ -124,7 +125,7 @@ export function getAll<E extends ObjectLiteral>(
   let sortSeveral = {
     summary: 'Sort several field',
     description: 'Sort several field',
-    value: `${field[1]},-${field[0]}`,
+    value: `${props[1]},-${props[0]}`,
   };
 
   if (relations.length > 0) {
@@ -162,7 +163,7 @@ export function getAll<E extends ObjectLiteral>(
     sortSeveral = {
       summary: 'Sort several field with relation',
       description: 'Sort several field relation',
-      value: `${field[1]},-${relationTree[2]},${relationTree[1]},-${field[0]}`,
+      value: `${props[1]},-${relationTree[2]},${relationTree[1]},-${props[0]}`,
     };
   }
 
@@ -175,12 +176,12 @@ export function getAll<E extends ObjectLiteral>(
       sortAsc: {
         summary: 'Sort field by ASC',
         description: 'Sort field by ASC',
-        value: field[1],
+        value: props[1],
       },
       sortDesc: {
         summary: 'Sort field by DESC',
         description: 'Sort field by DESC',
-        value: `-${field[1]}`,
+        value: `-${props[1]}`,
       },
       sortAscRelation,
       sortDescRelation,
@@ -221,6 +222,6 @@ export function getAll<E extends ObjectLiteral>(
   ApiResponse({
     status: 200,
     description: 'Resource list received successfully',
-    schema: jsonSchemaResponse(entity, zodParams, true),
+    schema: jsonSchemaResponse(entity, mapEntity, true),
   })(controller, methodName, descriptor);
 }

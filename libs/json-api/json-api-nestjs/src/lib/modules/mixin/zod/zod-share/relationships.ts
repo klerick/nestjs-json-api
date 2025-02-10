@@ -15,6 +15,7 @@ import {
 } from '../../types';
 import { zodRelData } from './rel-data';
 import { nonEmptyObject } from '../zod-utils';
+import { Users } from '../../../../mock-utils/microrom';
 
 function getZodRuleForData<
   K extends string,
@@ -155,3 +156,6 @@ export type Relationships<
   T extends ObjectLiteral,
   K extends true | false = false
 > = z.infer<ZodRelationships<T, K>>;
+
+const tmp = {} as Relationships<Users>;
+const r = tmp.roles;

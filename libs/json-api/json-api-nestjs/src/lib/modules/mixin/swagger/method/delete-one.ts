@@ -1,24 +1,25 @@
-import { EntityClass, EntityTarget, ObjectLiteral } from '../../../../types';
 import { Type } from '@nestjs/common';
-import { EntityProps, TypeField, ZodParams } from '../../types';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { errorSchema } from '../utils';
+
+import { TypeField, ZodEntityProps } from '../../types';
+import { EntityClass, ObjectLiteral } from '../../../../types';
+import { errorSchema, getEntityMapProps } from '../utils';
 
 export function deleteOne<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const { typeId } = zodParams;
+  const { primaryColumnType } = getEntityMapProps(mapEntity, entity);
 
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

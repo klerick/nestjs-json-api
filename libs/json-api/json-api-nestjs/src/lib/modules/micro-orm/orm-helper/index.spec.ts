@@ -1,26 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  MetadataStorage,
-  EntityManager,
-  Collection,
-  MikroORM,
-} from '@mikro-orm/core';
-import {
-  EntityProps,
-  EntityRelation,
-  ObjectTyped,
-} from '@klerick/json-api-nestjs-shared';
-import { IMemoryDb } from 'pg-mem';
+import { MetadataStorage, MikroORM } from '@mikro-orm/core';
 
-import { createAndPullSchemaBase } from '../../../mock-utils';
 import {
-  mockDBTestModule,
   Users,
-  pullAllData,
-  pullUser,
   Addresses,
   Notes,
   Roles,
+  dbRandomName,
+  mockDbPgLiteTestModule,
+  Comments,
+  UserGroups,
 } from '../../../mock-utils/microrom';
 import {
   CurrentMicroOrmProvider,
@@ -30,35 +19,27 @@ import {
 
 import { DEFAULT_ARRAY_TYPE, ENTITY_METADATA_TOKEN } from '../constants';
 
+import { TypeField } from '../../mixin/types';
+
 import {
-  getField,
-  getPropsTreeForRepository,
-  getArrayPropsForEntity,
-  getArrayFields,
-  getFieldWithType,
-  getTypeForAllProps,
-  getRelationTypeArray,
-  getTypePrimaryColumn,
-  getPropsFromDb,
-  getRelationTypeName,
-  getRelationTypePrimaryColumn,
+  getProps,
+  getPropsType,
+  getPropsNullable,
+  getPrimaryColumnName,
+  getPrimaryColumnType,
+  getRelation,
+  getRelationProperty,
 } from './';
-import { CURRENT_ENTITY_MANAGER_TOKEN } from '../../../constants';
 
-import { ArrayPropsForEntity, PropsArray, TypeField } from '../../mixin/types';
-
-describe('microorm-orm-helper', () => {
-  let db: IMemoryDb;
+describe('microorm-orm-helper-for-map', () => {
   let entityMetadataToken: MetadataStorage;
-  let em: EntityManager;
-  let user: Users;
-  let userWithRelation: Users;
   let mikroORM: MikroORM;
+  let dbName: string;
   const config = DEFAULT_ARRAY_TYPE;
   beforeAll(async () => {
-    db = createAndPullSchemaBase();
+    dbName = dbRandomName(true);
     const module: TestingModule = await Test.createTestingModule({
-      imports: [mockDBTestModule(db)],
+      imports: [mockDbPgLiteTestModule(dbName)],
       providers: [
         CurrentMicroOrmProvider(),
         CurrentEntityManager(),
@@ -67,199 +48,130 @@ describe('microorm-orm-helper', () => {
     }).compile();
 
     entityMetadataToken = module.get(ENTITY_METADATA_TOKEN);
-    em = module.get(CURRENT_ENTITY_MANAGER_TOKEN);
-    mikroORM = module.get(MikroORM);
-    user = await pullUser();
-    const { roles, comments, notes, ...other } = user;
-    user = other as Users;
-    user.id = 1;
 
-    userWithRelation = await pullAllData(em);
+    mikroORM = module.get(MikroORM);
   });
 
   afterAll(() => {
     mikroORM.close(true);
   });
 
-  it('getField', async () => {
-    const { field, relations } = getField(entityMetadataToken.get(Users));
+  it('getProps', () => {
+    const result = getProps(entityMetadataToken.get(Users));
+    expect(result.includes('id')).toBe(true);
+    expect(result.includes('lastName')).toBe(true);
+    expect(result.includes('createdAt')).toBe(true);
+    expect(result.includes('updatedAt')).toBe(true);
+    expect(result.includes('isActive')).toBe(true);
+    expect(result.includes('login')).toBe(true);
+    expect(result.includes('firstName')).toBe(true);
+    expect(result.includes('testReal')).toBe(true);
+    expect(result.includes('testArrayNull')).toBe(true);
+    expect(result.includes('testDate')).toBe(true);
 
-    const userFieldProps = Object.getOwnPropertyNames(
-      user
-    ) as EntityProps<Users>[];
-    const hasUserFieldInResultField = userFieldProps.some(
-      (field) => !field.includes(field)
-    );
-
-    const hasResultInUserField = field.some(
-      (field) => !userFieldProps.includes(field)
-    );
-
-    const userRelationProps: EntityRelation<Users>[] = (
-      Object.getOwnPropertyNames(userWithRelation) as (EntityProps<Users> &
-        EntityRelation<Users>)[]
-    )
-      .filter((props) => !userFieldProps.includes(props))
-      .filter((i) => i !== '__helper' && i !== '__gettersDefined');
-
-    const hasUserRelationInResultField = userRelationProps.some(
-      (field) => !relations.includes(field)
-    );
-
-    const hasResultInUserRelation = relations.some(
-      (field) => !userRelationProps.includes(field)
-    );
-
-    expect(hasUserFieldInResultField).toEqual(false);
-    expect(hasResultInUserField).toEqual(false);
-
-    expect(hasUserRelationInResultField).toEqual(false);
-    expect(hasResultInUserRelation).toEqual(false);
+    expect(result.includes('userGroup' as any)).toBe(false);
+    expect(result.includes('notes' as any)).toBe(false);
+    expect(result.includes('comments' as any)).toBe(false);
+    expect(result.includes('roles' as any)).toBe(false);
+    expect(result.includes('manager' as any)).toBe(false);
+    expect(result.includes('addresses' as any)).toBe(false);
   });
 
-  it('getPropsTreeForRepository', () => {
-    const relationField = getPropsTreeForRepository(entityMetadataToken, Users);
-    const userFieldProps = Object.getOwnPropertyNames(
-      user
-    ) as EntityProps<Users>[];
+  it('getPropsType', () => {
+    const result = getPropsType(entityMetadataToken.get(Users), config);
 
-    const userRelationProps: EntityRelation<Users>[] = (
-      Object.getOwnPropertyNames(userWithRelation) as (EntityProps<Users> &
-        EntityRelation<Users>)[]
-    )
-      .filter((props) => !userFieldProps.includes(props))
-      .filter((i) => i !== '__helper' && i !== '__gettersDefined');
-
-    const hasUserRelationInResultField = userRelationProps.some(
-      (field) => !Object.keys(relationField).includes(field)
-    );
-    const hasResultInUserRelation = ObjectTyped.keys(relationField).some(
-      (field) => !userRelationProps.includes(field)
-    );
-    expect(hasUserRelationInResultField).toEqual(false);
-    expect(hasResultInUserRelation).toEqual(false);
-
-    for (const [relationName, fieldsRelation] of ObjectTyped.entries(
-      relationField
-    )) {
-      const check = fieldsRelation.some((field) => {
-        const targetItem = userWithRelation[relationName];
-        const target =
-          targetItem instanceof Collection
-            ? targetItem.getItems().at(0)
-            : targetItem;
-        if (!target) return true;
-
-        // @ts-ignore
-        return !ObjectTyped.keys(target).includes(field);
-      });
-      expect(check).toEqual(false);
-    }
+    expect(result).toEqual({
+      createdAt: 'date',
+      firstName: 'string',
+      id: 'number',
+      isActive: 'boolean',
+      lastName: 'string',
+      login: 'string',
+      testArrayNull: 'array',
+      testDate: 'date',
+      testReal: 'array',
+      updatedAt: 'date',
+    });
   });
 
-  it('getArrayPropsForEntity', () => {
-    const result = getArrayPropsForEntity(entityMetadataToken, Users, config);
-    const check: ArrayPropsForEntity<Users> = {
-      target: {
-        testReal: true,
-        testArrayNull: true,
+  it('getPropsNullable', () => {
+    const result = getPropsNullable(entityMetadataToken.get(Users));
+    expect(result).toEqual([
+      'firstName',
+      'testReal',
+      'testArrayNull',
+      'lastName',
+      'isActive',
+      'testDate',
+      'createdAt',
+      'updatedAt',
+    ]);
+  });
+
+  it('getPrimaryColumnName', () => {
+    const result = getPrimaryColumnName(entityMetadataToken.get(Users));
+    expect(result).toBe('id');
+  });
+
+  it('getPrimaryColumnType', () => {
+    const result = getPrimaryColumnType(entityMetadataToken.get(Users));
+    expect(result).toBe(TypeField.number);
+  });
+
+  it('getRelation', () => {
+    const result = getRelation(entityMetadataToken.get(Users));
+    expect(result.includes('id' as any)).toBe(false);
+    expect(result.includes('lastName' as any)).toBe(false);
+    expect(result.includes('createdAt' as any)).toBe(false);
+    expect(result.includes('updatedAt' as any)).toBe(false);
+    expect(result.includes('isActive' as any)).toBe(false);
+    expect(result.includes('login' as any)).toBe(false);
+    expect(result.includes('firstName' as any)).toBe(false);
+    expect(result.includes('testReal' as any)).toBe(false);
+    expect(result.includes('testArrayNull' as any)).toBe(false);
+    expect(result.includes('testDate' as any)).toBe(false);
+
+    expect(result.includes('userGroup')).toBe(true);
+    expect(result.includes('notes')).toBe(true);
+    expect(result.includes('comments')).toBe(true);
+    expect(result.includes('roles')).toBe(true);
+    expect(result.includes('manager')).toBe(true);
+    expect(result.includes('addresses')).toBe(true);
+  });
+
+  it('getRelationProperty', () => {
+    const result = getRelationProperty(entityMetadataToken.get(Users));
+    expect(result).toEqual({
+      addresses: {
+        entityClass: Addresses,
+        isArray: false,
+        nullable: true,
+      },
+      comments: {
+        entityClass: Comments,
+        isArray: true,
+        nullable: false,
       },
       manager: {
-        testReal: true,
-        testArrayNull: true,
+        entityClass: Users,
+        isArray: false,
+        nullable: true,
       },
-      comments: {},
-      notes: {},
-      userGroup: {},
-      roles: {},
-      addresses: {
-        arrayField: true,
+      notes: {
+        entityClass: Notes,
+        isArray: true,
+        nullable: false,
       },
-    };
-    expect(result).toEqual(check);
-  });
-
-  it('getArrayFields', () => {
-    const result = getArrayFields(entityMetadataToken.get(Addresses), config);
-    expect(result).toEqual({
-      arrayField: true,
-    } as PropsArray<Addresses>);
-  });
-
-  it('getFieldWithType', () => {
-    const result = getFieldWithType(entityMetadataToken.get(Addresses), config);
-    expect(result.arrayField).toBe('array');
-    expect(result.state).toBe('string');
-    expect(result.id).toBe('number');
-    expect(result.createdAt).toBe('date');
-    const result2 = getFieldWithType(entityMetadataToken.get(Users), config);
-
-    expect(result2.isActive).toBe('boolean');
-  });
-
-  it('getTypeForAllProps', () => {
-    const result = getTypeForAllProps(entityMetadataToken, Users, config);
-    expect(result.manager.id).toBe(TypeField.number);
-    expect(result.testDate).toBe(TypeField.date);
-    // @ts-ignore
-    expect(result.comments.id).toBe(TypeField.number);
-    // @ts-ignore
-    expect(result.notes.id).toBe(TypeField.string);
-  });
-
-  it('getRelationType', () => {
-    const result = getRelationTypeArray(entityMetadataToken.get(Users));
-    expect(result.roles).toBe(true);
-    expect(result.comments).toBe(true);
-    expect(result.manager).toBe(false);
-    expect(result.addresses).toBe(false);
-    expect(result.userGroup).toBe(false);
-    expect(result.notes).toBe(true);
-  });
-
-  it('getTypePrimaryColumn', () => {
-    expect(getTypePrimaryColumn(entityMetadataToken.get(Users))).toBe(
-      TypeField.number
-    );
-    expect(getTypePrimaryColumn(entityMetadataToken.get(Notes))).toBe(
-      TypeField.string
-    );
-  });
-
-  it('getPropsFromDb', () => {
-    const result = getPropsFromDb(entityMetadataToken.get(Users), config);
-    // testReal has isNullable false but have default should be true
-    expect(result['testReal']).toEqual({
-      type: 'real',
-      isArray: true,
-      isNullable: true,
+      roles: {
+        entityClass: Roles,
+        isArray: true,
+        nullable: false,
+      },
+      userGroup: {
+        entityClass: UserGroups,
+        isArray: false,
+        nullable: true,
+      },
     });
-
-    const result2 = getPropsFromDb(entityMetadataToken.get(Roles), config);
-    expect(result2['key']).toEqual({
-      type: 'varchar',
-      isArray: false,
-      isNullable: false,
-    });
-  });
-
-  it('getRelationTypeName', () => {
-    const result = getRelationTypeName(entityMetadataToken.get(Users));
-    expect(result.roles).toBe('Roles');
-    expect(result.comments).toBe('Comments');
-    expect(result.manager).toBe('Users');
-    expect(result.addresses).toBe('Addresses');
-    expect(result.userGroup).toBe('UserGroups');
-    expect(result.notes).toBe('Notes');
-  });
-
-  it('getRelationTypePrimaryColumn', () => {
-    const result = getRelationTypePrimaryColumn(entityMetadataToken, Users);
-    expect(result.roles).toBe(TypeField.number);
-    expect(result.comments).toBe(TypeField.number);
-    expect(result.manager).toBe(TypeField.number);
-    expect(result.addresses).toBe(TypeField.number);
-    expect(result.userGroup).toBe(TypeField.number);
-    expect(result.notes).toBe(TypeField.string);
   });
 });

@@ -8,11 +8,11 @@ import {
   CurrentEntityMetadata,
   CurrentEntityRepository,
   CurrentMicroOrmProvider,
-  GetFieldForEntity,
   OrmServiceFactory,
   RunInTransactionFactory,
-  ZodParamsFactory,
+  EntityPropsMap,
 } from './factory';
+import { MicroOrmUtilService } from './service/micro-orm-util.service';
 
 export class MicroOrmJsonApiModule {
   static module = 'microOrm' as const;
@@ -32,8 +32,9 @@ export class MicroOrmJsonApiModule {
       optionProvider,
       CurrentMicroOrmProvider(options.connectionName),
       CurrentEntityManager(),
-      GetFieldForEntity(),
+      CurrentEntityMetadata(),
       RunInTransactionFactory(),
+      EntityPropsMap(options.entities),
     ];
 
     const currentImport = [microOrmModule, ...(options.imports || [])];
@@ -49,9 +50,8 @@ export class MicroOrmJsonApiModule {
   static getUtilProviders(entity: ObjectLiteral): NestProvider {
     return [
       CurrentEntityRepository(entity),
-      CurrentEntityMetadata(),
-      ZodParamsFactory(entity as any),
       OrmServiceFactory(),
+      MicroOrmUtilService,
     ];
   }
 }

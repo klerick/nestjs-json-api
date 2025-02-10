@@ -46,14 +46,14 @@ describe('zodFilterInputQuery', () => {
     const schema = zodFilterInputQuery(userFields, userRelations);
     const input = {
       invalidField: { eq: 'should be ignored' },
-      login: { eq: 'johndoe' },
+      login: { eq: 'johndoe', gte: '123' },
     };
 
     const result = schema.parse(input);
 
     expect(result).toEqual({
       relation: null,
-      target: { login: { eq: 'johndoe' } },
+      target: { login: { eq: 'johndoe', gte: '123' } },
     });
   });
 

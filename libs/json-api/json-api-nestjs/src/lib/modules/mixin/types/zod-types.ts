@@ -15,6 +15,7 @@ import {
   ObjectLiteral as Entity,
   ObjectLiteral,
 } from '../../../types';
+import { Collection } from '@mikro-orm/core';
 
 export enum PropsNameResultField {
   field = 'field',
@@ -131,7 +132,11 @@ export type PropsFieldItem = {
 };
 
 export type RelationPropsArray<E extends Entity> = {
-  [K in EntityRelation<E>]: E[K] extends unknown[] ? true : false;
+  [K in EntityRelation<E>]: E[K] extends unknown[]
+    ? true
+    : E[K] extends Collection<TypeOfArray<E[K]>>
+    ? true
+    : false;
 };
 
 export type RelationPropsTypeName<E extends Entity> = {
@@ -140,4 +145,35 @@ export type RelationPropsTypeName<E extends Entity> = {
 
 export type RelationPrimaryColumnType<E extends Entity> = {
   [K in EntityRelation<E>]: TypeForId;
+};
+
+export type FilterNullableProps<
+  T,
+  Props extends readonly (keyof T)[]
+> = Props extends [infer Head, ...infer Tail]
+  ? Head extends keyof T
+    ? null extends T[Head]
+      ? [Head, ...FilterNullableProps<T, Tail extends (keyof T)[] ? Tail : []>]
+      : FilterNullableProps<T, Tail extends (keyof T)[] ? Tail : []>
+    : FilterNullableProps<T, Tail extends (keyof T)[] ? Tail : []>
+  : [];
+
+export type RelationProperty<E extends Entity> = {
+  [K in TupleOfEntityRelation<E>[number]]: {
+    entityClass: TypeOfArray<CastProps<E, K>>;
+    nullable: [Extract<E[K], null>] extends [never] ? false : true;
+    isArray: E[K] extends unknown[] ? true : false;
+  };
+};
+
+export type ZodEntityProps<E extends Entity, I = string> = {
+  props: TupleOfEntityProps<E>;
+  propsType: FieldWithType<E>;
+  propsNullable: FilterNullableProps<E, TupleOfEntityProps<E>>;
+  primaryColumnName: I;
+  primaryColumnType: TypeForId;
+  typeName: string;
+  className: string;
+  relations: TupleOfEntityRelation<E>;
+  relationProperty: RelationProperty<E>;
 };

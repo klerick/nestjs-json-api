@@ -11,11 +11,17 @@ import {
   JSON_API_CONTROLLER_POSTFIX,
   JSON_API_DECORATOR_ENTITY,
   PARAMS_FOR_ZOD_SCHEMA,
+  ENTITY_MAP_PROPS,
 } from '../../../constants';
 import { getProviderName, nameIt } from '../helper';
 import { JsonBaseController } from '../controller/json-base.controller';
 import { EntityClass, ObjectLiteral } from '../../../types';
-import { DecoratorOptions, EntityProps, ZodParams } from '../types';
+import {
+  DecoratorOptions,
+  EntityProps,
+  ZodEntityProps,
+  ZodParams,
+} from '../types';
 import { FilterOperand } from './filter-operand-model';
 import { createApiModels } from './utils';
 import { Bindings } from '../config/bindings';
@@ -29,10 +35,10 @@ export class SwaggerBindService<E extends ObjectLiteral>
   @Inject(CURRENT_ENTITY) private entity!: EntityClass<E>;
   @Inject(DiscoveryService) private discoveryService!: DiscoveryService;
   @Inject(CONTROL_OPTIONS_TOKEN) private config!: DecoratorOptions;
-  @Inject(PARAMS_FOR_ZOD_SCHEMA) private zodParams!: ZodParams<
-    E,
-    EntityProps<E>,
-    string
+
+  @Inject(ENTITY_MAP_PROPS) private mapEntity!: Map<
+    EntityClass<E>,
+    ZodEntityProps<E>
   >;
 
   onModuleInit(): any {
@@ -58,6 +64,11 @@ export class SwaggerBindService<E extends ObjectLiteral>
       );
     if (!controllerInst)
       throw new Error(`Controller for ${this.entity.name} is empty`);
+
+    const mapProps = this.mapEntity.get(this.entity);
+    if (!mapProps)
+      throw new Error(`ZodEntityProps for ${this.entity.name} is empty`);
+
     const controller = controllerInst.instance.constructor;
     const apiTag = Reflect.getMetadata(DECORATORS.API_TAGS, controller);
     if (!apiTag) {
@@ -67,7 +78,7 @@ export class SwaggerBindService<E extends ObjectLiteral>
     ApiTags(this.entity.name)(controller);
 
     ApiExtraModels(FilterOperand)(controller);
-    ApiExtraModels(createApiModels(this.entity, this.zodParams))(controller);
+    ApiExtraModels(createApiModels(this.entity, mapProps))(controller);
 
     const { allowMethod = ObjectTyped.keys(Bindings) } = this.config;
     for (const method of ObjectTyped.keys(Bindings)) {
@@ -88,7 +99,7 @@ export class SwaggerBindService<E extends ObjectLiteral>
         controller.prototype,
         descriptor,
         this.entity,
-        this.zodParams,
+        this.mapEntity,
         method
       );
 

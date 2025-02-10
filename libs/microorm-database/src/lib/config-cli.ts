@@ -19,8 +19,8 @@ const pgSqlOptions: PgOptions = {
 };
 
 const config: Options = {
-  // dbName: process.env['DB_NAME'],
-  dbName: 'microorm-test',
+  dbName: process.env['DB_NAME'],
+  // dbName: 'microorm-test',
   host: process.env['DB_HOST'],
   port: parseInt(`${process.env['DB_PORT']}`, 10),
   user: process.env['DB_USERNAME'],

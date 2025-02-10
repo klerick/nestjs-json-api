@@ -2,6 +2,33 @@ import { DataType, IMemoryDb, newDb } from 'pg-mem';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { v4 } from 'uuid';
+// @ts-ignore
+import type { PGlite } from '@electric-sql/pglite';
+
+export async function createAndPullSchemaBasePgLite(): Promise<PGlite> {
+  const db = await Promise.all([
+    import('@electric-sql/pglite'),
+    // @ts-ignore
+    import('@electric-sql/pglite/contrib/uuid_ossp'),
+  ]).then(
+    ([{ PGlite }, { uuid_ossp }]) =>
+      new PGlite({
+        extensions: { uuid_ossp },
+        database: 'pgLite',
+        username: 'postgres',
+      })
+  );
+
+  // await db.exec(
+  //   'CREATE SCHEMA IF NOT EXISTS public; SET search_path TO public;'
+  // );
+
+  // const dump = readFileSync(join(__dirname, 'db-for-test'), {
+  //   encoding: 'utf8',
+  // });
+  // await db.exec(dump);
+  return db;
+}
 
 export function createAndPullSchemaBase(): IMemoryDb {
   const dump = readFileSync(join(__dirname, 'db-for-test'), {

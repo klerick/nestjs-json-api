@@ -6,6 +6,7 @@ import {
   OneToOne,
   Collection,
   OneToMany,
+  ArrayType,
 } from '@mikro-orm/core';
 
 import { Roles, Addresses, IAddresses, Comments, BookList } from './';
@@ -22,10 +23,11 @@ export class Users {
   public id!: number;
 
   @Property({
-    type: 'varchar',
+    // type: 'varchar',
     length: 100,
     nullable: false,
     unique: true,
+    type: new ArrayType((i) => parseFloat(i)),
   })
   public login!: string;
 

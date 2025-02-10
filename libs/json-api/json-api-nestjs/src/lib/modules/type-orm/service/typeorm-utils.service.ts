@@ -15,15 +15,13 @@ import {
   FilterOperand,
 } from '@klerick/json-api-nestjs-shared';
 
+import { ObjectLiteral, ValidateQueryError } from '../../../types';
 import {
-  ObjectLiteral,
   EXPRESSION,
   OperandMapExpressionForNull,
   OperandsMapExpression,
   OperandsMapExpressionForNullRelation,
-  ValidateQueryError,
-} from '../../../types';
-
+} from '../type';
 import { PatchData, PostData, Query } from '../../mixin/zod';
 import { TupleOfEntityRelation, EntityRelation } from '../../mixin/types';
 import { getEntityName } from '../../mixin/helper';

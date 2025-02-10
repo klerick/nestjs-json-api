@@ -14,11 +14,16 @@ import {
   ZodUpdate,
 } from './zod-helper';
 import { Users } from '../../../../mock-utils/typeorm';
-import { FIELD_FOR_ENTITY } from '../../../../constants';
+import { ENTITY_MAP_PROPS, FIELD_FOR_ENTITY } from '../../../../constants';
 import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
 import { MapController } from '../../types';
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
-import { GetFieldForEntity, TupleOfEntityRelation } from '../../../mixin/types';
+import {
+  GetFieldForEntity,
+  TupleOfEntityRelation,
+  ZodEntityProps,
+} from '../../../mixin/types';
+import { EntityClass } from '../../../../types';
 
 describe('ZodHelperSpec', () => {
   afterEach(() => {
@@ -444,26 +449,34 @@ describe('ZodHelperSpec', () => {
     });
   });
   describe('zodInputOperation', () => {
-    let getField: GetFieldForEntity<Users>;
+    let getField: Map<EntityClass<any>, ZodEntityProps<any>>;
     beforeAll(async () => {
       const module: TestingModule = await Test.createTestingModule({
         providers: [
           {
-            provide: FIELD_FOR_ENTITY,
-            useValue: () => ({
-              relations: [
-                'userGroup',
-                'notes',
-                'comments',
-                'roles',
-                'manager',
-                'addresses',
+            provide: ENTITY_MAP_PROPS,
+            useValue: new Map([
+              [
+                Users,
+                {
+                  relations: [
+                    'userGroup',
+                    'notes',
+                    'comments',
+                    'roles',
+                    'manager',
+                    'addresses',
+                  ],
+                },
               ],
-            }),
+            ]),
           },
         ],
       }).compile();
-      getField = module.get<GetFieldForEntity<Users>>(FIELD_FOR_ENTITY);
+      getField =
+        module.get<Map<EntityClass<any>, ZodEntityProps<any>>>(
+          ENTITY_MAP_PROPS
+        );
     });
 
     it('should be correct', () => {

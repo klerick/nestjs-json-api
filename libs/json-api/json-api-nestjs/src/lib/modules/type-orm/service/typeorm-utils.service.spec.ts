@@ -1,6 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IMemoryDb } from 'pg-mem';
 import { getDataSourceToken } from '@nestjs/typeorm';
+import { QueryField, FilterOperand } from '@klerick/json-api-nestjs-shared';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { IMemoryDb } from 'pg-mem';
 import { Repository } from 'typeorm';
 
 import {
@@ -26,17 +32,8 @@ import {
 } from '../../../constants';
 import { TypeormUtilsService } from './typeorm-utils.service';
 import { PostData, PostRelationshipData, Query } from '../../mixin/zod';
-import { QueryField, FilterOperand } from '@klerick/json-api-nestjs-shared';
-import {
-  EXPRESSION,
-  OperandsMapExpression,
-  ObjectLiteral as Entity,
-} from '../../../types';
-import {
-  BadRequestException,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { EXPRESSION, OperandsMapExpression } from '../type';
+import { ObjectLiteral as Entity } from '../../../types';
 import { createAndPullSchemaBase } from '../../../mock-utils';
 
 function getDefaultQuery<R extends Entity>() {
@@ -653,7 +650,7 @@ describe('TypeormUtilsService', () => {
       };
       const managerData = {
         type: 'users',
-        id: usersData.manager.id.toString(),
+        id: usersData.manager?.id.toString(),
       };
       const emptyRoles: { id: string; type: string }[] = [];
       const emptyManager = null;

@@ -13,9 +13,13 @@ import { camelToKebab } from '@klerick/json-api-nestjs-shared';
 
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
 import { MapController } from '../../types';
-import { GetFieldForEntity, TupleOfEntityRelation } from '../../../mixin/types';
+import {
+  GetFieldForEntity,
+  TupleOfEntityRelation,
+  ZodEntityProps,
+} from '../../../mixin/types';
 import { getEntityName } from '../../../mixin/helper';
-import { ObjectLiteral } from '../../../../types';
+import { EntityClass, ObjectLiteral } from '../../../../types';
 
 export enum Operation {
   add = 'add',
@@ -131,7 +135,7 @@ export type InputArray = z.infer<ZodInputArray>;
 
 export function zodInputOperation<E extends ObjectLiteral>(
   mapController: MapController<E>,
-  getField: GetFieldForEntity<E>
+  entityMapProps: Map<EntityClass<E>, ZodEntityProps<E>>
 ) {
   const array = [] as unknown as [
     ZodAdd<string>,
@@ -143,7 +147,10 @@ export function zodInputOperation<E extends ObjectLiteral>(
   ];
   for (const [entity, controller] of mapController.entries()) {
     const typeName = camelToKebab(getEntityName(entity));
-    const { relations } = getField(entity);
+    const entityMap = entityMapProps.get(entity as any);
+    if (!entityMap) throw new Error('Entity not found in map');
+
+    const { relations } = entityMap;
 
     const hasOwnProperty = (props: string) =>
       Object.prototype.hasOwnProperty.call(controller.prototype, props);

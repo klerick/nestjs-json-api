@@ -1,25 +1,36 @@
-import { EntityClass, EntityTarget, ObjectLiteral } from '../../../../types';
-import { Type } from '@nestjs/common';
-import { EntityProps, TypeField, ZodParams } from '../../types';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { errorSchema, jsonSchemaResponse } from '../utils';
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { Type } from '@nestjs/common';
+
+import { TypeField, ZodEntityProps } from '../../types';
+import { errorSchema, getEntityMapProps, jsonSchemaResponse } from '../utils';
+import { EntityClass, ObjectLiteral } from '../../../../types';
 
 export function getOne<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
+
   const {
-    entityFieldsStructure,
-    entityRelationStructure,
-    primaryColumn,
-    typeId,
-  } = zodParams;
-  const { field, relations } = entityFieldsStructure;
+    props,
+    relations,
+    relationProperty,
+    primaryColumnName,
+    primaryColumnType,
+  } = getEntityMapProps(mapEntity, entity);
+
+  const entityRelationStructure = ObjectTyped.entries(relationProperty).reduce(
+    (acum, [name, props]) => {
+      const relMap = getEntityMapProps(mapEntity, props.entityClass);
+      acum[name] = relMap.props;
+      return acum;
+    },
+    {} as any
+  );
 
   ApiOperation({
     summary: `Get one item of resource "${entityName}"`,
@@ -29,7 +40,7 @@ export function getOne<E extends ObjectLiteral>(
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 
@@ -45,7 +56,7 @@ export function getOne<E extends ObjectLiteral>(
         summary: 'Select all field',
         description: 'Select field for target and relation',
         value: {
-          target: field.join(','),
+          target: props.join(','),
           ...ObjectTyped.entries(entityRelationStructure).reduce(
             (acum, [name, props]) => {
               acum[name.toString()] = props.join(',');
@@ -59,7 +70,7 @@ export function getOne<E extends ObjectLiteral>(
         summary: 'Select ids for target',
         description: 'Select ids for target',
         value: {
-          target: field.filter((i) => i === primaryColumn).join(','),
+          target: props.filter((i) => i === primaryColumnName).join(','),
         },
       },
     },
@@ -103,6 +114,6 @@ export function getOne<E extends ObjectLiteral>(
   ApiResponse({
     status: 200,
     description: 'Resource one item received successfully',
-    schema: jsonSchemaResponse(entity, zodParams),
+    schema: jsonSchemaResponse(entity, mapEntity),
   })(controller, methodName, descriptor);
 }

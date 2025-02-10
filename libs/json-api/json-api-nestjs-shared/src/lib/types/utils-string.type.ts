@@ -1,3 +1,5 @@
+import type { Collection } from '@mikro-orm/core';
+
 export type KebabCase<S> = S extends `${infer C}${infer T}`
   ? KebabCase<T> extends infer U
     ? U extends string
@@ -15,6 +17,10 @@ export type KebabToCamelCase<S extends string> =
     ? `${Capitalize<T>}${Capitalize<KebabToCamelCase<U>>}`
     : S;
 
-export type TypeOfArray<T> = T extends (infer U)[] ? U : T;
+export type TypeOfArray<T> = T extends (infer U)[]
+  ? U
+  : T extends Collection<infer U>
+  ? U
+  : T;
 
 export type ValueOf<T> = T[keyof T];

@@ -7,28 +7,30 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { generateSchema } from '@anatine/zod-openapi';
 
 import { EntityClass, ObjectLiteral } from '../../../../types';
-import { EntityProps, TypeField, ZodParams } from '../../types';
+import { TypeField, ZodEntityProps } from '../../types';
 import { errorSchema, jsonSchemaResponse } from '../utils';
 import { zodPatch } from '../../zod';
+import { getParamsForOatchANdPostZod } from '../../factory';
 
 export function patchOne<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
+
   const {
-    typeId,
+    primaryColumnType,
     typeName,
     fieldWithType,
     propsDb,
-    primaryColumn,
+    primaryColumnName,
     relationArrayProps,
     relationPopsName,
-    primaryColumnType,
-  } = zodParams;
+    primaryColumnTypeForRel,
+  } = getParamsForOatchANdPostZod<E>(mapEntity, entity);
 
   ApiOperation({
     summary: `Update item of resource "${entityName}"`,
@@ -38,7 +40,7 @@ export function patchOne<E extends ObjectLiteral>(
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 
@@ -46,14 +48,14 @@ export function patchOne<E extends ObjectLiteral>(
     description: `Json api schema for update "${entityName}" item`,
     schema: generateSchema(
       zodPatch(
-        typeId,
+        primaryColumnType,
         typeName,
         fieldWithType,
         propsDb,
-        primaryColumn,
+        primaryColumnName,
         relationArrayProps,
         relationPopsName,
-        primaryColumnType
+        primaryColumnTypeForRel
       )
     ) as SchemaObject | ReferenceObject,
     required: true,
@@ -62,7 +64,7 @@ export function patchOne<E extends ObjectLiteral>(
   ApiResponse({
     status: 200,
     description: `Item of resource "${entityName}" has been updated`,
-    schema: jsonSchemaResponse(entity, zodParams),
+    schema: jsonSchemaResponse(entity, mapEntity),
   })(controller, methodName, descriptor);
 
   ApiResponse({

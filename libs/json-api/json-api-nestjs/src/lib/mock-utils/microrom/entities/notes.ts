@@ -8,7 +8,7 @@ import { Users, IUsers } from './index';
 export class Notes {
   @PrimaryKey({
     type: 'uuid',
-    defaultRaw: 'uuid_generate_v4()',
+    defaultRaw: 'gen_random_uuid()',
   })
   public id!: string;
 

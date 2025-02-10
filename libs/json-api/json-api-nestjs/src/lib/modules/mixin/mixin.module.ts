@@ -23,6 +23,7 @@ import {
   ZodInputPostRelationshipSchema,
 } from './factory';
 import { SwaggerBindService } from './swagger';
+import { JsonApiTransformerService } from './service/json-api-transformer.service';
 
 export class MixinModule {
   static forRoot(options: MixinOptions): DynamicModule {
@@ -71,11 +72,12 @@ export class MixinModule {
         currentEntityProvider,
         findOneRowEntityProvider,
         checkRelationNameProvider,
+        JsonApiTransformerService,
         ...ormModule.getUtilProviders(entity),
-        ZodInputQuerySchema(),
-        ZodQuerySchema(),
-        ZodPatchSchema(),
-        ZodPostSchema(),
+        ZodInputQuerySchema(entity),
+        ZodQuerySchema(entity),
+        ZodPatchSchema(entity),
+        ZodPostSchema(entity),
         SwaggerBindService,
         ZodInputPatchRelationshipSchema,
         ZodInputPostRelationshipSchema,

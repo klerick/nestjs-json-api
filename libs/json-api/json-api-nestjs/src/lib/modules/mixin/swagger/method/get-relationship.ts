@@ -1,22 +1,24 @@
-import { EntityClass, EntityTarget, ObjectLiteral } from '../../../../types';
 import { Type } from '@nestjs/common';
-import { EntityProps, TypeField, ZodParams } from '../../types';
-import { errorSchema, schemaTypeForRelation } from '../utils';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+
+import { EntityClass, ObjectLiteral } from '../../../../types';
+import { TypeField, ZodEntityProps } from '../../types';
+import {
+  errorSchema,
+  getEntityMapProps,
+  schemaTypeForRelation,
+} from '../utils';
 
 export function getRelationship<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const {
-    entityFieldsStructure: { relations },
-    typeId,
-  } = zodParams;
+  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
 
   ApiOperation({
     summary: `Get list of relation for resource "${entityName}"`,
@@ -26,7 +28,7 @@ export function getRelationship<E extends ObjectLiteral>(
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

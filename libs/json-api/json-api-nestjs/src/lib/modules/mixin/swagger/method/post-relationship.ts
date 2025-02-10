@@ -6,29 +6,30 @@ import {
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
-import { errorSchema, schemaTypeForRelation } from '../utils';
+import {
+  errorSchema,
+  getEntityMapProps,
+  schemaTypeForRelation,
+} from '../utils';
 import { zodPatchRelationship } from '../../zod';
-import { EntityProps, TypeField, ZodParams } from '../../types';
+import { TypeField, ZodEntityProps } from '../../types';
 import { EntityClass, ObjectLiteral } from '../../../../types';
 
 export function postRelationship<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const {
-    entityFieldsStructure: { relations },
-    typeId,
-  } = zodParams;
+  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
 
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

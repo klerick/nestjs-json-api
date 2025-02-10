@@ -7,23 +7,24 @@ import { generateSchema } from '@anatine/zod-openapi';
 import { Type } from '@nestjs/common';
 
 import { EntityClass, ObjectLiteral } from '../../../../types';
-import { EntityProps, TypeField, ZodParams } from '../../types';
-import { errorSchema, schemaTypeForRelation } from '../utils';
+import { TypeField, ZodEntityProps } from '../../types';
+import {
+  errorSchema,
+  getEntityMapProps,
+  schemaTypeForRelation,
+} from '../utils';
 import { zodPatchRelationship } from '../../zod';
 
 export function patchRelationship<E extends ObjectLiteral>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const {
-    entityFieldsStructure: { relations },
-    typeId,
-  } = zodParams;
+  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
 
   ApiOperation({
     summary: `Update list of relation for resource "${entityName}"`,
@@ -33,7 +34,7 @@ export function patchRelationship<E extends ObjectLiteral>(
   ApiParam({
     name: 'id',
     required: true,
-    type: typeId === TypeField.number ? 'integer' : 'string',
+    type: primaryColumnType === TypeField.number ? 'integer' : 'string',
     description: `ID of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

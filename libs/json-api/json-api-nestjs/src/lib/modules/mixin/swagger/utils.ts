@@ -6,7 +6,7 @@ import {
   camelToKebab,
 } from '@klerick/json-api-nestjs-shared';
 
-import { EntityProps, TypeField, ZodParams } from '../types';
+import { EntityProps, TypeField, ZodEntityProps, ZodParams } from '../types';
 import { EntityClass, ObjectLiteral } from '../../../types';
 
 export const errorSchema = {
@@ -50,19 +50,11 @@ export const errorSchema = {
 
 export function jsonSchemaResponse<E extends ObjectLiteral>(
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>,
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
   array = false
 ) {
-  const {
-    entityFieldsStructure,
-    fieldWithType,
-    relationArrayProps,
-    relationPopsName,
-    primaryColumn,
-  } = zodParams;
-  const { relations } = entityFieldsStructure;
-
-  const relationTypeName = relationPopsName;
+  const { propsType, relations, relationProperty, primaryColumnName } =
+    getEntityMapProps(mapEntity, entity);
 
   const dataType = {
     type: 'object',
@@ -76,8 +68,8 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
       },
       attributes: {
         type: 'object',
-        properties: ObjectTyped.entries(fieldWithType)
-          .filter(([name]) => name !== primaryColumn)
+        properties: ObjectTyped.entries(propsType)
+          .filter(([name]) => name !== primaryColumnName)
           .reduce((acum, [name, type]) => {
             switch (type) {
               case TypeField.array:
@@ -120,9 +112,10 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
             properties: {
               type: {
                 type: 'string',
-                const: camelToKebab(
-                  relationTypeName[name as EntityRelation<E>]
-                ),
+                const: getEntityMapProps(
+                  mapEntity,
+                  Reflect.get(relationProperty, name).entityClass
+                ).typeName,
               },
               id: {
                 type: 'string',
@@ -146,7 +139,7 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
                 },
                 required: ['self'],
               },
-              data: relationArrayProps[name as EntityRelation<E>]
+              data: Reflect.get(relationProperty, name).isArray
                 ? dataArray
                 : dataItem,
             },
@@ -230,54 +223,50 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
 
 export function createApiModels<E extends ObjectLiteral>(
   entity: EntityClass<E>,
-  zodParams: ZodParams<E, EntityProps<E>, string>
+  mapEntity: ZodEntityProps<E>
 ): EntityClass<E> {
-  const {
-    entityFieldsStructure,
-    propsType,
-    relationPopsName,
-    propsDb,
-    relationArrayProps,
-  } = zodParams;
+  const { propsType, props, relations, propsNullable, relationProperty } =
+    mapEntity;
 
-  for (const [name, type] of ObjectTyped.entries(propsType)) {
-    const { field, relations } = entityFieldsStructure;
+  for (const name of props) {
     let currentType: any;
     let required = false;
     let isArray = false;
-    if (field.includes(name as string)) {
-      required = !propsDb[name].isNullable;
-      isArray = propsDb[name].isArray;
-      switch (propsType[name as EntityProps<E>]) {
-        case TypeField.date:
-          currentType = Date;
-          break;
-        case TypeField.number:
-          currentType = Number;
-          break;
-        case TypeField.boolean:
-          currentType = Boolean;
-          break;
-        default:
-          currentType = String;
-      }
+    required = !(propsNullable as any).includes(name);
+    const type = Reflect.get(propsType, name);
+    isArray = type === 'array';
+    switch (type) {
+      case TypeField.date:
+        currentType = Date;
+        break;
+      case TypeField.number:
+        currentType = Number;
+        break;
+      case TypeField.boolean:
+        currentType = Boolean;
+        break;
+      default:
+        currentType = String;
     }
-
     if (relations.includes(name as string)) {
-      currentType = relationPopsName[name as EntityRelation<E>];
-      if (propsDb[name]) {
-        required = !propsDb[name].isNullable;
-        isArray = propsDb[name].isArray;
-      } else {
-        isArray = relationArrayProps[name as EntityRelation<E>];
-        required = !isArray;
-      }
+      const propsRel = Reflect.get(relationProperty, name);
+      currentType = propsRel.entityClass;
+      isArray = propsRel.isArray;
     }
 
     ApiProperty({
       required,
       isArray,
       type: () => currentType,
+    })(entity.prototype, name.toString());
+  }
+
+  for (const name of relations) {
+    const propsRel = Reflect.get(relationProperty, name);
+    ApiProperty({
+      required: !propsRel.nullable,
+      isArray: propsRel.isArray,
+      type: propsRel.entityClass,
     })(entity.prototype, name.toString());
   }
 
@@ -310,3 +299,12 @@ export const schemaTypeForRelation = {
     },
   },
 };
+
+export function getEntityMapProps<E extends ObjectLiteral>(
+  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  entity: EntityClass<E>
+) {
+  const entityMap = mapEntity.get(entity);
+  if (!entityMap) throw new Error('Entity not found in map');
+  return entityMap;
+}
