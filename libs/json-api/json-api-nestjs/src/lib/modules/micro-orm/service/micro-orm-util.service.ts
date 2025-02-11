@@ -720,7 +720,7 @@ export class MicroOrmUtilService<E extends ObjectLiteral> {
         },
       })
       .getResult();
-    console.log(checkResult, prepareData, rel, inputData);
+
     if (checkResult.length === prepareData.length) {
       return (
         isArray ? inputData.map((i) => i.id) : inputData.id
