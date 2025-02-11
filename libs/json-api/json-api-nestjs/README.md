@@ -8,7 +8,7 @@
 
 # json-api-nestjs
 
-This plugin works upon TypeOrm library, which is used as the main database abstraction layer tool. The module
+This plugin works upon TypeOrm or MicroOrm library, which is used as the main database abstraction layer tool. The module
 automatically generates an API according to JSON API specification from the database structure (TypeORM entities). It
 supports features such as requests validation based on database fields types, request filtering, endpoints extending,
 data relations control and much more. Our module significantly reduces the development time of REST services by removing
@@ -24,15 +24,32 @@ $ npm install json-api-nestjs
 ## Example
 
 Once the installation process is complete, we can import the **JsonApiModule** into the root **AppModule**.
-
+### TypeOrm
 ```typescript
 import {Module} from '@nestjs/common';
-import {JsonApiModule} from 'json-api-nestjs';
-import {Users} from 'database';
+import {JsonApiModule, TypeOrmJsonApiModule} from 'json-api-nestjs';
+import {Users} from 'type-orm/database';
 
 @Module({
   imports: [
-    JsonApiModule.forRoot({
+    JsonApiModule.forRoot(TypeOrmJsonApiModule, {
+      entities: [Users]
+    }),
+  ],
+})
+export class AppModule {
+}
+```
+
+### MicroOrm
+```typescript
+import {Module} from '@nestjs/common';
+import {JsonApiModule, MicroOrmJsonApiModule} from 'json-api-nestjs';
+import {Users} from 'micro-orm/database';
+
+@Module({
+  imports: [
+    JsonApiModule.forRoot(MicroOrmJsonApiModule, {
       entities: [Users]
     }),
   ],
@@ -69,11 +86,14 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
+    // TypeOrm
     useSoftDelete?: boolean // Use soft delete
     runInTransaction?: <Func extends (...args: any) => any>(
       isolationLevel: IsolationLevel,
       fn: Func
     ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
+    // MicroOrm
+    arrayType?: string[]; //Custom type for indicate of array
   };
 }
 ```
@@ -254,7 +274,7 @@ Available query params:
 ```typescript
 type FilterOperand
 {
-in:string[] // is equal to the conditional of query "WHERE 'attribute_name' IN ('value1', 'value2')"
+  in:string[] // is equal to the conditional of query "WHERE 'attribute_name' IN ('value1', 'value2')"
   nin: string[] // is equal to the conditional of query "WHERE 'attribute_name' NOT IN ('value1', 'value1')"
   eq: string // is equal to the conditional of query "WHERE 'attribute_name' = 'value1'
   ne: string // is equal to the conditional of query "WHERE 'attribute_name' <> 'value1'
