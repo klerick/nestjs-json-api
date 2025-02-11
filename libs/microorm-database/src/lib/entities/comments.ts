@@ -48,6 +48,7 @@ export class Comments {
 
   @ManyToOne(() => Users, {
     fieldName: 'created_by',
+    nullable: true,
   })
   createdBy!: IUsers;
 }

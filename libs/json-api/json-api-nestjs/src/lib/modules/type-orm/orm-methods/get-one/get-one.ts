@@ -86,7 +86,10 @@ export async function getOne<E extends ObjectLiteral>(
     };
     throw new NotFoundException([error]);
   }
-  const { included, data } = this.transformDataService.transformData(result);
+  const { included, data } = this.transformDataService.transformData(
+    result,
+    query
+  );
   return {
     meta: {},
     data,

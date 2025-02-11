@@ -1,4 +1,4 @@
-import { QueryFlag } from '@mikro-orm/core';
+import { QueryFlag, serialize, wrap } from '@mikro-orm/core';
 
 import { ObjectLiteral } from '../../../../types';
 import { MicroOrmService } from '../../service';
@@ -73,18 +73,19 @@ export async function getAll<E extends ObjectLiteral>(
   });
 
   const sortObject = getSortObject(query);
+  const resultList = await this.microOrmUtilService
+    .prePareQueryBuilder(resultQueryBuilder, query)
+    .orderBy(
+      Object.keys(sortObject).length > 0
+        ? sortObject
+        : {
+            [this.microOrmUtilService.currentPrimaryColumn]: 'ASC',
+          }
+    )
+    .getResult();
 
   return {
     totalItems: count,
-    items: await this.microOrmUtilService
-      .prePareQueryBuilder(resultQueryBuilder, query)
-      .orderBy(
-        Object.keys(sortObject).length > 0
-          ? sortObject
-          : {
-              [this.microOrmUtilService.currentPrimaryColumn]: 'ASC',
-            }
-      )
-      .execute('all', true),
+    items: resultList.map((i) => wrap(i).toJSON() as E),
   };
 }

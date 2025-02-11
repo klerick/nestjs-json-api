@@ -33,11 +33,11 @@ import { CURRENT_ENTITY, GLOBAL_MODULE_OPTIONS_TOKEN } from '../../constants';
 export * from './entities';
 export * from './utils';
 
-export const entities = [Users, UserGroups, Roles, Comments, Addresses, Notes];
-
 import { sharedConnect, initMikroOrm, pullAllData } from './utils';
 import { DEFAULT_ARRAY_TYPE } from '../../modules/micro-orm/constants';
 import { JsonApiTransformerService } from '../../modules/mixin/service/json-api-transformer.service';
+
+export const entities = [Users, UserGroups, Roles, Comments, Addresses, Notes];
 
 export function mockDbPgLiteTestModule(dbName = `test_db_${Date.now()}`) {
   const mikroORM = {
@@ -54,24 +54,6 @@ export function mockDbPgLiteTestModule(dbName = `test_db_${Date.now()}`) {
   };
 }
 
-export function mockDBTestModule(db: IMemoryDb): DynamicModule {
-  const mikroORM = {
-    provide: MikroORM,
-    useFactory: () =>
-      db.adapters.createMikroOrm({
-        highlighter: new SqlHighlighter(),
-        entities: [Users, UserGroups, Roles, Comments, Addresses, Notes],
-        driver: PostgreSqlDriver,
-        allowGlobalContext: true,
-        debug: ['query', 'query-params'],
-      }),
-  };
-  return {
-    module: MikroOrmModule,
-    providers: [mikroORM],
-    exports: [mikroORM],
-  };
-}
 const readOnlyDbName = `readonly_db_${Date.now()}`;
 
 export function dbRandomName(readOnly = false) {
@@ -110,27 +92,6 @@ export function getModuleForPgLite<E extends ObjectLiteral>(
         useValue: { options: { arrayType: DEFAULT_ARRAY_TYPE } },
       },
       JsonApiTransformerService,
-    ],
-  }).compile();
-}
-
-export function getModuleFor<E extends ObjectLiteral>(
-  db: IMemoryDb,
-  entity: E
-): Promise<TestingModule> {
-  return Test.createTestingModule({
-    imports: [mockDBTestModule(db)],
-    providers: [
-      CurrentMicroOrmProvider(),
-      CurrentEntityManager(),
-      CurrentEntityMetadata(),
-      CurrentEntityRepository(entity),
-      MicroOrmUtilService,
-      {
-        provide: CURRENT_ENTITY,
-        useValue: entity,
-      },
-      OrmServiceFactory(),
     ],
   }).compile();
 }

@@ -80,12 +80,28 @@ export class MicroOrmUtilService<E extends ObjectLiteral> {
 
   private _relationsName!: EntityKey<E, false>[];
   private _relationMap = new Map<EntityKey<E, false>, EntityProperty<E>>();
+  private _relationPropsMap = new Map<EntityClass<E>, EntityKey<E, false>[]>();
   get relationsName() {
     if (!this._relationsName) {
       this._relationsName = this.metadata.relations.map((r) => r.name);
     }
 
     return this._relationsName;
+  }
+
+  getRelationProps(entity: EntityClass<E>) {
+    const props = this._relationPropsMap.get(entity);
+    if (props) {
+      return props;
+    }
+    const relMetaData = this.entityManager.getMetadata(entity);
+    const relation = relMetaData.relations.map((i) => i.name);
+    const newProps = relMetaData.props
+      .filter((r) => !relation.includes(r.name))
+      .map((r) => r.name);
+    this._relationPropsMap.set(entity, newProps);
+
+    return newProps;
   }
 
   getRelation(name: EntityKey<E, false>) {
@@ -418,7 +434,7 @@ export class MicroOrmUtilService<E extends ObjectLiteral> {
         item
       );
 
-      let selectJoin: undefined | string[] = undefined;
+      let selectJoin: string[] = this.getRelationProps(relationEntity);
       if (item in relationFields) {
         const tmpSet = new Set<string>([
           ...relationFields[item],
@@ -595,7 +611,16 @@ export class MicroOrmUtilService<E extends ObjectLiteral> {
       for await (const item of this.asyncIterateFindRelationships(
         relationships
       )) {
-        Object.assign(targetInstance, item);
+        const itemProps = ObjectTyped.entries(item).at(0);
+        if (!itemProps) continue;
+        const [nameProps, data] = itemProps;
+
+        if ((targetInstance[nameProps] as any) instanceof Collection) {
+          targetInstance[nameProps].removeAll();
+          targetInstance[nameProps].add(...(data as []));
+        } else {
+          Object.assign(targetInstance, item);
+        }
       }
     }
 

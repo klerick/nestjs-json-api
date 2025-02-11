@@ -47,6 +47,8 @@ export class Comments {
   updatedAt: Date = new Date();
 
   @ManyToOne(() => Users, {
+    // #TODO need add chaeck for nullable relation to zod
+    nullable: true,
     fieldName: 'created_by',
   })
   createdBy!: IUsers;

@@ -11,7 +11,7 @@ export class UsersHaveRoles {
   public id!: number;
 
   @Column({
-    name: 'user_id',
+    name: 'users_id',
     type: 'int',
     nullable: false,
     unique: false,
@@ -19,7 +19,7 @@ export class UsersHaveRoles {
   public userId!: number;
 
   @Column({
-    name: 'role_id',
+    name: 'roles_id',
     type: 'int',
     nullable: false,
     unique: false,

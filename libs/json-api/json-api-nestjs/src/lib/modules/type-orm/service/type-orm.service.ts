@@ -30,7 +30,7 @@ import {
 } from '../orm-methods';
 
 import { TypeormUtilsService } from './typeorm-utils.service';
-import { TransformDataService } from './transform-data.service';
+import { JsonApiTransformerService } from '../../mixin/service/json-api-transformer.service';
 import {
   CONTROL_OPTIONS_TOKEN,
   CURRENT_ENTITY_REPOSITORY,
@@ -40,8 +40,8 @@ import { TypeOrmParam } from '../type';
 export class TypeOrmService<E extends ObjectLiteral> implements OrmService<E> {
   @Inject(TypeormUtilsService)
   public typeormUtilsService!: TypeormUtilsService<E>;
-  @Inject(TransformDataService)
-  public transformDataService!: TransformDataService<E>;
+  @Inject(JsonApiTransformerService)
+  public transformDataService!: JsonApiTransformerService<E>;
   @Inject(CONTROL_OPTIONS_TOKEN) public config!: ConfigParam & TypeOrmParam;
   @Inject(CURRENT_ENTITY_REPOSITORY) public repository!: Repository<E>;
 

@@ -96,11 +96,11 @@ export class Users {
     name: 'users_have_roles',
     inverseJoinColumn: {
       referencedColumnName: 'id',
-      name: 'role_id',
+      name: 'roles_id',
     },
     joinColumn: {
       referencedColumnName: 'id',
-      name: 'user_id',
+      name: 'users_id',
     },
   })
   public roles!: IRoles[];
@@ -113,11 +113,11 @@ export class Users {
     name: 'users_have_book',
     inverseJoinColumn: {
       referencedColumnName: 'id',
-      name: 'book_id',
+      name: 'book_list_id',
     },
     joinColumn: {
       referencedColumnName: 'id',
-      name: 'user_id',
+      name: 'users_id',
     },
   })
   public books!: IBookList[];

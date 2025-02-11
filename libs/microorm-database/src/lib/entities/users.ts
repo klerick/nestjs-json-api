@@ -23,11 +23,10 @@ export class Users {
   public id!: number;
 
   @Property({
-    // type: 'varchar',
+    type: 'varchar',
     length: 100,
     nullable: false,
     unique: true,
-    type: new ArrayType((i) => parseFloat(i)),
   })
   public login!: string;
 
@@ -97,7 +96,7 @@ export class Users {
   public manager!: IUsers;
 
   @OneToMany(() => Comments, (comment) => comment.createdBy)
-  comments = new Collection<Comment>(this);
+  comments = new Collection<Comments>(this);
 
   @ManyToMany(() => BookList, (item) => item.users, {
     owner: true,

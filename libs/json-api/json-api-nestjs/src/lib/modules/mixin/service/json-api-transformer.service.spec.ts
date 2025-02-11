@@ -211,7 +211,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         };
         if (i === 'roles') {
           acum[i]['data'] = userObject.roles.map((relName) => ({
-            id: relName.id,
+            id: relName.id.toString(),
             type: mapProps.get(Roles)?.typeName,
           }));
         }
@@ -233,7 +233,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         };
         if (i === 'addresses') {
           acum[i]['data'] = {
-            id: userObject.addresses.id,
+            id: userObject.addresses.id.toString(),
             type: mapProps.get(Addresses)?.typeName,
           };
         }
@@ -633,7 +633,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         relationships: {
           addresses: {
             data: {
-              id: userObject.addresses.id,
+              id: userObject.addresses.id.toString(),
               type: mapProps.get(Addresses)?.typeName,
             },
             links: {

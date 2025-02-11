@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 import { QueryOne } from '../../../mixin/zod';
 import { MicroOrmService } from '../../service';
+import { serialize, wrap } from '@mikro-orm/core';
 
 export async function getOne<E extends ObjectLiteral>(
   this: MicroOrmService<E>,
@@ -14,7 +15,7 @@ export async function getOne<E extends ObjectLiteral>(
 
   const resultItem = await this.microOrmUtilService
     .prePareQueryBuilder(queryBuilder, query)
-    .execute('get', true);
+    .getSingleResult();
 
   if (!resultItem) {
     const error: ValidateQueryError = {
@@ -25,5 +26,5 @@ export async function getOne<E extends ObjectLiteral>(
     throw new NotFoundException([error]);
   }
 
-  return resultItem;
+  return wrap(resultItem).toJSON() as E;
 }

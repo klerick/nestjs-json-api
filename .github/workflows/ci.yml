@@ -85,6 +85,7 @@ jobs:
       - run: npm run typeorm migration:run
       - run: npm run seed:run
       - run: npx nx affected -t e2e --parallel=1
+      - run: npx nx affected -t e2e-micro --parallel=1
       - name: Save cached .nx
         id: cache-dependencies-save
         uses: actions/cache/save@v4

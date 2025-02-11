@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { MicroOrmService } from '../../service';
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
+import { serialize } from '@mikro-orm/core';
 
 export async function getRelationship<
   E extends ObjectLiteral,
@@ -30,5 +31,5 @@ export async function getRelationship<
     throw new NotFoundException([error]);
   }
 
-  return result;
+  return serialize(result, { forceObject: true }) as unknown as E;
 }

@@ -1,7 +1,7 @@
 import { DeepPartial } from 'typeorm';
-import { ResourceObject } from '@klerick/json-api-nestjs-shared';
+import { QueryField, ResourceObject } from '@klerick/json-api-nestjs-shared';
 import { ObjectLiteral } from '../../../../types';
-import { PostData } from '../../../mixin/zod';
+import { PostData, Query } from '../../../mixin/zod';
 import { TypeOrmService } from '../../service';
 
 export async function postOne<E extends ObjectLiteral>(
@@ -28,8 +28,15 @@ export async function postOne<E extends ObjectLiteral>(
     entityTarget,
     relationships
   );
+  const fakeQuery: Query<E> = {
+    [QueryField.fields]: null,
+    [QueryField.include]: Object.keys(relationships || {}),
+  } as any;
 
-  const { data, included } = this.transformDataService.transformData(saveData);
+  const { data, included } = this.transformDataService.transformData(
+    saveData,
+    fakeQuery
+  );
   const includeData = included ? { included } : {};
   return {
     meta: {},

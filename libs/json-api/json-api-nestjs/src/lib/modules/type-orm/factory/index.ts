@@ -1,27 +1,23 @@
 import { FactoryProvider } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { camelToKebab, ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '@klerick/json-api-nestjs-shared';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 
 import {
   CURRENT_ENTITY_MANAGER_TOKEN,
   FIND_ONE_ROW_ENTITY,
   CHECK_RELATION_NAME,
-  PARAMS_FOR_ZOD_SCHEMA,
   ORM_SERVICE,
-  FIELD_FOR_ENTITY,
   RUN_IN_TRANSACTION_FUNCTION,
   GLOBAL_MODULE_OPTIONS_TOKEN,
   CURRENT_DATA_SOURCE_TOKEN,
   CURRENT_ENTITY_REPOSITORY,
+  ENTITY_MAP_PROPS,
 } from '../../../constants';
 import {
-  EntityProps,
-  FieldWithType,
   FindOneRowEntity,
   CheckRelationNme,
-  ZodParams,
-  GetFieldForEntity,
+  ZodEntityProps,
 } from '../../mixin/types';
 import {
   ObjectLiteral,
@@ -30,24 +26,23 @@ import {
   RequiredFromPartial,
   ConfigParam,
   RunInTransaction,
+  EntityClass,
 } from '../../../types';
-import {
-  getField,
-  getPropsTreeForRepository,
-  getArrayPropsForEntity,
-  getTypeForAllProps,
-  getRelationTypeArray,
-  getTypePrimaryColumn,
-  getFieldWithType,
-  getPropsFromDb,
-  getRelationTypeName,
-  getRelationTypePrimaryColumn,
-} from '../orm-helper';
 
 import { TypeOrmService, TypeormUtilsService } from '../service';
 import { getEntityName } from '../../mixin/helper';
 import { TypeOrmJsonApiModule } from '../type-orm-json-api.module';
 import { TypeOrmParam } from '../type';
+
+import {
+  getProps,
+  getRelation,
+  getPropsType,
+  getPropsNullable,
+  getPrimaryColumnName,
+  getPrimaryColumnType,
+  getRelationProperty,
+} from '../orm-helper';
 
 export function CurrentDataSourceProvider(
   connectionName?: string
@@ -78,52 +73,32 @@ export function CurrentEntityRepository<E extends ObjectLiteral>(
   };
 }
 
-export function GetFieldForEntity<E extends ObjectLiteral>(): FactoryProvider<
-  GetFieldForEntity<E>
-> {
+export function EntityPropsMap<E extends ObjectLiteral>(
+  entities: EntityClass<E>[]
+) {
   return {
-    provide: FIELD_FOR_ENTITY,
-    useFactory: (entityManager: EntityManager) => {
-      return (entity: EntityTarget<E>) =>
-        getField(entityManager.getRepository(entity));
-    },
+    provide: ENTITY_MAP_PROPS,
     inject: [CURRENT_ENTITY_MANAGER_TOKEN],
-  };
-}
+    useFactory: (entityManager: EntityManager) => {
+      const mapProperty = new Map<EntityClass<E>, ZodEntityProps<E>>();
 
-export function ZodParamsFactory<E extends ObjectLiteral>(): FactoryProvider<
-  ZodParams<E, EntityProps<E>>
-> {
-  return {
-    provide: PARAMS_FOR_ZOD_SCHEMA,
-    inject: [CURRENT_ENTITY_REPOSITORY],
-    useFactory: (repo: Repository<E>) => {
-      const primaryColumns = repo.metadata.primaryColumns[0]
-        .propertyName as EntityProps<E>;
-      const fieldWithType = ObjectTyped.entries(getFieldWithType(repo))
-        .filter(([key]) => key !== repo.metadata.primaryColumns[0].propertyName)
-        .reduce(
-          (acum, [key, type]) => ({
-            ...acum,
-            [key]: type,
-          }),
-          {} as FieldWithType<E>
-        );
+      for (const item of entities) {
+        const entityRepo = entityManager.getRepository<E>(item);
 
-      return {
-        entityFieldsStructure: getField(repo),
-        entityRelationStructure: getPropsTreeForRepository(repo),
-        propsArray: getArrayPropsForEntity(repo),
-        propsType: getTypeForAllProps(repo),
-        typeId: getTypePrimaryColumn(repo),
-        typeName: camelToKebab(getEntityName(repo.target)),
-        fieldWithType,
-        propsDb: getPropsFromDb(repo),
-        primaryColumn: primaryColumns,
-        relationArrayProps: getRelationTypeArray(repo),
-        relationPopsName: getRelationTypeName(repo),
-        primaryColumnType: getRelationTypePrimaryColumn(repo),
-      } satisfies ZodParams<E, EntityProps<E>>;
+        const className = getEntityName(item);
+        mapProperty.set(item, {
+          props: getProps(entityRepo),
+          propsType: getPropsType(entityRepo),
+          propsNullable: getPropsNullable(entityRepo),
+          primaryColumnName: getPrimaryColumnName(entityRepo),
+          primaryColumnType: getPrimaryColumnType(entityRepo),
+          typeName: camelToKebab(className),
+          className: className,
+          relations: getRelation(entityRepo),
+          relationProperty: getRelationProperty(entityRepo),
+        });
+      }
+      return mapProperty;
     },
   };
 }

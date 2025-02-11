@@ -64,7 +64,8 @@ export async function initMikroOrm(knex: TypeKnex, testDbName: string) {
     entities: [Users, UserGroups, Roles, Comments, Addresses, Notes],
     allowGlobalContext: true,
     schema: 'public',
-    debug: ['query', 'query-params'],
+    debug:
+      process.env['DB_LOGGING'] !== '0' ? ['query', 'query-params'] : false,
   });
 
   if ((result['rows'] as []).length === 0) {

@@ -5,7 +5,7 @@ import {
 } from '@klerick/json-api-nestjs-shared';
 import { Repository } from 'typeorm';
 
-import { ObjectLiteral } from '../../../types';
+import { ObjectLiteral, ResultMicroOrmModuleOptions } from '../../../types';
 import {
   RelationTree,
   ValueOf,
@@ -28,8 +28,13 @@ import {
   ColumnType,
   RelationPropsTypeName,
   RelationPrimaryColumnType,
+  TupleOfEntityRelation,
+  TupleOfEntityProps,
+  FilterNullableProps,
+  RelationProperty,
 } from '../../mixin/types';
 import { getEntityName } from '../../mixin/helper';
+import { EntityMetadata } from '@mikro-orm/core';
 
 export type ConcatFieldWithRelation<
   R extends string,
@@ -295,4 +300,118 @@ export const getRelationTypePrimaryColumn = <E extends ObjectLiteral>(
         : TypeField.string;
     return acum;
   }, {} as Record<string, TypeField>) as RelationPrimaryColumnType<E>;
+};
+// -----
+
+export const getRelation = <E extends ObjectLiteral>(
+  repository: Repository<E>
+) =>
+  repository.metadata.relations.map((i) => {
+    return i.propertyName;
+  }) as TupleOfEntityRelation<E>;
+
+export const getProps = <E extends ObjectLiteral>(
+  repository: Repository<E>
+): TupleOfEntityProps<E> => {
+  const relations = getRelation(repository);
+
+  return repository.metadata.columns
+    .filter((i) => !relations.includes(i.propertyName))
+    .map((r) => r.propertyName) as TupleOfEntityProps<E>;
+};
+
+export const getPropsType = <E extends ObjectLiteral>(
+  repository: Repository<E>
+): FieldWithType<E> => {
+  const field = getProps(repository);
+
+  const entity = repository.target as any;
+  const result = {} as any;
+  for (const item of field) {
+    let typeProps: TypeField = TypeField.string;
+
+    const fieldMetadata = repository.metadata.columns.find(
+      (i) => i.propertyName === item
+    );
+
+    if (fieldMetadata?.isArray) {
+      result[item] = TypeField.array;
+      continue;
+    }
+
+    switch (Reflect.getMetadata('design:type', entity['prototype'], item)) {
+      case Array:
+        typeProps = TypeField.array;
+        break;
+      case Date:
+        typeProps = TypeField.date;
+        break;
+      case Number:
+        typeProps = TypeField.number;
+        break;
+      case Boolean:
+        typeProps = TypeField.boolean;
+        break;
+      case Object:
+        typeProps = TypeField.object;
+        break;
+      default:
+        typeProps = TypeField.string;
+    }
+
+    result[item] = fieldMetadata?.isArray ? TypeField.array : typeProps;
+  }
+
+  return result;
+};
+
+export const getPropsNullable = <E extends ObjectLiteral>(
+  repository: Repository<E>
+): FilterNullableProps<E, TupleOfEntityProps<E>> => {
+  const relation = getRelation(repository);
+  return repository.metadata.columns
+    .filter((i) => !relation.includes(i.propertyName))
+    .map((i) =>
+      i.isNullable || i.default !== undefined ? i.propertyName : false
+    )
+    .filter((i) => !!i) as FilterNullableProps<E, TupleOfEntityProps<E>>;
+};
+
+export const getPrimaryColumnName = <E extends ObjectLiteral>(
+  repository: Repository<E>
+) => {
+  const column = repository.metadata.primaryColumns.at(0);
+  if (!column) throw new Error('Primary column not found');
+
+  return column.propertyName;
+};
+
+export const getPrimaryColumnType = <E extends ObjectLiteral>(
+  repository: Repository<E>
+): TypeForId => {
+  const target = repository.target as any;
+  const primaryColumn = repository.metadata.primaryColumns[0].propertyName;
+
+  return Reflect.getMetadata(
+    'design:type',
+    target['prototype'],
+    primaryColumn
+  ) === Number
+    ? TypeField.number
+    : TypeField.string;
+};
+
+export const getRelationProperty = <E extends ObjectLiteral>(
+  repository: Repository<E>
+): RelationProperty<E> => {
+  return repository.metadata.relations.reduce((acum, item) => {
+    // @ts-expect-error its dynamic creater
+    acum[item.propertyName] = {
+      entityClass: item.inverseEntityMetadata.target,
+      nullable: item.isManyToMany || item.isOneToMany ? false : item.isNullable,
+      isArray: item.isManyToMany || item.isOneToMany,
+    };
+
+    return acum;
+  }, {} as RelationProperty<E>);
 };

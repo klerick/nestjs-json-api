@@ -8,6 +8,7 @@ import { ObjectLiteral as Entity } from '../../../../types';
 import {
   Addresses,
   Comments,
+  entities,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -20,6 +21,7 @@ import {
 
 import {
   CONTROL_OPTIONS_TOKEN,
+  CURRENT_ENTITY,
   DEFAULT_CONNECTION_NAME,
   DEFAULT_PAGE_SIZE,
   DEFAULT_QUERY_PAGE,
@@ -29,16 +31,13 @@ import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
+  EntityPropsMap,
   OrmServiceFactory,
 } from '../../factory';
 import { Query } from '../../../mixin/zod';
 import { NotFoundException } from '@nestjs/common';
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
 
 function getDefaultQuery<R extends Entity>() {
@@ -62,7 +61,7 @@ function getDefaultQuery<R extends Entity>() {
 describe('getOne', () => {
   let db: IMemoryDb;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
+  let transformDataService: JsonApiTransformerService<Users>;
 
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -85,12 +84,16 @@ describe('getOne', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
     ({
@@ -110,8 +113,9 @@ describe('getOne', () => {
       userGroupRepository
     );
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
+    transformDataService = module.get<JsonApiTransformerService<Users>>(
+      JsonApiTransformerService
+    );
   });
 
   afterEach(() => {
@@ -136,7 +140,7 @@ describe('getOne', () => {
     });
     query.include = ['addresses', 'comments'];
     await typeormService.getOne('1', query);
-    expect(spyOnTransformData).toBeCalledWith(checkData);
+    expect(spyOnTransformData).toBeCalledWith(checkData, query);
   });
   it('Get one item with select', async () => {
     const spyOnTransformData = jest.spyOn(
@@ -177,7 +181,7 @@ describe('getOne', () => {
       manager: ['login'],
     };
     await typeormService.getOne('1', query);
-    expect(spyOnTransformData).toBeCalledWith(checkData);
+    expect(spyOnTransformData).toBeCalledWith(checkData, query);
   });
   it('Should be error', async () => {
     expect.assertions(1);

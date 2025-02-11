@@ -26,13 +26,13 @@ export class CreateUsersHaveBookTable1665719467563
             generationStrategy: 'increment',
           }),
           new TableColumn({
-            name: 'user_id',
+            name: 'users_id',
             type: 'int',
             isNullable: false,
             unsigned: true,
           }),
           new TableColumn({
-            name: 'book_id',
+            name: 'book_list_id',
             type: 'uuid',
             isNullable: false,
             unsigned: true,
@@ -54,17 +54,17 @@ export class CreateUsersHaveBookTable1665719467563
           new TableForeignKey({
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
-            columnNames: ['user_id'],
+            columnNames: ['users_id'],
           }),
           new TableForeignKey({
             referencedTableName: 'book_list',
             referencedColumnNames: ['id'],
-            columnNames: ['book_id'],
+            columnNames: ['book_list_id'],
           }),
         ],
         indices: [
           new TableIndex({
-            columnNames: ['user_id', 'book_id'],
+            columnNames: ['users_id', 'book_list_id'],
             isUnique: true,
           }),
         ],

@@ -49,10 +49,7 @@ describe('get-all', () => {
       const queryBuilder =
         microOrmServiceUser.microOrmUtilService.queryBuilder();
 
-      const checkData = await queryBuilder
-        .clone()
-        .limit(1)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(1).getResult();
 
       const count = await queryBuilder.clone().count();
       const query = getDefaultQuery<Users>();
@@ -71,10 +68,7 @@ describe('get-all', () => {
       const queryBuilder =
         microOrmServiceUser.microOrmUtilService.queryBuilder();
 
-      const checkData = await queryBuilder
-        .clone()
-        .limit(5, 5)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(5, 5).getResult();
       const count = await queryBuilder.clone().count();
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -102,7 +96,7 @@ describe('get-all', () => {
           lastName: 'DESC',
         })
         .limit(5, 5)
-        .execute('all', true);
+        .getResult();
       const count = await queryBuilder.clone().count();
 
       const query = getDefaultQuery<Users>();
@@ -142,7 +136,7 @@ describe('get-all', () => {
           },
         })
         .limit(5, 5)
-        .execute('all', true);
+        .getResult();
 
       const count = await queryBuilder.clone().count();
 
@@ -185,7 +179,7 @@ describe('get-all', () => {
           id: 'ASC',
         })
         .limit(5, 5)
-        .execute('all', true);
+        .getResult();
 
       const count = await queryBuilder
         .clone()
@@ -219,10 +213,7 @@ describe('get-all', () => {
     it('default', async () => {
       const queryBuilder =
         microOrmServiceUser.microOrmUtilService.queryBuilder();
-      const checkData = await queryBuilder
-        .clone()
-        .limit(5)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(5).getResult();
       const count = await queryBuilder.clone().count();
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -251,7 +242,7 @@ describe('get-all', () => {
         .clone()
         .select(['id', ...select])
         .limit(5)
-        .execute('all', true);
+        .getResult();
       const count = await queryBuilder.clone().count();
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -285,10 +276,7 @@ describe('get-all', () => {
           'state',
         ])
         .leftJoinAndSelect('Users.roles', 'Roles__roles', {}, ['name', 'key']);
-      const checkData = await queryBuilder
-        .clone()
-        .limit(5)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(5).getResult();
       const count = await queryBuilder.clone().count().distinct();
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -317,10 +305,7 @@ describe('get-all', () => {
         .queryBuilder('Users')
         .leftJoinAndSelect('Users.roles', 'Roles__roles');
 
-      const checkData = await queryBuilder
-        .clone()
-        .limit(5)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(5).getResult();
       const count = await queryBuilder.clone().count().distinct();
 
       const query = getDefaultQuery<Users>();
@@ -349,10 +334,7 @@ describe('get-all', () => {
           'state',
         ]);
 
-      const checkData = await queryBuilder
-        .clone()
-        .limit(5)
-        .execute('all', true);
+      const checkData = await queryBuilder.clone().limit(5).getResult();
       const count = await queryBuilder.clone().count().distinct();
 
       const query = getDefaultQuery<Users>();
@@ -384,20 +366,20 @@ describe('get-all', () => {
     beforeAll(async () => {
       rolesData = await microOrmServiceUser.microOrmUtilService
         .queryBuilder(Roles)
-        .execute('all', true);
+        .getResult();
       addresses = await microOrmServiceUser.microOrmUtilService
         .queryBuilder(Addresses)
-        .execute('all', true);
+        .getResult();
 
       userGroups = await microOrmServiceUser.microOrmUtilService
         .queryBuilder(UserGroups)
-        .execute('all', true);
+        .getResult();
       users = await microOrmServiceUser.microOrmUtilService
         .queryBuilder()
-        .execute('all', true);
+        .getResult();
       notes = await microOrmServiceUser.microOrmUtilService
         .queryBuilder(Notes)
-        .execute('all', true);
+        .getResult();
     });
 
     describe('target', () => {
@@ -417,7 +399,7 @@ describe('get-all', () => {
           .orderBy({
             login: 'DESC',
           })
-          .execute('all', true);
+          .getResult();
         const count = await queryBuilder.clone().count();
 
         const query = getDefaultQuery<Users>();
@@ -464,7 +446,7 @@ describe('get-all', () => {
               login: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
         const count = await queryBuilder.clone().count();
 
         const queryBuilder2 = microOrmServiceUser.microOrmUtilService
@@ -483,7 +465,7 @@ describe('get-all', () => {
               city: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
         const count2 = await queryBuilder2.clone().count();
 
         const query = getDefaultQuery<Users>();
@@ -555,7 +537,7 @@ describe('get-all', () => {
           .orderBy({
             login: 'DESC',
           })
-          .execute('all', true);
+          .getResult();
         const count = await queryBuilder.clone().count();
 
         const query = getDefaultQuery<Users>();
@@ -593,7 +575,7 @@ describe('get-all', () => {
               label: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count2 = await queryBuilder.clone().count();
 
@@ -639,7 +621,7 @@ describe('get-all', () => {
               id: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count3 = await queryBuilder2.clone().count().distinct();
 
@@ -673,7 +655,7 @@ describe('get-all', () => {
           .clone()
           .limit(5)
           .orderBy({ id: 'DESC' })
-          .execute('all', true);
+          .getResult();
         const count4 = await queryBuilder2.clone().count().distinct();
 
         const query4 = getDefaultQuery<Users>();
@@ -719,7 +701,7 @@ describe('get-all', () => {
               login: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count = await queryBuilder.clone().count();
 
@@ -765,7 +747,7 @@ describe('get-all', () => {
               key: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count1 = await queryBuilder1.clone().count().distinct();
 
@@ -820,7 +802,7 @@ describe('get-all', () => {
               city: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count = await queryBuilder.clone().count();
 
@@ -880,7 +862,7 @@ describe('get-all', () => {
               city: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
         const count = await quweryBuilder.clone().count();
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -935,7 +917,7 @@ describe('get-all', () => {
               city: 'DESC',
             },
           })
-          .execute('all', true);
+          .getResult();
 
         const count = await queryBuilder.clone().count();
 

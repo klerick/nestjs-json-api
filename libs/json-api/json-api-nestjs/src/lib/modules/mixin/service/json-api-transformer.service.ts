@@ -160,13 +160,15 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
     if (Array.isArray(props)) {
       return props.map((i: any) => ({
         type: relationMapPops.typeName,
-        id: i[relationMapPops.primaryColumnName],
+        id: i[relationMapPops.primaryColumnName].toString(),
       }));
     } else {
-      return {
-        type: relationMapPops.typeName,
-        id: props.primaryColumnName,
-      } as any;
+      return props
+        ? ({
+            type: relationMapPops.typeName,
+            id: props[relationMapPops.primaryColumnName].toString(),
+          } as any)
+        : null;
     }
   }
 
@@ -205,7 +207,7 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
             // @ts-expect-error incorrect parse
             acum[i as keyof Relationships<T>]['data'] = item[i].map(
               (rel: any) => ({
-                id: rel[relationMapPops.primaryColumnName],
+                id: rel[relationMapPops.primaryColumnName].toString(),
                 type: relationMapPops.typeName,
               })
             );
@@ -217,7 +219,7 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
           // @ts-expect-error incorrect parse
           acum[i as keyof Relationships<T>]['data'] = item[i]
             ? {
-                id: item[i][relationMapPops.primaryColumnName],
+                id: item[i][relationMapPops.primaryColumnName].toString(),
                 type: relationMapPops.typeName,
               }
             : null;

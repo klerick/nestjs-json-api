@@ -44,9 +44,9 @@ describe('get-one', () => {
     const checkData = await microOrmServiceUser.microOrmUtilService
       .queryBuilder()
       .limit(1)
-      .execute('get', true);
+      .getSingleResult();
     const query = getDefaultQuery<Users>();
-
+    if (!checkData) throw new Error('Result is null');
     const result = await getOne.call<
       MicroOrmService<Users>,
       Parameters<typeof getOne<Users>>,
@@ -69,8 +69,8 @@ describe('get-one', () => {
         },
       })
       .limit(1)
-      .execute('get', true);
-
+      .getSingleResult();
+    if (!checkData) throw new Error('Result is null');
     const query = getDefaultQuery<Users>();
     query.include = ['addresses', 'comments', 'manager'];
     query.fields = {

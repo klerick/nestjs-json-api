@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import {
   Addresses,
   Comments,
+  entities,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -18,6 +19,7 @@ import {
 } from '../../../../mock-utils/typeorm';
 import {
   CONTROL_OPTIONS_TOKEN,
+  CURRENT_ENTITY,
   DEFAULT_CONNECTION_NAME,
   ORM_SERVICE,
 } from '../../../../constants';
@@ -27,25 +29,22 @@ import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
+  EntityPropsMap,
   OrmServiceFactory,
 } from '../../factory';
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
 
 describe('postOne', () => {
   let db: IMemoryDb;
   let backaUp: IBackup;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
+  let transformDataService: JsonApiTransformerService<Users>;
   let podsRepository: Repository<Pods>;
 
   let typeormServicePods: TypeOrmService<Pods>;
-  let transformDataServicePods: TransformDataService<Pods>;
+  let transformDataServicePods: JsonApiTransformerService<Pods>;
 
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -80,12 +79,16 @@ describe('postOne', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
 
@@ -101,12 +104,16 @@ describe('postOne', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Pods),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
 
@@ -129,12 +136,14 @@ describe('postOne', () => {
     );
     backaUp = db.backup();
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
+    transformDataService = module.get<JsonApiTransformerService<Users>>(
+      JsonApiTransformerService
+    );
 
     typeormServicePods = modulePods.get<TypeOrmService<Pods>>(ORM_SERVICE);
-    transformDataServicePods =
-      modulePods.get<TransformDataService<Pods>>(TransformDataService);
+    transformDataServicePods = modulePods.get<JsonApiTransformerService<Pods>>(
+      JsonApiTransformerService
+    );
 
     notes = await notesRepository.find();
     users = await userRepository.find();
@@ -207,10 +216,13 @@ describe('postOne', () => {
       id,
     });
 
-    expect(spyOnTransformData).toBeCalledWith({
-      ...result,
-      id,
-    });
+    expect(spyOnTransformData).toBeCalledWith(
+      {
+        ...result,
+        id,
+      },
+      { fields: null, include: [] }
+    );
     expect(returnData).not.toHaveProperty('included');
   });
 
@@ -226,7 +238,10 @@ describe('postOne', () => {
       login,
     });
 
-    expect(spyOnTransformData).toBeCalledWith(result);
+    expect(spyOnTransformData).toBeCalledWith(result, {
+      fields: null,
+      include: [],
+    });
     expect(returnData).not.toHaveProperty('included');
   });
 
@@ -250,7 +265,10 @@ describe('postOne', () => {
       },
     });
 
-    expect(spyOnTransformData).toBeCalledWith(result);
+    expect(spyOnTransformData).toBeCalledWith(result, {
+      fields: null,
+      include: ['notes', 'roles', 'manager', 'userGroup'],
+    });
     expect(returnData).toHaveProperty('included');
   });
 });

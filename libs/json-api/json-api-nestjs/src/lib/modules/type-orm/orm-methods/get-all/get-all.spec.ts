@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { QueryField } from '@klerick/json-api-nestjs-shared';
-import { Equal, IsNull, Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { IMemoryDb } from 'pg-mem';
 
 import {
   Addresses,
   Comments,
+  entities,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -20,6 +21,7 @@ import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
+  EntityPropsMap,
   OrmServiceFactory,
 } from '../../factory';
 import {
@@ -28,18 +30,15 @@ import {
   ORM_SERVICE,
   DEFAULT_QUERY_PAGE,
   DEFAULT_PAGE_SIZE,
+  CURRENT_ENTITY,
 } from '../../../../constants';
 import { ObjectLiteral as Entity } from '../../../../types';
 
 import { Query } from '../../../mixin/zod';
 
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
 
 function getDefaultQuery<R extends Entity>() {
   const filter = {
@@ -63,7 +62,7 @@ function getDefaultQuery<R extends Entity>() {
 describe('getAll', () => {
   let db: IMemoryDb;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
+  let transformDataService: JsonApiTransformerService<Users>;
 
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -86,12 +85,16 @@ describe('getAll', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
     ({
@@ -111,8 +114,9 @@ describe('getAll', () => {
       userGroupRepository
     );
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
+    transformDataService = module.get<JsonApiTransformerService<Users>>(
+      JsonApiTransformerService
+    );
   });
 
   afterEach(() => {
@@ -150,7 +154,7 @@ describe('getAll', () => {
       },
     };
     await typeormService.getAll(query);
-    expect(spyOnTransformData).toBeCalledWith(checkData);
+    expect(spyOnTransformData).toBeCalledWith(checkData, query);
   });
 
   it('include', async () => {
@@ -177,7 +181,7 @@ describe('getAll', () => {
       },
     };
     await typeormService.getAll(query);
-    expect(spyOnTransformData).toBeCalledWith([checkData]);
+    expect(spyOnTransformData).toBeCalledWith([checkData], query);
   });
 
   it('select', async () => {
@@ -221,7 +225,7 @@ describe('getAll', () => {
       },
     };
     await typeormService.getAll(query);
-    expect(spyOnTransformData).toBeCalledWith([checkData]);
+    expect(spyOnTransformData).toBeCalledWith([checkData], query);
   });
 
   describe('filter', () => {
@@ -271,7 +275,7 @@ describe('getAll', () => {
         id: { eq: `${checkData?.id}` },
       };
       await typeormService.getAll(query);
-      expect(spyOnTransformData).toBeCalledWith([checkData]);
+      expect(spyOnTransformData).toBeCalledWith([checkData], query);
     });
 
     it('Check relation with the same Entity', async () => {
@@ -299,7 +303,7 @@ describe('getAll', () => {
         },
       };
       await typeormService.getAll(query);
-      expect(spyOnTransformData).toBeCalledWith([checkData]);
+      expect(spyOnTransformData).toBeCalledWith([checkData], query);
     });
 
     // it('Target relation is null', async () => {
@@ -341,7 +345,7 @@ describe('getAll', () => {
       };
       query.include = ['manager'];
       await typeormService.getAll(query);
-      expect(spyOnTransformData).toBeCalledWith([checkData]);
+      expect(spyOnTransformData).toBeCalledWith([checkData], query);
     });
 
     it('Relation one-to-many', async () => {
@@ -369,7 +373,7 @@ describe('getAll', () => {
         },
       };
       await typeormService.getAll(query);
-      expect(spyOnTransformData).toBeCalledWith([checkData]);
+      expect(spyOnTransformData).toBeCalledWith([checkData], query);
     });
 
     it('Relation many-to-many', async () => {
@@ -399,7 +403,7 @@ describe('getAll', () => {
         },
       };
       const { data } = await typeormService.getAll(query);
-      expect(spyOnTransformData).not.toBeCalled();
+      expect(spyOnTransformData).not.toHaveBeenCalled();
       expect(data).toEqual([]);
     });
   });

@@ -96,10 +96,10 @@ describe('GET method:', () => {
         return Promise.all(tmp);
       })
     );
-    await Promise.all(addressArray);
+
     await Promise.all(
-      [...usersArray, ...commentsArray, ...rolesArray].map((i) =>
-        jsonSdk.jonApiSdkService.deleteOne(i)
+      [...usersArray, ...commentsArray, ...rolesArray, ...addressArray].map(
+        (i) => jsonSdk.jonApiSdkService.deleteOne(i)
       )
     );
   });
@@ -339,6 +339,7 @@ describe('GET method:', () => {
         userItem.id,
         { include: ['addresses'] }
       );
+
       expect(result).toBe(`${resultGetOne.addresses.id}`);
     });
 

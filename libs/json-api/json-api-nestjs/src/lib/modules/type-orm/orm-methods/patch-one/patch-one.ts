@@ -3,10 +3,14 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
-import { ResourceObject, ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import {
+  ResourceObject,
+  ObjectTyped,
+  QueryField,
+} from '@klerick/json-api-nestjs-shared';
 
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
-import { PatchData } from '../../../mixin/zod';
+import { PatchData, Query } from '../../../mixin/zod';
 import { TypeOrmService } from '../../service';
 
 export async function patchOne<E extends ObjectLiteral>(
@@ -63,7 +67,15 @@ export async function patchOne<E extends ObjectLiteral>(
     relationships
   );
 
-  const { data, included } = this.transformDataService.transformData(saveData);
+  const fakeQuery: Query<E> = {
+    [QueryField.fields]: null,
+    [QueryField.include]: Object.keys(relationships || {}),
+  } as any;
+
+  const { data, included } = this.transformDataService.transformData(
+    saveData,
+    fakeQuery
+  );
   const includeData = included ? { included } : {};
   return {
     meta: {},

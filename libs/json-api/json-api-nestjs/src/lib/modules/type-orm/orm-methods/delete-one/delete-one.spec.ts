@@ -12,25 +12,25 @@ import {
   CurrentEntityRepository,
   OrmServiceFactory,
 } from '../../factory';
-import { DEFAULT_CONNECTION_NAME } from '../../../../constants';
+import { CURRENT_ENTITY, DEFAULT_CONNECTION_NAME } from '../../../../constants';
 
-import { getRepository, pullUser, Users } from '../../../../mock-utils/typeorm';
+import {
+  getRepository,
+  pullUser,
+  Users,
+  entities,
+} from '../../../../mock-utils/typeorm';
 
 import { Repository } from 'typeorm';
 import { CONTROL_OPTIONS_TOKEN, ORM_SERVICE } from '../../../../constants';
-
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
+import { EntityPropsMap } from '../../factory';
 
 describe('deleteOne', () => {
   let db: IMemoryDb;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
 
   let user: Users;
   let userRepository: Repository<Users>;
@@ -43,25 +43,27 @@ describe('deleteOne', () => {
         ...providerEntities(getDataSourceToken()),
         CurrentDataSourceProvider(DEFAULT_CONNECTION_NAME),
         {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        {
           provide: CONTROL_OPTIONS_TOKEN,
           useValue: {
             requiredSelectField: false,
             debug: false,
           },
         },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
     ({ userRepository } = getRepository(module));
     user = await pullUser(userRepository);
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
   });
 
   it('Should be ok', async () => {

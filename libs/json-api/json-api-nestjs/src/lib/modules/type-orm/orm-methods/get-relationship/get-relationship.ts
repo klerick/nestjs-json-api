@@ -54,16 +54,8 @@ export async function getRelationship<
     };
     throw new NotFoundException([error]);
   }
+  const data = this.transformDataService.transformRel<Rel>(result, rel);
 
-  const { data } = this.transformDataService.getRelationships<Rel>(result, rel);
-  if (data === undefined) {
-    const error: ValidateQueryError = {
-      code: 'custom',
-      message: `transformDataService.getRelationships return undefined`,
-      path: [],
-    };
-    throw new InternalServerErrorException([error]);
-  }
   return {
     meta: {},
     data,

@@ -16,6 +16,17 @@
         "passWithNoTests": true,
         "parallel": 1
       }
+    },
+    "e2e-micro": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{e2eProjectRoot}"
+      ],
+      "options": {
+        "jestConfig": "apps/json-api-server-e2e/jest.config.ts",
+        "passWithNoTests": true,
+        "parallel": 1
+      }
     }
   }
 }

@@ -72,20 +72,20 @@ export class Users {
   public isActive!: boolean;
 
   @Column({
-    name: 'created_at',
-    type: 'timestamp',
-    nullable: true,
-    default: 'CURRENT_TIMESTAMP',
-  })
-  public createdAt!: Date;
-
-  @Column({
     name: 'test_date',
     type: 'timestamp',
     nullable: true,
     default: 'CURRENT_TIMESTAMP',
   })
   public testDate!: Date;
+
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    nullable: true,
+    default: 'CURRENT_TIMESTAMP',
+  })
+  public createdAt!: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',

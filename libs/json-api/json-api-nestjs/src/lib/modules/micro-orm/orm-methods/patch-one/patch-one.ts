@@ -43,10 +43,11 @@ export async function patchOne<E extends ObjectLiteral>(
 
   if (attributes) {
     const attrTarget = this.microOrmUtilService.createEntity(attributes as any);
+
     for (const [props, val] of ObjectTyped.entries(attrTarget)) {
+      if (!(props in attributes)) continue;
       existEntity[props] = val;
     }
   }
-
   return this.microOrmUtilService.saveEntity(existEntity, relationships);
 }

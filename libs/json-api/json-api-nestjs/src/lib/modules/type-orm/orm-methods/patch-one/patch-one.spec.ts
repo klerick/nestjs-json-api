@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import {
   Addresses,
   Comments,
+  entities,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -19,28 +20,26 @@ import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
+  EntityPropsMap,
   OrmServiceFactory,
 } from '../../factory';
 import {
   CONTROL_OPTIONS_TOKEN,
+  CURRENT_ENTITY,
   DEFAULT_CONNECTION_NAME,
   ORM_SERVICE,
 } from '../../../../constants';
 
 import { PatchData, PostData } from '../../../mixin/zod';
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
 
 describe('patchOne', () => {
   let db: IMemoryDb;
   let backaUp: IBackup;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
+  let transformDataService: JsonApiTransformerService<Users>;
 
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -77,12 +76,16 @@ describe('patchOne', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
 
@@ -104,8 +107,9 @@ describe('patchOne', () => {
     );
 
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
+    transformDataService = module.get<JsonApiTransformerService<Users>>(
+      JsonApiTransformerService
+    );
 
     notes = await notesRepository.find();
     users = await userRepository.find();
@@ -232,7 +236,10 @@ describe('patchOne', () => {
     const result = await userRepository.findOneBy({
       id: parseInt(withoutRelationships.id as string, 10),
     });
-    expect(spyOnTransformData).toBeCalledWith(result);
+    expect(spyOnTransformData).toBeCalledWith(result, {
+      fields: null,
+      include: [],
+    });
     expect(returnData).not.toHaveProperty('included');
   });
 
@@ -262,7 +269,10 @@ describe('patchOne', () => {
       },
     });
 
-    expect(spyOnTransformData).toBeCalledWith(result);
+    expect(spyOnTransformData).toBeCalledWith(result, {
+      fields: null,
+      include: ['addresses', 'notes', 'roles', 'manager', 'userGroup'],
+    });
     expect(returnData).toHaveProperty('included');
   });
 
@@ -302,7 +312,10 @@ describe('patchOne', () => {
       },
     });
 
-    expect(spyOnTransformData).toBeCalledWith(result);
+    expect(spyOnTransformData).toBeCalledWith(result, {
+      fields: null,
+      include: ['addresses', 'notes', 'roles', 'manager', 'userGroup'],
+    });
     expect(returnData).toHaveProperty('included');
   });
 });

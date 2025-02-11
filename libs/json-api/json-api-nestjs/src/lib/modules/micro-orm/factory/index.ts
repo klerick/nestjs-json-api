@@ -12,7 +12,6 @@ import {
   CURRENT_DATA_SOURCE_TOKEN,
   CURRENT_ENTITY_MANAGER_TOKEN,
   CURRENT_ENTITY_REPOSITORY,
-  FIELD_FOR_ENTITY,
   GLOBAL_MODULE_OPTIONS_TOKEN,
   RUN_IN_TRANSACTION_FUNCTION,
   ORM_SERVICE,
@@ -21,12 +20,11 @@ import {
 
 import {
   EntityClass,
-  EntityTarget,
   ObjectLiteral,
   ResultMicroOrmModuleOptions,
   RunInTransaction,
 } from '../../../types';
-import { GetFieldForEntity, ZodEntityProps } from '../../mixin/types';
+import { ZodEntityProps } from '../../mixin/types';
 import {
   getProps,
   getRelation,
@@ -117,7 +115,7 @@ export function RunInTransactionFactory(): FactoryProvider<RunInTransaction> {
     provide: RUN_IN_TRANSACTION_FUNCTION,
     inject: [],
     useFactory() {
-      return async (callback) => {};
+      return async (callback) => callback();
     },
   };
 }

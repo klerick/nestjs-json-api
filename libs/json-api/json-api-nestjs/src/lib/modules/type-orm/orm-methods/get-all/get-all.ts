@@ -250,8 +250,10 @@ export async function getAll<E extends ObjectLiteral>(
     );
   }
   const resultData = await resultQuery.getMany();
-  const { included, data } =
-    this.transformDataService.transformData(resultData);
+  const { included, data } = this.transformDataService.transformData(
+    resultData,
+    query
+  );
   return {
     meta: {
       pageNumber: page.number,

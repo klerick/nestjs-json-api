@@ -26,13 +26,13 @@ export class CreateUsersHaveRolesTable1607701632300
             generationStrategy: 'increment',
           }),
           new TableColumn({
-            name: 'user_id',
+            name: 'users_id',
             type: 'int',
             isNullable: false,
             unsigned: true,
           }),
           new TableColumn({
-            name: 'role_id',
+            name: 'roles_id',
             type: 'int',
             isNullable: false,
             unsigned: true,
@@ -54,17 +54,17 @@ export class CreateUsersHaveRolesTable1607701632300
           new TableForeignKey({
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
-            columnNames: ['user_id'],
+            columnNames: ['users_id'],
           }),
           new TableForeignKey({
             referencedTableName: 'roles',
             referencedColumnNames: ['id'],
-            columnNames: ['role_id'],
+            columnNames: ['roles_id'],
           }),
         ],
         indices: [
           new TableIndex({
-            columnNames: ['user_id', 'role_id'],
+            columnNames: ['users_id', 'roles_id'],
             isUnique: true,
           }),
         ],

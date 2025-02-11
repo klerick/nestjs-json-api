@@ -6,19 +6,14 @@ import { NestProvider, ObjectLiteral, ResultModuleOptions } from '../../types';
 import {
   CurrentEntityManager,
   CurrentDataSourceProvider,
-  ZodParamsFactory,
   CurrentEntityRepository,
   FindOneRowEntityFactory,
   CheckRelationNameFactory,
   OrmServiceFactory,
-  GetFieldForEntity,
   RunInTransactionFactory,
+  EntityPropsMap,
 } from './factory';
-import {
-  EntityPropsMapService,
-  TransformDataService,
-  TypeormUtilsService,
-} from './service';
+import { TypeormUtilsService } from './service';
 import { GLOBAL_MODULE_OPTIONS_TOKEN } from '../../constants';
 
 export class TypeOrmJsonApiModule {
@@ -39,8 +34,7 @@ export class TypeOrmJsonApiModule {
       optionProvider,
       CurrentDataSourceProvider(options.connectionName),
       CurrentEntityManager(),
-      GetFieldForEntity(),
-      EntityPropsMapService,
+      EntityPropsMap(options.entities),
       RunInTransactionFactory(),
     ];
 
@@ -57,9 +51,7 @@ export class TypeOrmJsonApiModule {
   static getUtilProviders(entity: ObjectLiteral): NestProvider {
     return [
       CurrentEntityRepository(entity),
-      TransformDataService,
       TypeormUtilsService,
-      ZodParamsFactory(),
       OrmServiceFactory(),
       FindOneRowEntityFactory(),
       CheckRelationNameFactory(),

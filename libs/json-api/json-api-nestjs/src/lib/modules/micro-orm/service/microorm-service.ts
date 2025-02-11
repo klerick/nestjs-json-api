@@ -103,8 +103,14 @@ export class MicroOrmService<E extends ObjectLiteral> implements OrmService<E> {
       [QueryField.include]: Object.keys(relationships || {}),
     } as any;
 
+    const resultForResponse = await getOne.call<
+      MicroOrmService<E>,
+      Parameters<typeof getOne<E>>,
+      ReturnType<typeof getOne<E>>
+    >(this, result[this.microOrmUtilService.currentPrimaryColumn], fakeQuery);
+
     const { data, included } = this.jsonApiTransformerService.transformData(
-      result,
+      resultForResponse,
       fakeQuery
     );
 
@@ -118,7 +124,7 @@ export class MicroOrmService<E extends ObjectLiteral> implements OrmService<E> {
     id: number | string,
     inputData: PatchData<E>
   ): Promise<ResourceObject<E>> {
-    const result = await patchOne.call<
+    await patchOne.call<
       MicroOrmService<E>,
       Parameters<typeof patchOne<E>>,
       ReturnType<typeof patchOne<E>>
@@ -130,8 +136,14 @@ export class MicroOrmService<E extends ObjectLiteral> implements OrmService<E> {
       [QueryField.include]: Object.keys(relationships || {}),
     } as any;
 
+    const resultForResponse = await getOne.call<
+      MicroOrmService<E>,
+      Parameters<typeof getOne<E>>,
+      ReturnType<typeof getOne<E>>
+    >(this, id, fakeQuery);
+
     const { data, included } = this.jsonApiTransformerService.transformData(
-      result,
+      resultForResponse,
       fakeQuery
     );
 

@@ -21,7 +21,6 @@ import {
   HttpParams,
   isObject,
   isRelation,
-  kebabToCamel,
   ObjectTyped,
 } from '../utils';
 import { ID_KEY } from '../constants';
@@ -273,6 +272,7 @@ export class JsonApiUtilsService {
       (includedItem) =>
         includedItem.type === item.type && includedItem.id === item.id
     );
+
     if (!relatedIncluded) return;
 
     const entityObject = {

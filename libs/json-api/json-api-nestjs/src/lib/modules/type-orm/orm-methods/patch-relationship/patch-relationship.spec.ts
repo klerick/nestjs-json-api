@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import {
   Addresses,
   Comments,
+  entities,
   getRepository,
   mockDBTestModule,
   Notes,
@@ -18,6 +19,7 @@ import {
 
 import {
   CONTROL_OPTIONS_TOKEN,
+  CURRENT_ENTITY,
   DEFAULT_CONNECTION_NAME,
   ORM_SERVICE,
 } from '../../../../constants';
@@ -25,20 +27,17 @@ import {
   CurrentDataSourceProvider,
   CurrentEntityManager,
   CurrentEntityRepository,
+  EntityPropsMap,
   OrmServiceFactory,
 } from '../../factory';
-import {
-  EntityPropsMapService,
-  TypeOrmService,
-  TransformDataService,
-  TypeormUtilsService,
-} from '../../service';
+import { TypeOrmService, TypeormUtilsService } from '../../service';
 import { createAndPullSchemaBase } from '../../../../mock-utils';
+import { JsonApiTransformerService } from '../../../mixin/service/json-api-transformer.service';
 
 describe('patchRelationship', () => {
   let db: IMemoryDb;
   let typeormService: TypeOrmService<Users>;
-  let transformDataService: TransformDataService<Users>;
+  let transformDataService: JsonApiTransformerService<Users>;
   let typeormUtilsService: TypeormUtilsService<Users>;
   let userRepository: Repository<Users>;
   let addressesRepository: Repository<Addresses>;
@@ -61,12 +60,16 @@ describe('patchRelationship', () => {
             debug: false,
           },
         },
+        {
+          provide: CURRENT_ENTITY,
+          useValue: Users,
+        },
+        EntityPropsMap(entities as any),
         CurrentEntityManager(),
         CurrentEntityRepository(Users),
         TypeormUtilsService,
-        TransformDataService,
+        JsonApiTransformerService,
         OrmServiceFactory(),
-        EntityPropsMapService,
       ],
     }).compile();
     ({
@@ -86,8 +89,9 @@ describe('patchRelationship', () => {
       userGroupRepository
     );
     typeormService = module.get<TypeOrmService<Users>>(ORM_SERVICE);
-    transformDataService =
-      module.get<TransformDataService<Users>>(TransformDataService);
+    transformDataService = module.get<JsonApiTransformerService<Users>>(
+      JsonApiTransformerService
+    );
     typeormUtilsService =
       module.get<TypeormUtilsService<Users>>(TypeormUtilsService);
   });

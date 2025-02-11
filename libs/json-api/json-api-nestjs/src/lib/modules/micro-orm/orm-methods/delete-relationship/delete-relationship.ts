@@ -1,9 +1,10 @@
 import { EntityRelation } from '@klerick/json-api-nestjs-shared';
 
-import { ObjectLiteral } from '../../../../types';
+import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 
 import { PostRelationshipData } from '../../../mixin/zod';
 import { MicroOrmService } from '../../service';
+import { NotFoundException } from '@nestjs/common';
 
 export async function deleteRelationship<
   E extends ObjectLiteral,
@@ -19,10 +20,30 @@ export async function deleteRelationship<
     input
   );
 
-  const currentEntityRef = this.microOrmUtilService.entityManager.getReference(
-    this.microOrmUtilService.entity,
-    id as any
-  );
+  // const currentEntityRef = this.microOrmUtilService.entityManager.getReference(
+  //   this.microOrmUtilService.entity,
+  //   id as any
+  // );
+
+  const currentEntityRef = await this.microOrmUtilService
+    .queryBuilder()
+    .where({
+      [this.microOrmUtilService.currentPrimaryColumn]: id,
+    })
+    .getSingleResult();
+
+  if (!currentEntityRef) {
+    const error: ValidateQueryError = {
+      code: 'invalid_arguments',
+      message: `Resource '${this.microOrmUtilService.currentAlias}' with id '${id}' does not exist`,
+      path: ['fields'],
+    };
+    throw new NotFoundException([error]);
+  }
+
+  await this.microOrmUtilService.entityManager.populate(currentEntityRef, [
+    rel as any,
+  ]);
 
   if (Array.isArray(idsResult)) {
     const relEntity = this.microOrmUtilService.getRelation(rel as any).entity();
