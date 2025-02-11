@@ -1,4 +1,4 @@
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../shared';
 
 import { JsonApiSdkConfig, JsonSdkConfig } from '../types';
 import { ID_KEY } from '../constants';
@@ -14,7 +14,7 @@ export {
   capitalizeFirstChar,
   kebabToCamel,
   isObject,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../shared';
 
 export function resultConfig(partialConfig: JsonSdkConfig): JsonApiSdkConfig {
   return {

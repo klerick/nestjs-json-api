@@ -1,4 +1,4 @@
-import { QueryField } from '@klerick/json-api-nestjs-shared';
+import { QueryField } from '../../shared';
 import { EntityProps, EntityRelation } from './entity';
 import { TypeOfArray } from './utils';
 import { Operands, OperandsRelation } from './filter-operand';

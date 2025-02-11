@@ -10,4 +10,4 @@ export {
   ResourceData,
   ResourceObject,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../shared';

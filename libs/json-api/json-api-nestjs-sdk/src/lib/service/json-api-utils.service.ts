@@ -1,4 +1,4 @@
-import { createEntityInstance } from '@klerick/json-api-nestjs-shared';
+import { createEntityInstance } from '../../shared';
 
 import {
   Attributes,

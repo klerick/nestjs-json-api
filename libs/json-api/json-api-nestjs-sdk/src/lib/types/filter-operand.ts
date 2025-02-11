@@ -1,4 +1,4 @@
-import { FilterOperand } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand } from '../../shared';
 
 export { FilterOperand };
 
