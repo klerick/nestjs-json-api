@@ -14,35 +14,43 @@ export async function postRelationship<
   rel: Rel,
   input: PostRelationshipData
 ): Promise<E> {
-  const idsResult = await this.microOrmUtilService.validateRelationInputData(
-    rel,
-    input
-  );
-  const currentEntityRef = this.microOrmUtilService.entityManager.getReference(
-    this.microOrmUtilService.entity,
-    id as any
-  );
-
-  const relEntity = this.microOrmUtilService.getRelation(rel as any).entity();
-
-  if (Array.isArray(idsResult)) {
-    const relRef = idsResult.map((i) =>
-      this.microOrmUtilService.entityManager.getReference(relEntity, i as any)
+  try {
+    const idsResult = await this.microOrmUtilService.validateRelationInputData(
+      rel,
+      input
     );
-    currentEntityRef[rel].add(...relRef);
-  } else {
-    // @ts-ignore
-    currentEntityRef[rel] = this.microOrmUtilService.entityManager.getReference(
-      relEntity,
-      idsResult as any
-    );
+
+    const currentEntityRef =
+      this.microOrmUtilService.entityManager.getReference(
+        this.microOrmUtilService.entity,
+        id as any
+      );
+
+    const relEntity = this.microOrmUtilService.getRelation(rel as any).entity();
+
+    if (Array.isArray(idsResult)) {
+      const relRef = idsResult.map((i) =>
+        this.microOrmUtilService.entityManager.getReference(relEntity, i as any)
+      );
+      currentEntityRef[rel].add(...relRef);
+    } else {
+      // @ts-ignore
+      currentEntityRef[rel] =
+        this.microOrmUtilService.entityManager.getReference(
+          relEntity,
+          idsResult as any
+        );
+    }
+
+    await this.microOrmUtilService.entityManager.flush();
+
+    return getRelationship.call<
+      MicroOrmService<E>,
+      Parameters<typeof getRelationship<E, Rel>>,
+      ReturnType<typeof getRelationship<E, Rel>>
+    >(this, id, rel);
+  } catch (e) {
+    console.log(e);
+    throw e;
   }
-
-  await this.microOrmUtilService.entityManager.flush();
-
-  return getRelationship.call<
-    MicroOrmService<E>,
-    Parameters<typeof getRelationship<E, Rel>>,
-    ReturnType<typeof getRelationship<E, Rel>>
-  >(this, id, rel);
 }
