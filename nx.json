@@ -85,7 +85,8 @@
       "!json-api-server",
       "!json-api-front",
       "!shared-utils",
-      "!database",
+      "!typeorm-database",
+      "!microorm-database",
       "!type-for-rpc"
     ],
     "version": {
