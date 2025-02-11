@@ -8,7 +8,7 @@ import { ZodError } from 'zod';
 import { QueryPipe } from './query.pipe';
 import { ASC, ZOD_QUERY_SCHEMA } from '../../../../constants';
 import { ZodQuery, InputQuery, Query } from '../../zod';
-import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand, QueryField } from '../../../../utils/nestjs-shared';
 
 type MockEntity = { id: number; name: string };
 

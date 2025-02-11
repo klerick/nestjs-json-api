@@ -5,7 +5,7 @@ import {
   EntityRelation,
   TypeOfArray,
   EntityProps,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import { ObjectLiteral as Entity } from '../../../types';
 

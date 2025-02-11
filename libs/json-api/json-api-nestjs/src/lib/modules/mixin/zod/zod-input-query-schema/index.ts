@@ -1,4 +1,4 @@
-import { QueryField } from '@klerick/json-api-nestjs-shared';
+import { QueryField } from '../../../../utils/nestjs-shared';
 import { z } from 'zod';
 import { RelationTree, ResultGetField } from '../../types';
 import { ObjectLiteral } from '../../../../types';

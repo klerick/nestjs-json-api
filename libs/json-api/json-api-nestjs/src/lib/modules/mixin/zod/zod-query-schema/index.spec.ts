@@ -1,4 +1,4 @@
-import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand, QueryField } from '../../../../utils/nestjs-shared';
 import { zodQuery } from './index';
 import { ArrayPropsForEntity } from '../../types';
 import { Users } from '../../../../mock-utils/typeorm';

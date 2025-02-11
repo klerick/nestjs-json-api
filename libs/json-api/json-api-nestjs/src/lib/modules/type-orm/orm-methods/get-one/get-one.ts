@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { ObjectTyped, ResourceObject } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped, ResourceObject } from '../../../../utils/nestjs-shared';
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 import { QueryOne } from '../../../mixin/zod';
 import { TypeOrmService } from '../../service';

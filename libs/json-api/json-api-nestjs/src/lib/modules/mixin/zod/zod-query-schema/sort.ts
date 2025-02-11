@@ -1,4 +1,4 @@
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped } from '../../../../utils/nestjs-shared';
 import { z } from 'zod';
 
 import { RelationTree, ResultGetField } from '../../types';

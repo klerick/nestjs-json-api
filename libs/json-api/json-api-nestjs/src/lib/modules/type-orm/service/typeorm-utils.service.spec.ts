@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { QueryField, FilterOperand } from '@klerick/json-api-nestjs-shared';
+import { QueryField, FilterOperand } from '../../../utils/nestjs-shared';
 import {
   BadRequestException,
   NotFoundException,

@@ -1,6 +1,6 @@
 import { Controller, Inject, Type, UseInterceptors } from '@nestjs/common';
 
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../../utils/nestjs-shared';
 
 import { getProviderName, nameIt } from './utils';
 import {

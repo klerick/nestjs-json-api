@@ -28,7 +28,7 @@ import {
   EntityRelation,
   FilterOperand,
   ObjectTyped,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import {
   ASC,

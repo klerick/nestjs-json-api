@@ -2,7 +2,7 @@ import {
   EntityProps,
   ObjectTyped,
   TypeOfArray,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../../utils/nestjs-shared';
 import { z, ZodArray, ZodNullable } from 'zod';
 
 import { ObjectLiteral } from '../../../../types';

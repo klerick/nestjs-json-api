@@ -1,6 +1,6 @@
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueryField } from '@klerick/json-api-nestjs-shared';
+import { QueryField } from '../../../../utils/nestjs-shared';
 import { IMemoryDb } from 'pg-mem';
 import { Equal, Repository } from 'typeorm';
 

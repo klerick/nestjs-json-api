@@ -1,4 +1,4 @@
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 import { NotFoundException } from '@nestjs/common';
 
 import { MicroOrmService } from '../../service';

@@ -1,7 +1,7 @@
 import {
   EntityRelation,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../../utils/nestjs-shared';
 
 import { ObjectLiteral } from '../../../../types';
 import { PostRelationshipData } from '../../../mixin/zod';

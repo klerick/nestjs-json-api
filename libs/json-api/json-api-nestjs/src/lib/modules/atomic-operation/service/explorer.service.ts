@@ -1,7 +1,7 @@
 import { Inject, Injectable, Type } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
 import { ModulesContainer } from '@nestjs/core';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../utils/nestjs-shared';
 import { MAP_CONTROLLER_ENTITY, MAP_ENTITY } from '../constants';
 import { MapController, MapEntity, OperationMethode } from '../types';
 import { ObjectLiteral as Entity } from '../../../types';

@@ -17,7 +17,7 @@ export {
   ResourceObject,
   ResourceObjectRelationships,
   QueryField,
-} from '@klerick/json-api-nestjs-shared';
+} from './lib/utils/nestjs-shared';
 
 export { excludeMethod } from './lib/modules/mixin/config/bindings';
 export { entityForClass } from './lib/utils';

@@ -17,7 +17,7 @@ import {
   ObjectTyped,
   ResourceObject,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 import {
   InterceptorsConsumer,
   InterceptorsContextCreator,

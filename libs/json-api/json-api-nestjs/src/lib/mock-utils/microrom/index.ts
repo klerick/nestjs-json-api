@@ -2,11 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { EntityManager, MikroORM } from '@mikro-orm/core';
-import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { QueryField } from '@klerick/json-api-nestjs-shared';
-
-import { IMemoryDb } from 'pg-mem';
+import { QueryField } from '../../utils/nestjs-shared';
 
 import {
   Addresses,

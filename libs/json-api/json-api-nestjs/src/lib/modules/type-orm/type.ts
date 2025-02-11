@@ -1,5 +1,5 @@
 import { IsolationLevel } from 'typeorm/driver/types/IsolationLevel';
-import { FilterOperand } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand } from '../../utils/nestjs-shared';
 export type TypeOrmParam = {
   useSoftDelete?: boolean;
   runInTransaction?: <Func extends (...args: any) => any>(

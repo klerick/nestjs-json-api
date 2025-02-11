@@ -21,7 +21,7 @@ import {
 } from '../../../../constants';
 
 import { patchRelationship } from './patch-relationship';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 
 describe('patch-relationship', () => {
   let mikroORMUsers: MikroORM;

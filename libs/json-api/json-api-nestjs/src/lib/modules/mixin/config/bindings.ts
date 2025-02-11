@@ -1,5 +1,5 @@
 import { Body, Param, Query, RequestMethod } from '@nestjs/common';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped } from '../../../utils/nestjs-shared';
 
 import { BindingsConfig, MethodName } from '../types';
 import { JsonBaseController } from '../controller/json-base.controller';

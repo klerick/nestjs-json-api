@@ -7,7 +7,7 @@ import {
   ResourceObject,
   ObjectTyped,
   QueryField,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../../utils/nestjs-shared';
 
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 import { PatchData, Query } from '../../../mixin/zod';

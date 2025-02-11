@@ -21,8 +21,7 @@ import {
 } from '../../../../constants';
 
 import { deleteRelationship } from './delete-relationship';
-import { BadRequestException } from '@nestjs/common';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 
 describe('delete-relationship', () => {
   let mikroORMUsers: MikroORM;

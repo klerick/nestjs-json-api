@@ -1,5 +1,5 @@
 import { EntityManager, MikroORM } from '@mikro-orm/core';
-import { FilterOperand } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand } from '../../../../utils/nestjs-shared';
 import {
   UserGroups,
   Users,

@@ -1,4 +1,4 @@
-import { ObjectTyped, ResourceObject } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped, ResourceObject } from '../../../../utils/nestjs-shared';
 
 import { ObjectLiteral } from '../../../../types';
 import { Query } from '../../../mixin/zod';

@@ -4,7 +4,7 @@ import {
   EntityRelation,
   ResourceObject,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 import {
   PatchData,
   PatchRelationshipData,

@@ -26,8 +26,8 @@ import {
 } from '../../../../constants';
 
 import { getRelationship } from './get-relationship';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { NotFoundException } from '@nestjs/common';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 
 describe('get-relationship', () => {
   let mikroORMUsers: MikroORM;

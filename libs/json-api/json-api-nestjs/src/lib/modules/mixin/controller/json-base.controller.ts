@@ -2,7 +2,7 @@ import {
   EntityRelation,
   ResourceObject,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import { ORM_SERVICE_PROPS } from '../../../constants';
 import { MethodName } from '../types';

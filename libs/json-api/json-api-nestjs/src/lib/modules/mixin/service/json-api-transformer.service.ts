@@ -12,7 +12,7 @@ import {
   Relationships,
   ResourceData,
   ResourceObject,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import { EntityClass, ObjectLiteral } from '../../../types';
 import { ENTITY_MAP_PROPS, CURRENT_ENTITY } from '../../../constants';

@@ -1,6 +1,6 @@
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 import { ValueProvider } from '@nestjs/common';
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../../utils/nestjs-shared';
 import { MapEntity } from '../types';
 import { MAP_ENTITY } from '../constants';
 import { getEntityName } from '../../mixin/helper';

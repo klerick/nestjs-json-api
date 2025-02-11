@@ -3,7 +3,7 @@ import {
   PATH_METADATA,
   ROUTE_ARGS_METADATA,
 } from '@nestjs/common/constants';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped } from '../../../utils/nestjs-shared';
 import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
 
 import { bindController } from './bind-controller';

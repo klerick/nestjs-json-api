@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { QueryField } from '@klerick/json-api-nestjs-shared';
+import { QueryField } from '../../../../utils/nestjs-shared';
 
 import { QueryCheckSelectField } from './query-check-select-field';
 import { Users } from '../../../../mock-utils/typeorm';

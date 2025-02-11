@@ -1,6 +1,6 @@
 import { EntityTarget, ObjectLiteral } from '../../../types';
 
-import { upperFirstLetter } from '@klerick/json-api-nestjs-shared';
+import { upperFirstLetter } from '../../../utils/nestjs-shared';
 
 export const nameIt = (
   name: string,

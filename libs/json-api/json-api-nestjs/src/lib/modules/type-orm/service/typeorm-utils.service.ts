@@ -13,7 +13,7 @@ import {
   ObjectTyped,
   snakeToCamel,
   FilterOperand,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import { ObjectLiteral, ValidateQueryError } from '../../../types';
 import {

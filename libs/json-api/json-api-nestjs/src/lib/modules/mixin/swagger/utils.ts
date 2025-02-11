@@ -4,7 +4,7 @@ import {
   ObjectTyped,
   EntityRelation,
   camelToKebab,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 
 import { EntityProps, TypeField, ZodEntityProps, ZodParams } from '../types';
 import { EntityClass, ObjectLiteral } from '../../../types';

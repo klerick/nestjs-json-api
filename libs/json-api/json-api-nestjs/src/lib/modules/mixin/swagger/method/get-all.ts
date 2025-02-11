@@ -1,6 +1,6 @@
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped } from '../../../../utils/nestjs-shared';
 
 import { EntityClass, ObjectLiteral } from '../../../../types';
 import { ZodEntityProps } from '../../types';

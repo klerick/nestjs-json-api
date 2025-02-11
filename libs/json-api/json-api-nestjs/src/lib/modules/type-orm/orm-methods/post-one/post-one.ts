@@ -1,5 +1,5 @@
 import { DeepPartial } from 'typeorm';
-import { QueryField, ResourceObject } from '@klerick/json-api-nestjs-shared';
+import { QueryField, ResourceObject } from '../../../../utils/nestjs-shared';
 import { ObjectLiteral } from '../../../../types';
 import { PostData, Query } from '../../../mixin/zod';
 import { TypeOrmService } from '../../service';

@@ -2,7 +2,7 @@ import {
   FilterOperand,
   ObjectTyped,
   isString,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../../utils/nestjs-shared';
 import { z } from 'zod';
 
 import {

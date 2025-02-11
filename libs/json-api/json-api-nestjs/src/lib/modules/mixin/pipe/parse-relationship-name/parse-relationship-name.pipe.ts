@@ -3,7 +3,7 @@ import {
   UnprocessableEntityException,
   Inject,
 } from '@nestjs/common';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 import { ValidateQueryError } from '../../../../types';
 import { CHECK_RELATION_NAME, CURRENT_ENTITY } from '../../../../constants';
 import { EntityTarget, ObjectLiteral } from '../../../../types';

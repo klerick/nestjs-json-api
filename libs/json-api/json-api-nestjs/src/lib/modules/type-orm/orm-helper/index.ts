@@ -2,7 +2,7 @@ import {
   EntityProps,
   EntityRelation,
   ObjectTyped,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 import { Repository } from 'typeorm';
 
 import { ObjectLiteral, ResultMicroOrmModuleOptions } from '../../../types';

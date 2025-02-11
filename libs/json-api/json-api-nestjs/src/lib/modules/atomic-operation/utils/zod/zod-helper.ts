@@ -9,7 +9,7 @@ import {
   ZodType,
   ZodUnion,
 } from 'zod';
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../../../utils/nestjs-shared';
 
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
 import { MapController } from '../../types';

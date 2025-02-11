@@ -38,7 +38,7 @@ import {
   ResultGetField,
   ZodEntityProps,
 } from '../types';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped } from '../../../utils/nestjs-shared';
 
 function getEntityMap<E extends ObjectLiteral>(
   entityMapProps: Map<EntityClass<E>, ZodEntityProps<E>>,

@@ -1,4 +1,4 @@
-import { FilterOperand } from '@klerick/json-api-nestjs-shared';
+import { FilterOperand } from '../../../utils/nestjs-shared';
 import { MikroORM, RawQueryFragment } from '@mikro-orm/core';
 import { TestingModule } from '@nestjs/testing/testing-module';
 

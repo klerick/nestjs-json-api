@@ -2,8 +2,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
-
+import { ObjectTyped } from '../../../../utils/nestjs-shared';
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 import { MicroOrmService } from '../../service';
 import { PatchData } from '../../../mixin/zod';

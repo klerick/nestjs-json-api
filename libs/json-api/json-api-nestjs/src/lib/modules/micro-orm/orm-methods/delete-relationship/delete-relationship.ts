@@ -1,4 +1,4 @@
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 
 import { ObjectLiteral, ValidateQueryError } from '../../../../types';
 

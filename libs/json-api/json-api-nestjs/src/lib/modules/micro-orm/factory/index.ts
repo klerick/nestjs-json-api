@@ -5,7 +5,7 @@ import {
   EntityRepository,
   MetadataStorage,
 } from '@mikro-orm/core';
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../../utils/nestjs-shared';
 import { getMikroORMToken } from '@mikro-orm/nestjs';
 
 import {

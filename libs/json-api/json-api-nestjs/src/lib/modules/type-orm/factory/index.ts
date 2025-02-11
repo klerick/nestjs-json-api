@@ -1,6 +1,6 @@
 import { FactoryProvider } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { camelToKebab } from '@klerick/json-api-nestjs-shared';
+import { camelToKebab } from '../../../utils/nestjs-shared';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 
 import {

@@ -22,7 +22,7 @@ import {
 
 import { postRelationship } from './post-relationship';
 import { BadRequestException } from '@nestjs/common';
-import { EntityRelation } from '@klerick/json-api-nestjs-shared';
+import { EntityRelation } from '../../../../utils/nestjs-shared';
 
 describe('post-relationshipa', () => {
   let mikroORMUsers: MikroORM;

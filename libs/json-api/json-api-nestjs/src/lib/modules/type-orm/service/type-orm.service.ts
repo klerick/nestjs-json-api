@@ -2,7 +2,7 @@ import {
   ResourceObject,
   EntityRelation,
   ResourceObjectRelationships,
-} from '@klerick/json-api-nestjs-shared';
+} from '../../../utils/nestjs-shared';
 import { Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 

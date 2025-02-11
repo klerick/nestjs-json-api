@@ -1,5 +1,5 @@
 import { Injectable, ParseIntPipe } from '@nestjs/common';
-import { upperFirstLetter } from '@klerick/json-api-nestjs-shared';
+import { upperFirstLetter } from '../../../utils/nestjs-shared';
 
 import { PipeMixin } from '../../../types';
 import { MixinOptions } from '../types';
