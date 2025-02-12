@@ -1,3 +1,18 @@
+# 9.0.0 (2025-02-12)
+
+### 🚀 Features
+
+- **json-api-nestjs:** Microro orm ([4696f51](https://github.com/klerick/nestjs-json-api/commit/4696f51))
+- **json-api-nestjs:** Microro orm ([18f4a0c](https://github.com/klerick/nestjs-json-api/commit/18f4a0c))
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Fix circular type for query obkect ([e492cd1](https://github.com/klerick/nestjs-json-api/commit/e492cd1))
+
+### ❤️ Thank You
+
+- Alex H
+
 # 8.0.0 (2024-12-18)
 
 ### 🚀 Features

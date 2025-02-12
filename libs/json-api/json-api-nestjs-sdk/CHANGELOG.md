@@ -1,3 +1,7 @@
+# 9.0.0 (2025-02-12)
+
+This was a version bump only for json-api-nestjs-sdk to align it with other projects, there were no code changes.
+
 # 8.0.0 (2024-12-18)
 
 ### 🚀 Features
