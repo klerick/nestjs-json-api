@@ -14,8 +14,8 @@ import { InputOperationPipe } from '../pipes/input-operation.pipe';
 import { ExecuteService, ExplorerService } from '../service';
 import { KEY_MAIN_INPUT_SCHEMA, KEY_MAIN_OUTPUT_SCHEMA } from '../constants';
 import { OperationMethode, ParamsForExecute } from '../types';
-import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
-import { Entity, ValidateQueryError } from '../../../types';
+import { JsonBaseController } from '../../mixin/controller/json-base.controller';
+import { ObjectLiteral as Entity, ValidateQueryError } from '../../../types';
 
 @Controller('/')
 export class OperationController {
@@ -33,7 +33,7 @@ export class OperationController {
       } = dataInput;
 
       let controller: Type<JsonBaseController<Entity>>;
-      let methodName: OperationMethode;
+      let methodName: OperationMethode<Entity>;
       let module: Module;
       try {
         controller = this.explorerService.getControllerByEntityName(type);

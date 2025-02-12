@@ -1,3 +1,5 @@
+import { createEntityInstance } from '../../shared';
+
 import {
   Attributes,
   Entity as EntityObject,
@@ -19,7 +21,6 @@ import {
   HttpParams,
   isObject,
   isRelation,
-  kebabToCamel,
   ObjectTyped,
 } from '../utils';
 import { ID_KEY } from '../constants';
@@ -260,8 +261,7 @@ export class JsonApiUtilsService {
   }
 
   createEntityInstance<E>(name: string): E {
-    const entityName = kebabToCamel(name);
-    return Function('return new class ' + entityName + '{}')();
+    return createEntityInstance<E>(name);
   }
 
   private findIncludeEntity<E, R extends MainData<EntityRelation<E>>>(
@@ -272,6 +272,7 @@ export class JsonApiUtilsService {
       (includedItem) =>
         includedItem.type === item.type && includedItem.id === item.id
     );
+
     if (!relatedIncluded) return;
 
     const entityObject = {
@@ -338,7 +339,7 @@ export class JsonApiUtilsService {
         }
         return {
           ...acum,
-          [key]: data,
+          [key]: { data },
         };
       }, {} as Relationships<E>);
 

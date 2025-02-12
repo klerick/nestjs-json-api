@@ -1,0 +1,33 @@
+{
+  "name": "json-api-nestjs-shared",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/json-api/json-api-nestjs-shared/src",
+  "projectType": "library",
+  "release": {
+    "version": {
+      "generatorOptions": {
+        "packageRoot": "dist/{projectRoot}",
+        "currentVersionResolver": "git-tag"
+      }
+    }
+  },
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/json-api/json-api-nestjs-shared",
+        "tsConfig": "libs/json-api/json-api-nestjs-shared/tsconfig.lib.json",
+        "packageJson": "libs/json-api/json-api-nestjs-shared/package.json",
+        "main": "libs/json-api/json-api-nestjs-shared/src/index.ts",
+        "assets": ["libs/json-api/json-api-nestjs-shared/*.md"]
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  }
+}

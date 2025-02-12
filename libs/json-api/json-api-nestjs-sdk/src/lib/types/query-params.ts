@@ -1,4 +1,4 @@
-import { QueryField } from 'json-shared-type';
+import { QueryField } from '../../shared';
 import { EntityProps, EntityRelation } from './entity';
 import { TypeOfArray } from './utils';
 import { Operands, OperandsRelation } from './filter-operand';

@@ -3,16 +3,17 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/database/src/lib/config-cli.ts",
+    "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/typeorm-database/src/lib/config-cli.ts",
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
-    "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/database/src/lib/config-cli.ts seed libs/database/src/lib/seeders/root.seeder.ts",
+    "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/typeorm-database/src/lib/config-cli.ts seed libs/typeorm-database/src/lib/seeders/root.seeder.ts",
+    "microorm": "ts-node -r tsconfig-paths/register -r dotenv/config -P ./libs/microorm-database/tsconfig.lib.json ./node_modules/@mikro-orm/cli/cli.js",
+    "microorm:up": "npm run microorm migration:up",
     "demo:json-api": "nx run json-api-server:serve:development",
     "demo:json-api-front": "nx run json-api-front:serve:development"
   },
   "private": true,
   "dependencies": {
-    "@anatine/zod-nestjs": "^2.0.5",
     "@anatine/zod-openapi": "^2.2.3",
     "@angular/animations": "19.0.3",
     "@angular/common": "19.0.3",
@@ -22,6 +23,13 @@
     "@angular/platform-browser": "19.0.3",
     "@angular/platform-browser-dynamic": "19.0.3",
     "@angular/router": "19.0.3",
+    "@mikro-orm/cli": "^6.4.3",
+    "@mikro-orm/core": "^6.4.3",
+    "@mikro-orm/migrations": "^6.4.3",
+    "@mikro-orm/mysql": "^6.4.3",
+    "@mikro-orm/nestjs": "^6.0.2",
+    "@mikro-orm/postgresql": "^6.4.3",
+    "@mikro-orm/sql-highlighter": "^1.0.1",
     "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",
     "@nestjs/platform-express": "10.3.3",
@@ -42,8 +50,8 @@
     "tslib": "^2.3.0",
     "typeorm": "^0.3.20",
     "uuid": "^10.0.0",
-    "zod": "^3.22.4",
-    "zod-validation-error": "^3.0.2",
+    "zod": "^3.24.1",
+    "zod-validation-error": "^3.4.0",
     "zone.js": "0.15.0"
   },
   "devDependencies": {
@@ -56,6 +64,7 @@
     "@angular/cli": "~19.0.0",
     "@angular/compiler-cli": "19.0.3",
     "@angular/language-service": "19.0.3",
+    "@electric-sql/pglite": "^0.2.16",
     "@faker-js/faker": "^8.4.1",
     "@jorgebodega/typeorm-factory": "^1.4.0",
     "@jorgebodega/typeorm-seeding": "^6.0.1",
@@ -86,9 +95,10 @@
     "eslint-config-prettier": "^9.0.0",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
-    "jest-environment-node": "^29.4.1",
+    "jest-environment-node": "^29.7.0",
     "jest-preset-angular": "14.4.2",
     "jsonc-eslint-parser": "^2.1.0",
+    "knex-pglite": "^0.11.0",
     "ng-packagr": "19.0.1",
     "nx": "20.2.1",
     "pg-mem": "^3.0.2",
@@ -97,11 +107,18 @@
     "prettier": "^2.6.2",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
+    "typeorm-pglite": "^0.3.2",
     "typescript": "5.6.3",
     "verdaccio": "^5.0.4",
     "webpack-cli": "^5.1.4"
   },
   "nx": {
     "includedScripts": []
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "libs/microorm-database/src/lib/config-cli.ts"
+    ],
+    "tsConfigPath": "./libs/microorm-database/tsconfig.lib.json"
   }
 }

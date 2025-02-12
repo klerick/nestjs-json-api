@@ -1,73 +1,80 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { DiscoveryModule, RouterModule } from '@nestjs/core';
-import { ConfigParamDefault, DEFAULT_CONNECTION_NAME } from './constants';
-import { ModuleOptions } from './types';
-import { JsonApiNestJsCommonModule } from './json-api-nestjs-common.module';
-import { JSON_API_DECORATOR_ENTITY } from './constants';
-import { BaseModuleClass } from './mixin';
-import { AtomicOperationModule } from './modules/atomic-operation/atomic-operation.module';
+import { DiscoveryModule } from '@nestjs/core';
+
+import {
+  AnyEntity,
+  EntityName,
+  TypeOrmDefaultOptions,
+  TypeOrmOptions,
+  MicroOrmOptions,
+  ResultModuleOptions,
+} from './types';
+import { createMixinModule, prepareConfig, createAtomicModule } from './utils';
+import type { TypeOrmJsonApiModule, MicroOrmJsonApiModule } from './modules';
 
 @Module({})
 export class JsonApiModule {
-  private static connectionName = DEFAULT_CONNECTION_NAME;
+  public static forRoot(
+    module: typeof TypeOrmJsonApiModule,
+    options: TypeOrmOptions
+  ): DynamicModule;
+  public static forRoot(
+    module: typeof MicroOrmJsonApiModule,
+    options: MicroOrmOptions
+  ): DynamicModule;
+  /**
+   * @deprecated This type of method is deprecated and may be removed in future versions.
+   * Consider using newer alternatives or updated patterns for module registration.
+   */
+  public static forRoot(options: TypeOrmDefaultOptions): DynamicModule;
+  public static forRoot(
+    first:
+      | typeof TypeOrmJsonApiModule
+      | typeof MicroOrmJsonApiModule
+      | TypeOrmDefaultOptions,
+    second?: TypeOrmOptions | MicroOrmOptions
+  ): DynamicModule {
+    let resultOption: ResultModuleOptions = {} as any;
 
-  public static forRoot(options: ModuleOptions): DynamicModule {
-    JsonApiModule.connectionName =
-      options.connectionName || JsonApiModule.connectionName;
+    if (second) {
+      const module = first as
+        | typeof TypeOrmJsonApiModule
+        | typeof MicroOrmJsonApiModule;
+      resultOption = {
+        ...prepareConfig(second, module.module),
+        type: module,
+      } as ResultModuleOptions;
+    } else {
+      const {
+        TypeOrmJsonApiModule,
+      } = require('./modules/type-orm/type-orm-json-api.module');
+      resultOption = {
+        ...prepareConfig(
+          first as TypeOrmDefaultOptions,
+          TypeOrmJsonApiModule.module
+        ),
+        type: TypeOrmJsonApiModule as typeof TypeOrmJsonApiModule,
+      } as any;
+    }
 
-    options.connectionName = JsonApiModule.connectionName;
-    options.options = {
-      ...ConfigParamDefault,
-      ...options.options,
-    };
+    resultOption.imports.unshift(DiscoveryModule);
 
-    const commonModule = JsonApiNestJsCommonModule.forRoot(options);
+    const commonOrmModule = resultOption.type.forRoot(resultOption);
 
-    const entityImport = options.entities.map((entity) => {
-      const controller = (options.controllers || []).find(
-        (item) =>
-          item &&
-          Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, item) === entity
-      );
-      const module = BaseModuleClass.forRoot({
-        entity,
-        connectionName: JsonApiModule.connectionName,
-        controller,
-        config: {
-          ...ConfigParamDefault,
-          ...options.options,
-        },
-      });
-      module.imports = [
-        DiscoveryModule,
-        commonModule,
-        ...(module.imports || []),
-      ];
-      return module;
-    });
+    const entitiesMixinModules = resultOption.entities.map(
+      (entity: EntityName<AnyEntity>) =>
+        createMixinModule(entity, resultOption, commonOrmModule)
+    );
 
-    const operationModuleImport = options.options?.operationUrl
-      ? [
-          AtomicOperationModule.forRoot(
-            {
-              ...options,
-              connectionName: JsonApiModule.connectionName,
-            },
-            entityImport,
-            commonModule
-          ),
-          RouterModule.register([
-            {
-              module: AtomicOperationModule,
-              path: options.options.operationUrl,
-            },
-          ]),
-        ]
-      : [];
+    const operationModuleImport = createAtomicModule(
+      resultOption,
+      entitiesMixinModules,
+      commonOrmModule
+    );
 
     return {
       module: JsonApiModule,
-      imports: [...operationModuleImport, ...entityImport],
+      imports: [...operationModuleImport, ...entitiesMixinModules],
     };
   }
 }

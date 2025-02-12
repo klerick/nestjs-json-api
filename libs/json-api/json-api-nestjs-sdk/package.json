@@ -1,5 +1,5 @@
 {
-  "name": "json-api-nestjs-sdk",
+  "name": "@klerick/json-api-nestjs-sdk",
   "version": "8.0.0",
   "engines": {
     "node": ">= 16.0.0"

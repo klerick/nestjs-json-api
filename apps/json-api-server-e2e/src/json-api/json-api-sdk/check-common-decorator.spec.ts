@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { FilterOperand, JsonSdkPromise } from 'json-api-nestjs-sdk';
+import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { AxiosError } from 'axios';
-import { Users } from 'database';
+import { Users } from '@nestjs-json-api/typeorm-database';
 
 import { run, creatSdk } from '../utils/run-application';
 

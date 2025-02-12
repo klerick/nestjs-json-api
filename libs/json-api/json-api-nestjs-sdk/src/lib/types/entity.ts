@@ -1,4 +1,4 @@
-import { EntityField, EntityProps } from 'json-shared-type';
+import { EntityField, EntityProps } from '../../shared';
 
 export { EntityField, EntityProps };
 

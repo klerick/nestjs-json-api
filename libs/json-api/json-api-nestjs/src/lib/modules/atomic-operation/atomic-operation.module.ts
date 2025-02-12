@@ -17,13 +17,13 @@ import {
   ZodInputOperation,
   AsyncIterate,
 } from './factory';
-import { ModuleOptions } from '../../types';
+import { ResultModuleOptions } from '../../types';
 import { MAP_CONTROLLER_INTERCEPTORS, OPTIONS } from './constants';
 
 @Module({})
 export class AtomicOperationModule implements NestModule {
   static forRoot(
-    options: ModuleOptions,
+    options: ResultModuleOptions,
     entityModules: DynamicModule[],
     commonModule: DynamicModule
   ): DynamicModule {
@@ -37,7 +37,7 @@ export class AtomicOperationModule implements NestModule {
         AsyncIterate,
         MapControllerEntity(options.entities, entityModules),
         MapEntityNameToEntity(options.entities),
-        ZodInputOperation(options.connectionName),
+        ZodInputOperation(),
         {
           provide: MAP_CONTROLLER_INTERCEPTORS,
           useValue: new Map(),

@@ -10,4 +10,4 @@ export {
   ResourceData,
   ResourceObject,
   ResourceObjectRelationships,
-} from 'json-shared-type';
+} from '../../shared';

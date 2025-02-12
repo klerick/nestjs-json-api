@@ -1,4 +1,4 @@
-import { FilterOperand } from 'json-shared-type';
+import { FilterOperand } from '../../shared';
 
 export { FilterOperand };
 

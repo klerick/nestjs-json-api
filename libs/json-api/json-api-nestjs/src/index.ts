@@ -1,19 +1,24 @@
 export { JsonApiModule } from './lib/json-api.module';
-export { InjectService, JsonApi } from './lib/decorators';
-export {
-  EntityRelation,
-  TypeormService as JsonApiService,
-  ResourceObject,
-  ResourceObjectRelationships,
-} from './lib/types';
-export { JsonBaseController } from './lib/mixin/controller/json-base.controller';
+export { TypeOrmJsonApiModule, MicroOrmJsonApiModule } from './lib/modules';
+
+export { JsonApi, InjectService } from './lib/modules/mixin/decorators';
+export { OrmService as JsonApiService } from './lib/modules/mixin/types';
+export { JsonBaseController } from './lib/modules/mixin/controller/json-base.controller';
 export {
   Query,
   PatchData,
   PostData,
   PostRelationshipData,
   PatchRelationshipData,
+  QueryOne,
+} from './lib/modules/mixin/zod';
+
+export {
+  EntityRelation,
+  ResourceObject,
+  ResourceObjectRelationships,
   QueryField,
-} from './lib/helper/zod';
-export { excludeMethod } from './lib/config/bindings';
-export { entityForClass } from './lib/helper/utils';
+} from './lib/utils/nestjs-shared';
+
+export { excludeMethod } from './lib/modules/mixin/config/bindings';
+export { entityForClass } from './lib/utils';

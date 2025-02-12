@@ -453,15 +453,19 @@ describe('JsonApiUtilsService', () => {
       },
       relationships: {
         relatedEntity: {
-          type: 'related-entity',
-          id: '2',
-        },
-        relatedEntities: [
-          {
-            type: 'related-entities',
-            id: '3',
+          data: {
+            type: 'related-entity',
+            id: '2',
           },
-        ],
+        },
+        relatedEntities: {
+          data: [
+            {
+              type: 'related-entities',
+              id: '3',
+            },
+          ],
+        },
       },
     });
   });

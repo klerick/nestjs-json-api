@@ -13,25 +13,11 @@ import {
 import { Module } from '@nestjs/core/injector/module';
 import { ArgumentMetadata } from '@nestjs/common/interfaces/features/pipe-transform.interface';
 import { ApplicationConfig, ModuleRef, NestContainer } from '@nestjs/core';
-import { DataSource } from 'typeorm';
-
-import { MapControllerInterceptor, ParamsForExecute } from '../types';
-import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
 import {
-  ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_INPUT_SCHEMA,
-  MAP_CONTROLLER_INTERCEPTORS,
-  OPTIONS,
-} from '../constants';
-import { IterateFactory } from '../factory';
-import {
-  ConfigParam,
+  ObjectTyped,
   ResourceObject,
   ResourceObjectRelationships,
-  TypeFromType,
-  ValidateQueryError,
-} from '../../../types';
-import { ObjectTyped } from '../../../helper';
+} from '../../../utils/nestjs-shared';
 import {
   InterceptorsConsumer,
   InterceptorsContextCreator,
@@ -39,6 +25,17 @@ import {
 import { Controller } from '@nestjs/common/interfaces';
 import { lastValueFrom } from 'rxjs';
 import { AsyncLocalStorage } from 'async_hooks';
+
+import { MapControllerInterceptor, ParamsForExecute } from '../types';
+import {
+  ASYNC_ITERATOR_FACTORY,
+  KEY_MAIN_INPUT_SCHEMA,
+  MAP_CONTROLLER_INTERCEPTORS,
+} from '../constants';
+import { IterateFactory } from '../factory';
+import { TypeFromType } from '../../mixin/types';
+import { RunInTransaction, ValidateQueryError } from '../../../types';
+import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 export function isZodError(
   param: string | unknown
@@ -53,7 +50,7 @@ export function isZodError(
 
 @Injectable()
 export class ExecuteService {
-  @Inject(CURRENT_DATA_SOURCE_TOKEN) private readonly dataSource!: DataSource;
+  // @Inject(CURRENT_DATA_SOURCE_TOKEN) private readonly dataSource!: DataSource;
   @Inject(ModuleRef) private readonly moduleRef!: ModuleRef & {
     container: NestContainer;
     applicationConfig: ApplicationConfig;
@@ -62,7 +59,10 @@ export class ExecuteService {
   @Inject(ASYNC_ITERATOR_FACTORY) private asyncIteratorFactory!: IterateFactory<
     ExecuteService['runOneOperation']
   >;
-  @Inject(OPTIONS) private options!: ConfigParam;
+  @Inject(RUN_IN_TRANSACTION_FUNCTION)
+  private runInTransaction!: RunInTransaction<
+    () => ReturnType<ExecuteService['executeOperations']>
+  >;
   @Inject(MAP_CONTROLLER_INTERCEPTORS)
   private mapControllerInterceptor!: MapControllerInterceptor;
 
@@ -84,31 +84,10 @@ export class ExecuteService {
   private interceptorsConsumer = new InterceptorsConsumer();
 
   async run(params: ParamsForExecute[], tmpIds: (string | number)[]) {
-    if (
-      this.options.runInTransaction &&
-      typeof this.options.runInTransaction === 'function'
-    ) {
-      return this.options.runInTransaction('READ UNCOMMITTED', () => {
-        return this.executeOperations(params, tmpIds);
-      });
-    }
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.startTransaction('READ UNCOMMITTED');
-    try {
-      const resultArray = await this.executeOperations(params, tmpIds);
-      await queryRunner.commitTransaction();
-      return resultArray;
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-      throw e;
-    } finally {
-      await queryRunner.release();
-    }
-
-    return [];
+    return this.runInTransaction(() => this.executeOperations(params, tmpIds));
   }
 
-  private async executeOperations(
+  protected async executeOperations(
     params: ParamsForExecute[],
     tmpIds: (string | number)[] = []
   ) {
@@ -216,7 +195,7 @@ export class ExecuteService {
     return resultInterceptors;
   }
 
-  private replaceTmpIds<T extends ParamsForExecute['params']>(
+  replaceTmpIds<T extends ParamsForExecute['params']>(
     inputParams: T,
     tmpIdsMap: Record<string | number, string | number>
   ): T {
@@ -235,30 +214,44 @@ export class ExecuteService {
       return inputParams;
     }
 
-    if (!('relationships' in bodyInput)) {
+    if (!(typeof bodyInput === 'object' && 'relationships' in bodyInput)) {
       return inputParams;
     }
 
     const { relationships } = bodyInput;
+
     if (!relationships) {
       return inputParams;
     }
 
     bodyInput.relationships = ObjectTyped.entries(relationships).reduce(
       (acum, [name, val]) => {
-        if (Array.isArray(val)) {
-          acum[name] = (val as any[]).map((i) => {
-            i['id'] = tmpIdsMap[i['id']] ? tmpIdsMap[i['id']] : i['id'];
-            return i;
-          }) as never;
+        if (!val) throw new Error('Va; undefined');
+        const { data } = val;
+        if (Array.isArray(data)) {
+          acum[name] = {
+            data: data.map((i) => {
+              if (i === null) return i;
+              return {
+                ...i,
+                id: tmpIdsMap[i['id']] ? `${tmpIdsMap[i['id']]}` : i['id'],
+              };
+            }),
+          };
         } else {
-          acum[name]['id'] = tmpIdsMap[val['id']]
-            ? (tmpIdsMap[val['id']] as never)
-            : acum[name]['id'];
+          if (!data) {
+            acum[name] = val;
+          } else {
+            data['id'] = tmpIdsMap[data['id']]
+              ? `${tmpIdsMap[data['id']]}`
+              : data['id'];
+            acum[name] = {
+              data,
+            };
+          }
         }
         return acum;
       },
-      // @ts-ignore
       { ...relationships }
     );
 

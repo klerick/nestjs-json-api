@@ -85,10 +85,12 @@
       "!json-api-server",
       "!json-api-front",
       "!shared-utils",
-      "!database",
+      "!typeorm-database",
+      "!microorm-database",
       "!type-for-rpc"
     ],
     "version": {
+      "preVersionCommand": "npx nx run-many -t build",
       "conventionalCommits": true,
       "generatorOptions": {
         "fallbackCurrentVersionResolver": "1.0.0"

@@ -1,17 +1,18 @@
 import { Inject, Injectable, Type } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
 import { ModulesContainer } from '@nestjs/core';
+import { EntityRelation } from '../../../utils/nestjs-shared';
 import { MAP_CONTROLLER_ENTITY, MAP_ENTITY } from '../constants';
 import { MapController, MapEntity, OperationMethode } from '../types';
-import { Entity, EntityRelation } from '../../../types';
+import { ObjectLiteral as Entity } from '../../../types';
 import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
+import { JsonBaseController } from '../../mixin/controller/json-base.controller';
 import {
   PatchData,
   PatchRelationshipData,
   PostData,
   PostRelationshipData,
-} from '../../../helper/zod';
+} from '../../mixin/zod';
 
 @Injectable()
 export class ExplorerService<E extends Entity = Entity> {
@@ -44,7 +45,7 @@ export class ExplorerService<E extends Entity = Entity> {
     operation: Operation,
     id?: string,
     rel?: string
-  ): OperationMethode {
+  ): OperationMethode<E> {
     switch (operation) {
       case Operation.add:
         return id ? 'postRelationship' : 'postOne';
@@ -58,7 +59,7 @@ export class ExplorerService<E extends Entity = Entity> {
   }
 
   getParamsForMethod(
-    methodName: OperationMethode,
+    methodName: OperationMethode<E>,
     data: InputArray[number]
   ): Parameters<JsonBaseController<E>[typeof methodName]> {
     const { op, ref, ...other } = data;

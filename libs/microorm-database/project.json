@@ -1,0 +1,9 @@
+{
+  "name": "microorm-database",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/microorm-database/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project microorm-database --web",
+  "targets": {}
+}

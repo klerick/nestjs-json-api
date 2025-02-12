@@ -8,13 +8,12 @@ import { IMemoryDb } from 'pg-mem';
 import { OperationController } from './operation.controller';
 import { ExecuteService, ExplorerService } from '../service';
 import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
+import { JsonBaseController } from '../../mixin/controller/json-base.controller';
 import {
-  createAndPullSchemaBase,
   mockDBTestModule,
   providerEntities,
   Users,
-} from '../../../mock-utils';
+} from '../../../mock-utils/typeorm';
 
 import {
   ASYNC_ITERATOR_FACTORY,
@@ -26,10 +25,14 @@ import {
   OPTIONS,
 } from '../constants';
 
-import { CurrentDataSourceProvider } from '../../../factory';
-import { DEFAULT_CONNECTION_NAME } from '../../../constants';
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
+import { ObjectLiteral } from '../../../types';
+import {
+  CURRENT_DATA_SOURCE_TOKEN,
+  RUN_IN_TRANSACTION_FUNCTION,
+} from '../../../constants';
+import { createAndPullSchemaBase } from '../../../mock-utils';
 
 describe('OperationController', () => {
   let db: IMemoryDb;
@@ -44,11 +47,18 @@ describe('OperationController', () => {
       controllers: [OperationController],
       providers: [
         ...providerEntities(getDataSourceToken()),
-        CurrentDataSourceProvider(DEFAULT_CONNECTION_NAME),
+        {
+          provide: CURRENT_DATA_SOURCE_TOKEN,
+          useValue: {},
+        },
         ExplorerService,
         ExecuteService,
         {
           provide: MAP_ENTITY,
+          useValue: {},
+        },
+        {
+          provide: RUN_IN_TRANSACTION_FUNCTION,
           useValue: {},
         },
         {
@@ -117,7 +127,7 @@ describe('OperationController', () => {
       const getMethodNameByParamSpy = jest
         .spyOn(explorerService, 'getMethodNameByParam')
         .mockReturnValue(
-          paramsForExecuteMock[0].methodName as OperationMethode
+          paramsForExecuteMock[0].methodName as OperationMethode<ObjectLiteral>
         );
       const getModulesByControllerSpy = jest
         .spyOn(explorerService, 'getParamsForMethod')
@@ -150,7 +160,6 @@ describe('OperationController', () => {
       expect(getParamsForMethodSpy).toHaveBeenCalledWith(
         paramsForExecuteMock[0].controller
       );
-      // expect(runSpy).toHaveBeenCalledWith(paramsForExecuteMock[0].module, paramsForExecuteMock[0].methodName, paramsForExecuteMock[0].params);
 
       expect(runSpy).toHaveBeenCalledWith(paramsForExecuteMock, []);
     });

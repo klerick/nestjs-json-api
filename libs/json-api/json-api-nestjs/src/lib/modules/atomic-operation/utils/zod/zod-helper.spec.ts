@@ -1,7 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getDataSourceToken } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { IMemoryDb } from 'pg-mem';
 import { z, ZodError } from 'zod';
 import {
   Operation,
@@ -16,16 +13,17 @@ import {
   zodUpdate,
   ZodUpdate,
 } from './zod-helper';
-import {
-  createAndPullSchemaBase,
-  mockDBTestModule,
-  providerEntities,
-  Users,
-} from '../../../../mock-utils';
-import { DEFAULT_CONNECTION_NAME } from '../../../../constants';
-import { JsonBaseController } from '../../../../mixin/controller/json-base.controller';
+import { Users } from '../../../../mock-utils/typeorm';
+import { ENTITY_MAP_PROPS, FIELD_FOR_ENTITY } from '../../../../constants';
+import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
 import { MapController } from '../../types';
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
+import {
+  GetFieldForEntity,
+  TupleOfEntityRelation,
+  ZodEntityProps,
+} from '../../../mixin/types';
+import { EntityClass } from '../../../../types';
 
 describe('ZodHelperSpec', () => {
   afterEach(() => {
@@ -323,11 +321,16 @@ describe('ZodHelperSpec', () => {
   describe('zodOperationRel', () => {
     it('should be correct', () => {
       const user = 'user';
-      const rel: ['address', 'notes'] = ['address', 'notes'];
-      const schema = zodOperationRel(user, rel, Operation.remove);
-      const check: z.infer<
-        ZodOperationRel<'user', ['address', 'notes'], Operation.remove>
-      > = {
+      const rel = [
+        'address',
+        'notes',
+      ] as unknown as TupleOfEntityRelation<Users>;
+      const schema = zodOperationRel<Users, Operation>(
+        user,
+        rel,
+        Operation.remove
+      );
+      const check: z.infer<ZodOperationRel<Users, Operation.remove>> = {
         op: Operation.remove,
         ref: {
           type: 'user',
@@ -350,8 +353,15 @@ describe('ZodHelperSpec', () => {
     });
     it('should be not correct', () => {
       const user = 'user';
-      const rel: ['address', 'notes'] = ['address', 'notes'];
-      const schema = zodOperationRel(user, rel, Operation.remove);
+      const rel = [
+        'address',
+        'notes',
+      ] as unknown as TupleOfEntityRelation<Users>;
+      const schema = zodOperationRel<Users, Operation>(
+        user,
+        rel,
+        Operation.remove
+      );
 
       const check = {
         op: Operation.remove,
@@ -439,25 +449,42 @@ describe('ZodHelperSpec', () => {
     });
   });
   describe('zodInputOperation', () => {
-    let db: IMemoryDb;
-    let dataSource: DataSource;
+    let getField: Map<EntityClass<any>, ZodEntityProps<any>>;
     beforeAll(async () => {
-      db = createAndPullSchemaBase();
       const module: TestingModule = await Test.createTestingModule({
-        imports: [mockDBTestModule(db)],
-        providers: [...providerEntities(getDataSourceToken())],
+        providers: [
+          {
+            provide: ENTITY_MAP_PROPS,
+            useValue: new Map([
+              [
+                Users,
+                {
+                  relations: [
+                    'userGroup',
+                    'notes',
+                    'comments',
+                    'roles',
+                    'manager',
+                    'addresses',
+                  ],
+                },
+              ],
+            ]),
+          },
+        ],
       }).compile();
-      dataSource = module.get<DataSource>(
-        getDataSourceToken(DEFAULT_CONNECTION_NAME)
-      );
+      getField =
+        module.get<Map<EntityClass<any>, ZodEntityProps<any>>>(
+          ENTITY_MAP_PROPS
+        );
     });
 
     it('should be correct', () => {
-      const mapController: MapController = new Map([
+      const mapController: MapController<Users> = new Map([
         [Users as any, JsonBaseController],
       ]);
-      const schema = zodInputOperation(dataSource, mapController);
-      const check: z.infer<ZodInputOperation> = {
+      const schema = zodInputOperation(mapController, getField);
+      const check: z.infer<ZodInputOperation<any>> = {
         [KEY_MAIN_INPUT_SCHEMA]: [
           {
             data: {},
@@ -496,10 +523,10 @@ describe('ZodHelperSpec', () => {
     });
 
     it('incorrect input main data', () => {
-      const mapController: MapController = new Map([
+      const mapController: MapController<Users> = new Map([
         [Users as any, JsonBaseController],
       ]);
-      const schema = zodInputOperation(dataSource, mapController);
+      const schema = zodInputOperation(mapController, getField);
       const check = {};
       const check1 = {
         ssdf: 'sdfsdf',
@@ -533,9 +560,11 @@ describe('ZodHelperSpec', () => {
           return super.deleteOne(id);
         }
       }
-      const mapController: MapController = new Map([[Users as any, Test]]);
-      const schema = zodInputOperation(dataSource, mapController);
-      const check: z.infer<ZodInputOperation> = {
+      const mapController: MapController<Users> = new Map([
+        [Users as any, Test],
+      ]);
+      const schema = zodInputOperation(mapController, getField);
+      const check: z.infer<ZodInputOperation<any>> = {
         [KEY_MAIN_INPUT_SCHEMA]: [
           {
             data: {},
@@ -548,7 +577,7 @@ describe('ZodHelperSpec', () => {
           },
         ],
       };
-      const check1: z.infer<ZodInputOperation> = {
+      const check1: z.infer<ZodInputOperation<any>> = {
         [KEY_MAIN_INPUT_SCHEMA]: [
           {
             data: {},

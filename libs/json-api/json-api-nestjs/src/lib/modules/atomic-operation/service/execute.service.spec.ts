@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
-import { DataSource } from 'typeorm';
 import { ExecuteService, isZodError } from './execute.service';
 import { IterateFactory } from '../factory';
 import {
@@ -10,7 +9,7 @@ import {
   MAP_CONTROLLER_INTERCEPTORS,
   OPTIONS,
 } from '../constants';
-import { CURRENT_DATA_SOURCE_TOKEN } from '../../../constants';
+
 import {
   HttpException,
   NotFoundException,
@@ -19,22 +18,21 @@ import {
 } from '@nestjs/common';
 import { ParamsForExecute } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
+import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 describe('ExecuteService', () => {
   let service: ExecuteService;
-  let dataSource: DataSource;
+  let runInTransaction: jest.Mock;
   let moduleRef: ModuleRef;
   let asyncIteratorFactory: IterateFactory;
-  let mapControllerInterceptors = new Map();
+  const mapControllerInterceptors = new Map();
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ExecuteService,
         {
-          provide: CURRENT_DATA_SOURCE_TOKEN,
-          useValue: {
-            createQueryRunner: () => {},
-          },
+          provide: RUN_IN_TRANSACTION_FUNCTION,
+          useValue: jest.fn(),
         },
         {
           provide: ModuleRef,
@@ -64,7 +62,7 @@ describe('ExecuteService', () => {
     }).compile();
 
     service = module.get<ExecuteService>(ExecuteService);
-    dataSource = module.get<DataSource>(CURRENT_DATA_SOURCE_TOKEN);
+    runInTransaction = module.get<jest.Mock>(RUN_IN_TRANSACTION_FUNCTION);
     moduleRef = module.get<ModuleRef>(ModuleRef);
     asyncIteratorFactory = module.get<IterateFactory>(ASYNC_ITERATOR_FACTORY);
     mapControllerInterceptors.clear();
@@ -83,15 +81,7 @@ describe('ExecuteService', () => {
         },
       ] as ParamsForExecute[];
 
-      const queryRunnerMock = {
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        release: jest.fn(),
-      };
-      jest
-        .spyOn(dataSource, 'createQueryRunner')
-        .mockReturnValue(queryRunnerMock as any);
+      runInTransaction.mockImplementationOnce((args: () => {}) => args());
 
       jest.spyOn(service as any, 'executeOperations').mockImplementation(() => {
         throw new NotFoundException();
@@ -99,33 +89,18 @@ describe('ExecuteService', () => {
 
       await expect(service.run(params, [])).rejects.toThrow(NotFoundException);
 
-      expect(queryRunnerMock.rollbackTransaction).toHaveBeenCalled();
-      expect(queryRunnerMock.release).toHaveBeenCalled();
-      await expect(service.run(params, [])).rejects.toThrow(NotFoundException);
+      expect(runInTransaction).toHaveBeenCalled();
     });
 
     it('should return an empty array if no operations are executed', async () => {
       const params: ParamsForExecute[] = [];
 
-      const queryRunnerMock = {
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        rollbackTransaction: jest.fn(),
-        release: jest.fn(),
-      };
-      jest
-        .spyOn(dataSource, 'createQueryRunner')
-        .mockReturnValue(queryRunnerMock as any);
-
+      runInTransaction.mockImplementationOnce((args: () => {}) => args());
       jest.spyOn(service as any, 'executeOperations').mockReturnValue([]);
 
       const result = await service.run(params, []);
       expect(result).toEqual([]);
-
-      expect(queryRunnerMock.startTransaction).toHaveBeenCalled();
-      expect(queryRunnerMock.commitTransaction).toHaveBeenCalled();
-      expect(queryRunnerMock.rollbackTransaction).not.toHaveBeenCalled();
-      expect(queryRunnerMock.release).toHaveBeenCalled();
+      expect(runInTransaction).toHaveBeenCalled();
     });
   });
 
@@ -473,6 +448,162 @@ describe('ExecuteService', () => {
       expect(service['moduleRef'].get).toHaveBeenCalledWith(ParseBoolPipe, {
         strict: false,
       });
+    });
+  });
+
+  describe('ExecuteService - replaceTmpIds', () => {
+    let service: ExecuteService;
+
+    beforeEach(() => {
+      service = new ExecuteService();
+    });
+
+    it('should be return id first input params of array is undefined', () => {
+      const inputParams = [] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be return id first input params of array is string', () => {
+      const inputParams = ['string'] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be return id first input params of array is number', () => {
+      const inputParams = [1] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+    it('should be return id first input params of array is array', () => {
+      const inputParams = [[]] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be return id first input params of array is object', () => {
+      const inputParams = [{}] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be return id first input params of array is object with undefined of relationships', () => {
+      const inputParams = [{ relationships: undefined }] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be not replace of relation with object', () => {
+      const inputParams = [
+        {
+          relationships: {
+            addresses: { data: { id: '1234', type: 'addresses' } },
+          },
+        },
+      ] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be not replace of relation with array of object', () => {
+      const inputParams = [
+        {
+          relationships: {
+            addresses: {
+              data: [
+                { id: '1234', type: 'addresses' },
+                { id: '1235', type: 'addresses' },
+              ],
+            },
+          },
+        },
+      ] as any;
+      const tmpIdsMap = {};
+
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(inputParams);
+    });
+
+    it('should be replace of relation with object', () => {
+      const inputParams = [
+        {
+          relationships: {
+            addresses: { data: { id: '1234', type: 'addresses' } },
+          },
+        },
+      ] as any;
+      const newId = '4321';
+      const tmpIdsMap = { '1234': newId };
+
+      const checkResult = [
+        {
+          ...inputParams[0],
+          relationships: {
+            ...inputParams[0].relationships,
+            addresses: {
+              ...inputParams[0].relationships.addresses,
+              data: {
+                ...inputParams[0].relationships.addresses.data,
+                id: newId,
+              },
+            },
+          },
+        },
+      ];
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(checkResult);
+    });
+
+    it('should be replace of relation with array of object', () => {
+      const inputParams = [
+        {
+          relationships: {
+            addresses: {
+              data: [
+                { id: '12345', type: 'addresses' },
+                { id: '1234', type: 'addresses' },
+              ],
+            },
+          },
+        },
+      ] as any;
+      const newId = '4321';
+      const tmpIdsMap = { '1234': newId };
+
+      const checkResult = [
+        {
+          ...inputParams[0],
+          relationships: {
+            ...inputParams[0].relationships,
+            addresses: {
+              ...inputParams[0].relationships.addresses,
+              data: [
+                inputParams[0].relationships.addresses.data[0],
+                {
+                  ...inputParams[0].relationships.addresses.data[1],
+                  id: newId,
+                },
+              ],
+            },
+          },
+        },
+      ];
+      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      expect(result).toEqual(checkResult);
     });
   });
 });
