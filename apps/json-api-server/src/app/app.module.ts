@@ -3,7 +3,8 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { TypeOrmDatabaseModule } from '@nestjs-json-api/typeorm-database';
 import { MicroOrmDatabaseModule } from '@nestjs-json-api/microorm-database';
-import { ResourcesModule } from './resources/resources.module';
+import { ResourcesTypeModule } from './resources/type-orm/resources-type.module';
+import { ResourcesMicroModule } from './resources/micro-orm/resources-micro.module';
 import { RpcModule } from './rpc/rpc.module';
 import * as process from 'process';
 
@@ -12,10 +13,15 @@ const ormModule =
     ? TypeOrmDatabaseModule
     : MicroOrmDatabaseModule;
 
+const resourceModule =
+  process.env['ORM_TYPE'] === 'typeorm'
+    ? ResourcesTypeModule
+    : ResourcesMicroModule;
+
 @Module({
   imports: [
     ormModule,
-    ResourcesModule,
+    resourceModule,
     RpcModule,
     LoggerModule.forRoot({
       pinoHttp: {

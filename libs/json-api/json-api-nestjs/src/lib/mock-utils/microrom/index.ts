@@ -1,4 +1,3 @@
-import { DynamicModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { EntityManager, MikroORM } from '@mikro-orm/core';

@@ -163,6 +163,10 @@ type RelationFilterProps<E extends ObjectLiteral> = {
   [R in keyof RelationTree<E>]: ZodRulesForRelationShape<TypeOfArray<E[R]>>;
 };
 
+type TargetRelationShape<E extends ObjectLiteral> = {
+  [K in ResultGetField<E>['relations'][number]]: ZodOptional<ZodRuleFilterRelationSchema>;
+};
+
 export function zodFilterQuery<E extends ObjectLiteral>(
   fields: ResultGetField<E>['field'],
   relationTree: RelationTree<E>,
@@ -182,9 +186,7 @@ export function zodFilterQuery<E extends ObjectLiteral>(
       ...acum,
       [item]: zodRuleFilterRelationSchema.optional(),
     }),
-    {} as {
-      [K in ResultGetField<E>['relations'][number]]: ZodOptional<ZodRuleFilterRelationSchema>;
-    }
+    {} as TargetRelationShape<E>
   );
 
   const relationFilterProps = ObjectTyped.keys(relationTree).reduce(

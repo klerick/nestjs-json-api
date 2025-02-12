@@ -20,6 +20,10 @@ type ZodRule<K extends readonly [string, ...string[]]> = ReturnType<
   typeof getZodRules<K>
 >;
 
+type TargetRelationShape<E extends ObjectLiteral> = {
+  [K in keyof RelationTree<E>]: ZodRule<RelationTree<E>[K]>;
+};
+
 export function zodFieldsQuery<E extends ObjectLiteral>(
   fields: ResultGetField<E>['field'],
   relationList: RelationTree<E>
@@ -28,9 +32,7 @@ export function zodFieldsQuery<E extends ObjectLiteral>(
     target: getZodRules(fields),
   };
 
-  const relation = {} as {
-    [K in keyof RelationTree<E>]: ZodRule<RelationTree<E>[K]>;
-  };
+  const relation = {} as TargetRelationShape<E>;
 
   for (const [key, value] of ObjectTyped.entries(relationList)) {
     relation[key] = getZodRules(value);

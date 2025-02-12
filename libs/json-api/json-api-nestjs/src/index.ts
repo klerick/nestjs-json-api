@@ -10,6 +10,7 @@ export {
   PostData,
   PostRelationshipData,
   PatchRelationshipData,
+  QueryOne,
 } from './lib/modules/mixin/zod';
 
 export {

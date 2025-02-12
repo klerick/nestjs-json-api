@@ -81,7 +81,7 @@ function zodQueryOne<E extends ObjectLiteral>(
   entityRelationStructure: RelationTree<E>,
   propsArray: ArrayPropsForEntity<E>,
   propsType: AllFieldWithType<E>
-) {
+): ZodObject<Pick<Shape<E>, QueryField.fields | QueryField.include>, 'strict'> {
   return z
     .object({
       [QueryField.fields]: zodFieldsQuery(
