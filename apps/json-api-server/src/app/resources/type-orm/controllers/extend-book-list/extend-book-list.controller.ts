@@ -1,12 +1,10 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { BookList } from '../entity-orm';
 import { JsonApi, JsonBaseController } from '@klerick/json-api-nestjs';
 
-@JsonApi(BookList as any, {
+import { BookList } from '@nestjs-json-api/typeorm-database';
+@JsonApi(BookList, {
   pipeForId: ParseUUIDPipe,
   overrideRoute: 'override-book-list',
   allowMethod: ['getOne', 'postOne', 'deleteOne'],
 })
-export class ExtendBookListController extends JsonBaseController<
-  typeof BookList
-> {}
+export class ExtendBookListController extends JsonBaseController<BookList> {}
