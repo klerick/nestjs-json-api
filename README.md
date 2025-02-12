@@ -37,3 +37,4 @@ $ nx run json-api-server:serve:development
 ## License
 
 The plugin is [MIT licensed](LICENSE).
+
