@@ -8,8 +8,8 @@
 
 # json-api-nestjs
 
-This plugin works upon TypeOrm or MicroOrm library, which is used as the main database abstraction layer tool. The module
-automatically generates an API according to JSON API specification from the database structure (TypeORM entities). It
+This plugin works upon **TypeOrm** or **MicroOrm** library, which is used as the main database abstraction layer tool. The module
+automatically generates an API according to JSON API specification from the database structure (**TypeOrm** or **MicroOrm** entities). It
 supports features such as requests validation based on database fields types, request filtering, endpoints extending,
 data relations control and much more. Our module significantly reduces the development time of REST services by removing
 the need to negotiate the mechanism of client-server interaction and implementing automatic API generation without the
