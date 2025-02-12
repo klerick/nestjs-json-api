@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
-import { JsonApiSdkService } from 'json-api-nestjs-sdk';
-import { AtomicFactory } from 'json-api-nestjs-sdk/ngModule';
+import { JsonApiSdkService } from '@klerick/json-api-nestjs-sdk';
+import { AtomicFactory } from '@klerick/json-api-nestjs-sdk/ngModule';
 import {
   JSON_RPC,
   RPC_BATCH,

@@ -1,5 +1,5 @@
 import { ApplicationConfig, InjectionToken } from '@angular/core';
-import { provideJsonApi } from 'json-api-nestjs-sdk/ngModule';
+import { provideJsonApi } from '@klerick/json-api-nestjs-sdk/ngModule';
 import {
   JsonRpcAngularConfig,
   TransportType,

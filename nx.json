@@ -81,6 +81,7 @@
     "projects": [
       "*",
       "!json-shared-type",
+      "!json-api-nestjs-shared",
       "!json-api-server-e2e",
       "!json-api-server",
       "!json-api-front",
@@ -90,7 +91,7 @@
       "!type-for-rpc"
     ],
     "version": {
-      "preVersionCommand": "npx nx run-many -t build",
+      "preVersionCommand": "npx nx run-many -t build -p nestjs-json-rpc,nestjs-json-rpc-sdk,json-api-nestjs,json-api-nestjs-sdk",
       "conventionalCommits": true,
       "generatorOptions": {
         "fallbackCurrentVersionResolver": "1.0.0"
