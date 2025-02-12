@@ -33,7 +33,7 @@ jobs:
           path: |
             .nx
           key: ${{ runner.os }}-nx-master
-      - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,database,type-for-rpc'
+      - run: npx nx affected -t build --parallel=3 --exclude='json-api-front,json-api-server,json-api-server-e2e,shared-utils,json-shared-type,microorm-database,typeorm-database,type-for-rpc'
       - name: Publish packages
         run: npx nx release publish
         shell: bash
