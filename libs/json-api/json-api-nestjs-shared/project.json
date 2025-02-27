@@ -24,6 +24,16 @@
         "assets": ["libs/json-api/json-api-nestjs-shared/*.md"]
       }
     },
+    "ts-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsd --files \"src/**/*.test-d.ts\" -t src/lib/types/index.ts"
+        ],
+        "cwd": "{workspaceRoot}/{projectRoot}",
+        "parallel": false
+      }
+    },
     "nx-release-publish": {
       "options": {
         "packageRoot": "dist/{projectRoot}"
