@@ -1,13 +1,23 @@
-import { ObjectTyped } from '../../../../utils/nestjs-shared';
-import { z } from 'zod';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { z, ZodObject } from 'zod';
 
-import { nonEmptyObject, uniqueArray } from '../zod-utils';
-import { ObjectLiteral } from '../../../../types';
-import { ResultGetField, RelationTree } from '../../types';
+import { getRelationProps, nonEmptyObject, uniqueArray } from '../zod-utils';
+import {
+  EntityParam,
+  EntityRelationProps,
+  NonEmptyStringTuple,
+} from '../../../../types';
+import { EntityParamMapService } from '../../service';
 
-function getZodRules<K extends readonly [string, ...string[]]>(fields: K) {
+function getZodFieldRule<
+  E extends object,
+  IdKey extends string,
+  PropsList extends ShapeArrayInput<E, IdKey>
+>(fields: PropsList) {
+  const fieldsProps: NonEmptyStringTuple<PropsList> = fields as any;
+
   return z
-    .enum(fields)
+    .enum(fieldsProps)
     .array()
     .nonempty()
     .refine(uniqueArray(), {
@@ -16,40 +26,58 @@ function getZodRules<K extends readonly [string, ...string[]]>(fields: K) {
     .optional();
 }
 
-type ZodRule<K extends readonly [string, ...string[]]> = ReturnType<
-  typeof getZodRules<K>
->;
+type ShapeArrayInput<E extends object, IdKey extends string> =
+  | EntityParam<E, IdKey>['props']
+  | EntityRelationProps<E, IdKey>[keyof EntityRelationProps<E, IdKey>];
 
-type TargetRelationShape<E extends ObjectLiteral> = {
-  [K in keyof RelationTree<E>]: ZodRule<RelationTree<E>[K]>;
+type ZodFieldRule<
+  E extends object,
+  IdKey extends string,
+  PropsList extends ShapeArrayInput<E, IdKey>
+> = ReturnType<typeof getZodFieldRule<E, IdKey, PropsList>>;
+
+type ZodFieldsShape<E extends object, IdKey extends string> = {
+  target: ZodFieldRule<E, IdKey, EntityParam<E, IdKey>['props']>;
+} & {
+  [K in keyof EntityRelationProps<E, IdKey>]: ZodFieldRule<
+    E,
+    IdKey,
+    EntityRelationProps<E, IdKey>[K]
+  >;
 };
 
-export function zodFieldsQuery<E extends ObjectLiteral>(
-  fields: ResultGetField<E>['field'],
-  relationList: RelationTree<E>
+function getShapeFields<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+): ZodObject<ZodFieldsShape<E, IdKey>, 'strict'> {
+  const relationList = getRelationProps(entityParamMapService);
+
+  const fieldShape = ObjectTyped.entries(relationList).reduce(
+    (acum, [key, val]) => ({
+      ...acum,
+      [key as PropertyKey]: getZodFieldRule<E, IdKey, typeof val>(val),
+    }),
+    {
+      target: getZodFieldRule<E, IdKey, EntityParam<E, IdKey>['props']>(
+        entityParamMapService.entityParaMap.props
+      ),
+    } as ZodFieldsShape<E, IdKey>
+  );
+
+  return z.object(fieldShape).strict('Should be only target of relation');
+}
+
+export function zodFieldsQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
-  const target = {
-    target: getZodRules(fields),
-  };
-
-  const relation = {} as TargetRelationShape<E>;
-
-  for (const [key, value] of ObjectTyped.entries(relationList)) {
-    relation[key] = getZodRules(value);
-  }
-
-  return z
-    .object({
-      ...target,
-      ...relation,
-    })
-    .strict('Should be only target of relation')
+  return getShapeFields(entityParamMapService)
     .refine(nonEmptyObject(), {
       message: 'Validation error: Select target or relation fields',
     })
     .nullable();
 }
-export type ZodFieldsQuery<E extends ObjectLiteral> = ReturnType<
-  typeof zodFieldsQuery<E>
+export type ZodFieldsQuery<E extends object, IdKey extends string> = ReturnType<
+  typeof zodFieldsQuery<E, IdKey>
 >;
-export type FieldsQuery<E extends ObjectLiteral> = z.infer<ZodFieldsQuery<E>>;
+export type FieldsQuery<E extends object, IdKey extends string> = z.infer<
+  ZodFieldsQuery<E, IdKey>
+>;

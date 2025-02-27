@@ -1,6 +1,6 @@
 import { z, ZodObject, ZodOptional } from 'zod';
 
-import { ObjectLiteral } from '../../../../types';
+import { TypeForId } from '../../../../types';
 import {
   ZodId,
   zodId,
@@ -11,60 +11,42 @@ import {
   ZodRelationships,
   zodRelationships,
 } from '../zod-share';
-import {
-  EntityProps,
-  FieldWithType,
-  PropsForField,
-  RelationPrimaryColumnType,
-  RelationPropsArray,
-  RelationPropsTypeName,
-  TypeForId,
-} from '../../types';
+import { EntityParamMapService } from '../../service';
 
-type ZodInputPostShape<E extends ObjectLiteral, N extends string> = {
+type ZodInputPostShape<E extends object, IdKey extends string> = {
   id: ZodOptional<ZodId>;
-  type: ZodType<N>;
-  attributes: ZodAttributes<E>;
-  relationships: ZodOptional<ZodRelationships<E>>;
+  type: ZodType<string>;
+  attributes: ZodAttributes<E, IdKey>;
+  relationships: ZodOptional<ZodRelationships<E, IdKey>>;
 };
 
-type ZodInputPostSchema<E extends ObjectLiteral, N extends string> = ZodObject<
-  ZodInputPostShape<E, N>,
+type ZodInputPostSchema<E extends object, IdKey extends string> = ZodObject<
+  ZodInputPostShape<E, IdKey>,
   'strict'
 >;
 
-type ZodInputPostDataShape<E extends ObjectLiteral, N extends string> = {
-  data: ZodInputPostSchema<E, N>;
+type ZodInputPostDataShape<E extends object, IdKey extends string> = {
+  data: ZodInputPostSchema<E, IdKey>;
 };
 
-function getShape<E extends ObjectLiteral, N extends string>(
-  typeId: TypeForId,
-  typeName: N,
-  fieldWithType: FieldWithType<E>,
-  propsDb: PropsForField<E>,
-  primaryColumn: EntityProps<E>,
-  relationArrayProps: RelationPropsArray<E>,
-  relationPopsName: RelationPropsTypeName<E>,
-  primaryColumnType: RelationPrimaryColumnType<E>
-): ZodInputPostSchema<E, N> {
+function getShape<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+): ZodInputPostSchema<E, IdKey> {
   const shape = {
-    id: zodId(typeId).optional(),
-    type: zodType(typeName),
-    attributes: zodAttributes(fieldWithType, propsDb, primaryColumn, false),
-    relationships: zodRelationships(
-      relationArrayProps,
-      relationPopsName,
-      primaryColumnType,
-      false
+    id: zodId(
+      entityParamMapService.entityParaMap.primaryColumnType as TypeForId
     ).optional(),
+    type: zodType(entityParamMapService.entityParaMap.typeName),
+    attributes: zodAttributes(entityParamMapService, false),
+    relationships: zodRelationships(entityParamMapService, false).optional(),
   };
 
   return z.object(shape).strict();
 }
 
-function zodDataShape<E extends ObjectLiteral, N extends string>(
-  shape: ZodInputPostSchema<E, N>
-): ZodPost<E, N> {
+function zodDataShape<E extends object, IdKey extends string>(
+  shape: ZodInputPostSchema<E, IdKey>
+): ZodPost<E, IdKey> {
   return z
     .object({
       data: shape,
@@ -72,38 +54,22 @@ function zodDataShape<E extends ObjectLiteral, N extends string>(
     .strict();
 }
 
-export function zodPost<E extends ObjectLiteral, N extends string>(
-  typeId: TypeForId,
-  typeName: N,
-  fieldWithType: FieldWithType<E>,
-  propsDb: PropsForField<E>,
-  primaryColumn: EntityProps<E>,
-  relationArrayProps: RelationPropsArray<E>,
-  relationPopsName: RelationPropsTypeName<E>,
-  primaryColumnType: RelationPrimaryColumnType<E>
-): ZodPost<E, N> {
-  const shape = getShape(
-    typeId,
-    typeName,
-    fieldWithType,
-    propsDb,
-    primaryColumn,
-    relationArrayProps,
-    relationPopsName,
-    primaryColumnType
-  );
+export function zodPost<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+): ZodPost<E, IdKey> {
+  const shape = getShape(entityParamMapService);
 
   return zodDataShape(shape);
 }
 
-export type ZodPost<E extends ObjectLiteral, N extends string> = ZodObject<
-  ZodInputPostDataShape<E, N>,
+export type ZodPost<E extends object, IdKey extends string> = ZodObject<
+  ZodInputPostDataShape<E, IdKey>,
   'strict'
 >;
-export type Post<E extends ObjectLiteral, N extends string = string> = z.infer<
-  ZodPost<E, N>
+export type Post<E extends object, IdKey extends string> = z.infer<
+  ZodPost<E, IdKey>
 >;
-export type PostData<E extends ObjectLiteral, N extends string = string> = Post<
+export type PostData<E extends object, IdKey extends string> = Post<
   E,
-  N
+  IdKey
 >['data'];

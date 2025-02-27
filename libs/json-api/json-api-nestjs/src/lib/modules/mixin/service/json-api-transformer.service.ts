@@ -2,51 +2,45 @@ import { Inject, Injectable, VersioningType } from '@nestjs/common';
 import { ApplicationConfig } from '@nestjs/core';
 import {
   Attributes,
-  camelToKebab,
-  Data,
-  DataResult,
-  EntityRelation,
   Include,
-  MainData,
   ObjectTyped,
+  PropertyKeys,
   Relationships,
   ResourceData,
   ResourceObject,
-} from '../../../utils/nestjs-shared';
-
-import { EntityClass, ObjectLiteral } from '../../../types';
-import { ENTITY_MAP_PROPS, CURRENT_ENTITY } from '../../../constants';
-import {
-  EntityProps,
-  RelationProperty,
-  ZodEntityProps,
-  ZodParams,
-} from '../types';
-import { Query, QueryOne } from '../zod';
+  BaseMainData,
+  RelationKeys,
+} from '@klerick/json-api-nestjs-shared';
 import { RoutePathFactory } from '@nestjs/core/router/route-path-factory';
 
+import { EntityParam, EntityClass } from '../../../types';
+import { Query, QueryOne } from '../zod';
+import { EntityParamMapService } from './entity-param-map.service';
+
+function assertColumnName<E extends object>(
+  entity: E,
+  columnName: string
+): asserts columnName is keyof EntityClass<E> {
+  const entityType = entity as EntityClass<E>;
+  if (!(columnName in entityType)) {
+    throw new Error(`${columnName} not exist in ${entityType.name}`);
+  }
+}
+
 Injectable();
-export class JsonApiTransformerService<E extends ObjectLiteral> {
+export class JsonApiTransformerService<
+  E extends object,
+  IdKey extends string = 'id'
+> {
   @Inject(ApplicationConfig) private applicationConfig!: ApplicationConfig;
-  @Inject(ENTITY_MAP_PROPS) private entityMapProps!: Map<
-    EntityClass<E>,
-    ZodEntityProps<E>
-  >;
-  @Inject(CURRENT_ENTITY) private currentEntity!: EntityClass<E>;
+
+  @Inject(EntityParamMapService)
+  private entityParamMapService!: EntityParamMapService<E, IdKey>;
 
   private _urlPath!: string[];
-  private _currentMapProps!: ZodEntityProps<E>;
 
-  get currentMapProps(): ZodEntityProps<E> {
-    if (!this._currentMapProps) {
-      const result = this.entityMapProps.get(this.currentEntity);
-      if (!result)
-        throw new Error('Not found map for ' + this.currentEntity.name);
-
-      this._currentMapProps = result;
-    }
-
-    return this._currentMapProps;
+  get currentMapProps(): EntityParam<E, IdKey> {
+    return this.entityParamMapService.entityParaMap;
   }
 
   get urlPath() {
@@ -77,21 +71,21 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
 
   public transformData(
     data: E,
-    query: QueryOne<E>
-  ): Pick<ResourceObject<E>, 'data' | 'included'>;
+    query: QueryOne<E, IdKey>
+  ): Pick<ResourceObject<E, 'object', null, IdKey>, 'data' | 'included'>;
   public transformData(
     data: E[],
-    query: Query<E>
-  ): Pick<ResourceObject<E, 'array'>, 'data' | 'included'>;
+    query: Query<E, IdKey>
+  ): Pick<ResourceObject<E, 'array', null, IdKey>, 'data' | 'included'>;
   public transformData(
     data: E | E[],
-    query: Query<E>
+    query: Query<E, IdKey>
   ):
-    | Pick<ResourceObject<E>, 'data' | 'included'>
-    | Pick<ResourceObject<E, 'array'>, 'data' | 'included'> {
+    | Pick<ResourceObject<E, 'object', null, IdKey>, 'data' | 'included'>
+    | Pick<ResourceObject<E, 'array', null, IdKey>, 'data' | 'included'> {
     if (Array.isArray(data)) {
       const resultData: Pick<
-        ResourceObject<E, 'array'>,
+        ResourceObject<E, 'array', null, IdKey>,
         'data' | 'included'
       > = {
         data: data.map((item) =>
@@ -106,7 +100,10 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
       return resultData;
     }
 
-    const resultData: Pick<ResourceObject<E>, 'data' | 'included'> = {
+    const resultData: Pick<
+      ResourceObject<E, 'object', null, IdKey>,
+      'data' | 'included'
+    > = {
       data: this.transformItem(data, this.currentMapProps, query),
     };
 
@@ -117,42 +114,48 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
     return resultData;
   }
 
-  public transformItem<T extends ObjectLiteral = E>(
+  public transformItem<T extends object = E, TIdKey extends string = IdKey>(
     item: T,
-    mapProps: ZodEntityProps<T>,
-    query: Query<T>
-  ): ResourceData<T> {
+    mapProps: EntityParam<T, TIdKey>,
+    query: Query<T, TIdKey>
+  ): ResourceData<T, TIdKey> {
     const { fields } = query;
-    const target = Reflect.get(fields || {}, 'target');
-    return {
-      id: item[mapProps.primaryColumnName].toString(),
-      type: mapProps.typeName,
-      attributes: this.extractAttributes(
-        item,
-        mapProps.props.filter((i) => {
-          if (i === mapProps.primaryColumnName) {
-            return false;
-          }
-          if (!target) {
-            return true;
-          }
+    const targetField = fields && fields.target ? fields.target : null;
+    assertColumnName(item, mapProps.primaryColumnName);
+    const props = ObjectTyped.keys(mapProps.propsType).filter((i) => {
+      if (i.toString() === mapProps.primaryColumnName.toString()) {
+        return false;
+      }
+      if (!targetField) {
+        return true;
+      }
 
-          return (target as string[]).includes(i);
-        })
-      ),
+      return (targetField as any[]).includes(i);
+    });
+
+    return {
+      id: `${item[mapProps.primaryColumnName]}`,
+      type: mapProps.typeName,
+      attributes: this.extractAttributes<T, TIdKey>(item, props),
       links: {
         self: this.getLink(mapProps.typeName, item[mapProps.primaryColumnName]),
       },
-      relationships: this.transformRelationships(item, mapProps, query),
+      relationships: this.transformRelationships<T, TIdKey>(
+        item,
+        mapProps,
+        query
+      ),
     };
   }
 
-  public transformRel<Rel extends EntityRelation<E>>(
+  public transformRel<Rel extends RelationKeys<E, IdKey>>(
     item: E,
     rel: Rel
-  ): DataResult<E[Rel], Rel> {
+  ): BaseMainData<E, IdKey, Rel>['data'] {
     const relProps = Reflect.get(this.currentMapProps.relationProperty, rel);
-    const relationMapPops = this.entityMapProps.get(relProps.entityClass);
+    const relationMapPops = this.entityParamMapService.getParamMap(
+      relProps.entityClass as EntityClass<object>
+    );
     if (!relationMapPops)
       throw new Error('Not found props map for ' + relProps.entityClass);
     const props = item[rel];
@@ -161,49 +164,55 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
       return props.map((i: any) => ({
         type: relationMapPops.typeName,
         id: i[relationMapPops.primaryColumnName].toString(),
-      }));
+      })) as BaseMainData<E, IdKey, Rel>['data'];
     } else {
+      assertColumnName(item[rel] as any, relationMapPops.primaryColumnName);
       return props
         ? ({
             type: relationMapPops.typeName,
-            id: props[relationMapPops.primaryColumnName].toString(),
+            id: (props[relationMapPops.primaryColumnName] as any).toString(),
           } as any)
         : null;
     }
   }
 
-  public transformRelationships<T extends ObjectLiteral = E>(
+  public transformRelationships<
+    T extends object = E,
+    TIdKey extends string = IdKey
+  >(
     item: T,
-    mapProps: ZodEntityProps<T>,
-    query: Query<T>
-  ): Relationships<T> {
+    mapProps: EntityParam<T, TIdKey>,
+    query: Query<T, TIdKey>
+  ): Relationships<T, TIdKey> {
     const { include } = query;
-
     const includeMap = new Map((include || []).map((i) => [i, true]));
+    const primaryColumnName = mapProps.primaryColumnName;
+    assertColumnName<typeof item>(item, primaryColumnName);
 
-    return mapProps.relations.reduce((acum, i: keyof RelationProperty<T>) => {
-      acum[i as keyof Relationships<T>] = {
+    return ObjectTyped.keys(mapProps.relationProperty).reduce((acum, i) => {
+      acum[i as keyof Relationships<T, TIdKey>] = {
         links: {
           self: this.getLink(
             mapProps.typeName,
-            item[mapProps.primaryColumnName],
+            item[primaryColumnName],
             'relationships',
-            i
+            i.toString()
           ),
         },
       };
 
-      if (includeMap.has(i)) {
-        const relationMapPops = this.entityMapProps.get(
-          mapProps.relationProperty[i].entityClass
+      if (includeMap.has(i as any)) {
+        const relationMapPops = this.entityParamMapService.getParamMap(
+          mapProps.relationProperty[i].entityClass as EntityClass<object>
         );
         if (!relationMapPops)
           throw new Error(
             'Not found props map for ' +
               mapProps.relationProperty[i].entityClass.name
           );
+
         if (mapProps.relationProperty[i].isArray) {
-          if (item[i] && Array.isArray(item[i]) && item[i].length > 0) {
+          if (item[i] && Array.isArray(item[i]) && (item[i] as []).length > 0) {
             // @ts-expect-error incorrect parse
             acum[i as keyof Relationships<T>]['data'] = item[i].map(
               (rel: any) => ({
@@ -216,24 +225,30 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
             acum[i as keyof Relationships<T>]['data'] = [];
           }
         } else {
-          // @ts-expect-error incorrect parse
-          acum[i as keyof Relationships<T>]['data'] = item[i]
-            ? {
-                id: item[i][relationMapPops.primaryColumnName].toString(),
-                type: relationMapPops.typeName,
-              }
-            : null;
+          const relPrimaryColumnName = relationMapPops.primaryColumnName;
+          const relType = item[i] as object;
+          if (item[i]) {
+            assertColumnName<typeof relType>(relType, relPrimaryColumnName);
+            // @ts-expect-error incorrect parse
+            acum[i as keyof Relationships<T>]['data'] = {
+              id: `${relType[relPrimaryColumnName]}`,
+              type: relationMapPops.typeName,
+            };
+          } else {
+            // @ts-expect-error incorrect parse
+            acum[i as keyof Relationships<T>]['data'] = null;
+          }
         }
       }
 
       return acum;
-    }, {} as Relationships<T>);
+    }, {} as Relationships<T, TIdKey>);
   }
 
-  public extractAttributes<T extends ObjectLiteral = E>(
+  public extractAttributes<T extends object = E, TIdKey extends string = IdKey>(
     item: T,
-    fields: (keyof T)[]
-  ): Attributes<T> {
+    fields: PropertyKeys<T, TIdKey>[]
+  ): Attributes<T, TIdKey> {
     const mapFields = fields.reduce((acum, field) => {
       acum[field.toString()] = true;
       return acum;
@@ -244,13 +259,13 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
         acum[name] = value;
       }
       return acum;
-    }, {} as Attributes<T>);
+    }, {} as Attributes<T, TIdKey>);
   }
 
-  public extractIncluded<T extends ObjectLiteral = E>(
+  public extractIncluded<T extends object = E, TIdKey extends string = IdKey>(
     data: T[],
-    query: Query<E>
-  ): Include<T>[] {
+    query: Query<E, IdKey>
+  ): Include<T, TIdKey>[] {
     const includeArray: any[] = [];
     const { include } = query;
     if (!include) return [];
@@ -258,15 +273,15 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
       const relationProps =
         this.currentMapProps.relationProperty[relationPropsFromInclude];
       if (!relationProps) continue;
-      const relationMapProp = this.entityMapProps.get(
-        relationProps.entityClass
+      const relationMapProp = this.entityParamMapService.getParamMap(
+        relationProps.entityClass as EntityClass<object>
       );
       if (!relationMapProp)
         throw new Error(
           'Not found props for relation ' +
             relationPropsFromInclude +
             'in' +
-            this.currentEntity.name
+            this.currentMapProps.className
         );
       const { fields } = query;
 
@@ -281,7 +296,7 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
           target:
             selectFieldForInclude &&
             Array.isArray(selectFieldForInclude) &&
-            selectFieldForInclude.length > 0
+            (selectFieldForInclude as []).length > 0
               ? selectFieldForInclude
               : null,
         },
@@ -294,19 +309,19 @@ export class JsonApiTransformerService<E extends ObjectLiteral> {
         if (Array.isArray(propRel)) {
           for (const i of propRel as any) {
             includeArray.push(
-              this.transformItem<typeof i>(
+              this.transformItem<typeof i, 'id'>(
                 i,
-                relationMapProp as unknown as ZodEntityProps<typeof i>,
-                queryForInclude as Query<typeof i>
+                relationMapProp as unknown as EntityParam<typeof i>,
+                queryForInclude as Query<typeof i, 'id'>
               )
             );
           }
         } else {
           includeArray.push(
-            this.transformItem<typeof dataItem>(
+            this.transformItem<typeof dataItem, 'id'>(
               propRel,
-              relationMapProp as unknown as ZodEntityProps<typeof dataItem>,
-              queryForInclude as Query<typeof dataItem>
+              relationMapProp as unknown as EntityParam<typeof dataItem>,
+              queryForInclude as Query<typeof dataItem, 'id'>
             )
           );
         }

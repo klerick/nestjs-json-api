@@ -1,9 +1,9 @@
-import { ObjectTyped } from '../../../../utils/nestjs-shared';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { z } from 'zod';
 
-import { ObjectLiteral } from '../../../../types';
-import { ResultGetField, ZodInfer } from '../../types';
+import { EntityParam } from '../../../../types';
 import { nonEmptyObject, getValidationErrorForStrict } from '../zod-utils';
+import { EntityParamMapService } from '../../service';
 
 function getZodRules() {
   return z
@@ -14,26 +14,34 @@ function getZodRules() {
 
 type ZodRule = ReturnType<typeof getZodRules>;
 
-export function zodFieldsInputQuery<E extends ObjectLiteral>(
-  relationList: ResultGetField<E>['relations']
+export function zodFieldsInputQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
   const target = z.object({
     target: getZodRules(),
   });
 
-  const relation = relationList.reduce(
+  const relation = entityParamMapService.entityParaMap.relations.reduce(
     (acum, item) => ({
       ...acum,
-      [item]: getZodRules(),
+      [item as PropertyKey]: getZodRules(),
     }),
     {} as {
-      [K in ResultGetField<E>['relations'][number]]: ZodRule;
+      [K in EntityParam<E, IdKey>['relations'][number] & PropertyKey]: ZodRule;
     }
   );
 
   return target
     .merge(z.object(relation))
-    .strict(getValidationErrorForStrict(['target', ...relationList], 'Fields'))
+    .strict(
+      getValidationErrorForStrict(
+        [
+          'target',
+          ...(entityParamMapService.entityParaMap.relations as string[]),
+        ],
+        'Fields'
+      )
+    )
     .refine(nonEmptyObject(), {
       message: 'Validation error: Need select field for target or relation',
     })
@@ -54,6 +62,7 @@ export function zodFieldsInputQuery<E extends ObjectLiteral>(
     });
 }
 
-export type ZodFieldsInputQuery<E extends ObjectLiteral> = ZodInfer<
-  typeof zodFieldsInputQuery<E>
->;
+export type ZodFieldsInputQuery<
+  E extends object,
+  IdKey extends string
+> = z.infer<ReturnType<typeof zodFieldsInputQuery<E, IdKey>>>;

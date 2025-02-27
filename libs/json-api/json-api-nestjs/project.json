@@ -3,7 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/json-api/json-api-nestjs/src",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs", "type:publish"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -63,6 +63,16 @@
         ]
       }
     },
+    "ts-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsd --files \"src/**/*.test-d.ts\" -t src/lib/types/index.ts"
+        ],
+        "cwd": "{workspaceRoot}/{projectRoot}",
+        "parallel": false
+      }
+    },
     "upload-badge": {
       "executor": "nx:run-commands",
       "dependsOn": [
@@ -79,5 +89,6 @@
         "outputPath": "{workspaceRoot}/libs/json-api/json-api-nestjs"
       }
     }
-  }
+  },
+  "implicitDependencies": ["json-api-nestjs-shared"]
 }

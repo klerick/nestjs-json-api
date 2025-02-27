@@ -7,7 +7,6 @@ import {
   ASYNC_ITERATOR_FACTORY,
   KEY_MAIN_INPUT_SCHEMA,
   MAP_CONTROLLER_INTERCEPTORS,
-  OPTIONS,
 } from '../constants';
 
 import {
@@ -39,10 +38,6 @@ describe('ExecuteService', () => {
           useValue: {
             get() {},
           },
-        },
-        {
-          provide: OPTIONS,
-          useValue: {},
         },
         {
           provide: ASYNC_ITERATOR_FACTORY,

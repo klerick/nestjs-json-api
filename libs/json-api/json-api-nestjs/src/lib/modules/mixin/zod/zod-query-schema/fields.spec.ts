@@ -1,17 +1,11 @@
 import { zodFieldsQuery } from './fields';
-import { Users } from '../../../../mock-utils/typeorm';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
-import {
-  userFields,
-  userRelations,
-} from '../../../../utils/___test___/test.helper';
-
-const schema = zodFieldsQuery<Users>(userFields, userRelations);
+const schema = zodFieldsQuery(usersEntityParamMapMockData);
 describe('zodFieldsQuerySchema', () => {
   it('should validate a target field correctly', () => {
     const input = { target: ['id'] };
     const result = schema.safeParse(input);
-
     expect(result.success).toBe(true);
   });
 

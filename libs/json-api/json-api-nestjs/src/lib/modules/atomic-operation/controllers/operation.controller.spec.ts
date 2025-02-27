@@ -2,18 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DiscoveryModule } from '@nestjs/core';
 import { HttpException } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
-import { getDataSourceToken } from '@nestjs/typeorm';
-import { IMemoryDb } from 'pg-mem';
 
 import { OperationController } from './operation.controller';
 import { ExecuteService, ExplorerService } from '../service';
 import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../mixin/controller/json-base.controller';
-import {
-  mockDBTestModule,
-  providerEntities,
-  Users,
-} from '../../../mock-utils/typeorm';
+import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
+
+import { Users } from '../../../utils/___test___/test-classes.helper';
 
 import {
   ASYNC_ITERATOR_FACTORY,
@@ -22,35 +17,23 @@ import {
   MAP_ENTITY,
   ZOD_INPUT_OPERATION,
   MAP_CONTROLLER_INTERCEPTORS,
-  OPTIONS,
 } from '../constants';
 
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ObjectLiteral } from '../../../types';
-import {
-  CURRENT_DATA_SOURCE_TOKEN,
-  RUN_IN_TRANSACTION_FUNCTION,
-} from '../../../constants';
-import { createAndPullSchemaBase } from '../../../mock-utils';
+import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 describe('OperationController', () => {
-  let db: IMemoryDb;
   let operationController: OperationController;
   let explorerService: ExplorerService<Users>;
   let executeService: ExecuteService;
 
   beforeEach(async () => {
-    db = createAndPullSchemaBase();
     const app: TestingModule = await Test.createTestingModule({
-      imports: [DiscoveryModule, mockDBTestModule(db)],
+      imports: [DiscoveryModule],
       controllers: [OperationController],
       providers: [
-        ...providerEntities(getDataSourceToken()),
-        {
-          provide: CURRENT_DATA_SOURCE_TOKEN,
-          useValue: {},
-        },
         ExplorerService,
         ExecuteService,
         {
@@ -71,10 +54,6 @@ describe('OperationController', () => {
         },
         {
           provide: ZOD_INPUT_OPERATION,
-          useValue: {},
-        },
-        {
-          provide: OPTIONS,
           useValue: {},
         },
         {

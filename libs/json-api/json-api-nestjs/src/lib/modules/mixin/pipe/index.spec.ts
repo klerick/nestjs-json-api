@@ -1,8 +1,8 @@
 import { INJECTABLE_WATERMARK } from '@nestjs/common/constants';
 import { PipeTransform } from '@nestjs/common/interfaces';
 
-import { MixinOptions } from '../types';
 import { factoryMixin } from './index';
+import { ModuleMixinOptions } from '../../../types';
 
 describe('factoryMixin', () => {
   class TestEntity {}
@@ -21,7 +21,7 @@ describe('factoryMixin', () => {
 
   it('should return a pipe class with a new name', () => {
     const pipeClass = factoryMixin(
-      TestEntity as MixinOptions['entity'],
+      TestEntity as ModuleMixinOptions['entity'],
       TestPipe
     );
     expect(pipeClass.name).toBe('TestEntityTestPipe');
@@ -29,7 +29,7 @@ describe('factoryMixin', () => {
 
   it('should return a pipe class that is Injectable', () => {
     const pipeClass = factoryMixin(
-      TestEntity as MixinOptions['entity'],
+      TestEntity as ModuleMixinOptions['entity'],
       TestPipe
     );
     expect(isInjectable(pipeClass)).toBe(true);
@@ -37,7 +37,7 @@ describe('factoryMixin', () => {
 
   it('should preserve the behavior of the original pipe', () => {
     const pipeClass = factoryMixin(
-      TestEntity as MixinOptions['entity'],
+      TestEntity as ModuleMixinOptions['entity'],
       TestPipe
     );
     const instance = new pipeClass();

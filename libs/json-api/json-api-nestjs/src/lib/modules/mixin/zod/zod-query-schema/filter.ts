@@ -1,33 +1,20 @@
-import { z, ZodOptional } from 'zod';
 import {
   FilterOperand,
-  ObjectTyped,
   FilterOperandOnlyInNin,
   FilterOperandOnlySimple,
-} from '../../../../utils/nestjs-shared';
+  ObjectTyped,
+} from '@klerick/json-api-nestjs-shared';
+import { z, ZodOptional } from 'zod';
 
+import { EntityParamMapService } from '../../service';
+import { EntityParam, TypeField, TypeOfConstructor } from '../../../../types';
 import {
-  AllFieldWithType,
-  ArrayPropsForEntity,
-  RelationTree,
-  ResultGetField,
-  IsArray,
-  TypeField,
-  EntityProps,
-  TypeOfArray,
-  CastProps,
-  TypeCast,
-  PropsArray,
-} from '../../types';
-import { ObjectLiteral } from '../../../../types';
-import {
-  stringLongerThan,
   arrayItemStringLongerThan,
-  stringMustBe,
   elementOfArrayMustBe,
-  oneOf,
-  guardIsKeyOfObject,
   nonEmptyObject,
+  oneOf,
+  stringLongerThan,
+  stringMustBe,
 } from '../zod-utils';
 
 const zodRuleForString = z.union([
@@ -49,6 +36,10 @@ const zodNullRule = z.union([
   z.literal(null).transform((r) => 'null' as const),
 ]);
 
+const zodRuleForArrayField = z
+  .object({ [FilterOperand.some]: zodRuleStringArray })
+  .strict();
+
 const zodRuleFilterRelationSchema = z.union([
   z
     .object({
@@ -61,9 +52,6 @@ const zodRuleFilterRelationSchema = z.union([
     })
     .strict(),
 ]);
-const zodRuleForArrayField = z
-  .object({ [FilterOperand.some]: zodRuleStringArray })
-  .strict();
 
 function getZodRulesForField(type: TypeField = TypeField.string) {
   const simpleShape = ObjectTyped.entries(FilterOperandOnlySimple).reduce(
@@ -111,119 +99,120 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
     );
 }
 
-function getFilterPropsShapeForEntity<E extends ObjectLiteral>(
-  fields: ResultGetField<E>['field'],
-  propsArrayTarget: PropsArray<E>,
-  propsType: AllFieldWithType<E>
-) {
-  return fields.reduce(
-    (acum, field) => ({
-      ...acum,
-      [field]: (Reflect.get(propsArrayTarget, field)
-        ? zodRuleForArrayField
-        : getZodRulesForField(propsType[field as EntityProps<E>])
-      ).optional(),
-    }),
-    {} as FilterProps<E, ResultGetField<E>['field']>
-  );
-}
-
-function getZodRulesForRelationShape<E extends ObjectLiteral>(
-  shape: FilterProps<E, ResultGetField<E>['field']>
+function getZodRulesForRelationShape<E extends object, IdKey extends string>(
+  shape: FilterProps<E, IdKey>
 ) {
   return z.object(shape).strict().optional().refine(nonEmptyObject());
 }
 
 type ZodRuleForString = typeof zodRuleForString;
 type ZodRuleStringArray = typeof zodRuleStringArray;
-type ZodRuleFilterRelationSchema = typeof zodRuleFilterRelationSchema;
 type ZodRuleForArrayField = typeof zodRuleForArrayField;
+type ZodRuleFilterRelationSchema = typeof zodRuleFilterRelationSchema;
 type ZodRulesForField = ReturnType<typeof getZodRulesForField>;
-type ZodRulesForRelationShape<E extends ObjectLiteral> = ReturnType<
-  typeof getZodRulesForRelationShape<E>
+type ZodRulesForRelationShape<
+  E extends object,
+  IdKey extends string
+> = ReturnType<typeof getZodRulesForRelationShape<E, IdKey>>;
+
+type RelTypeBase<
+  E extends object,
+  IdKey extends string,
+  Rel extends keyof EntityParam<E, IdKey>['relationProperty']
+> = TypeOfConstructor<
+  EntityParam<E, IdKey>['relationProperty'][Rel]['entityClass']
 >;
 
-type FilterProps<
-  E extends ObjectLiteral,
-  P extends readonly [string, ...string[]]
-> = {
-  [Props in P[number]]: Props extends keyof E
-    ? IsArray<E[Props]> extends true
+type RelType<
+  E extends object,
+  IdKey extends string,
+  Rel extends keyof EntityParam<E, IdKey>['relationProperty']
+> = RelTypeBase<E, IdKey, Rel> extends object
+  ? RelTypeBase<E, IdKey, Rel>
+  : never;
+
+type RelationFilterProps<E extends object, IdKey extends string> = {
+  [R in keyof EntityParam<
+    E,
+    IdKey
+  >['relationProperty']]: ZodRulesForRelationShape<RelType<E, IdKey, R>, IdKey>;
+};
+
+export type FilterProps<E extends object, IdKey extends string> = {
+  [Props in EntityParam<E, IdKey>['props'][number] &
+    PropertyKey]: Props extends keyof E
+    ? E[Props] extends TypeField.array
       ? ZodOptional<ZodRuleForArrayField>
       : ZodOptional<ZodRulesForField>
     : never;
 };
 
-type RelationType<E extends ObjectLiteral, R> = TypeCast<
-  TypeOfArray<CastProps<E, R>>,
-  ObjectLiteral
->;
-
-type RelationFilterProps<E extends ObjectLiteral> = {
-  [R in keyof RelationTree<E>]: ZodRulesForRelationShape<TypeOfArray<E[R]>>;
+type TargetRelationShape<E extends object, IdKey extends string> = {
+  [Props in EntityParam<E, IdKey>['relations'][number] &
+    PropertyKey]: ZodOptional<ZodRuleFilterRelationSchema>;
 };
 
-type TargetRelationShape<E extends ObjectLiteral> = {
-  [K in ResultGetField<E>['relations'][number]]: ZodOptional<ZodRuleFilterRelationSchema>;
-};
+type ResultTargetType<E extends object, IdKey extends string> = FilterProps<
+  E,
+  IdKey
+> &
+  TargetRelationShape<E, IdKey>;
 
-export function zodFilterQuery<E extends ObjectLiteral>(
-  fields: ResultGetField<E>['field'],
-  relationTree: RelationTree<E>,
-  propsArray: ArrayPropsForEntity<E>,
-  propsType: AllFieldWithType<E>
+function getFilterPropsShapeForEntity<E extends object, IdKey extends string>(
+  entityParam: EntityParam<E, IdKey>
+): FilterProps<E, IdKey> {
+  return entityParam.props.reduce((acum, field) => {
+    const propertyType = Reflect.get(
+      entityParam.propsType,
+      field as PropertyKey
+    );
+    const value =
+      propertyType === TypeField.array
+        ? zodRuleForArrayField
+        : getZodRulesForField(propertyType);
+
+    Reflect.set(acum, field as PropertyKey, value.optional());
+
+    return acum;
+  }, {} as FilterProps<E, IdKey>);
+}
+
+export function zodFilterQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
-  const { target: propsArrayTarget, ...otherRelationPropsArray } = propsArray;
-
-  const fieldsFilterProps = getFilterPropsShapeForEntity(
-    fields,
-    propsArrayTarget,
-    propsType
-  );
-
-  const targetRelation = ObjectTyped.keys(relationTree).reduce(
+  const targetResult = entityParamMapService.entityParaMap.relations.reduce(
     (acum, item) => ({
       ...acum,
-      [item]: zodRuleFilterRelationSchema.optional(),
+      [item as PropertyKey]: zodRuleFilterRelationSchema.optional(),
     }),
-    {} as TargetRelationShape<E>
+    getFilterPropsShapeForEntity(
+      entityParamMapService.entityParaMap
+    ) as ResultTargetType<E, IdKey>
   );
 
-  const relationFilterProps = ObjectTyped.keys(relationTree).reduce(
-    (acum, name) => {
-      type F = typeof name;
-      type RT = RelationType<E, F>;
-      type RTF = ResultGetField<RT>['field'];
+  const relationFilterProps = ObjectTyped.entries(
+    entityParamMapService.entityParaMap.relationProperty
+  ).reduce((acum, [relName, relProps]) => {
+    type RT = TypeOfConstructor<typeof relProps.entityClass> extends object
+      ? TypeOfConstructor<typeof relProps.entityClass>
+      : never;
+    const relParams = entityParamMapService.getParamMap(
+      relProps.entityClass as any
+    ) as EntityParam<RT, IdKey>;
 
-      guardIsKeyOfObject(otherRelationPropsArray, name);
-      const relationField = relationTree[name] as RTF;
-      const relationPropsArray = otherRelationPropsArray[
-        name
-      ] as PropsArray<RT>;
-      const relationPropsType = propsType[name] as AllFieldWithType<RT>;
+    const zodFilter = getZodRulesForRelationShape(
+      getFilterPropsShapeForEntity(relParams)
+    );
 
-      const filterProps = getFilterPropsShapeForEntity<RT>(
-        relationField,
-        relationPropsArray,
-        relationPropsType
-      );
-
-      const zodFilter = getZodRulesForRelationShape(filterProps);
-
-      return {
-        ...acum,
-        [name]: zodFilter.optional(),
-      };
-    },
-    {} as RelationFilterProps<E>
-  );
+    return {
+      ...acum,
+      [relName]: zodFilter.optional(),
+    };
+  }, {} as RelationFilterProps<E, IdKey>);
 
   const targetShapeFilter = {
     target: z
-      .object({
-        ...fieldsFilterProps,
-        ...targetRelation,
-      })
+      .object(targetResult)
       .strict()
       .optional()
       .refine(nonEmptyObject())
@@ -239,7 +228,9 @@ export function zodFilterQuery<E extends ObjectLiteral>(
   return z.object(targetShapeFilter).strict().refine(nonEmptyObject());
 }
 
-export type ZodFilterQuery<E extends ObjectLiteral> = ReturnType<
-  typeof zodFilterQuery<E>
+export type ZodFilterQuery<E extends object, IdKey extends string> = ReturnType<
+  typeof zodFilterQuery<E, IdKey>
 >;
-export type FilterQuery<E extends ObjectLiteral> = z.infer<ZodFilterQuery<E>>;
+export type FilterQuery<E extends object, IdKey extends string> = z.infer<
+  ZodFilterQuery<E, IdKey>
+>;

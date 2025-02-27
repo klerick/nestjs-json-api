@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { TypeForId } from '../../types';
+import { TypeForId } from '../../../../types';
 import { nonEmptyObject } from '../zod-utils';
 
 import { zodType, zodId } from './';

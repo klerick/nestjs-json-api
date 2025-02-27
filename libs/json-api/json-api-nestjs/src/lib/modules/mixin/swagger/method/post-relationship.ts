@@ -6,25 +6,21 @@ import {
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
-import {
-  errorSchema,
-  getEntityMapProps,
-  schemaTypeForRelation,
-} from '../utils';
+import { errorSchema, schemaTypeForRelation } from '../utils';
 import { zodPatchRelationship } from '../../zod';
-import { TypeField, ZodEntityProps } from '../../types';
-import { EntityClass, ObjectLiteral } from '../../../../types';
+import { EntityClass, TypeField } from '../../../../types';
+import { EntityParamMapService } from '../../service';
 
-export function postRelationship<E extends ObjectLiteral>(
+export function postRelationship<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
+  const { relations, primaryColumnType } = mapEntity.getParamMap(entity);
 
   ApiParam({
     name: 'id',
@@ -37,7 +33,7 @@ export function postRelationship<E extends ObjectLiteral>(
     name: 'relName',
     required: true,
     type: 'string',
-    enum: relations,
+    enum: relations as any,
     description: `Relation name of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

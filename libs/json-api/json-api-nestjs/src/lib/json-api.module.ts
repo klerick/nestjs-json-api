@@ -1,80 +1,60 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { DiscoveryModule } from '@nestjs/core';
-
+import { OrmModule, ParamsModule } from './types';
+import { prepareConfig, getController } from './utils';
+import { ENTITY_PARAM_MAP } from './constants';
+import { AtomicOperationModule, MixinModule } from './modules';
 import {
-  AnyEntity,
-  EntityName,
-  TypeOrmDefaultOptions,
-  TypeOrmOptions,
-  MicroOrmOptions,
-  ResultModuleOptions,
-} from './types';
-import { createMixinModule, prepareConfig, createAtomicModule } from './utils';
-import type { TypeOrmJsonApiModule, MicroOrmJsonApiModule } from './modules';
+  ErrorInterceptors,
+  LogTimeInterceptors,
+} from './modules/mixin/interceptors';
+import { ErrorFormatService } from './modules/mixin/service';
 
 @Module({})
 export class JsonApiModule {
-  public static forRoot(
-    module: typeof TypeOrmJsonApiModule,
-    options: TypeOrmOptions
-  ): DynamicModule;
-  public static forRoot(
-    module: typeof MicroOrmJsonApiModule,
-    options: MicroOrmOptions
-  ): DynamicModule;
-  /**
-   * @deprecated This type of method is deprecated and may be removed in future versions.
-   * Consider using newer alternatives or updated patterns for module registration.
-   */
-  public static forRoot(options: TypeOrmDefaultOptions): DynamicModule;
-  public static forRoot(
-    first:
-      | typeof TypeOrmJsonApiModule
-      | typeof MicroOrmJsonApiModule
-      | TypeOrmDefaultOptions,
-    second?: TypeOrmOptions | MicroOrmOptions
+  public static forRoot<M extends OrmModule>(
+    module: M,
+    options: ParamsModule<M>
   ): DynamicModule {
-    let resultOption: ResultModuleOptions = {} as any;
+    const prepareOptions = prepareConfig(options);
+    prepareOptions.providers.push(
+      ErrorInterceptors,
+      ErrorFormatService,
+      LogTimeInterceptors
+    );
+    const commonOrmModule = module.forRoot(prepareOptions);
 
-    if (second) {
-      const module = first as
-        | typeof TypeOrmJsonApiModule
-        | typeof MicroOrmJsonApiModule;
-      resultOption = {
-        ...prepareConfig(second, module.module),
-        type: module,
-      } as ResultModuleOptions;
-    } else {
-      const {
-        TypeOrmJsonApiModule,
-      } = require('./modules/type-orm/type-orm-json-api.module');
-      resultOption = {
-        ...prepareConfig(
-          first as TypeOrmDefaultOptions,
-          TypeOrmJsonApiModule.module
-        ),
-        type: TypeOrmJsonApiModule as typeof TypeOrmJsonApiModule,
-      } as any;
-    }
+    if (
+      !commonOrmModule.providers ||
+      !commonOrmModule.providers.find(
+        (i) => 'provide' in i && i.provide === ENTITY_PARAM_MAP
+      )
+    )
+      throw new Error(
+        `The module ${module.name} should be provide ${ENTITY_PARAM_MAP.description}`
+      );
 
-    resultOption.imports.unshift(DiscoveryModule);
-
-    const commonOrmModule = resultOption.type.forRoot(resultOption);
-
-    const entitiesMixinModules = resultOption.entities.map(
-      (entity: EntityName<AnyEntity>) =>
-        createMixinModule(entity, resultOption, commonOrmModule)
+    const entitiesModules = prepareOptions.entities.map((entityItem) =>
+      MixinModule.forRoot({
+        entity: entityItem,
+        imports: [commonOrmModule, ...prepareOptions.imports],
+        ormModule: module,
+        controller: getController(entityItem, prepareOptions.controllers),
+        config: prepareOptions,
+      })
     );
 
-    const operationModuleImport = createAtomicModule(
-      resultOption,
-      entitiesMixinModules,
-      commonOrmModule
-    );
+    const atomicOperation = prepareOptions.options.operationUrl
+      ? AtomicOperationModule.forRoot(
+          prepareOptions.options.operationUrl,
+          prepareOptions.entities,
+          entitiesModules,
+          commonOrmModule
+        )
+      : [];
 
     return {
       module: JsonApiModule,
-      imports: [...operationModuleImport, ...entitiesMixinModules],
+      imports: [...entitiesModules, ...atomicOperation],
     };
   }
 }

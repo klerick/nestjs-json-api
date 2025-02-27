@@ -1,40 +1,37 @@
 import { ZodError } from 'zod';
 import { zodAttributes, ZodAttributes, Attributes } from './attributes';
-import { Addresses, Users } from '../../../../mock-utils/typeorm';
-import { PropsForField } from '../../types';
-
 import {
-  fieldTypeUsers,
-  propsDb,
-  fieldTypeAddresses,
+  addressesEntityParamMapMockData,
+  usersEntityParamMapMockData,
 } from '../../../../utils/___test___/test.helper';
+import {
+  Users,
+  Addresses,
+} from '../../../../utils/___test___/test-classes.helper';
 
 describe('attributes', () => {
-  type SchemaTypeUsers = Attributes<Users>;
-  type SchemaTypeAddresses = Attributes<Addresses>;
-
   describe('Attributes for post', () => {
-    let schemaUsers: ZodAttributes<Users>;
-    let schemaAddresses: ZodAttributes<Addresses>;
+    type SchemaTypeUsers = Attributes<Users, 'id'>;
+    type SchemaTypeAddresses = Attributes<Addresses, 'id'>;
+    let schemaUsers: ZodAttributes<Users, 'id'>;
+    let schemaAddresses: ZodAttributes<Addresses, 'id'>;
     beforeEach(() => {
-      schemaUsers = zodAttributes<Users>(fieldTypeUsers, propsDb, 'id', false);
-      schemaAddresses = zodAttributes<Addresses>(
-        fieldTypeAddresses,
-        {} as PropsForField<Addresses>,
-        'id',
-        false
-      );
+      schemaUsers = zodAttributes(usersEntityParamMapMockData, false);
+      schemaAddresses = zodAttributes(addressesEntityParamMapMockData, false);
     });
 
     it('should be ok', () => {
       const date = new Date();
       const check: SchemaTypeUsers = {
         login: 'login',
-        isActive: true,
+        isActive: 'null',
         lastName: 'sdsdf',
         testReal: [123.123, 123.123],
         testArrayNull: [],
         testDate: date.toISOString() as any,
+        createdAt: date.toISOString() as any,
+        updatedAt: date.toISOString() as any,
+        firstName: '',
       };
 
       const check2: SchemaTypeAddresses = {
@@ -48,16 +45,20 @@ describe('attributes', () => {
 
       const check3: SchemaTypeUsers = {
         login: 'login',
-        isActive: true,
         lastName: 'sdsdf',
         testReal: [123.123, 123.123],
         testArrayNull: null as any,
         testDate: date.toISOString() as any,
+        firstName: '',
+        createdAt: date.toISOString() as any,
+        updatedAt: date.toISOString() as any,
       };
 
       expect(schemaUsers.parse(check)).toEqual({
         ...check,
         testDate: date,
+        createdAt: date,
+        updatedAt: date,
       });
       expect(schemaAddresses.parse(check2)).toEqual({
         ...check2,
@@ -68,6 +69,8 @@ describe('attributes', () => {
       expect(schemaUsers.parse(check3)).toEqual({
         ...check3,
         testDate: date,
+        createdAt: date,
+        updatedAt: date,
       });
     });
 
@@ -95,29 +98,22 @@ describe('attributes', () => {
   });
 
   describe('Attributes for patch', () => {
-    let schemaUsers: ZodAttributes<Users, true>;
-    let schemaAddresses: ZodAttributes<Addresses, true>;
+    type SchemaTypeUsers = Attributes<Users, 'id', true>;
+    type SchemaTypeAddresses = Attributes<Addresses, 'id', true>;
+    let schemaUsers: ZodAttributes<Users, 'id', true>;
+    let schemaAddresses: ZodAttributes<Addresses, 'id', true>;
     beforeEach(() => {
-      schemaUsers = zodAttributes<Users, true>(
-        fieldTypeUsers,
-        propsDb,
-        'id',
-        true
-      );
-      schemaAddresses = zodAttributes<Addresses, true>(
-        fieldTypeAddresses,
-        {} as PropsForField<Addresses>,
-        'id',
-        true
-      );
+      schemaUsers = zodAttributes(usersEntityParamMapMockData, true);
+      schemaAddresses = zodAttributes(addressesEntityParamMapMockData, true);
     });
 
     it('should be ok', () => {
       const date = new Date();
       const check: SchemaTypeUsers = {
         login: 'login',
-        isActive: true,
         testDate: date.toISOString() as any,
+        firstName: '',
+        testReal: [],
       };
 
       const check2: SchemaTypeAddresses = {
@@ -125,12 +121,16 @@ describe('attributes', () => {
         state: 'state',
         createdAt: date.toISOString() as any,
         updatedAt: date.toISOString() as any,
+        city: '',
+        country: '',
       };
 
       const check3: SchemaTypeUsers = {
         testReal: [123.123, 123.123],
         testArrayNull: null as any,
         testDate: date.toISOString() as any,
+        login: '',
+        firstName: '',
       };
 
       expect(schemaUsers.parse(check)).toEqual({

@@ -1,14 +1,8 @@
 import { zodFieldsInputQuery } from './fields';
-import { ResultGetField } from '../../types';
-import { Users } from '../../../../mock-utils/typeorm';
-
-import { userFieldsStructure } from '../../../../utils/___test___/test.helper';
-
-const validRelationList: ResultGetField<Users>['relations'] =
-  userFieldsStructure['relations'];
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
 describe('zodFieldsInputQuerySchema', () => {
-  const schema = zodFieldsInputQuery<Users>(validRelationList);
+  const schema = zodFieldsInputQuery(usersEntityParamMapMockData);
 
   it('should validate successfully with a valid target and relation', () => {
     const targetInput = 'field1,field2';
@@ -88,6 +82,7 @@ describe('zodFieldsInputQuerySchema', () => {
     };
 
     const result = schema.safeParse(input);
+
     expect.assertions(5);
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -95,13 +90,13 @@ describe('zodFieldsInputQuerySchema', () => {
         'Expected string, received null'
       );
       expect(result.error.issues[1].message).toContain(
-        'Expected string, received boolean'
+        'Expected string, received array'
       );
       expect(result.error.issues[2].message).toContain(
         'Expected string, received number'
       );
       expect(result.error.issues[3].message).toContain(
-        'Expected string, received array'
+        ' Fields should be have only props: ["target","addresses","manager","roles","comments","userGroup"]'
       );
     }
   });

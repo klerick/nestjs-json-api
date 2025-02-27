@@ -2,26 +2,29 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { generateSchema } from '@anatine/zod-openapi';
 import { Type } from '@nestjs/common';
 
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { TypeField, ZodEntityProps } from '../../types';
+import { EntityClass, TypeField } from '../../../../types';
 import { zodPatchRelationship } from '../../zod';
-import { errorSchema, getEntityMapProps } from '../utils';
+import { errorSchema } from '../utils';
 
 import {
   ReferenceObject,
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { EntityParamMapService } from '../../service';
 
-export function deleteRelationship<E extends ObjectLiteral>(
+export function deleteRelationship<
+  E extends object,
+  IdKey extends string = 'id'
+>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
+  const { relations, primaryColumnType } = mapEntity.getParamMap(entity);
 
   ApiOperation({
     summary: `Delete list of relation for resource "${entityName}"`,
@@ -39,7 +42,7 @@ export function deleteRelationship<E extends ObjectLiteral>(
     name: 'relName',
     required: true,
     type: 'string',
-    enum: relations,
+    enum: relations as any,
     description: `Relation name of resource "${entityName}"`,
   })(controller, methodName, descriptor);
 

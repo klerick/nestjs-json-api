@@ -1,25 +1,33 @@
 import {
   FilterOperand,
-  ObjectTyped,
   isString,
-} from '../../../../utils/nestjs-shared';
-import { z } from 'zod';
+  ObjectTyped,
+} from '@klerick/json-api-nestjs-shared';
+import { z, ZodType } from 'zod';
 
+import { EntityParamMapService } from '../../service';
+import { getRelationProps, oneOf, stringLongerThan } from '../zod-utils';
 import {
-  RelationTree,
-  ResultGetField,
+  EntityParam,
+  EntityRelationProps,
   UnionToTuple,
-  ZodInfer,
-} from '../../types';
-import { ObjectLiteral } from '../../../../types';
+} from '../../../../types';
 
-import { oneOf, stringLongerThan } from '../zod-utils';
+type FilterType = Partial<{
+  [key in FilterOperand]: string | string[];
+}>;
+
+type OutPutFilter = {
+  relation: null | Record<string, Record<string, FilterType>>;
+  target: null | Record<string, FilterType>;
+};
 
 const arrayOp = {
   [FilterOperand.in]: true,
   [FilterOperand.nin]: true,
   [FilterOperand.some]: true,
 };
+
 function convertToFilterObject(
   value: Record<string, string> | string
 ): Partial<{
@@ -39,36 +47,6 @@ function convertToFilterObject(
       return acum;
     }, {} as Record<string, string | string[]>);
   }
-}
-
-type FilterType = Partial<{
-  [key in FilterOperand]: string | string[];
-}>;
-
-type OutPutFilter = {
-  relation: null | Record<string, Record<string, FilterType>>;
-  target: null | Record<string, FilterType>;
-};
-
-function getZodRulesForRelation() {
-  return z
-    .union([
-      z
-        .object({
-          [FilterOperand.eq]: z
-            .union([z.literal('null'), z.null()])
-            .transform(() => null),
-        })
-        .strict(),
-      z
-        .object({
-          [FilterOperand.ne]: z
-            .union([z.literal('null'), z.null()])
-            .transform(() => null),
-        })
-        .strict(),
-    ])
-    .optional();
 }
 
 function getZodRulesForFilterOperator() {
@@ -94,28 +72,46 @@ function getZodRulesForFilterOperator() {
   return z.union([filterConditional, conditional]).optional();
 }
 
-function shapeForArray<
-  R extends readonly [string, ...string[]],
-  Z extends ZodRulesForRelation | ZodRulesForFilterOperator
->(fields: R, zodSchema: Z) {
-  return fields.reduce(
-    (acum, item) => ({
-      ...acum,
-      [item]: zodSchema,
-    }),
-    {} as {
-      [K in R[number]]: Z;
-    }
-  );
+export type ZodRulesForFilterOperator = ReturnType<
+  typeof getZodRulesForFilterOperator
+>;
+
+function getZodRulesForRelation() {
+  return z
+    .union([
+      z
+        .object({
+          [FilterOperand.eq]: z
+            .union([z.literal('null'), z.null()])
+            .transform(() => null),
+        })
+        .strict(),
+      z
+        .object({
+          [FilterOperand.ne]: z
+            .union([z.literal('null'), z.null()])
+            .transform(() => null),
+        })
+        .strict(),
+    ])
+    .optional();
 }
 
-function getTupleConcatRelationFields<E extends ObjectLiteral>(
-  relationList: RelationTree<E>
-): UnionToTuple<
+type ZodRulesForRelation = ReturnType<typeof getZodRulesForRelation>;
+
+export type ConcatRelationField<
+  E extends object,
+  IdKey extends string
+> = UnionToTuple<
   {
-    [K in keyof RelationTree<E>]: `${K & string}.${RelationTree<E>[K][number]}`;
-  }[keyof RelationTree<E>]
-> {
+    [K in keyof EntityRelationProps<E, IdKey>]: `${K &
+      string}.${EntityRelationProps<E, IdKey>[K][number] & string}`;
+  }[keyof EntityRelationProps<E, IdKey>]
+>;
+
+function getTupleConcatRelationFields<E extends object, IdKey extends string>(
+  relationList: EntityRelationProps<E, IdKey>
+): ConcatRelationField<E, IdKey> {
   const result: string[] = [];
 
   for (const [key, val] of ObjectTyped.entries(relationList)) {
@@ -125,37 +121,65 @@ function getTupleConcatRelationFields<E extends ObjectLiteral>(
     }
   }
 
-  return result as any;
+  return result as ConcatRelationField<E, IdKey>;
 }
 
-type ZodRulesForRelation = ReturnType<typeof getZodRulesForRelation>;
-type ZodRulesForFilterOperator = ReturnType<
-  typeof getZodRulesForFilterOperator
->;
+export type ShapeArrayInput<E extends object, IdKey extends string> =
+  | EntityParam<E, IdKey>['props']
+  | EntityParam<E, IdKey>['relations']
+  | ConcatRelationField<E, IdKey>;
 
-export function zodFilterInputQuery<E extends ObjectLiteral>(
-  fields: ResultGetField<E>['field'],
-  relationList: RelationTree<E>
+export function shapeForArray<
+  E extends object,
+  Z extends ZodType,
+  IdKey extends string,
+  PropsList extends ShapeArrayInput<E, IdKey>
+>(fields: PropsList, zodSchema: Z) {
+  return fields.reduce(
+    (acum, item) => ({
+      ...acum,
+      [item as PropertyKey]: zodSchema,
+    }),
+    {} as {
+      [K in PropsList[number] & PropertyKey]: Z;
+    }
+  );
+}
+
+export function zodFilterInputQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
   const target = z.object(
-    shapeForArray(fields, getZodRulesForFilterOperator())
+    shapeForArray<
+      E,
+      ZodRulesForFilterOperator,
+      IdKey,
+      EntityParam<E, IdKey>['props']
+    >(entityParamMapService.entityParaMap.props, getZodRulesForFilterOperator())
   );
-
-  const relationTuple = ObjectTyped.keys(relationList) as UnionToTuple<
-    keyof RelationTree<E>
-  >;
 
   const relations = z.object(
-    shapeForArray(relationTuple, getZodRulesForRelation())
+    shapeForArray<
+      E,
+      ZodRulesForRelation,
+      IdKey,
+      EntityParam<E, IdKey>['relations']
+    >(entityParamMapService.entityParaMap.relations, getZodRulesForRelation())
   );
 
+  const relationList = getRelationProps(entityParamMapService);
+
   const relationFields = z.object(
-    shapeForArray(
+    shapeForArray<
+      E,
+      ZodRulesForFilterOperator,
+      IdKey,
+      ConcatRelationField<E, IdKey>
+    >(
       getTupleConcatRelationFields(relationList),
       getZodRulesForFilterOperator()
     )
   );
-
   return target
     .merge(relations)
     .merge(relationFields)
@@ -191,6 +215,7 @@ export function zodFilterInputQuery<E extends ObjectLiteral>(
     });
 }
 
-export type ZodFilterInputQuery<E extends ObjectLiteral> = ZodInfer<
-  typeof zodFilterInputQuery<E>
->;
+export type ZodFilterInputQuery<
+  E extends object,
+  IdKey extends string
+> = z.infer<ReturnType<typeof zodFilterInputQuery<E, IdKey>>>;

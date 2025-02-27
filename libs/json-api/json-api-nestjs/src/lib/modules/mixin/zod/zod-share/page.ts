@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
-import { ObjectLiteral } from '../../../../types';
 
 export function zodPageInputQuery() {
   return z
@@ -20,4 +19,3 @@ export function zodPageInputQuery() {
 }
 
 export type ZodPageInputQuery = ReturnType<typeof zodPageInputQuery>;
-export type PageInputQuery = z.infer<ZodPageInputQuery>;

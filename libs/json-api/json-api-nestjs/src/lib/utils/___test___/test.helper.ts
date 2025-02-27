@@ -1,211 +1,192 @@
-// @ts-nocheck
+import { kebabCase } from 'change-case-commonjs';
+
+import { EntityParamMapService } from '../../modules/mixin/service';
 import {
-  AllFieldWithType,
-  FieldWithType,
-  PropsForField,
-  RelationPrimaryColumnType,
-  RelationPropsArray,
-  RelationPropsTypeName,
-  RelationTree,
-  ResultGetField,
-  TypeField,
-} from '../../modules/mixin/types';
-import { Addresses, Users } from '../../mock-utils/typeorm';
+  Addresses,
+  Comments,
+  Roles,
+  UserGroups,
+  Users,
+} from './test-classes.helper';
+import { Constructor, EntityClass, EntityParam, TypeField } from '../../types';
 
-export const fieldTypeUsers: FieldWithType<Users> = {
-  id: TypeField.number,
-  isActive: TypeField.boolean,
-  firstName: TypeField.string,
-  createdAt: TypeField.date,
-  lastName: TypeField.string,
-  login: TypeField.string,
-  testDate: TypeField.date,
-  updatedAt: TypeField.date,
-  testReal: TypeField.array,
-  testArrayNull: TypeField.array,
-};
-export const propsDb: PropsForField<Users> = {
-  id: { type: Number, isArray: false, isNullable: false },
-  login: { type: 'varchar', isArray: false, isNullable: false },
-  firstName: { type: 'varchar', isArray: false, isNullable: true },
-  testReal: { type: 'real', isArray: true, isNullable: false },
-  testArrayNull: { type: 'real', isArray: true, isNullable: true },
-  lastName: { type: 'varchar', isArray: false, isNullable: true },
-  isActive: { type: 'boolean', isArray: false, isNullable: true },
-  createdAt: { type: 'timestamp', isArray: false, isNullable: true },
-  testDate: { type: 'timestamp', isArray: false, isNullable: true },
-  updatedAt: { type: 'timestamp', isArray: false, isNullable: true },
-  notes: { type: 'string', isArray: false, isNullable: true },
-  roles: { type: 'number', isArray: true, isNullable: true },
-  addresses: { type: 'number', isArray: true, isNullable: true },
-  userGroup: { type: 'number', isArray: false, isNullable: true },
-  manager: { type: 'number', isArray: false, isNullable: true },
-  comments: { type: 'number', isArray: true, isNullable: true },
-};
-export const fieldTypeAddresses: FieldWithType<Addresses> = {
-  id: TypeField.number,
-  arrayField: TypeField.array,
-  state: TypeField.string,
-  city: TypeField.string,
-  createdAt: TypeField.date,
-  updatedAt: TypeField.date,
-  country: TypeField.string,
-};
-
-export const relationArrayProps: RelationPropsArray<Users> = {
-  roles: true,
-  userGroup: false,
-  notes: true,
-  addresses: false,
-  comments: true,
-  manager: false,
-};
-export const relationPopsName: RelationPropsTypeName<Users> = {
-  roles: 'Roles',
-  userGroup: 'UserGroups',
-  notes: 'Notes',
-  addresses: 'Addresses',
-  comments: 'Comments',
-  manager: 'Users',
-};
-
-export const primaryColumnType: RelationPrimaryColumnType<Users> = {
-  roles: TypeField.number,
-  userGroup: TypeField.number,
-  notes: TypeField.string,
-  addresses: TypeField.number,
-  comments: TypeField.number,
-  manager: TypeField.number,
-};
-
-export const userFields: ResultGetField<Users>['field'] = [
-  'updatedAt',
-  'testDate',
-  'createdAt',
-  'isActive',
-  'lastName',
-  'testArrayNull',
-  'testReal',
-  'firstName',
-  'login',
-  'id',
-];
-
-export const userRelations: RelationTree<Users> = {
-  addresses: [
-    'arrayField',
-    'country',
-    'state',
-    'city',
-    'updatedAt',
-    'createdAt',
+const entityParamUsers: EntityParam<Users, 'id'> = {
+  relations: ['addresses', 'manager', 'roles', 'comments', 'userGroup'],
+  props: [
     'id',
-  ],
-  manager: [
-    'updatedAt',
+    'login',
+    'firstName',
+    'testReal',
+    'testArrayNull',
+    'lastName',
+    'isActive',
     'testDate',
     'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
-    'id',
+    'updatedAt',
   ],
-  roles: ['isDefault', 'key', 'name', 'updatedAt', 'createdAt', 'id'],
-  comments: ['kind', 'text', 'updatedAt', 'createdAt', 'id'],
-  notes: ['text', 'updatedAt', 'createdAt', 'id'],
-  userGroup: ['label', 'id'],
-};
-
-export const propsType: AllFieldWithType<Users> = {
-  updatedAt: TypeField.date,
-  testDate: TypeField.date,
-  createdAt: TypeField.date,
-  isActive: TypeField.boolean,
-  lastName: TypeField.string,
-  testArrayNull: TypeField.array,
-  testReal: TypeField.array,
-  firstName: TypeField.string,
-  login: TypeField.string,
-  id: TypeField.number,
-  addresses: {
-    arrayField: TypeField.array,
-    country: TypeField.string,
-    state: TypeField.string,
-    city: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
+  className: 'Users',
+  primaryColumnName: 'id',
+  propsType: {
     id: TypeField.number,
-  },
-  manager: {
-    updatedAt: TypeField.date,
+    login: TypeField.string,
+    firstName: TypeField.string,
+    testReal: TypeField.array,
+    testArrayNull: TypeField.array,
+    lastName: TypeField.string,
+    isActive: TypeField.null,
     testDate: TypeField.date,
     createdAt: TypeField.date,
-    isActive: TypeField.boolean,
-    lastName: TypeField.string,
-    testArrayNull: TypeField.array,
-    testReal: TypeField.array,
-    firstName: TypeField.string,
-    login: TypeField.string,
-    id: TypeField.number,
+    updatedAt: TypeField.date,
   },
-  roles: {
-    isDefault: TypeField.boolean,
-    key: TypeField.string,
+  propsArrayType: {
+    testReal: TypeField.number,
+    testArrayNull: TypeField.number,
+  },
+  primaryColumnType: TypeField.number,
+  propsNullable: ['testArrayNull', 'lastName', 'isActive'],
+  typeName: 'users',
+  relationProperty: {
+    userGroup: {
+      entityClass: UserGroups,
+      nullable: true,
+      isArray: false,
+    },
+    roles: {
+      entityClass: Roles,
+      nullable: false,
+      isArray: true,
+    },
+    manager: {
+      entityClass: Users,
+      isArray: false,
+      nullable: false,
+    },
+    comments: {
+      entityClass: Comments,
+      nullable: false,
+      isArray: true,
+    },
+    addresses: {
+      entityClass: Addresses,
+      isArray: false,
+      nullable: false,
+    },
+  },
+};
+
+const entityParamRoles: EntityParam<Roles, 'id'> = {
+  relations: [],
+  props: ['id', 'createdAt', 'updatedAt', 'name', 'key', 'isDefault'] as any,
+  className: 'Roles',
+  propsArrayType: {},
+  primaryColumnName: 'id',
+  propsType: {
+    id: TypeField.number,
     name: TypeField.string,
-    updatedAt: TypeField.date,
+    key: TypeField.string,
+    isDefault: TypeField.boolean,
     createdAt: TypeField.date,
-    id: TypeField.number,
-  },
-  comments: {
-    kind: TypeField.string,
-    text: TypeField.string,
     updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.number,
   },
-  notes: {
-    text: TypeField.string,
-    updatedAt: TypeField.date,
-    createdAt: TypeField.date,
-    id: TypeField.string,
-  },
-  userGroup: {
-    label: TypeField.string,
-    id: TypeField.number,
-  },
+  primaryColumnType: TypeField.number,
+  propsNullable: [],
+  typeName: 'roles',
+  relationProperty: {},
 };
 
-export const relationList: ResultGetField<Users>['relations'] = [
-  'userGroup',
-  'notes',
-  'comments',
-  'roles',
-  'manager',
-  'addresses',
-];
-
-export const userFieldsStructure: ResultGetField<Users> = {
-  field: [
-    'updatedAt',
-    'testDate',
-    'createdAt',
-    'isActive',
-    'lastName',
-    'testArrayNull',
-    'testReal',
-    'firstName',
-    'login',
+const entityParamAddresses: EntityParam<Addresses, 'id'> = {
+  relations: [],
+  props: [
     'id',
+    'createdAt',
+    'updatedAt',
+    'city',
+    'state',
+    'country',
+    'arrayField',
   ],
-  relations: [
-    'userGroup',
-    'notes',
-    'comments',
-    'roles',
-    'manager',
-    'addresses',
-  ],
+  propsArrayType: {
+    arrayField: TypeField.string,
+  },
+  className: 'Addresses',
+  primaryColumnName: 'id',
+  propsType: {
+    id: TypeField.number,
+    city: TypeField.string,
+    country: TypeField.string,
+    state: TypeField.string,
+    arrayField: TypeField.array,
+    createdAt: TypeField.date,
+    updatedAt: TypeField.date,
+  },
+  primaryColumnType: TypeField.number,
+  propsNullable: [],
+  typeName: 'addresses',
+  relationProperty: {},
 };
+
+const entityParamComments: EntityParam<Comments, 'id'> = {
+  relations: [],
+  props: ['id', 'createdAt', 'updatedAt', 'kind'],
+  propsArrayType: {},
+  className: 'Comments',
+  primaryColumnName: 'id',
+  propsType: {
+    id: TypeField.number,
+    kind: TypeField.string,
+    createdAt: TypeField.date,
+    updatedAt: TypeField.date,
+  },
+  primaryColumnType: TypeField.number,
+  propsNullable: [],
+  typeName: 'comments',
+  relationProperty: {
+    user: {
+      entityClass: Users,
+      nullable: false,
+      isArray: false,
+    },
+  },
+};
+
+const entityParamUserGroups: EntityParam<UserGroups, 'id'> = {
+  relations: [],
+  props: ['id', 'label'],
+  propsArrayType: {},
+  className: 'UserGroups',
+  primaryColumnName: 'id',
+  propsType: {
+    id: TypeField.number,
+    label: TypeField.string,
+  },
+  primaryColumnType: TypeField.number,
+  propsNullable: [],
+  typeName: kebabCase('UserGroups'),
+  relationProperty: {},
+};
+
+export const mapMock = new Map<Constructor<any>, EntityParam<any, any>>([
+  [Users, entityParamUsers],
+  [Roles, entityParamRoles],
+  [UserGroups, entityParamUserGroups],
+  [Addresses, entityParamAddresses],
+  [Comments, entityParamComments],
+]);
+
+export const usersEntityParamMapMockData = {
+  entityParaMap: entityParamUsers,
+  getParamMap<T extends object, IdKey extends string>(
+    entity: EntityClass<T>
+  ): EntityParam<T, IdKey> {
+    return mapMock.get(entity) as EntityParam<T, IdKey>;
+  },
+} as EntityParamMapService<Users, 'id'>;
+
+export const addressesEntityParamMapMockData = {
+  entityParaMap: entityParamAddresses,
+  getParamMap<T extends object, IdKey extends string>(
+    entity: EntityClass<T>
+  ): EntityParam<T, IdKey> {
+    return mapMock.get(entity) as EntityParam<T, IdKey>;
+  },
+} as EntityParamMapService<Addresses, 'id'>;

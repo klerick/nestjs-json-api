@@ -1,3 +1,4 @@
+import { getEntityName, RelationKeys } from '@klerick/json-api-nestjs-shared';
 import {
   z,
   ZodArray,
@@ -9,17 +10,12 @@ import {
   ZodType,
   ZodUnion,
 } from 'zod';
-import { camelToKebab } from '../../../../utils/nestjs-shared';
-
+import { kebabCase } from 'change-case-commonjs';
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
 import { MapController } from '../../types';
-import {
-  GetFieldForEntity,
-  TupleOfEntityRelation,
-  ZodEntityProps,
-} from '../../../mixin/types';
-import { getEntityName } from '../../../mixin/helper';
-import { EntityClass, ObjectLiteral } from '../../../../types';
+
+import { AnyEntity, EntityClass, UnionToTuple } from '../../../../types';
+import { EntityParamMap } from '../../../mixin/types';
 
 export enum Operation {
   add = 'add',
@@ -81,17 +77,16 @@ export const zodRemove = <T extends string>(type: T) =>
     })
     .strict();
 
-export type ZodOperationRel<
-  E extends ObjectLiteral,
-  O extends Operation
-> = ReturnType<typeof zodOperationRel<E, O>>;
+export type ZodOperationRel<E extends object, O extends Operation> = ReturnType<
+  typeof zodOperationRel<E, O>
+>;
 
-export const zodOperationRel = <E extends ObjectLiteral, O extends Operation>(
+export const zodOperationRel = <E extends object, O extends Operation>(
   type: string,
-  rel: TupleOfEntityRelation<E>,
+  rel: UnionToTuple<RelationKeys<E>>,
   typeOperation: O
 ) => {
-  const literalArray = rel.map((i) => z.literal(i)) as [
+  const literalArray = rel.map((i) => z.literal(i as string)) as [
     ZodLiteral<string>,
     ZodLiteral<string>,
     ...ZodLiteral<string>[]
@@ -125,17 +120,16 @@ export type ZodInputArray = ZodArray<
   'atleastone'
 >;
 
-export type ZodInputOperation<E extends ObjectLiteral = ObjectLiteral> =
-  ReturnType<typeof zodInputOperation<E>>;
-export type InputOperation<E extends ObjectLiteral> = z.infer<
-  ZodInputOperation<E>
+export type ZodInputOperation<E extends object> = ReturnType<
+  typeof zodInputOperation<E>
 >;
+export type InputOperation<E extends object> = z.infer<ZodInputOperation<E>>;
 
 export type InputArray = z.infer<ZodInputArray>;
 
-export function zodInputOperation<E extends ObjectLiteral>(
+export function zodInputOperation<E extends object>(
   mapController: MapController<E>,
-  entityMapProps: Map<EntityClass<E>, ZodEntityProps<E>>
+  entityMapProps: EntityParamMap<EntityClass<AnyEntity>>
 ) {
   const array = [] as unknown as [
     ZodAdd<string>,
@@ -146,7 +140,7 @@ export function zodInputOperation<E extends ObjectLiteral>(
     ZodOperationRel<E, Operation.update>
   ];
   for (const [entity, controller] of mapController.entries()) {
-    const typeName = camelToKebab(getEntityName(entity));
+    const typeName = kebabCase(getEntityName(entity));
     const entityMap = entityMapProps.get(entity as any);
     if (!entityMap) throw new Error('Entity not found in map');
 

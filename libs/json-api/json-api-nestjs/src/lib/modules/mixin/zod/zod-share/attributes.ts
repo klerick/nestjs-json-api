@@ -1,202 +1,287 @@
-import {
-  EntityProps,
-  ObjectTyped,
-  TypeOfArray,
-} from '../../../../utils/nestjs-shared';
-import { z, ZodArray, ZodNullable } from 'zod';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { z, ZodArray, ZodType } from 'zod';
 
-import { ObjectLiteral } from '../../../../types';
-import {
-  FieldWithType,
-  PropsFieldItem,
-  PropsForField,
-  TypeField,
-} from '../../types';
-import { nonEmptyObject } from '../zod-utils';
+import { EntityParam, TypeField } from '../../../../types';
+import { nonEmptyObject, setOptionalOrNot } from '../zod-utils';
+import { ResultSchema } from './type';
+import { EntityParamMapService } from '../../service';
 
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 type Literal = z.infer<typeof literalSchema>;
 type Json = Literal | { [key: string]: Json } | Json[];
 
-function getZodRulesForNumber(isNullable: boolean) {
+export function getZodRulesForNumber<
+  Null extends true | false,
+  isPatch extends true | false
+>(isNullable: Null, isPatch: isPatch) {
   const schema = z.preprocess((x) => Number(x), z.number());
-  if (isNullable) schema.nullable().optional();
-  return isNullable ? schema.optional() : schema;
+  return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodRulesForString(isNullable: boolean) {
+function getZodRulesForString<
+  Null extends true | false,
+  isPatch extends true | false
+>(isNullable: Null, isPatch: isPatch) {
   const schema = z.string();
-  if (isNullable) schema.nullable().optional();
-  return isNullable ? schema.optional() : schema;
+  return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodRulesForDate(isNullable: boolean) {
+function getZodRulesForDate<
+  Null extends true | false,
+  isPatch extends true | false
+>(isNullable: Null, isPatch: isPatch) {
   const schema = z.coerce.date();
-  if (isNullable) schema.nullable().optional();
-  return isNullable ? schema.optional() : schema;
+  return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodRulesForBoolean(isNullable: boolean) {
+function getZodRulesForBoolean<
+  Null extends true | false,
+  isPatch extends true | false
+>(isNullable: Null, isPatch: isPatch) {
   const schema = z.boolean();
-  if (isNullable) schema.nullable();
-  return isNullable ? schema.optional() : schema;
+  return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodSchemaForJson(isNullable: boolean) {
+function getZodSchemaForJson<
+  Null extends true | false,
+  isPatch extends true | false
+>(isNullable: Null, isPatch: isPatch) {
   const tmpSchema = isNullable ? literalSchema.nullable() : literalSchema;
 
   const schema: z.ZodType<Json> = z.lazy(() =>
     z.union([tmpSchema, z.array(tmpSchema), z.record(tmpSchema)])
   );
 
-  return isNullable ? schema.optional() : schema;
+  return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodRulesForArray<T>(
-  propsField: PropsFieldItem
-):
-  | ZodArray<ZodRulesForArray<T>, 'many'>
-  | ZodNullable<ZodArray<ZodRulesForArray<T>, 'many'>> {
-  const type = propsField.type as T;
-  let schema: ZodRulesForArray<T>;
-
-  if (!propsField) {
-    schema = getZodRulesForString(false) as ZodRulesForArray<T>;
-  } else {
-    switch (type) {
-      case 'number':
-      case 'real':
-      case 'integer':
-      case 'bigint':
-      case 'double':
-      case 'numeric':
-      case Number:
-        schema = getZodRulesForNumber(false) as ZodRulesForArray<T>;
-        break;
-      case 'date':
-      case Date:
-        schema = getZodRulesForDate(false) as ZodRulesForArray<T>;
-        break;
-      case 'boolean':
-      case Boolean:
-        schema = getZodRulesForBoolean(false) as ZodRulesForArray<T>;
-        break;
-      default:
-        schema = getZodRulesForString(false) as ZodRulesForArray<T>;
-    }
-  }
-
-  if (propsField.isNullable) {
-    return schema.array().nullable() as ZodNullable<
-      ZodArray<ZodRulesForArray<T>, 'many'>
-    >;
-  }
-  return schema.array() as ZodArray<ZodRulesForArray<T>, 'many'>;
-}
-
-type ZodRulesForArray<T> = T extends number
-  ? ReturnType<typeof getZodRulesForNumber>
-  : T extends Date
-  ? ReturnType<typeof getZodRulesForDate>
-  : T extends boolean
-  ? ReturnType<typeof getZodRulesForBoolean>
-  : ReturnType<typeof getZodRulesForString>;
-
-type ZodRulesForType<T extends TypeField, I> = ReturnType<
-  T extends TypeField.array
-    ? typeof getZodRulesForArray<I>
-    : T extends TypeField.date
-    ? typeof getZodRulesForDate
-    : T extends TypeField.boolean
-    ? typeof getZodRulesForBoolean
-    : T extends TypeField.number
-    ? typeof getZodRulesForNumber
-    : T extends TypeField.object
-    ? typeof getZodSchemaForJson
-    : typeof getZodRulesForString
+type ZodRulesResultArray<
+  T extends TypeField,
+  Null extends true | false,
+  isPatch extends true | false
+> = ResultSchema<
+  ZodArray<ZodRulesForType<T, false, false>, 'many'>,
+  Null,
+  isPatch
 >;
 
-function buildSchema<T extends TypeField, P extends PropsFieldItem, I>(
-  fieldType: T,
-  propsField: P
-): ZodRulesForType<T, I> {
-  let schema: ZodRulesForType<T, I>;
-  switch (fieldType) {
-    case TypeField.array:
-      schema = getZodRulesForArray<I>(propsField) as ZodRulesForType<T, I>;
+function getZodRulesForArray<
+  T extends TypeField,
+  Null extends true | false,
+  isPatch extends true | false
+>(
+  propsField: T,
+  isNullable: Null,
+  isPatch: isPatch
+): ZodRulesResultArray<T, Null, isPatch> {
+  let schema: ZodType;
+  switch (propsField) {
+    case TypeField.number:
+      schema = getZodRulesForNumber(false, false);
       break;
     case TypeField.date:
-      schema = getZodRulesForDate(propsField.isNullable) as ZodRulesForType<
-        T,
-        I
-      >;
+      schema = getZodRulesForDate(false, false);
       break;
     case TypeField.boolean:
-      schema = getZodRulesForBoolean(propsField.isNullable) as ZodRulesForType<
-        T,
-        I
-      >;
-      break;
-    case TypeField.number:
-      schema = getZodRulesForNumber(propsField.isNullable) as ZodRulesForType<
-        T,
-        I
-      >;
-      break;
-    case TypeField.object:
-      schema = getZodSchemaForJson(propsField.isNullable) as ZodRulesForType<
-        T,
-        I
-      >;
+      schema = getZodRulesForBoolean(false, false);
       break;
     default:
-      schema = getZodRulesForString(propsField.isNullable) as ZodRulesForType<
-        T,
-        I
-      >;
+      schema = getZodRulesForString(false, false);
   }
 
-  return schema;
+  return setOptionalOrNot(schema.array(), isNullable, isPatch) as ResultSchema<
+    ZodArray<ZodRulesForType<T, false, false>, 'many'>,
+    Null,
+    isPatch
+  >;
+}
+
+type ZodRulesForArray<
+  T extends TypeField,
+  Null extends true | false,
+  isPatch extends true | false
+> = ReturnType<typeof getZodRulesForArray<T, Null, isPatch>>;
+
+export type ZodRulesForType<
+  T extends TypeField,
+  Null extends true | false,
+  isPatch extends true | false
+> = ReturnType<
+  T extends TypeField.date
+    ? typeof getZodRulesForDate<Null, isPatch>
+    : T extends TypeField.boolean
+    ? typeof getZodRulesForBoolean<Null, isPatch>
+    : T extends TypeField.number
+    ? typeof getZodRulesForNumber<Null, isPatch>
+    : T extends TypeField.object
+    ? typeof getZodSchemaForJson<Null, isPatch>
+    : typeof getZodRulesForString<Null, isPatch>
+>;
+
+export type IsNullableProps<
+  E extends object,
+  IdKey extends string,
+  K extends keyof E
+> = K extends EntityParam<E, IdKey>['propsNullable'][number] ? true : false;
+type IsTypeArray<T extends TypeField> = T extends TypeField.array ? 1 : 0;
+type Props<E extends object, IdKey extends string> = EntityParam<
+  E,
+  IdKey
+>['propsType'];
+
+type PropsArray<E extends object, IdKey extends string> = EntityParam<
+  E,
+  IdKey
+>['propsArrayType'];
+
+type OmitPrimary<E extends object, IdKey extends string> = Omit<
+  Props<E, IdKey>,
+  IdKey
+>;
+
+type ZodRules<
+  E extends object,
+  IdKey extends string,
+  P extends keyof E,
+  IsArray extends 1 | 0,
+  isPatch extends boolean
+> = IsArray extends 1
+  ? P extends keyof PropsArray<E, IdKey>
+    ? ZodRulesForArray<
+        PropsArray<E, IdKey>[P],
+        IsNullableProps<E, IdKey, P>,
+        isPatch
+      >
+    : never
+  : P extends keyof Props<E, IdKey>
+  ? ZodRulesForType<Props<E, IdKey>[P], IsNullableProps<E, IdKey, P>, isPatch>
+  : never;
+
+export type ShapeAttributesType<
+  E extends object,
+  IdKey extends string,
+  isPatch extends boolean
+> = {
+  [K in keyof OmitPrimary<E, IdKey>]: ZodRules<
+    E,
+    IdKey,
+    K,
+    IsTypeArray<OmitPrimary<E, IdKey>[K]>,
+    isPatch
+  >;
+};
+
+function assertPropsIsarrayProps<E extends object, IdKey extends string>(
+  paramMap: EntityParam<E, IdKey>,
+  propsName: unknown
+): propsName is keyof PropsArray<E, IdKey> {
+  return Reflect.get(paramMap.propsType, `${propsName}`) === TypeField.array;
+}
+
+function buildSchema<
+  E extends object,
+  IdKey extends string,
+  isPatch extends boolean,
+  K extends keyof Props<E, IdKey>
+>(
+  paramMap: EntityParam<E, IdKey>,
+  propsName: K,
+  isPatch: isPatch
+): ZodRules<E, IdKey, K, IsTypeArray<Props<E, IdKey>[K]>, isPatch> {
+  // @ts-expect-error need check in tuple
+  const isNullable = paramMap.propsNullable.includes(propsName);
+  if (assertPropsIsarrayProps(paramMap, propsName)) {
+    const arrayPropsType = paramMap.propsArrayType[propsName];
+
+    return getZodRulesForArray(arrayPropsType, isNullable, isPatch) as ZodRules<
+      E,
+      IdKey,
+      K,
+      IsTypeArray<Props<E, IdKey>[K]>,
+      isPatch
+    >;
+  }
+
+  const propsType = paramMap.propsType[propsName];
+  switch (propsType) {
+    case TypeField.date:
+      return getZodRulesForDate(isNullable, isPatch) as ZodRules<
+        E,
+        IdKey,
+        K,
+        IsTypeArray<Props<E, IdKey>[K]>,
+        isPatch
+      >;
+    case TypeField.boolean:
+      return getZodRulesForBoolean(isNullable, isPatch) as ZodRules<
+        E,
+        IdKey,
+        K,
+        IsTypeArray<Props<E, IdKey>[K]>,
+        isPatch
+      >;
+    case TypeField.number:
+      return getZodRulesForNumber(isNullable, isPatch) as ZodRules<
+        E,
+        IdKey,
+        K,
+        IsTypeArray<Props<E, IdKey>[K]>,
+        isPatch
+      >;
+    case TypeField.object:
+      return getZodSchemaForJson(isNullable, isPatch) as ZodRules<
+        E,
+        IdKey,
+        K,
+        IsTypeArray<Props<E, IdKey>[K]>,
+        isPatch
+      >;
+    default:
+      return getZodRulesForString(isNullable, isPatch) as ZodRules<
+        E,
+        IdKey,
+        K,
+        IsTypeArray<Props<E, IdKey>[K]>,
+        isPatch
+      >;
+  }
+}
+
+function assertOmitKeysProps<E extends object, IdKey extends string>(
+  primaryColumnName: EntityParam<E, IdKey>['primaryColumnName'],
+  key: keyof Props<E, IdKey>
+): key is keyof OmitPrimary<E, IdKey> {
+  return !(key.toString() === primaryColumnName);
 }
 
 export function zodAttributes<
-  E extends ObjectLiteral,
+  E extends object,
+  IdKey extends string,
   S extends true | false = false
->(
-  fieldWithType: FieldWithType<E>,
-  propsDb: PropsForField<E>,
-  primaryColumn: EntityProps<E>,
-  isPatch: S
-) {
-  const objectShape = {} as {
-    [K in keyof Omit<FieldWithType<E>, keyof EntityProps<E>>]: ZodRulesForType<
-      FieldWithType<E>[K],
-      TypeOfArray<E[K]>
-    >;
-  };
+>(entityParamMapService: EntityParamMapService<E, IdKey>, isPatch: S) {
+  const paramsMap = entityParamMapService.entityParaMap;
 
-  for (const [nameList, type] of ObjectTyped.entries(fieldWithType)) {
-    if (nameList === primaryColumn) continue;
-    const name = nameList as keyof Omit<FieldWithType<E>, keyof EntityProps<E>>;
-    const propsField = propsDb[name];
-    objectShape[name] = buildSchema<
-      typeof type,
-      typeof propsField,
-      TypeOfArray<E[typeof name]>
-    >(type, propsField || {});
-  }
-  const zodSchema = z.object(objectShape).strict();
-  if (isPatch) {
-    return zodSchema.partial().refine(nonEmptyObject());
-  }
-  return zodSchema.refine(nonEmptyObject());
+  const objectShape = ObjectTyped.keys(paramsMap.propsType).reduce(
+    (acum, key) => {
+      if (assertOmitKeysProps(paramsMap.primaryColumnName, key)) {
+        acum[key] = buildSchema(paramsMap, key, isPatch);
+      }
+
+      return acum;
+    },
+    {} as ShapeAttributesType<E, IdKey, S>
+  );
+
+  return z.object(objectShape).strict().refine(nonEmptyObject());
 }
 
 export type ZodAttributes<
-  E extends ObjectLiteral,
+  E extends object,
+  IdKey extends string,
   K extends true | false = false
-> = ReturnType<typeof zodAttributes<E, K>>;
+> = ReturnType<typeof zodAttributes<E, IdKey, K>>;
 export type Attributes<
-  E extends ObjectLiteral,
+  E extends object,
+  IdKey extends string,
   K extends true | false = false
-> = z.infer<ZodAttributes<E, K>>;
+> = z.infer<ZodAttributes<E, IdKey, K>>;

@@ -1,24 +1,11 @@
-import { QueryField, ObjectTyped } from '../../../../utils/nestjs-shared';
+import { QueryField } from '@klerick/json-api-nestjs-shared';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
+
 import { zodInputQuery } from './index';
-
-import { ResultGetField, TupleOfEntityRelation } from '../../types';
-import { Users } from '../../../../mock-utils/typeorm';
-
-import {
-  userFieldsStructure,
-  userRelations,
-} from '../../../../utils/___test___/test.helper';
-
-const userFields: ResultGetField<Users>['field'] = userFieldsStructure['field'];
-
-const entityFieldsStructure = {
-  field: userFields,
-  relations: ObjectTyped.keys(userRelations) as TupleOfEntityRelation<Users>,
-};
 
 describe('zodInputQuery', () => {
   it('should validate a correct input query object', () => {
-    const schema = zodInputQuery(entityFieldsStructure, userRelations);
+    const schema = zodInputQuery(usersEntityParamMapMockData);
     const input = {
       [QueryField.fields]: {
         target: 'login',
@@ -40,7 +27,7 @@ describe('zodInputQuery', () => {
   });
 
   it('should throw an error for an invalid field in the input query', () => {
-    const schema = zodInputQuery(entityFieldsStructure, userRelations);
+    const schema = zodInputQuery(usersEntityParamMapMockData);
     const input = {
       [QueryField.fields]: ['invalidRelation.invalidField'],
       [QueryField.filter]: { id: 1 },
@@ -53,7 +40,7 @@ describe('zodInputQuery', () => {
   });
 
   it('should throw an error if an unexpected key is present in the input query', () => {
-    const schema = zodInputQuery(entityFieldsStructure, userRelations);
+    const schema = zodInputQuery(usersEntityParamMapMockData);
     const input = {
       [QueryField.fields]: ['roles.name'],
       [QueryField.filter]: { id: 1 },
@@ -67,7 +54,7 @@ describe('zodInputQuery', () => {
   });
 
   it('should throw an error when a required field is missing', () => {
-    const schema = zodInputQuery(entityFieldsStructure, userRelations);
+    const schema = zodInputQuery(usersEntityParamMapMockData);
     const input = {
       [QueryField.fields]: ['roles.name'],
       [QueryField.include]: ['roles'],
@@ -79,7 +66,7 @@ describe('zodInputQuery', () => {
   });
 
   it('should validate input with empty but valid fields', () => {
-    const schema = zodInputQuery(entityFieldsStructure, userRelations);
+    const schema = zodInputQuery(usersEntityParamMapMockData);
     const input = {
       [QueryField.page]: { number: 1, size: 10 },
     };

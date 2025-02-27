@@ -1,44 +1,17 @@
-import { FilterOperand, QueryField } from '../../../../utils/nestjs-shared';
-import { zodQuery } from './index';
-import { ArrayPropsForEntity } from '../../types';
-import { Users } from '../../../../mock-utils/typeorm';
-import { InputQuery } from '../zod-input-query-schema';
+import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
+
 import { ASC } from '../../../../constants';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
 
-import {
-  userFieldsStructure as userFields,
-  userRelations,
-  propsType,
-} from '../../../../utils/___test___/test.helper';
+import { InputQuery } from '../zod-input-query-schema';
+import { zodQuery } from './index';
 
-const propsArray: ArrayPropsForEntity<Users> = {
-  target: {
-    testArrayNull: true,
-    testReal: true,
-  },
-  addresses: {
-    arrayField: true,
-  },
-  userGroup: {},
-  manager: {
-    testArrayNull: true,
-    testReal: true,
-  },
-  comments: {},
-  notes: {},
-  roles: {},
-};
-
-const schemaQuery = zodQuery<Users>(
-  userFields,
-  userRelations,
-  propsArray,
-  propsType
-);
+const schemaQuery = zodQuery(usersEntityParamMapMockData);
 
 describe('schemaQuery.parse', () => {
   it('should successfully parse valid input', () => {
-    const validInput: InputQuery<Users> = {
+    const validInput: InputQuery<Users, 'id'> = {
       [QueryField.fields]: {
         target: [
           'id',
@@ -81,7 +54,7 @@ describe('schemaQuery.parse', () => {
   });
 
   it('should handle nested relations', () => {
-    const validInput: InputQuery<Users> = {
+    const validInput: InputQuery<Users, 'id'> = {
       [QueryField.fields]: {
         target: [
           'id',

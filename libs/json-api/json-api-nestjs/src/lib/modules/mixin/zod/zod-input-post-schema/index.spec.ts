@@ -1,30 +1,8 @@
-import { EntityProps, TypeField, TypeForId } from '../../types';
-import { Users } from '../../../../mock-utils/typeorm';
-import { zodPost } from './';
 import { ZodError } from 'zod';
+import { zodPost } from './';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
-import {
-  fieldTypeUsers as fieldWithType,
-  propsDb,
-  relationArrayProps,
-  relationPopsName,
-  primaryColumnType,
-} from '../../../../utils/___test___/test.helper';
-
-const typeId: TypeForId = TypeField.number;
-
-const primaryColumn: EntityProps<Users> = 'id';
-
-const schema = zodPost(
-  typeId,
-  'users',
-  fieldWithType,
-  propsDb,
-  primaryColumn,
-  relationArrayProps,
-  relationPopsName,
-  primaryColumnType
-);
+const schema = zodPost(usersEntityParamMapMockData);
 
 describe('zodPost', () => {
   it('should be ok', () => {
@@ -33,19 +11,34 @@ describe('zodPost', () => {
     const attributes = {
       login: 'login',
       lastName: 'sdfsdf',
-      isActive: true,
+      firstName: 'sdds',
+      isActive: 'null',
       testDate: date.toISOString(),
+      createdAt: date.toISOString() as any,
+      updatedAt: date.toISOString() as any,
       testReal: [`${real}`],
       testArrayNull: null,
     };
     const relationships = {
-      notes: {
+      roles: {
         data: [
           {
-            type: 'notes',
-            id: 'dsfsdf',
+            type: 'roles',
+            id: '1',
           },
         ],
+      },
+      addresses: {
+        data: {
+          type: 'addresses',
+          id: '1',
+        },
+      },
+      manager: {
+        data: {
+          type: 'users',
+          id: '1',
+        },
       },
     };
     const check = {
@@ -75,6 +68,8 @@ describe('zodPost', () => {
         attributes: {
           ...attributes,
           ['testDate']: date,
+          createdAt: date,
+          updatedAt: date,
           testReal: [real],
         },
         relationships,
@@ -86,6 +81,8 @@ describe('zodPost', () => {
         attributes: {
           ...attributes,
           ['testDate']: date,
+          createdAt: date,
+          updatedAt: date,
           testReal: [real],
         },
       },
@@ -97,6 +94,8 @@ describe('zodPost', () => {
         attributes: {
           ...attributes,
           ['testDate']: date,
+          createdAt: date,
+          updatedAt: date,
           testReal: [real],
         },
       },

@@ -1,6 +1,5 @@
+import { isString } from '@klerick/json-api-nestjs-shared';
 import { z } from 'zod';
-import { isString } from '../../../../utils/nestjs-shared';
-import { ZodInfer } from '../../types';
 
 export function zodIncludeInputQuery() {
   return z
@@ -15,4 +14,6 @@ export function zodIncludeInputQuery() {
     });
 }
 
-export type ZodIncludeInputQuery = ZodInfer<typeof zodIncludeInputQuery>;
+export type ZodIncludeInputQuery = z.infer<
+  ReturnType<typeof zodIncludeInputQuery>
+>;

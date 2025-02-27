@@ -1,13 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import {
-  ObjectTyped,
-  EntityRelation,
-  camelToKebab,
-} from '../../../utils/nestjs-shared';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { kebabCase } from 'change-case-commonjs';
 
-import { EntityProps, TypeField, ZodEntityProps, ZodParams } from '../types';
-import { EntityClass, ObjectLiteral } from '../../../types';
+import {
+  AnyEntity,
+  EntityClass,
+  EntityParam,
+  RelationProperty,
+  TypeField,
+} from '../../../types';
+
+import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
+import { EntityParamMap } from '../types';
+import { EntityParamMapService } from '../service';
+
+export function assertIsKeysOfObject<E extends object>(
+  object: EntityClass<E>,
+  element: any
+): asserts element is readonly [keyof E] {
+  if (!Array.isArray(element)) {
+    throw new Error(element + ' is not keys of ' + object.name);
+  }
+  if (false) throw new Error(element + ' not exist in ' + object.name);
+}
+
+export function assertIsKeyOfObject<E extends object>(
+  object: EntityClass<E>,
+  element: unknown
+): asserts element is PropertyKeys<E> {
+  if (false) throw new Error(element + 'not exist in ' + object.name);
+}
 
 export const errorSchema = {
   type: 'object',
@@ -48,20 +71,24 @@ export const errorSchema = {
   },
 };
 
-export function jsonSchemaResponse<E extends ObjectLiteral>(
+export function jsonSchemaResponse<
+  E extends object,
+  IdKey extends string = 'id'
+>(
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   array = false
 ) {
   const { propsType, relations, relationProperty, primaryColumnName } =
-    getEntityMapProps(mapEntity, entity);
+    mapEntity.getParamMap(entity);
 
+  assertIsKeysOfObject(entity, relations);
   const dataType = {
     type: 'object',
     properties: {
       type: {
         type: 'string',
-        const: camelToKebab(entity.name),
+        const: kebabCase(entity.name),
       },
       id: {
         type: 'string',
@@ -71,6 +98,7 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
         properties: ObjectTyped.entries(propsType)
           .filter(([name]) => name !== primaryColumnName)
           .reduce((acum, [name, type]) => {
+            assertIsKeyOfObject(entity, name);
             switch (type) {
               case TypeField.array:
                 acum[name.toString()] = {
@@ -106,15 +134,16 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
       },
       relationships: {
         type: 'object',
-        properties: relations.reduce((acum, name) => {
+        properties: ObjectTyped.keys(
+          relationProperty as RelationProperty<Record<string, unknown>>
+        ).reduce((acum, name) => {
           const dataItem = {
             type: 'object',
             properties: {
               type: {
                 type: 'string',
-                const: getEntityMapProps(
-                  mapEntity,
-                  Reflect.get(relationProperty, name).entityClass
+                const: mapEntity.getParamMap(
+                  Reflect.get(relationProperty, name).entityClass as any
                 ).typeName,
               },
               id: {
@@ -127,7 +156,7 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
             type: 'array',
             items: dataItem,
           };
-          acum[name.toString()] = {
+          acum[name] = {
             type: 'object',
             properties: {
               links: {
@@ -221,19 +250,25 @@ export function jsonSchemaResponse<E extends ObjectLiteral>(
   };
 }
 
-export function createApiModels<E extends ObjectLiteral>(
+export function createApiModels<E extends object>(
   entity: EntityClass<E>,
-  mapEntity: ZodEntityProps<E>
+  mapEntity: EntityParam<E>
 ): EntityClass<E> {
   const { propsType, props, relations, propsNullable, relationProperty } =
     mapEntity;
+  assertIsKeysOfObject(entity, propsNullable);
+  assertIsKeysOfObject(entity, relations);
 
   for (const name of props) {
     let currentType: any;
     let required = false;
     let isArray = false;
-    required = !(propsNullable as any).includes(name);
-    const type = Reflect.get(propsType, name);
+
+    assertIsKeyOfObject(entity, name);
+
+    required = !propsNullable.includes(name);
+
+    const type = propsType[name];
     isArray = type === 'array';
     switch (type) {
       case TypeField.date:
@@ -248,7 +283,7 @@ export function createApiModels<E extends ObjectLiteral>(
       default:
         currentType = String;
     }
-    if (relations.includes(name as string)) {
+    if (relations.includes(name)) {
       const propsRel = Reflect.get(relationProperty, name);
       currentType = propsRel.entityClass;
       isArray = propsRel.isArray;
@@ -300,8 +335,8 @@ export const schemaTypeForRelation = {
   },
 };
 
-export function getEntityMapProps<E extends ObjectLiteral>(
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+export function getEntityMapProps<E extends object>(
+  mapEntity: EntityParamMap<EntityClass<AnyEntity>>,
   entity: EntityClass<E>
 ) {
   const entityMap = mapEntity.get(entity);

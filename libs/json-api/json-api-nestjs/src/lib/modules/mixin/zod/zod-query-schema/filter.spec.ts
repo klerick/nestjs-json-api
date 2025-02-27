@@ -1,44 +1,16 @@
-import { zodFilterQuery } from './filter';
-import { Users } from '../../../../mock-utils/typeorm';
-import { ArrayPropsForEntity } from '../../types';
 import { ZodError } from 'zod';
+
+import { zodFilterQuery } from './filter';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
 import { ZodFilterInputQuery } from '../zod-input-query-schema/filter';
 
-import {
-  userFields,
-  userRelations,
-  propsType,
-} from '../../../../utils/___test___/test.helper';
-
-const propsArray: ArrayPropsForEntity<Users> = {
-  target: {
-    testArrayNull: true,
-    testReal: true,
-  },
-  addresses: {
-    arrayField: true,
-  },
-  userGroup: {},
-  manager: {
-    testArrayNull: true,
-    testReal: true,
-  },
-  comments: {},
-  notes: {},
-  roles: {},
-};
-
-const schema = zodFilterQuery<Users>(
-  userFields,
-  userRelations,
-  propsArray,
-  propsType
-);
+const schema = zodFilterQuery(usersEntityParamMapMockData);
 
 describe('Check "filter" zod schema', () => {
   describe('Valid schema', () => {
     it('Valid schema - check1', () => {
-      const check1: ZodFilterInputQuery<Users> = {
+      const check1: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           id: {
             gte: '1213',
@@ -52,7 +24,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check2', () => {
-      const check2: ZodFilterInputQuery<Users> = {
+      const check2: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           id: {
             gte: '1213',
@@ -74,7 +46,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check3', () => {
-      const check3: ZodFilterInputQuery<Users> = {
+      const check3: ZodFilterInputQuery<Users, 'id'> = {
         target: null,
         relation: null,
       };
@@ -83,7 +55,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check4', () => {
-      const check4: ZodFilterInputQuery<Users> = {
+      const check4: ZodFilterInputQuery<Users, 'id'> = {
         target: null,
         relation: {
           comments: {
@@ -103,7 +75,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check5', () => {
-      const check5: ZodFilterInputQuery<Users> = {
+      const check5: ZodFilterInputQuery<Users, 'id'> = {
         target: null,
         relation: {
           comments: {
@@ -123,7 +95,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check6', () => {
-      const check6: ZodFilterInputQuery<Users> = {
+      const check6: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           id: {
             gte: '1213',
@@ -140,7 +112,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check7', () => {
-      const check7: ZodFilterInputQuery<Users> = {
+      const check7: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           isActive: {
             eq: 'true',
@@ -153,7 +125,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check8', () => {
-      const check8: ZodFilterInputQuery<Users> = {
+      const check8: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           createdAt: {
             eq: '2023-12-08T09:40:58.020Z',
@@ -166,7 +138,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check9', () => {
-      const check9: ZodFilterInputQuery<Users> = {
+      const check9: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           createdAt: {
             eq: 'null',
@@ -181,7 +153,7 @@ describe('Check "filter" zod schema', () => {
     });
 
     it('Valid schema - check10', () => {
-      const check: ZodFilterInputQuery<Users> = {
+      const check: ZodFilterInputQuery<Users, 'id'> = {
         target: {
           id: {
             gte: '1213',

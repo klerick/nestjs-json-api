@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 import { z, ZodError } from 'zod';
 import {
   Operation,
@@ -13,17 +14,16 @@ import {
   zodUpdate,
   ZodUpdate,
 } from './zod-helper';
-import { Users } from '../../../../mock-utils/typeorm';
-import { ENTITY_MAP_PROPS, FIELD_FOR_ENTITY } from '../../../../constants';
-import { JsonBaseController } from '../../../mixin/controller/json-base.controller';
+
 import { MapController } from '../../types';
 import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
-import {
-  GetFieldForEntity,
-  TupleOfEntityRelation,
-  ZodEntityProps,
-} from '../../../mixin/types';
-import { EntityClass } from '../../../../types';
+
+import { AnyEntity, EntityClass, UnionToTuple } from '../../../../types';
+import { JsonBaseController } from '../../../mixin/controllers/json-base.controller';
+import { mapMock } from '../../../../utils/___test___/test.helper';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
+import { ENTITY_PARAM_MAP } from '../../../../constants';
+import { EntityParamMap } from '../../../mixin/types';
 
 describe('ZodHelperSpec', () => {
   afterEach(() => {
@@ -321,10 +321,9 @@ describe('ZodHelperSpec', () => {
   describe('zodOperationRel', () => {
     it('should be correct', () => {
       const user = 'user';
-      const rel = [
-        'address',
-        'notes',
-      ] as unknown as TupleOfEntityRelation<Users>;
+      const rel = ['address', 'notes'] as unknown as UnionToTuple<
+        RelationKeys<Users>
+      >;
       const schema = zodOperationRel<Users, Operation>(
         user,
         rel,
@@ -353,10 +352,9 @@ describe('ZodHelperSpec', () => {
     });
     it('should be not correct', () => {
       const user = 'user';
-      const rel = [
-        'address',
-        'notes',
-      ] as unknown as TupleOfEntityRelation<Users>;
+      const rel = ['address', 'notes'] as unknown as UnionToTuple<
+        RelationKeys<Users>
+      >;
       const schema = zodOperationRel<Users, Operation>(
         user,
         rel,
@@ -449,41 +447,25 @@ describe('ZodHelperSpec', () => {
     });
   });
   describe('zodInputOperation', () => {
-    let getField: Map<EntityClass<any>, ZodEntityProps<any>>;
+    let entityParamMap: EntityParamMap<EntityClass<AnyEntity>>;
     beforeAll(async () => {
       const module: TestingModule = await Test.createTestingModule({
         providers: [
           {
-            provide: ENTITY_MAP_PROPS,
-            useValue: new Map([
-              [
-                Users,
-                {
-                  relations: [
-                    'userGroup',
-                    'notes',
-                    'comments',
-                    'roles',
-                    'manager',
-                    'addresses',
-                  ],
-                },
-              ],
-            ]),
+            provide: ENTITY_PARAM_MAP,
+            useValue: mapMock,
           },
         ],
       }).compile();
-      getField =
-        module.get<Map<EntityClass<any>, ZodEntityProps<any>>>(
-          ENTITY_MAP_PROPS
-        );
+      entityParamMap =
+        module.get<EntityParamMap<EntityClass<AnyEntity>>>(ENTITY_PARAM_MAP);
     });
 
     it('should be correct', () => {
       const mapController: MapController<Users> = new Map([
         [Users as any, JsonBaseController],
       ]);
-      const schema = zodInputOperation(mapController, getField);
+      const schema = zodInputOperation(mapController, entityParamMap);
       const check: z.infer<ZodInputOperation<any>> = {
         [KEY_MAIN_INPUT_SCHEMA]: [
           {
@@ -526,7 +508,7 @@ describe('ZodHelperSpec', () => {
       const mapController: MapController<Users> = new Map([
         [Users as any, JsonBaseController],
       ]);
-      const schema = zodInputOperation(mapController, getField);
+      const schema = zodInputOperation(mapController, entityParamMap);
       const check = {};
       const check1 = {
         ssdf: 'sdfsdf',
@@ -563,7 +545,7 @@ describe('ZodHelperSpec', () => {
       const mapController: MapController<Users> = new Map([
         [Users as any, Test],
       ]);
-      const schema = zodInputOperation(mapController, getField);
+      const schema = zodInputOperation(mapController, entityParamMap);
       const check: z.infer<ZodInputOperation<any>> = {
         [KEY_MAIN_INPUT_SCHEMA]: [
           {

@@ -2,11 +2,11 @@ import {
   JSON_API_DECORATOR_ENTITY,
   JSON_API_DECORATOR_OPTIONS,
 } from '../../../../constants';
-import { EntityClass, ObjectLiteral } from '../../../../types';
+import { AnyEntity, EntityClass } from '../../../../types';
 import { DecoratorOptions } from '../../types';
 
-export function JsonApi<T extends ObjectLiteral>(
-  entity: EntityClass<T>,
+export function JsonApi(
+  entity: EntityClass<AnyEntity>,
   options?: DecoratorOptions
 ): ClassDecorator {
   return (target): typeof target => {

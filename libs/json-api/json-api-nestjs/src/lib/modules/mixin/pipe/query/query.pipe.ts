@@ -8,15 +8,14 @@ import { ZodError } from 'zod';
 
 import { ZOD_QUERY_SCHEMA } from '../../../../constants';
 import { ZodQuery, Query, InputQuery } from '../../zod';
-import { ObjectLiteral } from '../../../../types';
 
-export class QueryPipe<E extends ObjectLiteral>
-  implements PipeTransform<InputQuery<E>, Query<E>>
+export class QueryPipe<E extends object>
+  implements PipeTransform<InputQuery<E, 'id'>, Query<E, 'id'>>
 {
   @Inject(ZOD_QUERY_SCHEMA)
-  private zodQuerySchema!: ZodQuery<E>;
+  private zodQuerySchema!: ZodQuery<E, 'id'>;
 
-  transform(value: InputQuery<E>): Query<E> {
+  transform(value: InputQuery<E, 'id'>): Query<E, 'id'> {
     try {
       return this.zodQuerySchema.parse(value);
     } catch (e) {

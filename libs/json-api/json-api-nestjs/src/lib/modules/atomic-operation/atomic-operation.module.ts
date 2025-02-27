@@ -6,7 +6,7 @@ import {
   Module,
   NestModule,
 } from '@nestjs/common';
-import { DiscoveryModule } from '@nestjs/core';
+import { DiscoveryModule, RouterModule } from '@nestjs/core';
 
 import { OperationController } from './controllers';
 import { ExplorerService, ExecuteService, SwaggerService } from './service';
@@ -17,13 +17,34 @@ import {
   ZodInputOperation,
   AsyncIterate,
 } from './factory';
-import { ResultModuleOptions } from '../../types';
-import { MAP_CONTROLLER_INTERCEPTORS, OPTIONS } from './constants';
+import { AnyEntity, EntityClass } from '../../types';
+import { MAP_CONTROLLER_INTERCEPTORS } from './constants';
 
 @Module({})
 export class AtomicOperationModule implements NestModule {
   static forRoot(
-    options: ResultModuleOptions,
+    operationUrl: string,
+    entities: EntityClass<AnyEntity>[],
+    entityModules: DynamicModule[],
+    commonModule: DynamicModule
+  ): DynamicModule[] {
+    return [
+      AtomicOperationModule.factoryModule(
+        entities,
+        entityModules,
+        commonModule
+      ),
+      RouterModule.register([
+        {
+          module: AtomicOperationModule,
+          path: operationUrl,
+        },
+      ]),
+    ];
+  }
+
+  private static factoryModule(
+    entities: EntityClass<AnyEntity>[],
     entityModules: DynamicModule[],
     commonModule: DynamicModule
   ): DynamicModule {
@@ -35,16 +56,12 @@ export class AtomicOperationModule implements NestModule {
         ExecuteService,
         SwaggerService,
         AsyncIterate,
-        MapControllerEntity(options.entities, entityModules),
-        MapEntityNameToEntity(options.entities),
+        MapControllerEntity(entities, entityModules),
+        MapEntityNameToEntity(entities),
         ZodInputOperation(),
         {
           provide: MAP_CONTROLLER_INTERCEPTORS,
           useValue: new Map(),
-        },
-        {
-          provide: OPTIONS,
-          useValue: options.options,
         },
         {
           provide: AsyncLocalStorage,
@@ -54,6 +71,7 @@ export class AtomicOperationModule implements NestModule {
       imports: [DiscoveryModule, commonModule],
     };
   }
+
   @Inject(AsyncLocalStorage) private readonly als!: AsyncLocalStorage<any>;
 
   configure(consumer: MiddlewareConsumer) {
@@ -66,6 +84,6 @@ export class AtomicOperationModule implements NestModule {
         };
         this.als.run(store, () => next());
       })
-      .forRoutes('*');
+      .forRoutes('{*splat}');
   }
 }

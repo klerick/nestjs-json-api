@@ -3,7 +3,6 @@ import { ModulesContainer } from '@nestjs/core';
 import {
   MAP_ENTITY,
   MAP_CONTROLLER_ENTITY,
-  OPTIONS,
   MAP_CONTROLLER_INTERCEPTORS,
 } from '../constants';
 import { Operation } from '../utils';
@@ -39,10 +38,6 @@ describe('ExplorerService', () => {
         {
           provide: MAP_CONTROLLER_INTERCEPTORS,
           useValue: new Map(),
-        },
-        {
-          provide: OPTIONS,
-          useValue: {},
         },
       ],
     }).compile();

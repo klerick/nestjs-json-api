@@ -6,25 +6,24 @@ import {
 import { generateSchema } from '@anatine/zod-openapi';
 import { Type } from '@nestjs/common';
 
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { TypeField, ZodEntityProps } from '../../types';
-import {
-  errorSchema,
-  getEntityMapProps,
-  schemaTypeForRelation,
-} from '../utils';
+import { EntityClass, TypeField } from '../../../../types';
+import { errorSchema, schemaTypeForRelation } from '../utils';
 import { zodPatchRelationship } from '../../zod';
+import { EntityParamMapService } from '../../service';
 
-export function patchRelationship<E extends ObjectLiteral>(
+export function patchRelationship<
+  E extends object,
+  IdKey extends string = 'id'
+>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const { relations, primaryColumnType } = getEntityMapProps(mapEntity, entity);
+  const { relations, primaryColumnType } = mapEntity.getParamMap(entity);
 
   ApiOperation({
     summary: `Update list of relation for resource "${entityName}"`,
@@ -42,7 +41,7 @@ export function patchRelationship<E extends ObjectLiteral>(
     name: 'relName',
     required: true,
     type: 'string',
-    enum: relations,
+    enum: relations as any,
     description: `Relation name of resource "${entityName}"`,
   })(controller.prototype, methodName, descriptor);
 

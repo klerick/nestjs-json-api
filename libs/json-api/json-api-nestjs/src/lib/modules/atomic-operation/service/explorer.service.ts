@@ -1,12 +1,12 @@
 import { Inject, Injectable, Type } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
 import { ModulesContainer } from '@nestjs/core';
-import { EntityRelation } from '../../../utils/nestjs-shared';
+import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 import { MAP_CONTROLLER_ENTITY, MAP_ENTITY } from '../constants';
 import { MapController, MapEntity, OperationMethode } from '../types';
-import { ObjectLiteral as Entity } from '../../../types';
+
 import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../mixin/controller/json-base.controller';
+import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
 import {
   PatchData,
   PatchRelationshipData,
@@ -15,7 +15,7 @@ import {
 } from '../../mixin/zod';
 
 @Injectable()
-export class ExplorerService<E extends Entity = Entity> {
+export class ExplorerService<E extends object = object> {
   @Inject(ModulesContainer)
   private readonly modulesContainer!: ModulesContainer;
 
@@ -65,27 +65,27 @@ export class ExplorerService<E extends Entity = Entity> {
     const { op, ref, ...other } = data;
     switch (methodName) {
       case 'postOne':
-        return [other as PostData<E>];
+        return [other as PostData<E, 'id'>];
       case 'patchOne':
-        return [ref.id as string, other as PatchData<E>];
+        return [ref.id as string, other as PatchData<E, 'id'>];
       case 'deleteOne':
         return [ref.id as string];
       case 'deleteRelationship':
         return [
           ref.id as string,
-          ref.relationship as EntityRelation<E>,
+          ref.relationship as RelationKeys<E>,
           other as PostRelationshipData,
         ];
       case 'patchRelationship':
         return [
           ref.id as string,
-          ref.relationship as EntityRelation<E>,
+          ref.relationship as RelationKeys<E>,
           other as PatchRelationshipData,
         ];
       case 'postRelationship':
         return [
           ref.id as string,
-          ref.relationship as EntityRelation<E>,
+          ref.relationship as RelationKeys<E>,
           other as PostRelationshipData,
         ];
     }

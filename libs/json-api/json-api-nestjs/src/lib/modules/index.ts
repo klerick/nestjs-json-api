@@ -1,3 +1,2 @@
-export * from './type-orm';
-export * from './micro-orm';
-export * from './atomic-operation';
+export * from './mixin/mixin.module';
+export * from './atomic-operation/atomic-operation.module';

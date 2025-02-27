@@ -3,18 +3,17 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
 import { ZodError } from 'zod';
 
 import { QueryPipe } from './query.pipe';
 import { ASC, ZOD_QUERY_SCHEMA } from '../../../../constants';
 import { ZodQuery, InputQuery, Query } from '../../zod';
-import { FilterOperand, QueryField } from '../../../../utils/nestjs-shared';
-
-type MockEntity = { id: number; name: string };
+import { Users } from '../../../../utils/___test___/test-classes.helper';
 
 describe('QueryPipe', () => {
-  let queryPipe: QueryPipe<MockEntity>;
-  let zodQuerySchemaMock: ZodQuery<MockEntity>;
+  let queryPipe: QueryPipe<Users>;
+  let zodQuerySchemaMock: ZodQuery<Users, 'id'>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +28,12 @@ describe('QueryPipe', () => {
       ],
     }).compile();
 
-    queryPipe = module.get<QueryPipe<MockEntity>>(QueryPipe);
-    zodQuerySchemaMock = module.get<ZodQuery<MockEntity>>(ZOD_QUERY_SCHEMA);
+    queryPipe = module.get<QueryPipe<Users>>(QueryPipe);
+    zodQuerySchemaMock = module.get<ZodQuery<Users, 'id'>>(ZOD_QUERY_SCHEMA);
   });
 
   it('should parse the query successfully using the zod schema', () => {
-    const inputQuery: InputQuery<MockEntity> = {
+    const inputQuery: InputQuery<Users, 'id'> = {
       [QueryField.fields]: {
         target: ['id', 'name'],
       },
@@ -50,9 +49,9 @@ describe('QueryPipe', () => {
       [QueryField.sort]: { target: { id: ASC } },
       [QueryField.page]: { number: 1, size: 10 },
     };
-    const parsedQuery: Query<MockEntity> = {
+    const parsedQuery: Query<Users, 'id'> = {
       [QueryField.fields]: {
-        target: ['id', 'name'],
+        target: ['id', 'lastName'],
       },
       [QueryField.filter]: {
         relation: null,
@@ -79,7 +78,7 @@ describe('QueryPipe', () => {
     const inputQuery = {
       id: 1,
       name: 'Invalid',
-    } as unknown as InputQuery<MockEntity>;
+    } as unknown as InputQuery<Users, 'id'>;
     const zodError = new ZodError([]);
 
     jest.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {
@@ -93,7 +92,7 @@ describe('QueryPipe', () => {
     const inputQuery = {
       id: 1,
       name: 'Invalid',
-    } as unknown as InputQuery<MockEntity>;
+    } as unknown as InputQuery<Users, 'id'>;
     const unexpectedError = new Error('Unexpected error');
 
     jest.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {

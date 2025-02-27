@@ -12,7 +12,7 @@ import { ZodInputOperation } from '../utils';
 
 describe('PatchInputPipe', () => {
   let patchInputPipe: InputOperationPipe;
-  let zodInputOperation: ZodInputOperation;
+  let zodInputOperation: ZodInputOperation<object>;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -27,7 +27,8 @@ describe('PatchInputPipe', () => {
     }).compile();
 
     patchInputPipe = module.get<InputOperationPipe>(InputOperationPipe);
-    zodInputOperation = module.get<ZodInputOperation>(ZOD_INPUT_OPERATION);
+    zodInputOperation =
+      module.get<ZodInputOperation<object>>(ZOD_INPUT_OPERATION);
   });
 
   afterEach(() => {

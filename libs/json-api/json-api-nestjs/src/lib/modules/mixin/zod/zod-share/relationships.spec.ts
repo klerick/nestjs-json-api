@@ -1,23 +1,16 @@
 import { z, ZodError } from 'zod';
 
 import { zodRelationships, ZodRelationships } from './relationships';
-import { Users } from '../../../../mock-utils/typeorm';
 
-import {
-  relationArrayProps,
-  relationPopsName,
-  primaryColumnType,
-} from '../../../../utils/___test___/test.helper';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
 describe('zodRelationships', () => {
-  let relationshipsSchema: ZodRelationships<Users>;
-
   describe('POST', () => {
+    let relationshipsSchema: ZodRelationships<Users, 'id'>;
     beforeAll(() => {
       relationshipsSchema = zodRelationships(
-        relationArrayProps,
-        relationPopsName,
-        primaryColumnType,
+        usersEntityParamMapMockData,
         false
       );
     });
@@ -38,19 +31,17 @@ describe('zodRelationships', () => {
             id: '1',
           },
         },
+        addresses: {
+          data: {
+            type: 'addresses',
+            id: '1',
+          },
+        },
         manager: {
           data: {
             type: 'users',
             id: '1',
           },
-        },
-        notes: {
-          data: [
-            {
-              type: 'notes',
-              id: 'id',
-            },
-          ],
         },
       };
       expect(relationshipsSchema.parse(check)).toEqual(check);
@@ -106,6 +97,14 @@ describe('zodRelationships', () => {
       const check16 = {
         manager: [],
       };
+      const check17 = {
+        userGroup: {
+          data: {
+            type: 'user-groups',
+            id: '1',
+          },
+        },
+      };
       const arrayCheck = [
         check1,
         check2,
@@ -123,6 +122,7 @@ describe('zodRelationships', () => {
         check14,
         check15,
         check16,
+        check17,
       ];
       expect.assertions(arrayCheck.length);
       for (const item of arrayCheck) {
@@ -136,13 +136,9 @@ describe('zodRelationships', () => {
   });
 
   describe('PATCH', () => {
+    let relationshipsSchema: ZodRelationships<Users, 'id', true>;
     beforeAll(() => {
-      relationshipsSchema = zodRelationships(
-        relationArrayProps,
-        relationPopsName,
-        primaryColumnType,
-        true
-      );
+      relationshipsSchema = zodRelationships(usersEntityParamMapMockData, true);
     });
 
     it('Should be ok', () => {
@@ -158,14 +154,6 @@ describe('zodRelationships', () => {
             type: 'users',
             id: '1',
           },
-        },
-        notes: {
-          data: [
-            {
-              type: 'notes',
-              id: 'id',
-            },
-          ],
         },
       };
       expect(relationshipsSchema.parse(check)).toEqual(check);

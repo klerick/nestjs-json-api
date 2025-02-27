@@ -1,10 +1,7 @@
 import { zodIncludeQuery } from './include';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
-import { Users } from '../../../../mock-utils/typeorm';
-
-import { relationList } from '../../../../utils/___test___/test.helper';
-
-const schema = zodIncludeQuery<Users>(relationList);
+const schema = zodIncludeQuery(usersEntityParamMapMockData);
 
 describe('zodIncludeQuery', () => {
   it('should validate an array of relations successfully', () => {
