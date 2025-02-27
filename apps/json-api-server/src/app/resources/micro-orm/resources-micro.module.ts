@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { JsonApiModule, MicroOrmJsonApiModule } from '@klerick/json-api-nestjs';
+import { JsonApiModule } from '@klerick/json-api-nestjs';
+import { MicroOrmJsonApiModule } from '@klerick/json-api-nestjs-microorm';
 import {
   Users,
   Addresses,

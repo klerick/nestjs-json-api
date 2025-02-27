@@ -20,5 +20,6 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "implicitDependencies": ["json-api-nestjs-typeorm", "json-api-nestjs-microorm"]
 }
