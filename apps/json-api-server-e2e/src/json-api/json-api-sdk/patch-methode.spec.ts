@@ -29,7 +29,7 @@ describe('PATCH method:', () => {
 
   let comments: Comments;
   let commentsAfterSave: Comments;
-  let newCommentsAfterSave: Comments;
+  let newCommentsAfterSave: Comments | undefined = undefined;
 
   beforeEach(async () => {
     jsonSdk = creatSdk();
@@ -89,9 +89,7 @@ describe('PATCH method:', () => {
       newAddress
     );
 
-    const newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(
-      newComments
-    );
+    newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(newComments);
 
     userAfterSave.addresses = newAddressAfterSave;
     userAfterSave.comments = [newCommentsAfterSave];
@@ -104,8 +102,6 @@ describe('PATCH method:', () => {
     expect(userAfterUpdate.addresses).toEqual(newAddressAfterSave);
     newCommentsAfterSave.updatedAt = userAfterUpdate.comments[0].updatedAt;
     expect(userAfterUpdate.comments[0]).toEqual(newCommentsAfterSave);
-
-    await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
   });
 
   it('Should be update empty attributes with relations', async () => {

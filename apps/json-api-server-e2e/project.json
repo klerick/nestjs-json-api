@@ -7,6 +7,11 @@
   "projectType": "application",
   "targets": {
     "e2e": {
+      "dependsOn":[        {
+        "dependencies": true,
+        "target": "build",
+        "params": "ignore"
+      }],
       "executor": "@nx/jest:jest",
       "outputs": [
         "{workspaceRoot}/coverage/{e2eProjectRoot}"
@@ -18,6 +23,11 @@
       }
     },
     "e2e-micro": {
+      "dependsOn":[        {
+        "dependencies": true,
+        "target": "build",
+        "params": "ignore"
+      }],
       "executor": "@nx/jest:jest",
       "outputs": [
         "{workspaceRoot}/coverage/{e2eProjectRoot}"
