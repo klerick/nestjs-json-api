@@ -1,8 +1,6 @@
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
-
-import { EntityClass } from '../../../../types';
+import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import {
   assertIsKeysOfObject,

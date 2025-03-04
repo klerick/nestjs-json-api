@@ -1,9 +1,9 @@
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { Type } from '@nestjs/common';
 
 import { errorSchema, jsonSchemaResponse } from '../utils';
-import { EntityClass, TypeField } from '../../../../types';
+import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
 
 export function getOne<E extends object, IdKey extends string = 'id'>(

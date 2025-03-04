@@ -1,8 +1,8 @@
 import { NestInterceptor, Type } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
 import { Controller } from '@nestjs/common/interfaces';
-import { EntityClass } from '../../../types';
-import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
+import { JsonBaseController } from '../../mixin/controllers';
 
 export type MapControllerInterceptor = Map<
   Controller,

@@ -2,17 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DiscoveryModule } from '@nestjs/core';
 import { HttpException } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
+import {
+  KEY_MAIN_OUTPUT_SCHEMA,
+  Operation,
+} from '@klerick/json-api-nestjs-shared';
 
 import { OperationController } from './operation.controller';
 import { ExecuteService, ExplorerService } from '../service';
-import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
+import { InputArray } from '../utils';
+import { JsonBaseController } from '../../mixin/controllers';
 
 import { Users } from '../../../utils/___test___/test-classes.helper';
 
 import {
   ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_OUTPUT_SCHEMA,
   MAP_CONTROLLER_ENTITY,
   MAP_ENTITY,
   ZOD_INPUT_OPERATION,
@@ -21,7 +24,6 @@ import {
 
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
-import { ObjectLiteral } from '../../../types';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 describe('OperationController', () => {
@@ -106,7 +108,7 @@ describe('OperationController', () => {
       const getMethodNameByParamSpy = jest
         .spyOn(explorerService, 'getMethodNameByParam')
         .mockReturnValue(
-          paramsForExecuteMock[0].methodName as OperationMethode<ObjectLiteral>
+          paramsForExecuteMock[0].methodName as OperationMethode<object>
         );
       const getModulesByControllerSpy = jest
         .spyOn(explorerService, 'getParamsForMethod')

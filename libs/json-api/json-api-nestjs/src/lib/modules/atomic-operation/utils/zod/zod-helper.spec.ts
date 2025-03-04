@@ -1,8 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RelationKeys } from '@klerick/json-api-nestjs-shared';
+import {
+  RelationKeys,
+  KEY_MAIN_INPUT_SCHEMA,
+  Operation,
+  AnyEntity,
+  EntityClass,
+} from '@klerick/json-api-nestjs-shared';
 import { z, ZodError } from 'zod';
 import {
-  Operation,
   ZodAdd,
   zodAdd,
   zodInputOperation,
@@ -16,14 +21,12 @@ import {
 } from './zod-helper';
 
 import { MapController } from '../../types';
-import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
-
-import { AnyEntity, EntityClass, UnionToTuple } from '../../../../types';
-import { JsonBaseController } from '../../../mixin/controllers/json-base.controller';
+import { JsonBaseController } from '../../../mixin/controllers';
 import { mapMock } from '../../../../utils/___test___/test.helper';
 import { Users } from '../../../../utils/___test___/test-classes.helper';
 import { ENTITY_PARAM_MAP } from '../../../../constants';
 import { EntityParamMap } from '../../../mixin/types';
+import { UnionToTuple } from '../../../../types';
 
 describe('ZodHelperSpec', () => {
   afterEach(() => {

@@ -1,17 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
-import { kebabCase } from 'change-case-commonjs';
-
 import {
+  ObjectTyped,
   AnyEntity,
   EntityClass,
-  EntityParam,
-  RelationProperty,
-  TypeField,
-} from '../../../types';
+  PropertyKeys,
+} from '@klerick/json-api-nestjs-shared';
+import { kebabCase } from 'change-case-commonjs';
 
-import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
+import { EntityParam, RelationProperty, TypeField } from '../../../types';
+
 import { EntityParamMap } from '../types';
 import { EntityParamMapService } from '../service';
 

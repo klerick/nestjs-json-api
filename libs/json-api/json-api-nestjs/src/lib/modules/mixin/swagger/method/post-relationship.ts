@@ -5,10 +5,11 @@ import {
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { errorSchema, schemaTypeForRelation } from '../utils';
 import { zodPatchRelationship } from '../../zod';
-import { EntityClass, TypeField } from '../../../../types';
+import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
 
 export function postRelationship<E extends object, IdKey extends string = 'id'>(

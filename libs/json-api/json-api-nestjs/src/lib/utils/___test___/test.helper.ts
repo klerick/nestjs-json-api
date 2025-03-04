@@ -1,3 +1,4 @@
+import { EntityClass, Constructor } from '@klerick/json-api-nestjs-shared';
 import { kebabCase } from 'change-case-commonjs';
 
 import { EntityParamMapService } from '../../modules/mixin/service';
@@ -8,7 +9,7 @@ import {
   UserGroups,
   Users,
 } from './test-classes.helper';
-import { Constructor, EntityClass, EntityParam, TypeField } from '../../types';
+import { EntityParam, TypeField } from '../../types';
 
 const entityParamUsers: EntityParam<Users, 'id'> = {
   relations: ['addresses', 'manager', 'roles', 'comments', 'userGroup'],

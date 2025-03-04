@@ -1,7 +1,11 @@
-import { getEntityName, ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import {
+  getEntityName,
+  ObjectTyped,
+  EntityClass,
+  AnyEntity,
+} from '@klerick/json-api-nestjs-shared';
 import { pascalCase } from 'change-case-commonjs';
 
-import { AnyEntity, EntityClass } from '../../../types';
 import { MethodName } from '../types';
 
 import { Bindings } from '../config/bindings';

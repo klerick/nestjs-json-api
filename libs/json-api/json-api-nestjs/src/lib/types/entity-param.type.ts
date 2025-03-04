@@ -3,11 +3,11 @@ import {
   PropertyKeys,
   RelationKeys,
   IsIterator,
+  Constructor,
 } from '@klerick/json-api-nestjs-shared';
 import {
   CastIteratorType,
   UnionToTuple,
-  Constructor,
   IsArray,
   CastArrayType,
 } from './utils-type';

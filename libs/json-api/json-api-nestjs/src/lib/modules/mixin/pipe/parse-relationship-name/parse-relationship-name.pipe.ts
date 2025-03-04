@@ -3,13 +3,11 @@ import {
   UnprocessableEntityException,
   Inject,
 } from '@nestjs/common';
+import { EntityClass, getEntityName } from '@klerick/json-api-nestjs-shared';
 
 import { EntityParam, ValidateQueryError } from '../../../../types';
 import { CHECK_RELATION_NAME, CURRENT_ENTITY } from '../../../../constants';
-import { EntityClass } from '../../../../types';
 import { CheckRelationName } from '../../types';
-
-import { getEntityName } from '@klerick/json-api-nestjs-shared';
 
 export class ParseRelationshipNamePipe<
   E extends object,

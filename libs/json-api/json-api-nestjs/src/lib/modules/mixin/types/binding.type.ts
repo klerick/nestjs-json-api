@@ -1,7 +1,8 @@
 import { Type } from '@nestjs/common/interfaces';
 import { PipeTransform, RequestMethod } from '@nestjs/common';
-import { JsonBaseController } from '../controllers/json-base.controller';
-import { AnyEntity, EntityClass, PipeMixin } from '../../../types';
+import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
+import { JsonBaseController } from '../controllers';
+import { PipeMixin } from '../../../types';
 import { EntityControllerParam } from './decorator-options.type';
 
 export type MethodName =

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 import { ParseRelationshipNamePipe } from './parse-relationship-name.pipe';
 import { CURRENT_ENTITY, CHECK_RELATION_NAME } from '../../../../constants';
-import { EntityParam, EntityClass } from '../../../../types';
+import { EntityParam } from '../../../../types';
 
 describe('CheckItemEntityPipe', () => {
   let pipe: ParseRelationshipNamePipe<

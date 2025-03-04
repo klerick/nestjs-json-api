@@ -1,7 +1,8 @@
 import { Type } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, TypeField } from '../../../../types';
+import { TypeField } from '../../../../types';
 import { errorSchema } from '../utils';
 import { EntityParamMapService } from '../../service';
 

@@ -1,8 +1,7 @@
 import { ParseIntPipe } from '@nestjs/common';
+import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import {
-  AnyEntity,
-  EntityClass,
   NestController,
   OptionOfConfig,
   Params,

@@ -10,10 +10,11 @@ import {
   ResourceObject,
   BaseMainData,
   RelationKeys,
+  EntityClass,
 } from '@klerick/json-api-nestjs-shared';
 import { RoutePathFactory } from '@nestjs/core/router/route-path-factory';
 
-import { EntityParam, EntityClass } from '../../../types';
+import { EntityParam } from '../../../types';
 import { Query, QueryOne } from '../zod';
 import { EntityParamMapService } from './entity-param-map.service';
 

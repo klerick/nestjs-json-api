@@ -5,8 +5,8 @@ import {
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass } from '../../../../types';
 import { errorSchema, jsonSchemaResponse } from '../utils';
 import { zodPost } from '../../zod';
 import { EntityParamMapService } from '../../service';

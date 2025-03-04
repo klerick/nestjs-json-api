@@ -1,10 +1,9 @@
 import { Inject, NotFoundException, PipeTransform } from '@nestjs/common';
+import { EntityClass, getEntityName } from '@klerick/json-api-nestjs-shared';
+
 import { ValidateQueryError } from '../../../../types';
 import { CURRENT_ENTITY, FIND_ONE_ROW_ENTITY } from '../../../../constants';
-import { EntityClass } from '../../../../types';
 import { FindOneRowEntity } from '../../types';
-
-import { getEntityName } from '@klerick/json-api-nestjs-shared';
 
 export class CheckItemEntityPipe<E extends object, I extends string | number>
   implements PipeTransform<I, Promise<I>>

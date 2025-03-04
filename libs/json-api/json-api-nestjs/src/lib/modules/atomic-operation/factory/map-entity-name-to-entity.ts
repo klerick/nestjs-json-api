@@ -1,10 +1,12 @@
 import { ValueProvider } from '@nestjs/common';
+import {
+  getEntityName,
+  AnyEntity,
+  EntityClass,
+} from '@klerick/json-api-nestjs-shared';
 import { kebabCase } from 'change-case-commonjs';
 import { MapEntity } from '../types';
 import { MAP_ENTITY } from '../constants';
-import { AnyEntity, EntityClass } from '../../../types';
-
-import { getEntityName } from '@klerick/json-api-nestjs-shared';
 
 export function MapEntityNameToEntity(
   entities: EntityClass<AnyEntity>[]

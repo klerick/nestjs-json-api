@@ -1,4 +1,5 @@
-import { EntityClass, EntityParam } from '../../../types';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
+import { EntityParam } from '../../../types';
 
 export type EntityParamMap<E extends object> = Map<E, EntityParam<E>>;
 

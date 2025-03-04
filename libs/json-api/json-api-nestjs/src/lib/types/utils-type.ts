@@ -1,5 +1,9 @@
-import { HasId, CastIteratorType } from '@klerick/json-api-nestjs-shared';
-import { Any, Union, Tuple } from 'ts-toolbelt';
+import {
+  CastIteratorType,
+  HasId,
+  Constructor,
+} from '@klerick/json-api-nestjs-shared';
+import { Any, Tuple, Union } from 'ts-toolbelt';
 import { Type } from '@nestjs/common/interfaces';
 
 export { HasId, CastIteratorType };
@@ -20,7 +24,6 @@ export type UnionToTuple<
 export type IsArray<T> = T extends unknown[] ? 1 : 0;
 export type CastArrayType<T> = T extends (infer U)[] ? U : T;
 
-export type Constructor<T> = new (...args: any[]) => T;
 export type TypeOfConstructor<T> = T extends Constructor<infer E> ? E : T;
 
 export type NonEmptyStringTuple<T extends readonly any[]> = T extends []

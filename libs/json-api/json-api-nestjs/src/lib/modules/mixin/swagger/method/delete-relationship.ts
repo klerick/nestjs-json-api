@@ -1,8 +1,9 @@
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { generateSchema } from '@anatine/zod-openapi';
 import { Type } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, TypeField } from '../../../../types';
+import { TypeField } from '../../../../types';
 import { zodPatchRelationship } from '../../zod';
 import { errorSchema } from '../utils';
 

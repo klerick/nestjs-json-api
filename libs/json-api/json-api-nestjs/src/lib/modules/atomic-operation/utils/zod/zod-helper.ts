@@ -1,4 +1,11 @@
-import { getEntityName, RelationKeys } from '@klerick/json-api-nestjs-shared';
+import {
+  getEntityName,
+  RelationKeys,
+  KEY_MAIN_INPUT_SCHEMA,
+  Operation,
+  AnyEntity,
+  EntityClass,
+} from '@klerick/json-api-nestjs-shared';
 import {
   z,
   ZodArray,
@@ -11,17 +18,11 @@ import {
   ZodUnion,
 } from 'zod';
 import { kebabCase } from 'change-case-commonjs';
-import { KEY_MAIN_INPUT_SCHEMA } from '../../constants';
+
 import { MapController } from '../../types';
 
-import { AnyEntity, EntityClass, UnionToTuple } from '../../../../types';
+import { UnionToTuple } from '../../../../types';
 import { EntityParamMap } from '../../../mixin/types';
-
-export enum Operation {
-  add = 'add',
-  update = 'update',
-  remove = 'remove',
-}
 
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 type Literal = z.infer<typeof literalSchema>;

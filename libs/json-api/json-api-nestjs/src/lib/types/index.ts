@@ -1,4 +1,3 @@
-export * from './entity-type';
 export * from './common-type';
 export * from './module-options.types';
 export * from './utils-type';

@@ -5,8 +5,9 @@ import {
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { generateSchema } from '@anatine/zod-openapi';
 import { Type } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, TypeField } from '../../../../types';
+import { TypeField } from '../../../../types';
 import { errorSchema, schemaTypeForRelation } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { EntityParamMapService } from '../../service';

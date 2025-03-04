@@ -17,6 +17,7 @@ import {
   ObjectTyped,
   ResourceObject,
   ResourceObjectRelationships,
+  KEY_MAIN_INPUT_SCHEMA,
 } from '@klerick/json-api-nestjs-shared';
 import {
   InterceptorsConsumer,
@@ -29,7 +30,6 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MapControllerInterceptor, ParamsForExecute } from '../types';
 import {
   ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_INPUT_SCHEMA,
   MAP_CONTROLLER_INTERCEPTORS,
 } from '../constants';
 import { IterateFactory } from '../factory';

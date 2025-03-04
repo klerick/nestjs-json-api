@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
+
 import { ENTITY_PARAM_MAP, CURRENT_ENTITY } from '../../../constants';
 import { EntityParamMap } from '../types';
-import { AnyEntity, EntityClass, EntityParam } from '../../../types';
+import { EntityParam } from '../../../types';
 
 @Injectable()
 export class EntityParamMapService<

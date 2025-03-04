@@ -1,11 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { ModulesContainer } from '@nestjs/core';
+import { Operation } from '@klerick/json-api-nestjs-shared';
 import {
   MAP_ENTITY,
   MAP_CONTROLLER_ENTITY,
   MAP_CONTROLLER_INTERCEPTORS,
 } from '../constants';
-import { Operation } from '../utils';
+
 import { ExplorerService } from './explorer.service';
 
 describe('ExplorerService', () => {
