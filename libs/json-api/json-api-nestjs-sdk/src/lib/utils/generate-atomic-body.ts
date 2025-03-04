@@ -1,36 +1,16 @@
-import {
-  AtomicMainOperations,
-  Entity as EntityObject,
-  EntityRelation,
-  JsonApiSdkConfig,
-} from '../types';
-import { getTypeForReq } from './';
+import { Operation, RelationKeys } from '@klerick/json-api-nestjs-shared';
+
+import { AtomicMainOperations, JsonApiSdkConfig, BodyType } from '../types';
+import { getTypeForReq } from './utils';
 import { JsonApiUtilsService } from '../service';
-
-export enum Operation {
-  add = 'add',
-  update = 'update',
-  remove = 'remove',
-}
-
-export type BodyType = {
-  op: Operation;
-  ref: {
-    type: string;
-    id?: string;
-    relationship?: string;
-    tmpId?: string;
-  };
-  data?: any;
-};
 
 export type AtomicVoidOperation = {
   [K in keyof AtomicMainOperations<[]>]: (...arg: any) => void;
 };
 
 export class GenerateAtomicBody<
-  Entity extends EntityObject = any,
-  Rel extends EntityRelation<Entity> = any
+  Entity extends object = any,
+  Rel extends RelationKeys<Entity> = any
 > implements AtomicVoidOperation
 {
   constructor(
@@ -49,15 +29,13 @@ export class GenerateAtomicBody<
 
     const { relationships, attributes } =
       this.jsonApiUtilsService.generateBody(entity);
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
 
-    const idObj =
-      op === 'add' && !relationType
-        ? {}
-        : { id: entity[this.jsonApiSdkConfig.idKey].toString() };
+    const idObj = op === 'add' && !relationType ? {} : { id: String(id) };
     const data = relationType
-      ? this.jsonApiUtilsService.generateRelationshipsBody<
-          Entity[EntityRelation<Entity>]
-        >(entity[relationType])
+      ? this.jsonApiUtilsService.generateRelationshipsBody(
+          entity[relationType] as any
+        )
       : {
           type: getTypeForReq(entity.constructor.name),
           attributes,
@@ -67,9 +45,7 @@ export class GenerateAtomicBody<
 
     const rel = relationType ? { relationship: String(relationType) } : {};
     const tmpId =
-      op === 'add' && entity[this.jsonApiSdkConfig.idKey] && !relationType
-        ? { tmpId: entity[this.jsonApiSdkConfig.idKey] }
-        : {};
+      op === 'add' && id && !relationType ? { tmpId: String(id) } : {};
     this.bodyData = {
       op,
       ref: { type, ...idObj, ...rel, ...tmpId },
@@ -85,8 +61,8 @@ export class GenerateAtomicBody<
     this.setToBody(Operation.add, entity);
   }
   patchOne(entity: Entity): void {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
-      new Error(
+    if (Reflect.get(entity, this.jsonApiSdkConfig.idKey) === undefined) {
+      throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
@@ -94,8 +70,8 @@ export class GenerateAtomicBody<
     this.setToBody(Operation.update, entity);
   }
   deleteOne(entity: Entity, skipEmpty: boolean): void {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
-      new Error(
+    if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
+      throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
@@ -103,8 +79,8 @@ export class GenerateAtomicBody<
     this.setToBody(Operation.remove, entity);
   }
   patchRelationships(entity: Entity, relationType: Rel): void {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
-      new Error(
+    if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
+      throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
@@ -115,26 +91,30 @@ export class GenerateAtomicBody<
     this.setToBody(Operation.update, entity, relationType);
   }
   postRelationships(entity: Entity, relationType: Rel): void {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
-      new Error(
+    if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
+      throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
 
     if (entity[relationType] === undefined) {
-      new Error(`${relationType.toString()} should not be undefined in entity`);
+      throw new Error(
+        `${relationType.toString()} should not be undefined in entity`
+      );
     }
     this.setToBody(Operation.add, entity, relationType);
   }
   deleteRelationships(entity: Entity, relationType: Rel): void {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
-      new Error(
+    if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
+      throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
 
     if (entity[relationType] === undefined) {
-      new Error(`${relationType.toString()} should not be undefined in entity`);
+      throw new Error(
+        `${relationType.toString()} should not be undefined in entity`
+      );
     }
     this.setToBody(Operation.remove, entity, relationType);
   }

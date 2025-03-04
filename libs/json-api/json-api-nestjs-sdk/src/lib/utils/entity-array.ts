@@ -1,4 +1,4 @@
-import { PageProps } from '../types';
+import { PageProps } from '@klerick/json-api-nestjs-shared';
 
 export class EntityArray<T> extends Array<T> {
   constructor(items: T[], private pageProps: PageProps) {

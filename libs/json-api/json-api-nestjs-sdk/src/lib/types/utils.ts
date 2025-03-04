@@ -1,18 +1,7 @@
-import { TypeOfArray } from '../../shared';
-export { TypeOfArray };
-
-type IntersectionToObj<T> = {
-  [K in keyof T]: T[K];
-};
-export type PartialByKeys<T, K extends keyof T> = IntersectionToObj<
-  {
-    [P in keyof T as P extends K ? P : never]?: T[P];
-  } & {
-    [P in Exclude<keyof T, K>]: T[P];
-  }
->;
-
 export type ReturnIfArray<I, O> = I extends unknown[] ? O[] : O;
+
+export type PartialByKeys<E, K extends keyof E> = Omit<E, K> &
+  Partial<Pick<E, K>>;
 
 export type FunctionProperty<T, K extends keyof T> = T[K] extends (
   ...args: any
@@ -23,9 +12,3 @@ export type FunctionProperty<T, K extends keyof T> = T[K] extends (
 export type FunctionPropertyNames<T> = {
   [K in keyof T]: T[K] extends (...args: any) => any ? K : never;
 }[keyof T];
-
-export type Parameters<T extends (...args: unknown[]) => unknown> = T extends (
-  ...args: infer P
-) => unknown
-  ? P
-  : never;

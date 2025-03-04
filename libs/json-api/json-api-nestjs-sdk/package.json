@@ -1,5 +1,5 @@
 {
-  "name": "json-api-nestjs-sdk",
+  "name": "@klerick/json-api-nestjs-sdk",
   "version": "9.0.0",
   "engines": {
     "node": ">= 16.0.0"
@@ -17,7 +17,6 @@
   },
   "private": false,
   "license": "MIT",
-  "main": "./src/index.js",
   "files": [
     "**/*"
   ],
@@ -29,11 +28,34 @@
     "typeorm",
     "CRUD"
   ],
-  "peerDependencies": {
-    "@angular/common": ">=19.0.0 <20.0.0",
-    "@angular/core": ">=19.0.0 <20.0.0",
-    "axios": "^1.6.0",
-    "reflect-metadata": "^0.1.13",
-    "tslib": "^2.3.0"
+  "dependencies": {
+    "tslib": ">2.3.0"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./mjs/src/index.d.ts",
+      "node": "./cjs/src/index.js",
+      "require": "./cjs/src/index.js",
+      "module": "./mjs/src/index.js",
+      "default": "./mjs/src/index.js"
+    },
+    "./ngModule": {
+      "types": "./mjs/src/ngModule.d.ts",
+      "node": "./cjs/src/ngModule.js",
+      "require": "./cjs/src/ngModule.js",
+      "module": "./mjs/src/ngModule.js",
+      "default": "./mjs/src/ngModule.js"
+    }
+  },
+  "main": "./cjs/src/index.js",
+  "module": "./mjs/src/index.js",
+  "types": "./mjs/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "ngModule": [
+        "./mjs/src/ngModule.d.ts"
+      ]
+    }
   }
 }

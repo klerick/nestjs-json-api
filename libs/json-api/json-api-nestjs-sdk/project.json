@@ -3,50 +3,29 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/json-api/json-api-nestjs-sdk/src",
   "projectType": "library",
-  "targets": {
-    "compile-for-angular": {
-      "executor": "@nx/angular:package",
-      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
-      "options": {
-        "project": "libs/json-api/json-api-nestjs-sdk/ng-package.json"
-      },
-      "configurations": {
-        "production": {
-          "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig-mjs.lib.json"
-        },
-        "development": {
-          "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig-mjs.lib.json"
-        }
-      },
-      "defaultConfiguration": "production"
-    },
-    "build": {
-      "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-cjs"
-      ],
-      "options": {
-        "outputPath": "dist/libs/json-api/json-api-nestjs-sdk",
-        "commands": [
-          "node tools/scripts/preparation-hybrid-npm-package.mjs json-api-nestjs-sdk",
-          "node tools/scripts/preparation-npm-package.mjs json-api-nestjs-sdk"
-        ],
-        "cwd": "./",
-        "parallel": false
+  "release": {
+    "version": {
+      "generatorOptions": {
+        "packageRoot": "dist/{projectRoot}",
+        "currentVersionResolver": "git-tag",
+        "fallbackCurrentVersionResolver": "disk"
       }
-    },
+    }
+  },
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-sdk", "type:publish"],
+  "targets": {
     "build-cjs": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
-      "dependsOn": [
-        "build-mjs"
-      ],
       "options": {
         "outputPath": "dist/libs/json-api/json-api-nestjs-sdk/cjs",
         "main": "libs/json-api/json-api-nestjs-sdk/src/index.ts",
         "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig.lib.json",
-        "assets": ["libs/json-api/json-api-nestjs-sdk/*.md"],
-        "external": "none",
+        "assets": [{
+          "glob": "*.md",
+          "input": "libs/json-api/json-api-nestjs-sdk",
+          "output": "../"
+        }],
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
@@ -62,8 +41,11 @@
         "outputPath": "dist/libs/json-api/json-api-nestjs-sdk/mjs",
         "main": "libs/json-api/json-api-nestjs-sdk/src/index.ts",
         "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig-mjs.lib.json",
-        "assets": ["libs/json-api/json-api-nestjs-sdk/*.md"],
-        "external": "none",
+        "assets": [{
+          "glob": "*.md",
+          "input": "libs/json-api/json-api-nestjs-sdk",
+          "output": "../"
+        }],
         "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "additionalEntryPoints": [
@@ -72,42 +54,40 @@
         "generateExportsField": true
       }
     },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs json-api-nestjs-sdk {args.ver} {args.tag}",
-      "dependsOn": ["build"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/json-api/json-api-nestjs-sdk/jest.config.ts",
-        "codeCoverage": true,
-        "coverageReporters": ["json-summary"]
-      }
-    },
-    "upload-badge": {
+    "build": {
       "executor": "nx:run-commands",
       "dependsOn": [
-        {
-          "target": "test"
-        }
+        "build-cjs", "build-mjs"
       ],
       "options": {
-        "outputPath": "{workspaceRoot}/libs/json-api/json-api-nestjs-sdk",
-        "commands": ["node tools/scripts/upload-badge.mjs json-api-nestjs-sdk"],
+        "outputPath": "dist/libs/json-api/json-api-nestjs-sdk",
+        "commands": [
+          {
+            "command": "mv dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -rf dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-sdk",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-sdk",
+            "forwardAllArgs": false
+          }
+        ],
         "cwd": "./",
         "parallel": false
       }
     },
     "nx-release-publish": {
       "options": {
-        "packageRoot": "dist/libs/json-api/json-api-nestjs-sdk"
+        "packageRoot": "dist/{projectRoot}"
       }
     }
   },
-  "tags": []
+  "implicitDependencies": ["json-api-nestjs-shared"]
 }

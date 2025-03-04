@@ -1,4 +1,3 @@
-/* eslint-disable */
 export default {
   displayName: 'json-api-nestjs-sdk',
   preset: '../../../jest.preset.js',

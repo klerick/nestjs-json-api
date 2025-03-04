@@ -1,41 +1,61 @@
 import { Observable } from 'rxjs';
+import {
+  RelationKeys,
+  ResourceObject,
+  ResourceObjectRelationships,
+} from '@klerick/json-api-nestjs-shared';
 
 import { ParamObject } from '../utils';
-import { ResourceObject, ResourceObjectRelationships } from './response-body';
-import { EntityRelation } from './entity';
-import {
-  AtomicBody,
-  AtomicResponse,
-  PatchData,
-  PostData,
-  RelationBodyData,
-} from './index';
+import { PostData, PatchData, RelationBodyData } from './http-request-params';
+import { AtomicBody, AtomicResponse } from './atomic-type';
 
 export interface HttpInnerClient {
-  get<T, R extends 'object' | 'array' = 'object'>(
+  get<
+    T extends object,
+    R extends 'object' | 'array' = 'object',
+    IdKey extends string = string
+  >(
     url: string,
     params?: { params: ParamObject }
-  ): Observable<ResourceObject<T, R>>;
-  get<T, Rel extends EntityRelation<T>>(
+  ): Observable<ResourceObject<T, R, null, IdKey>>;
+  get<
+    T extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<T, IdKey>
+  >(
     url: string,
     params?: { params: ParamObject }
-  ): Observable<ResourceObjectRelationships<T, Rel>>;
+  ): Observable<ResourceObjectRelationships<T, IdKey, Rel>>;
 
-  post<T>(url: string, body: PostData<T>): Observable<ResourceObject<T>>;
+  post<T extends object>(
+    url: string,
+    body: PostData<T>
+  ): Observable<ResourceObject<T>>;
   post<T extends unknown[]>(
     url: string,
     body: AtomicBody
   ): Observable<AtomicResponse<T>>;
-  post<T, Rel extends EntityRelation<T>>(
+  post<
+    T extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<T, IdKey>
+  >(
     url: string,
     body: RelationBodyData | RelationBodyData[]
-  ): Observable<ResourceObjectRelationships<T, Rel>>;
+  ): Observable<ResourceObjectRelationships<T, IdKey, Rel>>;
 
-  patch<T>(url: string, body: PatchData<T>): Observable<ResourceObject<T>>;
-  patch<T, Rel extends EntityRelation<T>>(
+  patch<T extends object>(
+    url: string,
+    body: PatchData<T>
+  ): Observable<ResourceObject<T>>;
+  patch<
+    T extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<T, IdKey>
+  >(
     url: string,
     body: RelationBodyData | RelationBodyData[]
-  ): Observable<ResourceObjectRelationships<T, Rel>>;
+  ): Observable<ResourceObjectRelationships<T, IdKey, Rel>>;
 
   delete(
     url: string,

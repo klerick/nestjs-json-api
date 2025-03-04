@@ -1,7 +1,7 @@
 import { BehaviorSubject, of, take } from 'rxjs';
 import { JsonApiSdkService } from './json-api-sdk.service';
 import { HttpInnerClient, JsonApiSdkConfig } from '../types';
-import { JsonApiUtilsService } from './';
+import { JsonApiUtilsService } from './index';
 import { EntityArray } from '../utils';
 import { FetchInnerClient } from './fetch-inner-client';
 

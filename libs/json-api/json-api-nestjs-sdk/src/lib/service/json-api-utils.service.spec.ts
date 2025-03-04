@@ -92,7 +92,7 @@ describe('JsonApiUtilsService', () => {
       const includeArray: string[] = ['param1', 'param2'];
       const httpParams = new HttpParams();
       const queryParams: QueryParams<any> = {
-        include: includeArray,
+        include: includeArray as any,
       };
 
       const httpParamsWithIncludes = service['getIncludeParam'](
@@ -308,6 +308,13 @@ describe('JsonApiUtilsService', () => {
 
       expect(typeof entityInstance).toBe('object');
       expect(entityInstance.constructor.name).toBe('Test');
+
+      const entityInstance1 = service['createEntityInstance'](
+        'test-test'
+      ) as any;
+
+      expect(typeof entityInstance1).toBe('object');
+      expect(entityInstance1.constructor.name).toBe('TestTest');
     });
   });
 
@@ -412,7 +419,7 @@ describe('JsonApiUtilsService', () => {
       } as any;
       const response = service['convertResponseData'](data, [
         'relationship1',
-      ]) as any;
+      ] as any) as any;
       expect(response[0].constructor.name).toBe('Type1');
       expect(response[0][mockJsonApiSdkConfig.idKey]).toBe(1);
       expect(response[0]).toHaveProperty('attr1');
