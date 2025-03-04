@@ -4,7 +4,7 @@ import { Any } from 'ts-toolbelt';
 import { Users } from '../utils/___test___/test-classes.helper';
 
 import { RelationKeys, PropertyKeys, IsIterator } from './entity-type';
-import { Collection } from '@mikro-orm/core';
+import type { Collection } from '@mikro-orm/core';
 
 type RelationId = 'addresses' | 'manager' | 'roles' | 'comments' | 'userGroup';
 type RelationName = 'roles';

@@ -1,4 +1,4 @@
-import { kebabCase } from 'change-case-commonjs';
+import { pascalCase } from 'change-case-commonjs';
 
 export const ObjectTyped = {
   keys: Object.keys as <T extends {}>(yourObject: T) => Array<keyof T>,
@@ -20,7 +20,7 @@ export function isString<T, P extends T>(value: T): value is P {
 }
 
 export function createEntityInstance<E>(name: string): E {
-  const entityName = kebabCase(name);
+  const entityName = pascalCase(name);
   return Function('return new class ' + entityName + '{}')();
 }
 

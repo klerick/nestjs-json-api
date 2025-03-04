@@ -5,5 +5,7 @@
     "tslib": "^2.3.0"
   },
   "type": "commonjs",
-  "main": "./src/index.js"
+  "main": "./cjs/src/index.js",
+  "types": "./cjs/src/index.d.ts",
+  "module": "./mjs/src/index.js"
 }

@@ -38,3 +38,6 @@ export type IsIterator<T> = T extends {
 export type TypeOfArray<T> = T extends (infer U)[] ? U : T;
 
 export type ValueOf<T> = T[keyof T];
+export type Constructor<T> = new (...args: any[]) => T;
+export type AnyEntity<T = object> = T;
+export type EntityClass<T extends AnyEntity> = Constructor<T>;
