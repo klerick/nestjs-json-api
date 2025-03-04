@@ -68,5 +68,6 @@
         "buildTarget": "json-api-front:build"
       }
     }
-  }
+  },
+  "implicitDependencies": ["json-api-nestjs-sdk"]
 }

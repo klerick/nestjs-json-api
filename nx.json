@@ -97,6 +97,5 @@
         "fallbackCurrentVersionResolver": "1.0.0"
       }
     }
-  },
-  "useLegacyCache": true
+  }
 }

@@ -26,5 +26,7 @@ export default {
       '<rootDir>/../../dist/libs/json-api/json-api-nestjs-shared',
     '^@klerick/json-api-nestjs-typeorm$':
       '<rootDir>/../../dist/libs/json-api/json-api-nestjs-typeorm',
+    '^@klerick/json-api-nestjs-sdk$':
+      '<rootDir>/../../dist/libs/json-api/json-api-nestjs-sdk',
   },
 };

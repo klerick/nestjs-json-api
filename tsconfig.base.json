@@ -15,23 +15,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@klerick/json-api-nestjs-sdk": [
-        "libs/json-api/json-api-nestjs-sdk/src/index.ts"
-      ],
-      "@klerick/json-api-nestjs-sdk/ngModule": [
-        "libs/json-api/json-api-nestjs-sdk/src/ngModule.ts"
-      ],
-      "@klerick/json-api-nestjs-shared": [
-        "dist/libs/json-api/json-api-nestjs-shared"
-      ],
-      "@klerick/json-api-nestjs-typeorm": [
-        "dist/libs/json-api/json-api-nestjs-typeorm"
-      ],
       "@klerick/json-api-nestjs": [
         "dist/libs/json-api/json-api-nestjs"
       ],
       "@klerick/json-api-nestjs-microorm": [
         "dist/libs/json-api/json-api-nestjs-microorm"
+      ],
+      "@klerick/json-api-nestjs-typeorm": [
+        "dist/libs/json-api/json-api-nestjs-typeorm"
       ],
       "@klerick/nestjs-json-rpc": [
         "libs/json-rpc/nestjs-json-rpc/src/index.ts"
@@ -51,5 +42,5 @@
       ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "**/___test___/**"],
 }
