@@ -23,18 +23,8 @@
         "previewTargetName": "preview"
       }
     },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      }
-    }
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
+    { "plugin": "@nx/jest/plugin", "options": { "targetName": "test" } }
   ],
   "targetDefaults": {
     "@nx/js:tsc": {
@@ -47,9 +37,7 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "test": {
-      "cache": true
-    },
+    "test": { "cache": true },
     "@nx/angular:ng-packagr-lite": {
       "cache": true,
       "dependsOn": ["^build"],
@@ -63,20 +51,11 @@
       "style": "css",
       "unitTestRunner": "jest"
     },
-    "@nx/angular:library": {
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nx/angular:component": {
-      "style": "css"
-    }
+    "@nx/angular:library": { "linter": "eslint", "unitTestRunner": "jest" },
+    "@nx/angular:component": { "style": "css" }
   },
   "release": {
-    "changelog": {
-      "projectChangelogs": {
-        "createRelease": "github"
-      }
-    },
+    "changelog": { "projectChangelogs": { "createRelease": "github" } },
     "projectsRelationship": "independent",
     "projects": [
       "*",
@@ -93,10 +72,9 @@
     "version": {
       "preVersionCommand": "npx nx run-many -t build -p nestjs-json-rpc,nestjs-json-rpc-sdk,json-api-nestjs,json-api-nestjs-sdk",
       "conventionalCommits": true,
-      "generatorOptions": {
-        "fallbackCurrentVersionResolver": "1.0.0"
-      }
+      "generatorOptions": { "fallbackCurrentVersionResolver": "1.0.0" }
     }
   },
-  "useLegacyCache": true
+  "useLegacyCache": true,
+  "nxCloudId": "67c859dd862a93f16da79c89"
 }
