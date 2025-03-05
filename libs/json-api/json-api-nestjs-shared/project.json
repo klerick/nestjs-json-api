@@ -1,17 +1,9 @@
 {
   "name": "json-api-nestjs-shared",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/json-api/json-api-nestjs-shared/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "generatorOptions": {
-        "packageRoot": "dist/{projectRoot}",
-        "currentVersionResolver": "git-tag"
-      }
-    }
-  },
-  "tags": [],
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-shared", "type:publish"],
   "targets": {
     "build-cjs": {
       "executor": "@nx/js:tsc",
@@ -30,6 +22,7 @@
             "output": "../"
           }
         ],
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "updateBuildableProjectDepsInPackageJson": true
       }
     },
@@ -88,6 +81,22 @@
         ],
         "cwd": "{workspaceRoot}/{projectRoot}",
         "parallel": false
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-shared"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
       }
     },
     "nx-release-publish": {

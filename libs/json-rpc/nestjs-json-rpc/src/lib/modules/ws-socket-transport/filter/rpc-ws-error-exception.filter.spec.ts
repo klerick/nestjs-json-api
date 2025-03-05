@@ -10,14 +10,20 @@ import { WS_EVENT_NAME } from '../constants';
 
 describe('rpc-ws-error-exception.filter', () => {
   describe('WebSocket', () => {
-    const WebSocketInst = new WebSocket(
-      'wss://demo.piesocket.com/v3/channel_123',
-      {}
-    );
+    let WebSocketInst: WebSocket;
     let argumentsHost: ArgumentsHost;
     let getClient: () => WebSocket;
 
-    beforeEach(() => {
+    beforeAll(async () => {
+      WebSocketInst = new WebSocket(
+        'wss://demo.piesocket.com/v3/channel_123',
+        {}
+      );
+
+      await new Promise((resolve) => {
+        WebSocketInst.addEventListener('open', (event) => resolve(void 0));
+      });
+
       getClient = () => WebSocketInst;
       argumentsHost = {
         switchToWs(): WsArgumentsHost {
@@ -26,6 +32,11 @@ describe('rpc-ws-error-exception.filter', () => {
           } as any;
         },
       } as any;
+      WebSocketInst.onopen = () => console.log('open');
+    });
+
+    afterAll(() => {
+      WebSocketInst.close();
     });
 
     it('should catch RpcError and transform it to RpcErrorObject', () => {
@@ -76,7 +87,7 @@ describe('rpc-ws-error-exception.filter', () => {
     let argumentsHost: ArgumentsHost;
     let getClient: () => Socket;
 
-    beforeEach(() => {
+    beforeAll(() => {
       getClient = () => WebSocketInst;
       argumentsHost = {
         switchToWs(): WsArgumentsHost {
@@ -85,6 +96,10 @@ describe('rpc-ws-error-exception.filter', () => {
           } as any;
         },
       } as any;
+    });
+
+    afterAll(() => {
+      WebSocketInst.disconnect();
     });
 
     it('should catch RpcError and transform it to RpcErrorObject', () => {

@@ -1,35 +1,56 @@
 {
   "name": "json-api-nestjs-microorm",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/json-api/json-api-nestjs-microorm/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "generatorOptions": {
-        "packageRoot": "dist/{projectRoot}",
-        "currentVersionResolver": "git-tag",
-        "fallbackCurrentVersionResolver": "disk"
-      }
-    }
-  },
-  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-microorm", "type:publish"],
+  "tags": [
+    "type:lib",
+    "lib:json-api-nestjs",
+    "lib:json-api-nestjs-microorm",
+    "type:publish"
+  ],
   "targets": {
     "build": {
       "dependsOn": [
         {
-          "projects": ["json-api-nestjs"],
+          "projects": [
+            "json-api-nestjs"
+          ],
           "target": "build",
           "params": "ignore"
         }
       ],
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/libs/json-api/json-api-nestjs-microorm",
-        "tsConfig": "libs/json-api/json-api-nestjs-microorm/tsconfig.lib.json",
-        "packageJson": "libs/json-api/json-api-nestjs-microorm/package.json",
-        "main": "libs/json-api/json-api-nestjs-microorm/src/index.ts",
-        "assets": ["libs/json-api/json-api-nestjs-microorm/*.md"]
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": [
+          "{projectRoot}/*.md"
+        ],
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-microorm"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
       }
     },
     "nx-release-publish": {
@@ -38,5 +59,7 @@
       }
     }
   },
-  "implicitDependencies": ["json-api-nestjs"]
+  "implicitDependencies": [
+    "json-api-nestjs"
+  ]
 }

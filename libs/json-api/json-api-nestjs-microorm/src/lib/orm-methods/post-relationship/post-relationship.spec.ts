@@ -81,14 +81,11 @@ describe('post-relationshipa', () => {
     jest.restoreAllMocks();
   });
 
-  afterAll(() => {
-    mikroORMUsers.close(true);
-  });
+  afterAll(() => mikroORMUsers.close(true));
 
   it('should be ok', async () => {
-    const roles1 = faker.helpers.arrayElement(roles);
-    const roles2 = faker.helpers.arrayElement(roles);
-    const roles3 = faker.helpers.arrayElement(roles);
+    const [roles1, roles2, roles3] = faker.helpers.arrayElements(roles, 3);
+
     const userGroup1 = faker.helpers.arrayElement(userGroup);
     const saveIdUserGroup = userGroup1.id;
 
@@ -139,12 +136,15 @@ describe('post-relationshipa', () => {
       })
       .getSingleResult();
 
+    const newRolesId = [roles1.id, roles2.id, roles3.id].filter(
+      (i) => !saveRolesIds.includes(i)
+    );
     expect(checkData?.roles.map((i) => i.id)).toEqual(
       expect.arrayContaining([roles1.id, roles2.id, roles3.id])
     );
 
     expect(checkData?.roles.map((i) => i.id)).toHaveLength(
-      [roles1.id, roles2.id, roles3.id].length + saveRolesIds.length
+      newRolesId.length + saveRolesIds.length
     );
     expect(checkData?.userGroup?.id).toBe(saveIdUserGroup);
   });

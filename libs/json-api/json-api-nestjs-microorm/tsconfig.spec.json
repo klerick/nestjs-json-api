@@ -15,7 +15,8 @@
       "@klerick/json-api-nestjs": [
         "libs/json-api/json-api-nestjs/src/index.ts"
       ]
-    }
+    },
+    "allowJs": true
   },
   "include": [
     "jest.config.ts",

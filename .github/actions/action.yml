@@ -1,34 +1,36 @@
-name: 'My composite action'
-description: 'Checks out the repository and install'
+name: Main action for Node.js
+description: Setup Node.js
+
+inputs:
+  node-version:
+    description: Node.js version
+    required: false
+    default: 20.x
+
 runs:
-  using: 'composite'
+  using: composite
   steps:
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: ${{ inputs.node-version }}
         registry-url: 'https://registry.npmjs.org'
-    - name: Restore cached npm dependencies
-      id: cache-dependencies-restore
-      uses: actions/cache/restore@v4
+        cache: npm
+
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      shell: pwsh
+      run: echo "dir=$(npm config get cache)" >> ${env:GITHUB_OUTPUT}
+
+    - name: Cache NPM dependencies
+      uses: actions/cache@v4
+      id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
       with:
-        path: |
-          node_modules
-          ~/.cache/Cypress # needed for the Cypress binary
-        key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('package-lock.json') }}
-    - name: Npm install
-      if: steps.cache-dependencies-restore.outputs.cache-hit != 'true'
-      run: npm ci
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Dependencies
       shell: bash
-    - name: Cache npm dependencies
-      id: cache-dependencies-save
-      uses: actions/cache/save@v4
-      with:
-        path: |
-          node_modules
-          ~/.cache/Cypress # needed for the Cypress binary
-        key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
-    - name: Derive appropriate SHAs for base and head for `nx affected` commands
-      uses: nrwl/nx-set-shas@v4
-      with:
-        main-branch-name: "master"
+      run: npm ci

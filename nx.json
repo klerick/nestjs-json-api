@@ -12,7 +12,9 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/**/*"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/**/*.yml"
+    ]
   },
   "plugins": [
     {
@@ -73,29 +75,22 @@
   },
   "release": {
     "changelog": {
+      "automaticFromRef": true,
       "projectChangelogs": {
         "createRelease": "github"
       }
     },
     "projectsRelationship": "independent",
-    "projects": [
-      "*",
-      "!json-shared-type",
-      "!json-api-nestjs-shared",
-      "!json-api-server-e2e",
-      "!json-api-server",
-      "!json-api-front",
-      "!shared-utils",
-      "!typeorm-database",
-      "!microorm-database",
-      "!type-for-rpc"
-    ],
+    "projects": "tag:type:publish",
     "version": {
-      "preVersionCommand": "npx nx run-many -t build -p nestjs-json-rpc,nestjs-json-rpc-sdk,json-api-nestjs,json-api-nestjs-sdk",
+      "preVersionCommand": "npx nx run-many --projects=tag:type:publish --target=build --parallel",
       "conventionalCommits": true,
       "generatorOptions": {
-        "fallbackCurrentVersionResolver": "1.0.0"
+        "fallbackCurrentVersionResolver": "disk"
       }
-    }
-  }
+    },
+    "releaseTagPattern": "{projectName}@{version}"
+  },
+  "defaultBase": "master",
+  "nxCloudId": "67c859dd862a93f16da79c89"
 }

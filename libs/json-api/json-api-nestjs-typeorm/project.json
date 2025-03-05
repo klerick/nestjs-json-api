@@ -1,34 +1,43 @@
 {
   "name": "json-api-nestjs-typeorm",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/json-api/json-api-nestjs-typeorm/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "generatorOptions": {
-        "packageRoot": "dist/{projectRoot}",
-        "currentVersionResolver": "git-tag"
-      }
-    }
-  },
   "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-typeorm", "type:publish"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/json-api/json-api-nestjs-typeorm",
-        "tsConfig": "libs/json-api/json-api-nestjs-typeorm/tsconfig.lib.json",
-        "packageJson": "libs/json-api/json-api-nestjs-typeorm/package.json",
-        "main": "libs/json-api/json-api-nestjs-typeorm/src/index.ts",
-        "assets": ["libs/json-api/json-api-nestjs-typeorm/*.md"],
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": ["{projectRoot}/*.md"],
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "generateExportsField": true
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "nx-release-publish": {
       "options": {
         "packageRoot": "dist/{projectRoot}"
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-typeorm"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
       }
     }
   },

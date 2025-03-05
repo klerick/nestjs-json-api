@@ -105,5 +105,5 @@
       }
     }
   },
-  "tags": []
+  "tags": ["type:lib", "lib:nestjs-json-rpc", "lib:nestjs-json-rpc-sdk", "type:publish"]
 }

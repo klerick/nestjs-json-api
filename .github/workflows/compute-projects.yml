@@ -1,0 +1,100 @@
+name: ⚙️ Compute Projects
+
+on:
+  workflow_call:
+    inputs:
+      tagChoice:
+        description: "Тег для фильтрации проектов. Если задан, используется вместо чекбоксов."
+        required: false
+        default: ""
+        type: string
+      project1:
+        description: "Project 1"
+        required: false
+        default: ""
+        type: string
+      project2:
+        description: "Project 2"
+        required: false
+        default: ""
+        type: string
+      project3:
+        description: "Project 3"
+        required: false
+        default: ""
+        type: string
+      project4:
+        description: "Project 4"
+        required: false
+        default: ""
+        type: string
+    outputs:
+      finalProjects:
+        description: "Result Project"
+        value: ${{ steps.final.outputs.finalProjects }}
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: ./.github/actions
+
+      - name: Get projects by tag
+        id: tag_projects
+        if: ${{ inputs.tagChoice != '' }}
+        shell: bash
+        run: |
+          echo "Using tag: ${{ inputs.tagChoice }}"
+          projects=$(npx nx show projects --exclude="*,!${{ inputs.tagChoice }}" --sep=',')
+          echo "projects=$projects" >> $GITHUB_OUTPUT
+          echo "Projects by tag: $projects"
+
+      - name: Collect projects from select
+        id: select_projects
+        if: ${{ inputs.tagChoice == '' }}
+        shell: bash
+        run: |
+          final=""
+          for var in "${{ inputs.projectList1 }}" "${{ inputs.projectList2 }}" "${{ inputs.projectList3 }}"; do
+            if [ ! -z "$var" ]; then
+              if [ -z "$final" ]; then
+                final="$var"
+              else
+                final="$final,$var"
+              fi
+            fi
+          done
+          echo "Final projects: $final"
+          if [ -z "$final" ]; then
+            echo "ERROR: Не выбрано ни одного проекта." >&2
+            exit 1
+          fi
+          echo "selectProjects=$final" >> $GITHUB_OUTPUT
+          echo "Checkbox-selected projects: $final"
+
+      - name: Determine final projects list
+        id: final
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.tagChoice }}" ]; then
+            final="${{ steps.tag_projects.outputs.projects }}"
+          else
+            final="${{ steps.select_projects.outputs.selectProjects }}"
+          fi
+          final=$(echo "$final" | xargs)
+          echo "finalProjects=$final" >> $GITHUB_OUTPUT
+          echo "Final projects: $final"
+          if [ -z "$final" ]; then
+            echo "ERROR: No projects selected or found." >&2
+            exit 1
+          fi
+
+      - name: Output final projects
+        run: |
+          echo "Final projects: ${{ steps.final.outputs.finalProjects }}"

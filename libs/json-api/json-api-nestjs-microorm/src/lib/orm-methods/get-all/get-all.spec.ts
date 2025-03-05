@@ -860,7 +860,7 @@ describe('get-all', () => {
             },
           })
           .getResult();
-        const count = await quweryBuilder.clone().count();
+        const count = await quweryBuilder.clone().count('id', true);
         const query = getDefaultQuery<Users>();
         query.page = {
           size: 5,

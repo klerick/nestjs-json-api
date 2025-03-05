@@ -9,7 +9,8 @@
       "@klerick/json-api-nestjs-shared": [
         "libs/json-api/json-api-nestjs-shared/src/index.ts"
       ]
-    }
+    },
+    "allowJs": true
   },
   "include": [
     "jest.config.ts",
