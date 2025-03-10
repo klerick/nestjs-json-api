@@ -1,11 +1,24 @@
 # json-api-nestjs-typeorm
 
-This library was generated with [Nx](https://nx.dev).
+TypeOrm adapter for **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)**
 
-## Building
+## Installation
 
-Run `nx build json-api-nestjs-typeorm` to build the library.
+```bash  
+$ npm install @klerick/json-api-nestjs-typeorm
+```  
 
-## Running unit tests
 
-Run `nx test json-api-nestjs-typeorm` to execute the unit tests via [Jest](https://jestjs.io).
+## Configuration params
+
+The following interface is using for the configuration:
+
+```typescript
+export type TypeOrmParam = {
+  useSoftDelete?: boolean // Use soft delete
+  runInTransaction?: <Func extends (...args: any) => any>(
+    isolationLevel: IsolationLevel,
+    fn: Func
+  ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
+};
+```

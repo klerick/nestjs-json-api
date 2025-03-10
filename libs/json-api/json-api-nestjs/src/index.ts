@@ -2,7 +2,10 @@ export { JsonApiModule } from './lib/json-api.module';
 
 export { JsonBaseController } from './lib/modules/mixin/controllers/json-base.controller';
 export { JsonApi, InjectService } from './lib/modules/mixin/decorators';
-export { entityForClass } from './lib/modules/mixin/helpers/utils';
+export {
+  entityForClass,
+  excludeMethod,
+} from './lib/modules/mixin/helpers/utils';
 export {
   PrepareParams,
   NestProvider,

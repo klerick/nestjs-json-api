@@ -39,6 +39,12 @@
         "parallel": false,
         "outputPath": "{workspaceRoot}/{projectRoot}"
       }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-typeorm {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
     }
   },
   "implicitDependencies": ["json-api-nestjs"]

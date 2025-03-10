@@ -1,11 +1,20 @@
 # json-api-nestjs-microorm
 
-This library was generated with [Nx](https://nx.dev).
+MocroOrm adapter for **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)**
 
-## Building
+## Installation
 
-Run `nx build json-api-nestjs-microorm` to build the library.
+```bash  
+$ npm install @klerick/json-api-nestjs-microorm
+```  
 
-## Running unit tests
+## Configuration params
 
-Run `nx test json-api-nestjs-microorm` to execute the unit tests via [Jest](https://jestjs.io).
+The following interface is using for the configuration:
+
+```typescript
+export type MicroOrmParam = {
+  arrayType?: string[]; //Custom type for indicate of array
+};
+
+```

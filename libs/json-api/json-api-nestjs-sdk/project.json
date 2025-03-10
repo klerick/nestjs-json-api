@@ -6,6 +6,15 @@
   "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-sdk", "type:publish"],
   "targets": {
     "build-cjs": {
+      "dependsOn": [
+        {
+          "projects": [
+            "json-api-nestjs-shared"
+          ],
+          "target": "build",
+          "params": "ignore"
+        }
+      ],
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -17,15 +26,25 @@
           "input": "{projectRoot}",
           "output": "../"
         }],
-        "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true,
         "additionalEntryPoints": [
           "{projectRoot}/src/ngModule.ts"
         ],
-        "generateExportsField": true
+        "externalBuildTargets": ["build-cjs"]
       }
     },
     "build-mjs": {
+      "dependsOn": [
+        {
+          "projects": [
+            "json-api-nestjs-shared"
+          ],
+          "target": "build",
+          "params": "ignore"
+        }
+      ],
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -37,12 +56,12 @@
           "input": "{projectRoot}",
           "output": "../"
         }],
-        "updateBuildableProjectDepsInPackageJson": true,
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true,
         "additionalEntryPoints": [
           "{projectRoot}/src/ngModule.ts"
-        ],
-        "generateExportsField": true
+        ]
       }
     },
     "build": {
@@ -54,11 +73,7 @@
         "outputPath": "dist/{projectRoot}",
         "commands": [
           {
-            "command": "mv dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
-            "forwardAllArgs": false
-          },
-          {
-            "command": "rm -rf dist/{projectRoot}/mjs/package.json",
+            "command": "cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
             "forwardAllArgs": false
           },
           {
@@ -78,6 +93,12 @@
       "options": {
         "packageRoot": "dist/{projectRoot}"
       }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-sdk {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
     }
   },
   "implicitDependencies": ["json-api-nestjs-shared"]

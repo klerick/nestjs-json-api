@@ -21,7 +21,6 @@ import {
 import { MicroOrmUtilService } from './service/micro-orm-util.service';
 
 export class MicroOrmJsonApiModule {
-  static module = 'microOrm' as const;
   static forRoot(options: PrepareParams<MicroOrmParam>): DynamicModule {
     const optionProvider = {
       provide: MODULE_OPTIONS_TOKEN,

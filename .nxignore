@@ -1,2 +1,3 @@
-**/*.test-d.ts
-**/__test__/**/*
+libs/**/*.test-d.ts
+libs/json-api/**/___test___/
+

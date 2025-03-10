@@ -57,6 +57,12 @@
       "options": {
         "packageRoot": "dist/{projectRoot}"
       }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-microorm {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
     }
   },
   "implicitDependencies": [

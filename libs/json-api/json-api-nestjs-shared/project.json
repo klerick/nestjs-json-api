@@ -52,13 +52,10 @@
         "build-mjs"
       ],
       "options": {
+        "outputPath": "dist/{projectRoot}",
         "commands": [
           {
-            "command": "[ ! -f dist/{projectRoot}/cjs/package.json ] ||  mv dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
-            "forwardAllArgs": false
-          },
-          {
-            "command": "rm -rf dist/{projectRoot}/mjs/package.json",
+            "command": "[ ! -f dist/{projectRoot}/cjs/package.json ] ||  cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
             "forwardAllArgs": false
           },
           {
@@ -66,7 +63,8 @@
             "forwardAllArgs": false
           },
           {
-            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-shared"
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-shared",
+            "forwardAllArgs": false
           }
         ],
         "cwd": "./",
@@ -98,6 +96,12 @@
         "parallel": false,
         "outputPath": "{workspaceRoot}/{projectRoot}"
       }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-shared {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
     },
     "nx-release-publish": {
       "options": {

@@ -1,11 +1,9 @@
 # json-api-nestjs-shared
 
-This library was generated with [Nx](https://nx.dev).
+Helper module for **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)**
 
-## Building
+## Installation
 
-Run `nx build json-api-nestjs-shared` to build the library.
-
-## Running unit tests
-
-Run `nx test json-api-nestjs-shared` to execute the unit tests via [Jest](https://jestjs.io).
+```bash  
+$ npm install @klerick/json-api-nestjs-shared
+```  

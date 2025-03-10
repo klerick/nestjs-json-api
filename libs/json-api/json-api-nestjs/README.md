@@ -18,7 +18,7 @@ need to write any code.
 ## Installation
 
 ```bash  
-$ npm install json-api-nestjs
+$ npm install @klerick/json-api-nestjs
 ```  
 
 ## Example
@@ -27,7 +27,8 @@ Once the installation process is complete, we can import the **JsonApiModule** i
 ### TypeOrm
 ```typescript
 import {Module} from '@nestjs/common';
-import {JsonApiModule, TypeOrmJsonApiModule} from 'json-api-nestjs';
+import {JsonApiModule} from '@klerick/json-api-nestjs';
+import {TypeOrmJsonApiModule} from '@klerick/json-api-nestjs-typeorm';
 import {Users} from 'type-orm/database';
 
 @Module({
@@ -44,7 +45,8 @@ export class AppModule {
 ### MicroOrm
 ```typescript
 import {Module} from '@nestjs/common';
-import {JsonApiModule, MicroOrmJsonApiModule} from 'json-api-nestjs';
+import {JsonApiModule} from '@klerick/json-api-nestjs';
+import {MicroOrmJsonApiModule} from '@klerick/json-api-nestjs-microorm';
 import {Users} from 'micro-orm/database';
 
 @Module({
@@ -86,15 +88,8 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
-    // TypeOrm
-    useSoftDelete?: boolean // Use soft delete
-    runInTransaction?: <Func extends (...args: any) => any>(
-      isolationLevel: IsolationLevel,
-      fn: Func
-    ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
-    // MicroOrm
-    arrayType?: string[]; //Custom type for indicate of array
-  };
+    // You can add params for MicroOrm or TypeOrm adapter  
+  } ;
 }
 ```
 
@@ -110,9 +105,11 @@ import {
   JsonBaseController,
   InjectService,
   JsonApiService,
-  ResourceObjectRelationships,
   Query,
-} from 'json-api-nestjs';
+} from '@klerick/json-api-nestjs';
+import {
+  ResourceObjectRelationships,
+} from '@klerick/json-api-nestjs-shared';
 import {ExampleService} from '../../service/example/example.service';
 
 @JsonApi(Users, {
@@ -120,11 +117,11 @@ import {ExampleService} from '../../service/example/example.service';
   requiredSelectField: true,
   overrideRoute: 'user',
 })
-export class ExtendUserController extends JsonBaseController<Users> {
+export class ExtendUserController extends JsonBaseController<Users, 'id'> {
   @InjectService() public service: JsonApiService<Users>;
   @Inject(ExampleService) protected exampleService: ExampleService;
 
-  public override getAll(query: Query<Users>): Promise<ResourceObject<Users, 'array'>> {
+  public override getAll(query: Query<Users, 'id'>): Promise<ResourceObject<Users, 'array'>> {
     if (!this.exampleService.someCheck(query)) {
       throw new BadRequestException({});
     }
@@ -135,7 +132,7 @@ export class ExtendUserController extends JsonBaseController<Users> {
     id: string | number,
     relName: Rel,
     input: PatchRelationshipData
-  ): Promise<ResourceObjectRelationships<Users, Rel>> {
+  ): Promise<ResourceObjectRelationships<Users, 'id', Rel>> {
     return super.patchRelationship(id, relName, input);
   }
 
@@ -168,12 +165,12 @@ import {
   requiredSelectField: true,
   overrideRoute: 'user',
 })
-export class ExtendUserController extends JsonBaseController<Users> {
+export class ExtendUserController extends JsonBaseController<Users, 'id'> {
   @InjectService() public service: JsonApiService<Users>;
   @Inject(ExampleService) protected exampleService: ExampleService;
 
   public override getAll(
-    @Query(ExamplePipe) query: QueryType<Users>
+    @Query(ExamplePipe) query: QueryType<Users, 'id'>
   ): Promise<ResourceObject<Users, 'array'>> {
     return super.getAll(query);
   }
@@ -186,8 +183,8 @@ import { ArgumentMetadata, PipeTransform } from '@nestjs/common';
 import { Query } from 'json-api-nestjs';
 import { Users } from 'database';
 
-export class ExamplePipe implements PipeTransform<Query<Users>, Query<Users>> {
-  transform(value: Query<Users>, metadata: ArgumentMetadata): Query<Users> {
+export class ExamplePipe implements PipeTransform<Query<Users, 'id'>, Query<Users, 'id'>> {
+  transform(value: Query<Users, 'id'>, metadata: ArgumentMetadata): Query<Users, 'id'> {
     return value;
   }
 }
@@ -200,6 +197,7 @@ For using swagger, you should only add [@nestjs/swagger](https://docs.nestjs.com
 const app = await NestFactory.create(AppModule);
 
 const config = new DocumentBuilder()
+  .setOpenAPIVersion('3.1.0')
   .setTitle('JSON API swagger example')
   .setDescription('The JSON API list example')
   .setVersion('1.0')

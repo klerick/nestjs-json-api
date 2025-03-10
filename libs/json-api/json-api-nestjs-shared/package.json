@@ -1,8 +1,20 @@
 {
   "name": "@klerick/json-api-nestjs-shared",
   "version": "0.0.1",
+  "description": "Shared Helper for JsonApi Plugin for NestJs",
+  "keywords": [
+    "nestjs",
+    "nest",
+    "jsonapi",
+    "json-api",
+    "typeorm",
+    "microorm",
+    "CRUD"
+  ],
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": ">2.3.0",
+    "reflect-metadata": "^0.1.12 || ^0.2.0",
+    "rxjs": "^7.1.0"
   },
   "type": "commonjs",
   "main": "./cjs/src/index.js",

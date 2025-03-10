@@ -15,9 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@klerick/json-api-nestjs": [
-        "dist/libs/json-api/json-api-nestjs"
-      ],
+      "@klerick/json-api-nestjs": ["dist/libs/json-api/json-api-nestjs"],
       "@klerick/json-api-nestjs-microorm": [
         "dist/libs/json-api/json-api-nestjs-microorm"
       ],
@@ -42,5 +40,5 @@
       ]
     }
   },
-  "exclude": ["node_modules", "tmp", "**/___test___/**"],
+  "exclude": ["node_modules", "tmp", "**/___test___/**"]
 }

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApplicationConfig } from '@nestjs/core';
 import { faker } from '@faker-js/faker';
-
+import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
 import { JsonApiTransformerService } from './json-api-transformer.service';
 import { EntityParamMapService } from './entity-param-map.service';
 import { usersEntityParamMapMockData } from '../../../utils/___test___/test.helper';
@@ -12,8 +12,6 @@ import {
   Comments,
 } from '../../../utils/___test___/test-classes.helper';
 import { EntityParam } from '../../../types';
-import { Collection } from '@mikro-orm/core';
-import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
 
 describe('JsonApiTransformerService - extractAttributes', () => {
   let service: JsonApiTransformerService<Users, 'id'>;
@@ -134,7 +132,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           key: faker.string.alphanumeric(5),
           name: faker.word.words(),
         },
-      ] as unknown as Collection<Roles>;
+      ] as any;
 
       userObject.manager = null as any;
     });
@@ -255,7 +253,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
       roleFake.key = faker.string.alphanumeric(5);
       roleFake.name = faker.word.words();
 
-      userObject.roles = [roleFake] as unknown as Collection<Roles>;
+      userObject.roles = [roleFake] as any;
 
       userObject.manager = null as any;
     });
