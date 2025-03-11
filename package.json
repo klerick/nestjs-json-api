@@ -23,6 +23,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/typeorm-database/src/lib/config-cli.ts",
     "typeorm:run": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
+    "typeorm:generate": "npm run typeorm migration:generate",
     "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/typeorm-database/src/lib/config-cli.ts seed libs/typeorm-database/src/lib/seeders/root.seeder.ts",
     "microorm": "ts-node -r tsconfig-paths/register -r dotenv/config -P ./libs/microorm-database/tsconfig.lib.json ./node_modules/@mikro-orm/cli/cli.js",
     "microorm:up": "npm run microorm migration:up",

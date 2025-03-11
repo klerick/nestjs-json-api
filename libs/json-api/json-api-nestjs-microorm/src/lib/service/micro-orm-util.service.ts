@@ -252,8 +252,12 @@ export class MicroOrmUtilService<
         [tmpField]: {},
       };
       let subQueryExpression: QBFilterQuery<T> | undefined;
+
       for (const entries of ObjectTyped.entries(filter as any)) {
-        const [operand, value] = entries as [FilterOperand, string];
+        const [operand, valueInput] = entries as [FilterOperand, string];
+
+        const value =
+          operand === FilterOperand.like ? `%${valueInput}%` : valueInput;
 
         if (!this.relationsName.includes(tmpField)) {
           const operandForMiroOrmResult = this.extractedResultOperand(operand);
@@ -329,6 +333,13 @@ export class MicroOrmUtilService<
   }
 
   private extractedResultOperand(operand: FilterOperand) {
+    if (
+      operand === FilterOperand.like &&
+      this.entityManager.getDriver().constructor.name === 'PostgreSqlDriver'
+    ) {
+      return '$ilike';
+    }
+
     return operand === 'regexp'
       ? '$re'
       : operand === 'some'

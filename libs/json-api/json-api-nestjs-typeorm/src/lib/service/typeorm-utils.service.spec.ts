@@ -363,9 +363,15 @@ describe('TypeormUtilsService', () => {
           throw new Error(`name is not pattern: params_${alias}_\\d{1,}`);
         }
         const expressionMap = expression.replace(name, EXPRESSION);
-        const checkFilterOperand = Object.entries(FilterOperand).find(
+
+        const checkFilterOperand = Object.entries({
+          ...FilterOperand,
+          like: 'ilike',
+        } as any).find(
+          // @ts-ignore
           ([key, val]) => OperandsMapExpression[val] === expressionMap
         );
+
         if (!checkFilterOperand) {
           expect(checkFilterOperand).not.toBe(undefined);
           throw new Error(`expression incorrect`);
@@ -580,7 +586,7 @@ describe('TypeormUtilsService', () => {
         throw Error('Should be like pattern');
       }
 
-      expect(second.expression).toBe(`ILIKE :${secondResult[0]}`);
+      expect(second.expression).toBe(`LIKE :${secondResult[0]}`);
       expect(second.alias).toBe('Users__Comments_comments.createdAt');
       expect(second.selectInclude).toBe('comments');
       if (!Array.isArray(second.params)) {

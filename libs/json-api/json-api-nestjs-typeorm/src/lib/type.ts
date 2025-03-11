@@ -17,11 +17,12 @@ export const OperandsMapExpression = {
   [FilterOperand.gt]: `> :${EXPRESSION}`,
   [FilterOperand.gte]: `>= :${EXPRESSION}`,
   [FilterOperand.in]: `IN (:...${EXPRESSION})`,
-  [FilterOperand.like]: `ILIKE :${EXPRESSION}`,
+  [FilterOperand.like]: `LIKE :${EXPRESSION}`,
   [FilterOperand.lt]: `< :${EXPRESSION}`,
   [FilterOperand.lte]: `<= :${EXPRESSION}`,
   [FilterOperand.nin]: `NOT IN (:...${EXPRESSION})`,
   [FilterOperand.some]: `&& :${EXPRESSION}`,
+  ilike: `ILIKE :${EXPRESSION}`,
 };
 
 export const OperandMapExpressionForNull = {

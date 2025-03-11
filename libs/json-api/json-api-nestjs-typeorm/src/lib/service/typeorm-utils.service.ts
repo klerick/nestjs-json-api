@@ -5,7 +5,14 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { EntityMetadata, Equal, In, Repository } from 'typeorm';
+import {
+  EntityMetadata,
+  Equal,
+  In,
+  Repository,
+  ILike,
+  FindOperator,
+} from 'typeorm';
 import { RelationMetadata as TypeOrmRelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import {
   ObjectTyped,
@@ -31,6 +38,7 @@ import {
 } from '../type';
 
 import { CURRENT_ENTITY_REPOSITORY } from '../constants';
+import { DriverUtils } from 'typeorm/driver/DriverUtils';
 
 type RelationAlias<E> = {
   [K in UnionToTuple<RelationKeys<E>>[number] & PropertyKey]: string;
@@ -255,9 +263,18 @@ export class TypeormUtilsService<
     for (const [fieldName, filter] of ObjectTyped.entries(filterTarget)) {
       if (!filter) continue;
       for (const entries of ObjectTyped.entries(filter)) {
-        const [operand, value] = entries as [FilterOperand, string];
+        const [operandFromQuery, value] = entries as [FilterOperand, string];
         const valueConditional =
-          operand === FilterOperand.like ? `%${value}%` : value;
+          operandFromQuery === FilterOperand.like ? `%${value}%` : value;
+
+        const operand = DriverUtils.isPostgresFamily(
+          this.repository.manager.connection.driver
+        )
+          ? operandFromQuery === FilterOperand.like
+            ? 'ilike'
+            : operandFromQuery
+          : operandFromQuery;
+
         const fieldWithAlias = this.getAliasPath(fieldName);
         const paramsName = this.getParamName(fieldWithAlias);
 

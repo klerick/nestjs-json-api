@@ -185,7 +185,7 @@ describe('MicroOrmUtilService', () => {
         [otherFiled]: {
           ['$' + FilterOperand.in]: otherFiledValue1,
           ['$' + FilterOperand.nin]: otherFiledValue1,
-          ['$' + FilterOperand.like]: otherFiledValue2,
+          ['$ilike']: `%${otherFiledValue2}%`,
           ['$' + FilterOperand.gt]: otherFiledValue3,
         },
       });
