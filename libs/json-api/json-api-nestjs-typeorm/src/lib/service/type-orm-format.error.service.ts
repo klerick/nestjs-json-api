@@ -3,8 +3,6 @@ import {
   EntityParam,
   ValidateQueryError,
   ENTITY_PARAM_MAP,
-  EntityControllerParam,
-  MODULE_OPTIONS_TOKEN,
 } from '@klerick/json-api-nestjs';
 import {
   BadRequestException,
@@ -108,7 +106,6 @@ export const PostgresError = {
 };
 
 export class TypeOrmFormatErrorService extends ErrorFormatService {
-  @Inject(MODULE_OPTIONS_TOKEN) private moduleOptions!: EntityControllerParam;
   @Inject(CURRENT_ENTITY_MANAGER_TOKEN) private entityManager!: EntityManager;
   @Inject(ENTITY_PARAM_MAP) private readonly mapProperty!: Map<
     EntityTarget<any>,
