@@ -1,6 +1,10 @@
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
-import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
+import {
+  ObjectTyped,
+  EntityClass,
+  FilterOperand,
+} from '@klerick/json-api-nestjs-shared';
 
 import {
   assertIsKeysOfObject,
@@ -72,13 +76,44 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     },
     description: `Object of field for select field from "${entity.name}" resource`,
   })(controller, methodName, descriptor);
-
+  // https://github.com/OAI/OpenAPI-Specification/issues/1706#issuecomment-2704374644 need wait fix deepObject
   ApiQuery({
     name: 'filter',
     required: false,
     style: 'deepObject',
     schema: {
       type: 'object',
+      properties: {
+        ...props.reduce((acum, i) => {
+          Reflect.set(acum, String(i), {
+            type: 'object',
+            properties: Object.keys(FilterOperand).reduce((acum, name) => {
+              Reflect.set(acum, String(name), {
+                type: 'string',
+              });
+              return acum;
+            }, {}),
+            minProperties: 1,
+            additionalProperties: false,
+          });
+          return acum;
+        }, {}),
+        ...relationTree.reduce((acum, i) => {
+          Reflect.set(acum, String(i), {
+            type: 'object',
+            properties: Object.keys(FilterOperand).reduce((acum, name) => {
+              Reflect.set(acum, String(name), {
+                type: 'string',
+              });
+              return acum;
+            }, {}),
+            minProperties: 1,
+            additionalProperties: false,
+          });
+          return acum;
+        }, {}),
+      },
+      additionalProperties: false,
     },
     examples: {
       simpleExample: {
@@ -204,16 +239,20 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     required: false,
     schema: {
       type: 'object',
+      examples: [
+        {
+          number: DEFAULT_QUERY_PAGE,
+          size: DEFAULT_PAGE_SIZE,
+        },
+      ],
       properties: {
         number: {
           type: 'integer',
           minimum: 1,
-          example: DEFAULT_QUERY_PAGE,
         },
         size: {
           type: 'integer',
           minimum: 1,
-          example: DEFAULT_PAGE_SIZE,
           maximum: 500,
         },
       },

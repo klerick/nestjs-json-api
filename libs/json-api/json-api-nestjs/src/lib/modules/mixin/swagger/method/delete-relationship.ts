@@ -29,7 +29,7 @@ export function deleteRelationship<
 
   ApiOperation({
     summary: `Delete list of relation for resource "${entityName}"`,
-    operationId: `${controller.name}_${methodName}`,
+    operationId: `${controller.constructor.name}_${methodName}`,
   })(controller, methodName, descriptor);
 
   ApiParam({
