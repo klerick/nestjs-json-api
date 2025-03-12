@@ -8,17 +8,6 @@ import { config } from './config';
   imports: [MikroOrmModule.forRoot(config), MikroOrmModule.forMiddleware()],
   exports: [MikroOrmCoreModule],
 })
-export class MicroOrmDatabaseModule {
-  // static async forRootAsync() {
-  //   const microOrmModule = await MikroOrmModule.forRoot(config);
-  //   console.log(microOrmModule.providers);
-  //   return {
-  //     module: MicroOrmDatabaseModule,
-  //     imports: [microOrmModule],
-  //     // imports: [microOrmModule],
-  //     // exports: [MikroOrmCoreModule],
-  //   };
-  // }
-}
+export class MicroOrmDatabaseModule {}
 
 export { config };
