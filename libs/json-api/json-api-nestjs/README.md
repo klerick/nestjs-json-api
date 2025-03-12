@@ -427,6 +427,7 @@ but [Atomic operation](https://jsonapi.org/ext/atomic/) allow for one request.
 
 ```
 **tmpId** - is params for operation **add**, should be unique for all operations.
+
 If you have Interceptor you can check call it from **AtomicOperation**
 
 
