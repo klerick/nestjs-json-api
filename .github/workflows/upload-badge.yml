@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       mainBranch:
+        type: string
         description: Type for main nx affect
         required: false
         default: "master"
