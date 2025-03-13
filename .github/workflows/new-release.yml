@@ -1,15 +1,5 @@
 name: 📦 New Release
 
-projectDefaults: &project_options
-  - ""
-  - json-api-nestjs
-  - json-api-nestjs-sdk
-  - nestjs-json-rpc
-  - nestjs-json-rpc-sdk
-  - json-api-nestjs-microorm
-  - json-api-nestjs-shared
-  - json-api-nestjs-typeorm
-
 on:
   workflow_dispatch:
     inputs:
@@ -28,25 +18,57 @@ on:
         required: false
         default: ""
         type: choice
-        options: *project_options
+        options:
+          - ""
+          - json-api-nestjs
+          - json-api-nestjs-sdk
+          - nestjs-json-rpc
+          - nestjs-json-rpc-sdk
+          - json-api-nestjs-microorm
+          - json-api-nestjs-shared
+          - json-api-nestjs-typeorm
       project2:
         description: "Select project"
         required: false
         default: ""
         type: choice
-        options: *project_options
+        options:
+          - ""
+          - json-api-nestjs
+          - json-api-nestjs-sdk
+          - nestjs-json-rpc
+          - nestjs-json-rpc-sdk
+          - json-api-nestjs-microorm
+          - json-api-nestjs-shared
+          - json-api-nestjs-typeorm
       project3:
         description: "Select project"
         required: false
         default: ""
         type: choice
-        options: *project_options
+        options:
+          - ""
+          - json-api-nestjs
+          - json-api-nestjs-sdk
+          - nestjs-json-rpc
+          - nestjs-json-rpc-sdk
+          - json-api-nestjs-microorm
+          - json-api-nestjs-shared
+          - json-api-nestjs-typeorm
       project4:
         description: "Select project"
         required: false
         default: ""
         type: choice
-        options: *project_options
+        options:
+          - ""
+          - json-api-nestjs
+          - json-api-nestjs-sdk
+          - nestjs-json-rpc
+          - nestjs-json-rpc-sdk
+          - json-api-nestjs-microorm
+          - json-api-nestjs-shared
+          - json-api-nestjs-typeorm
       beta-release:
         description: 'Is beta release?'
         required: false
