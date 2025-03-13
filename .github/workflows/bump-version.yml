@@ -51,5 +51,10 @@ jobs:
         uses: ./.github/actions
       - name: Bump version
         run: |
-          npx nx release --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }}
+          if [ "${{ inputs.beta-release }}" = "true" ]; then
+            npx nx release --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }} --preid=beta
+          else
+            npx nx release --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }}
+          fi
         shell: bash
+
