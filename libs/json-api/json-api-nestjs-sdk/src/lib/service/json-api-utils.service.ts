@@ -1,35 +1,33 @@
-import { createEntityInstance } from '../../shared';
-
 import {
-  Attributes,
-  Entity as EntityObject,
-  Entity,
-  EntityRelation,
-  Include,
-  JsonApiSdkConfig,
+  createEntityInstance,
+  isObject,
+  ObjectTyped,
+  BaseAttribute,
+  RelationKeys,
   MainData,
-  QueryParams,
-  RelationData,
-  Relationships,
   ResourceObject,
   ResourceObjectRelationships,
+  Include,
+} from '@klerick/json-api-nestjs-shared';
+import { kebabCase } from 'change-case-commonjs';
+import {
+  JsonApiSdkConfig,
+  QueryParams,
+  Relationships,
   ReturnIfArray,
 } from '../types';
-import {
-  camelToKebab,
-  getTypeForReq,
-  HttpParams,
-  isObject,
-  isRelation,
-  ObjectTyped,
-} from '../utils';
+
+import { getTypeForReq, HttpParams, isRelation } from '../utils';
 import { ID_KEY } from '../constants';
+
+type Attributes<E extends object> = BaseAttribute<E>['attributes'];
+type RelationData = MainData;
 
 export class JsonApiUtilsService {
   constructor(private jsonApiSdkConfig: JsonApiSdkConfig) {}
 
   public getUrlForResource(resource: string): string {
-    const url: string[] = [camelToKebab(resource).toLocaleLowerCase()];
+    const url: string[] = [kebabCase(resource).toLocaleLowerCase()];
     if (this.jsonApiSdkConfig.apiPrefix) {
       url.unshift(this.jsonApiSdkConfig.apiPrefix);
     }
@@ -180,23 +178,23 @@ export class JsonApiUtilsService {
     return httpParams;
   }
 
-  convertResponseData<E>(
+  convertResponseData<E extends object>(
     body: ResourceObject<E>,
     includeEntity?: QueryParams<E>['include']
   ): E;
-  convertResponseData<E>(
-    body: ResourceObject<E, 'array'>,
+  convertResponseData<E extends object, IdKey extends string>(
+    body: ResourceObject<E, 'array', null, IdKey>,
     includeEntity?: QueryParams<E>['include']
   ): E[];
-  convertResponseData<E, M>(
-    body: ResourceObject<E, 'object', M>,
+  convertResponseData<E extends object, IdKey extends string>(
+    body: ResourceObject<E, 'object', null, IdKey>,
     includeEntity?: QueryParams<E>['include']
   ): E;
-  convertResponseData<E, M>(
-    body: ResourceObject<E, 'array', M>,
+  convertResponseData<E extends object, IdKey extends string>(
+    body: ResourceObject<E, 'array', null, IdKey>,
     includeEntity?: QueryParams<E>['include']
   ): E[];
-  convertResponseData<E>(
+  convertResponseData<E extends object>(
     body: ResourceObject<E, 'array'> | ResourceObject<E>,
     includeEntity?: QueryParams<E>['include']
   ): E[] | E {
@@ -213,7 +211,7 @@ export class JsonApiUtilsService {
         ...Object.entries(dataItem.attributes || []).reduce(
           (acum, [key, val]) => {
             acum[key] = this.jsonApiSdkConfig.dateFields.includes(key)
-              ? new Date(val)
+              ? new Date(String(val))
               : val;
 
             return acum;
@@ -235,9 +233,10 @@ export class JsonApiUtilsService {
           continue;
         }
         const relationship = dataItem.relationships[itemInclude];
-        if (!(relationship && relationship.data)) {
+        if (!relationship || !('data' in relationship) || !relationship.data) {
           continue;
         }
+
         const relationshipData = relationship.data;
 
         if (Array.isArray(relationshipData)) {
@@ -245,7 +244,7 @@ export class JsonApiUtilsService {
             const result = this.findIncludeEntity(item, included);
             if (result) acum.push(result);
             return acum;
-          }, [] as E[EntityRelation<E>][]) as E[EntityRelation<E>];
+          }, [] as E[RelationKeys<E>][]) as E[RelationKeys<E>];
         } else {
           const relation = this.findIncludeEntity(relationshipData, included);
           if (relation) itemEntity[itemInclude] = relation;
@@ -264,10 +263,10 @@ export class JsonApiUtilsService {
     return createEntityInstance<E>(name);
   }
 
-  private findIncludeEntity<E, R extends MainData<EntityRelation<E>>>(
+  private findIncludeEntity<E, R extends MainData>(
     item: R,
     included: Include<E>[]
-  ): E[EntityRelation<E>] | undefined {
+  ): E[RelationKeys<E>] | undefined {
     const relatedIncluded = included.find(
       (includedItem) =>
         includedItem.type === item.type && includedItem.id === item.id
@@ -282,7 +281,7 @@ export class JsonApiUtilsService {
       ...Object.entries(relatedIncluded.attributes || []).reduce(
         (acum, [key, val]) => {
           acum[key] = this.jsonApiSdkConfig.dateFields.includes(key)
-            ? new Date(val)
+            ? new Date(String(val))
             : val;
 
           return acum;
@@ -290,15 +289,16 @@ export class JsonApiUtilsService {
         {} as Record<string, unknown>
       ),
     };
+
     return Object.assign(
-      this.createEntityInstance<E[typeof item.type]>(
+      this.createEntityInstance<E[RelationKeys<E>]>(
         item.type.toString()
       ) as object,
       entityObject
-    ) as E[typeof item.type];
+    ) as E[RelationKeys<E>];
   }
 
-  generateBody<E extends Entity>(entity: E) {
+  generateBody<E extends object>(entity: E) {
     const attributes = Object.entries(entity)
       .filter(([key, val]) => {
         if (key === ID_KEY) return false;
@@ -347,10 +347,11 @@ export class JsonApiUtilsService {
   }
 
   getResultForRelation<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<Entity, IdKey>
   >(
-    body: ResourceObjectRelationships<Entity, Rel>
+    body: ResourceObjectRelationships<Entity, IdKey, Rel>
   ): ReturnIfArray<Entity[Rel], string> {
     if (Array.isArray(body.data)) {
       return body.data.map(
@@ -361,13 +362,13 @@ export class JsonApiUtilsService {
     }
   }
 
-  public generateRelationshipsBody<RelationshipEntity extends EntityObject>(
+  public generateRelationshipsBody<RelationshipEntity extends object>(
     relationshipEntity: RelationshipEntity | RelationshipEntity[]
   ): RelationData | RelationData[] {
     const generateRelationObj = (
       relation: RelationshipEntity
     ): RelationData => ({
-      id: String(relation[this.jsonApiSdkConfig.idKey]),
+      id: String(Reflect.get(relation, this.jsonApiSdkConfig.idKey)),
       type: getTypeForReq(relation.constructor.name),
     });
 

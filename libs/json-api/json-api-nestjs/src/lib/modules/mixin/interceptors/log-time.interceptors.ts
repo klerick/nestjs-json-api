@@ -1,30 +1,39 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { ResourceObject } from '@klerick/json-api-nestjs-shared';
+
 import { map, Observable } from 'rxjs';
-import { ObjectLiteral } from '../../../types';
 
-// import { Entity, ResourceObject } from '../../types';
+@Injectable()
+export class LogTimeInterceptors<E extends object> implements NestInterceptor {
+  private static _instance: LogTimeInterceptors<any>;
+  constructor() {
+    if (LogTimeInterceptors._instance) {
+      return LogTimeInterceptors._instance;
+    }
+    LogTimeInterceptors._instance = this;
+  }
 
-export class LogTimeInterceptors<E extends ObjectLiteral>
-  implements NestInterceptor
-{
   intercept(
     context: ExecutionContext,
-    // next: CallHandler<ResourceObject<E>>
-    next: CallHandler<any>
-  ): Observable<any> | Promise<Observable<any>> {
-    const now = Date.now();
-    return next.handle();
-    //   .pipe(
-    //   map((r) => {
-    //     const response = context.switchToHttp().getResponse();
-    //     const time = Date.now() - now;
-    //     response.setHeader('x-response-time', time);
-    //     if (r && r.meta) {
-    //       r.meta['time'] = time;
-    //     }
-    //
-    //     return r;
-    //   })
-    // );
+    next: CallHandler<ResourceObject<E>>
+  ): Observable<ResourceObject<E>> {
+    const now = performance.now();
+    return next.handle().pipe(
+      map((r) => {
+        const response = context.switchToHttp().getResponse();
+        const time = performance.now() - now;
+        response.setHeader('x-response-time', time);
+        if (r && r.meta) {
+          r.meta['time'] = time;
+        }
+
+        return r;
+      })
+    );
   }
 }

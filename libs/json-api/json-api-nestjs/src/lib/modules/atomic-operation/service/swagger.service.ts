@@ -15,7 +15,7 @@ import { ZOD_INPUT_OPERATION } from '../constants';
 export class SwaggerService implements OnModuleInit {
   @Inject(ModuleRef) private readonly moduleRef!: ModuleRef;
   @Inject(ZOD_INPUT_OPERATION)
-  private typeZodInputOperation!: ZodInputOperation;
+  private typeZodInputOperation!: ZodInputOperation<object>;
 
   private initSwagger() {
     const operationControllerInst = this.moduleRef.get(OperationController);

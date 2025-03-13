@@ -15,12 +15,14 @@ import {
   JsonApiService,
   Query as QueryType,
   QueryOne,
-  ResourceObject,
-  EntityRelation,
   PatchRelationshipData,
-  ResourceObjectRelationships,
   PostData,
 } from '@klerick/json-api-nestjs';
+import {
+  ResourceObjectRelationships,
+  ResourceObject,
+  RelationKeys,
+} from '@klerick/json-api-nestjs-shared';
 import { ExamplePipe } from '../../service/example.pipe';
 import { ExampleService } from '../../service/example.service';
 import { ControllerInterceptor } from '../../service/controller.interceptor';
@@ -38,28 +40,28 @@ import { AtomicInterceptor } from '../../service/atomic.interceptor';
 @UseFilters(new HttpExceptionFilter())
 @UseInterceptors(ControllerInterceptor)
 @JsonApi(Users)
-export class ExtendUserController extends JsonBaseController<Users> {
+export class ExtendUserController extends JsonBaseController<Users, 'id'> {
   @InjectService() public service: JsonApiService<Users>;
   @Inject(ExampleService) protected exampleService: ExampleService;
   override getOne(
     id: string | number,
-    query: QueryOne<Users>
+    query: QueryOne<Users, 'id'>
   ): Promise<ResourceObject<Users>> {
     const t = query.fields?.target;
 
     return super.getOne(id, query);
   }
 
-  patchRelationship<Rel extends EntityRelation<Users>>(
+  patchRelationship<Rel extends RelationKeys<Users>>(
     id: string | number,
     relName: Rel,
     input: PatchRelationshipData
-  ): Promise<ResourceObjectRelationships<Users, Rel>> {
+  ): Promise<ResourceObjectRelationships<Users, 'id', Rel>> {
     return super.patchRelationship(id, relName, input);
   }
 
   // @UseInterceptors(AtomicInterceptor)
-  postOne(inputData: PostData<Users>): Promise<ResourceObject<Users>> {
+  postOne(inputData: PostData<Users, 'id'>): Promise<ResourceObject<Users>> {
     return super.postOne(inputData);
   }
 
@@ -67,7 +69,7 @@ export class ExtendUserController extends JsonBaseController<Users> {
   @UseFilters(HttpExceptionMethodFilter)
   @UseInterceptors(MethodInterceptor)
   getAll(
-    @Query(ExamplePipe) query: QueryType<Users>
+    @Query(ExamplePipe) query: QueryType<Users, 'id'>
   ): Promise<ResourceObject<Users, 'array'>> {
     return super.getAll(query);
   }

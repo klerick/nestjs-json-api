@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TypeField, TypeForId } from '../../types';
+import { TypeField, TypeForId } from '../../../../types';
 
 const reg = new RegExp('^-?\\d+$');
 

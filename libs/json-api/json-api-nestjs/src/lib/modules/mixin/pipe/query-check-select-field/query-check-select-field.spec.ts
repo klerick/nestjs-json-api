@@ -1,19 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { QueryField } from '../../../../utils/nestjs-shared';
+import { QueryField } from '@klerick/json-api-nestjs-shared';
 
 import { QueryCheckSelectField } from './query-check-select-field';
-import { Users } from '../../../../mock-utils/typeorm';
-import { CONTROL_OPTIONS_TOKEN } from '../../../../constants';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
+import { CONTROLLER_OPTIONS_TOKEN } from '../../../../constants';
 import { Query } from '../../zod';
-import { ConfigParam, ObjectLiteral } from '../../../../types';
+import { EntityControllerParam } from '../../types';
 
-function getDefaultQuery<R extends ObjectLiteral>() {
+function getDefaultQuery<R extends object>() {
   const filter = {
     relation: null,
     target: null,
   };
-  const defaultQuery: Query<R> = {
+  const defaultQuery: Query<R, 'id'> = {
     [QueryField.filter]: filter,
     [QueryField.fields]: null,
     [QueryField.include]: null,
@@ -29,12 +29,12 @@ function getDefaultQuery<R extends ObjectLiteral>() {
 
 describe('QueryCheckSelectField', () => {
   let queryCheckSelectField: QueryCheckSelectField<Users>;
-  let configParam: ConfigParam;
+  let configParam: EntityControllerParam;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
-          provide: CONTROL_OPTIONS_TOKEN,
+          provide: CONTROLLER_OPTIONS_TOKEN,
           useValue: {
             requiredSelectField: false,
             debug: false,
@@ -47,7 +47,7 @@ describe('QueryCheckSelectField', () => {
     queryCheckSelectField = module.get<QueryCheckSelectField<Users>>(
       QueryCheckSelectField
     );
-    configParam = module.get<ConfigParam>(CONTROL_OPTIONS_TOKEN);
+    configParam = module.get<EntityControllerParam>(CONTROLLER_OPTIONS_TOKEN);
   });
 
   it('Is valid', () => {

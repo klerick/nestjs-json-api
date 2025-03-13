@@ -17,6 +17,7 @@ import { AppModule } from '../../../../json-api-server/src/app/app.module';
 import { JsonConfig } from '../../../../../libs/json-api/json-api-nestjs-sdk/src/lib/types';
 import { WsAdapter } from '@nestjs/platform-ws';
 import { Subject } from 'rxjs';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 export const axiosAdapter = adapterForAxios(axios);
 let saveApp: INestApplication;
@@ -28,7 +29,7 @@ export const run = async () => {
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
-  const app = moduleRef.createNestApplication({
+  const app = moduleRef.createNestApplication<NestExpressApplication>({
     bufferLogs: true,
     logger: false,
   });
@@ -36,6 +37,7 @@ export const run = async () => {
   // const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(globalPrefix);
   app.useWebSocketAdapter(new WsAdapter(app));
+  app.set('query parser', 'extended');
   await app.init();
   await app.listen(port);
 

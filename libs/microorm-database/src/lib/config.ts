@@ -6,5 +6,8 @@ const { entitiesTs, ...configOther } = ormConfig;
 
 export const config: Options = {
   discovery: { requireEntitiesArray: true },
+  contextName: 'default',
+  // @ts-ignore
+  registerRequestContext: false,
   ...configOther,
 };

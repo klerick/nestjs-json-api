@@ -1,53 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApplicationConfig } from '@nestjs/core';
-
-import { JsonApiTransformerService } from './json-api-transformer.service';
-import {
-  Addresses,
-  Roles,
-  Users,
-  Notes,
-  Comments,
-  UserGroups,
-  dbRandomName,
-  mockDbPgLiteTestModule,
-} from '../../../mock-utils/microrom';
-
 import { faker } from '@faker-js/faker';
-import { Collection, MikroORM } from '@mikro-orm/core';
+import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
+import { JsonApiTransformerService } from './json-api-transformer.service';
+import { EntityParamMapService } from './entity-param-map.service';
+import { usersEntityParamMapMockData } from '../../../utils/___test___/test.helper';
 import {
-  CurrentEntityManager,
-  CurrentEntityMetadata,
-  CurrentMicroOrmProvider,
-  EntityPropsMap,
-} from '../../micro-orm/factory';
-import {
-  CURRENT_ENTITY,
-  ENTITY_MAP_PROPS,
-  GLOBAL_MODULE_OPTIONS_TOKEN,
-} from '../../../constants';
-import { DEFAULT_ARRAY_TYPE } from '../../micro-orm/constants';
-import { EntityClass } from '../../../types';
-import { ZodEntityProps } from '../types';
+  Users,
+  Roles,
+  Addresses,
+  Comments,
+} from '../../../utils/___test___/test-classes.helper';
+import { EntityParam } from '../../../types';
 
 describe('JsonApiTransformerService - extractAttributes', () => {
-  let service: JsonApiTransformerService<Users>;
+  let service: JsonApiTransformerService<Users, 'id'>;
   const userObject: Users = {} as Users;
   const urlPrefix = 'api';
   const version = '1';
-  let mikroORM: MikroORM;
-  let dbName: string;
-  let mapProps: Map<EntityClass<any>, ZodEntityProps<any>>;
-  let mapPropsUser: ZodEntityProps<Users>;
+  let mapPropsService: EntityParamMapService<Users, 'id'>;
+  let mapPropsUser: EntityParam<Users, 'id'>;
   beforeAll(async () => {
-    dbName = dbRandomName(true);
     const module: TestingModule = await Test.createTestingModule({
-      imports: [mockDbPgLiteTestModule(dbName)],
       providers: [
-        CurrentMicroOrmProvider(),
-        CurrentEntityManager(),
-        CurrentEntityMetadata(),
-        JsonApiTransformerService,
         {
           provide: ApplicationConfig,
           useValue: {
@@ -59,43 +34,27 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           },
         },
         {
-          provide: CURRENT_ENTITY,
-          useValue: Users,
+          provide: EntityParamMapService,
+          useValue: usersEntityParamMapMockData,
         },
-        EntityPropsMap([
-          Addresses,
-          Roles,
-          Users,
-          Notes,
-          Comments,
-          UserGroups,
-        ] as any),
-        {
-          provide: GLOBAL_MODULE_OPTIONS_TOKEN,
-          useValue: { options: { arrayType: DEFAULT_ARRAY_TYPE } },
-        },
+        JsonApiTransformerService,
       ],
     }).compile();
 
     service = module.get<JsonApiTransformerService<Users>>(
       JsonApiTransformerService
     );
-    mapProps = module.get(ENTITY_MAP_PROPS);
-    const mapPropsUserCheck = mapProps.get(Users);
-    if (!mapPropsUserCheck) throw new Error('Not found map property for Users');
-    mapPropsUser = mapPropsUserCheck;
-    mikroORM = module.get(MikroORM);
-  });
-
-  afterAll(() => {
-    mikroORM.close(true);
+    mapPropsService = module.get<EntityParamMapService<Users, 'id'>>(
+      EntityParamMapService
+    );
+    mapPropsUser = mapPropsService.getParamMap(Users);
   });
 
   beforeEach(async () => {
     userObject.id = faker.number.int();
     userObject.firstName = faker.person.firstName();
     userObject.lastName = faker.person.lastName();
-    userObject.isActive = faker.datatype.boolean();
+    userObject.isActive = null;
     userObject.login = faker.internet.userName({
       lastName: userObject.lastName,
       firstName: userObject.firstName,
@@ -108,7 +67,11 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
   describe('extractAttributes', () => {
     it('should extract specified fields from an object', () => {
-      const fields: (keyof Users)[] = ['firstName', 'lastName', 'login'];
+      const fields: PropertyKeys<Users, 'id'>[] = [
+        'firstName',
+        'lastName',
+        'login',
+      ];
       const result = service.extractAttributes(userObject, fields);
 
       expect(result).toEqual({
@@ -169,10 +132,9 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           key: faker.string.alphanumeric(5),
           name: faker.word.words(),
         },
-      ] as unknown as Collection<Roles>;
+      ] as any;
 
       userObject.manager = null as any;
-      userObject.notes = [] as any;
     });
 
     it('should transform relationships without "include" option enabled', () => {
@@ -197,7 +159,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
     it('should transform relationships with "include" option enabled', () => {
       const query = { include: ['roles'] } as any;
 
-      const result = service.transformRelationships(
+      const result = service.transformRelationships<Users, 'id'>(
         userObject,
         mapPropsUser,
         query
@@ -212,7 +174,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         if (i === 'roles') {
           acum[i]['data'] = userObject.roles.map((relName) => ({
             id: relName.id.toString(),
-            type: mapProps.get(Roles)?.typeName,
+            type: mapPropsService.getParamMap(Roles)?.typeName,
           }));
         }
         return acum;
@@ -234,7 +196,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         if (i === 'addresses') {
           acum[i]['data'] = {
             id: userObject.addresses.id.toString(),
-            type: mapProps.get(Addresses)?.typeName,
+            type: mapPropsService.getParamMap(Addresses)?.typeName,
           };
         }
         return acum;
@@ -256,9 +218,6 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         if (i === 'manager') {
           acum[i]['data'] = null;
         }
-        if (i === 'notes') {
-          acum[i]['data'] = [];
-        }
         return acum;
       }, {} as Record<string, any>);
 
@@ -270,7 +229,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
       const result = service.transformRelationships(
         userObject,
-        { ...mapPropsUser, relations: [] as any },
+        { ...mapPropsUser, relationProperty: {} as any },
         query
       );
 
@@ -294,10 +253,9 @@ describe('JsonApiTransformerService - extractAttributes', () => {
       roleFake.key = faker.string.alphanumeric(5);
       roleFake.name = faker.word.words();
 
-      userObject.roles = [roleFake] as unknown as Collection<Roles>;
+      userObject.roles = [roleFake] as any;
 
       userObject.manager = null as any;
-      userObject.notes = [] as any;
     });
 
     it('should by include', () => {
@@ -307,65 +265,49 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
       const result = service.extractIncluded([userObject], query);
       const rolesInclude = result.find(
-        (i) => i.type === mapProps.get(Roles)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Roles)?.typeName
       );
       const addressesInclude = result.find(
-        (i) => i.type === mapProps.get(Addresses)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Addresses)?.typeName
       );
       const managerInclude = result.find(
-        (i) => i.type === mapProps.get(Users)?.typeName
-      );
-      const notesInclude = result.find(
-        (i) => i.type === mapProps.get(Notes)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Users)?.typeName
       );
 
-      expect(notesInclude).toBe(undefined);
       expect(managerInclude).toBe(undefined);
 
       const { id: roleId, ...checkRolesAttr } = roleFake;
       expect(rolesInclude).toEqual({
         id: roleId.toString(),
-        type: mapProps.get(Roles)?.typeName,
+        type: mapPropsService.getParamMap(Roles)?.typeName,
         attributes: checkRolesAttr,
         links: {
-          self: `/api/v1/${mapProps.get(Roles)?.typeName}/${roleId}`,
+          self: `/api/v1/${
+            mapPropsService.getParamMap(Roles)?.typeName
+          }/${roleId}`,
         },
-        relationships: {
-          users: {
-            links: {
-              self: `/api/v${version}/${
-                mapProps.get(Roles)?.typeName
-              }/${roleId}/relationships/users`,
-            },
-          },
-        },
+        relationships: {},
       });
       const { id: addressesId, ...addressesAttr } = userObject.addresses;
       expect(addressesInclude).toEqual({
         id: addressesId.toString(),
-        type: mapProps.get(Addresses)?.typeName,
+        type: mapPropsService.getParamMap(Addresses)?.typeName,
         attributes: addressesAttr,
         links: {
-          self: `/api/v1/${mapProps.get(Addresses)?.typeName}/${addressesId}`,
+          self: `/api/v1/${
+            mapPropsService.getParamMap(Addresses)?.typeName
+          }/${addressesId}`,
         },
-        relationships: {
-          user: {
-            links: {
-              self: `/api/v${version}/${
-                mapProps.get(Addresses)?.typeName
-              }/${addressesId}/relationships/user`,
-            },
-          },
-        },
+        relationships: {},
       });
     });
 
-    it('should ne include by custom select', () => {
+    it('should be include by custom select', () => {
       const userObject = {
         id: faker.number.int(),
         firstName: faker.person.firstName(),
         isActive: faker.datatype.boolean(),
-      } as any;
+      } as unknown as Users;
       userObject.addresses = {
         id: faker.number.int(),
         city: faker.location.city(),
@@ -380,7 +322,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         {
           id: faker.number.int(),
           text: faker.lorem.text(),
-          kind: undefined,
+          kind: 'COMMENT',
           createdAt: undefined,
           updatedAt: undefined,
           createdBy: undefined,
@@ -404,13 +346,13 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         addresses: undefined,
         manager: undefined,
         userGroup: undefined,
-      };
+      } as any;
 
       const query = {
         include: ['addresses', 'comments', 'manager'],
         fields: {
           target: ['firstName', 'isActive'],
-          comments: ['text'],
+          comments: ['kind'],
           manager: ['login'],
         },
       } as any;
@@ -418,60 +360,54 @@ describe('JsonApiTransformerService - extractAttributes', () => {
       const result = service.extractIncluded([userObject], query);
 
       const rolesInclude = result.find(
-        (i) => i.type === mapProps.get(Roles)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Roles)?.typeName
       );
       const addressesInclude = result.find(
-        (i) => i.type === mapProps.get(Addresses)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Addresses)?.typeName
       );
       const managerInclude = result.find(
-        (i) => i.type === mapProps.get(Users)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Users)?.typeName
       );
       const commentsInclude = result.find(
-        (i) => i.type === mapProps.get(Comments)?.typeName
-      );
-      const notesInclude = result.find(
-        (i) => i.type === mapProps.get(Notes)?.typeName
+        (i) => i.type === mapPropsService.getParamMap(Comments)?.typeName
       );
 
-      expect(notesInclude).toBe(undefined);
       expect(rolesInclude).toBe(undefined);
 
       const { id: addressesId, ...addressesAttr } = userObject.addresses;
       expect(addressesInclude).toEqual({
         id: addressesId.toString(),
-        type: mapProps.get(Addresses)?.typeName,
+        type: mapPropsService.getParamMap(Addresses)?.typeName,
         attributes: addressesAttr,
         links: {
-          self: `/api/v1/${mapProps.get(Addresses)?.typeName}/${addressesId}`,
+          self: `/api/v1/${
+            mapPropsService.getParamMap(Addresses)?.typeName
+          }/${addressesId}`,
         },
-        relationships: {
-          user: {
-            links: {
-              self: `/api/v${version}/${
-                mapProps.get(Addresses)?.typeName
-              }/${addressesId}/relationships/user`,
-            },
-          },
-        },
+        relationships: {},
       });
 
       const { id: commentsId } = userObject.comments[0];
+
       expect(commentsInclude).toEqual({
         id: commentsId.toString(),
-        type: mapProps.get(Comments)?.typeName,
+        type: mapPropsService.getParamMap(Comments)?.typeName,
         attributes: query.fields.comments.reduce((acum: any, field: any) => {
+          // @ts-ignore
           acum[field] = userObject.comments[0][field];
           return acum;
         }, {}),
         links: {
-          self: `/api/v1/${mapProps.get(Comments)?.typeName}/${commentsId}`,
+          self: `/api/v1/${
+            mapPropsService.getParamMap(Comments)?.typeName
+          }/${commentsId}`,
         },
         relationships: {
-          createdBy: {
+          user: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Comments)?.typeName
-              }/${commentsId}/relationships/createdBy`,
+                mapPropsService.getParamMap(Comments)?.typeName
+              }/${commentsId}/relationships/user`,
             },
           },
         },
@@ -481,55 +417,51 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
       expect(managerInclude).toEqual({
         id: managerId.toString(),
-        type: mapProps.get(Users)?.typeName,
+        type: mapPropsService.getParamMap(Users)?.typeName,
         attributes: query.fields.manager.reduce((acum: any, field: any) => {
+          // @ts-ignore
           acum[field] = userObject.manager[field];
           return acum;
         }, {}),
         links: {
-          self: `/api/v1/${mapProps.get(Users)?.typeName}/${managerId}`,
+          self: `/api/v1/${
+            mapPropsService.getParamMap(Users)?.typeName
+          }/${managerId}`,
         },
         relationships: {
           addresses: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Users)?.typeName
+                mapPropsService.getParamMap(Users)?.typeName
               }/${managerId}/relationships/addresses`,
             },
           },
           manager: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Users)?.typeName
+                mapPropsService.getParamMap(Users)?.typeName
               }/${managerId}/relationships/manager`,
             },
           },
           roles: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Users)?.typeName
+                mapPropsService.getParamMap(Users)?.typeName
               }/${managerId}/relationships/roles`,
             },
           },
           userGroup: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Users)?.typeName
+                mapPropsService.getParamMap(Users)?.typeName
               }/${managerId}/relationships/userGroup`,
             },
           },
           comments: {
             links: {
               self: `/api/v1/${
-                mapProps.get(Users)?.typeName
+                mapPropsService.getParamMap(Users)?.typeName
               }/${managerId}/relationships/comments`,
-            },
-          },
-          notes: {
-            links: {
-              self: `/api/v1/${
-                mapProps.get(Users)?.typeName
-              }/${managerId}/relationships/notes`,
             },
           },
         },
@@ -541,7 +473,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
       const query = { include: [] } as any;
       const result = service.transformItem(userObject, mapPropsUser, query);
 
-      const { id, manager, notes, roles, addresses, ...checkAttr } = userObject;
+      const { id, manager, roles, addresses, ...checkAttr } = userObject;
 
       expect(result).toEqual({
         id: userObject.id.toString(),
@@ -574,11 +506,6 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           comments: {
             links: {
               self: `/api/v1/${mapPropsUser.typeName}/${userObject.id}/relationships/comments`,
-            },
-          },
-          notes: {
-            links: {
-              self: `/api/v1/${mapPropsUser.typeName}/${userObject.id}/relationships/notes`,
             },
           },
         },
@@ -634,7 +561,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           addresses: {
             data: {
               id: userObject.addresses.id.toString(),
-              type: mapProps.get(Addresses)?.typeName,
+              type: mapPropsService.getParamMap(Addresses)?.typeName,
             },
             links: {
               self: `/api/v1/${mapPropsUser.typeName}/${userObject.id}/relationships/addresses`,
@@ -660,11 +587,6 @@ describe('JsonApiTransformerService - extractAttributes', () => {
           userGroup: {
             links: {
               self: `/api/v1/${mapPropsUser.typeName}/${userObject.id}/relationships/userGroup`,
-            },
-          },
-          notes: {
-            links: {
-              self: `/api/v1/${mapPropsUser.typeName}/${userObject.id}/relationships/notes`,
             },
           },
         },

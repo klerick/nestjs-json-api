@@ -4,7 +4,13 @@
     "outDir": "../../../dist/out-tsc",
     "module": "commonjs",
     "moduleResolution": "node16",
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "paths": {
+      "@klerick/json-api-nestjs-shared": [
+        "libs/json-api/json-api-nestjs-shared/src/index.ts"
+      ]
+    },
+    "allowJs": true
   },
   "include": [
     "jest.config.ts",

@@ -34,3 +34,9 @@ export enum FilterOperandOnlySimple {
   ne = 'ne',
   regexp = 'regexp',
 }
+
+export enum Operation {
+  add = 'add',
+  update = 'update',
+  remove = 'remove',
+}

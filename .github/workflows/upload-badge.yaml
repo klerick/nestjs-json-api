@@ -1,0 +1,53 @@
+name: 📈️ Upload Badge
+
+on:
+  workflow_call:
+    inputs:
+      mainBranch:
+        description: Type for main nx affect
+        required: false
+        default: "master"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN:
+        required: true
+      GIST_SECRET:
+        required: true
+      GIST_ID:
+        required: true
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  GIST_SECRET: ${{ secrets.GIST_SECRET }}
+  GIST_ID: ${{ secrets.GIST_ID }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: ./.github/actions
+
+      - name: Determine base for NX affected (if not master)
+        if: ${{ inputs.mainBranch != 'master' }}
+        shell: bash
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          LAST_TAG_HASH=$(git rev-parse "$LAST_TAG")
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          echo "Using last tag hash as NX_BASE: $LAST_TAG_HASH"
+          echo "Using current commit as NX_HEAD: $CURRENT_COMMIT"
+          echo "NX_BASE=$LAST_TAG_HASH" >> $GITHUB_ENV
+          echo "NX_HEAD=$CURRENT_COMMIT" >> $GITHUB_ENV
+
+      - name: Determine base for NX affected (if master)
+        if: ${{ inputs.mainBranch == 'master' }}
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: ${{ inputs.mainBranch }}
+
+      - name: Upload test coverage badge
+        run: npx nx affected --target=upload-badge --passWithNoTests --exclude='*,!tag:type:publish'

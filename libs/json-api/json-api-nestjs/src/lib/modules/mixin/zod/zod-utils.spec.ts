@@ -8,7 +8,7 @@ import {
   stringMustBe,
   guardIsKeyOfObject,
 } from './zod-utils';
-import { TypeField } from '../types';
+import { TypeField } from '../../../types';
 
 describe('zod-utils', () => {
   describe('guardIsKeyOfObject', () => {

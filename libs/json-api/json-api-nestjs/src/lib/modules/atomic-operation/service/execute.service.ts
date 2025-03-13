@@ -17,7 +17,8 @@ import {
   ObjectTyped,
   ResourceObject,
   ResourceObjectRelationships,
-} from '../../../utils/nestjs-shared';
+  KEY_MAIN_INPUT_SCHEMA,
+} from '@klerick/json-api-nestjs-shared';
 import {
   InterceptorsConsumer,
   InterceptorsContextCreator,
@@ -29,12 +30,11 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MapControllerInterceptor, ParamsForExecute } from '../types';
 import {
   ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_INPUT_SCHEMA,
   MAP_CONTROLLER_INTERCEPTORS,
 } from '../constants';
 import { IterateFactory } from '../factory';
-import { TypeFromType } from '../../mixin/types';
-import { RunInTransaction, ValidateQueryError } from '../../../types';
+import { TypeFromType, ValidateQueryError } from '../../../types';
+import { RunInTransaction } from '../../mixin/types';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 export function isZodError(
@@ -48,9 +48,12 @@ export function isZodError(
   );
 }
 
+function assertIsArray(data: unknown): data is Array<any> {
+  return Array.isArray(data);
+}
+
 @Injectable()
 export class ExecuteService {
-  // @Inject(CURRENT_DATA_SOURCE_TOKEN) private readonly dataSource!: DataSource;
   @Inject(ModuleRef) private readonly moduleRef!: ModuleRef & {
     container: NestContainer;
     applicationConfig: ApplicationConfig;
@@ -97,7 +100,8 @@ export class ExecuteService {
     );
 
     const resultArray: Array<
-      ResourceObject<any> | ResourceObjectRelationships<any, any>
+      | ResourceObject<object>
+      | ResourceObjectRelationships<object, string, keyof object>
     > = [];
     let i = 0;
     const tmpIdsMap: Record<string | number, string | number> = {};
@@ -134,9 +138,9 @@ export class ExecuteService {
             itemReplace,
           ],
           controller,
-          // @ts-ignore
+          // @ts-expect-error inccorect parse
           controller[methodName],
-          // @ts-ignore
+          // @ts-expect-error inccorect parse
           async () => controller[methodName](...itemReplace)
         );
 
@@ -226,9 +230,9 @@ export class ExecuteService {
 
     bodyInput.relationships = ObjectTyped.entries(relationships).reduce(
       (acum, [name, val]) => {
-        if (!val) throw new Error('Va; undefined');
-        const { data } = val;
-        if (Array.isArray(data)) {
+        if (!val) throw new Error('Val undefined');
+        const { data } = val as any;
+        if (assertIsArray(data)) {
           acum[name] = {
             data: data.map((i) => {
               if (i === null) return i;
@@ -252,7 +256,7 @@ export class ExecuteService {
         }
         return acum;
       },
-      { ...relationships }
+      { ...relationships } as any
     );
 
     inputParams[inputParams.length - 1] = bodyInput;

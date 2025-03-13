@@ -2,12 +2,9 @@ import { zodSortQuery } from './sort';
 
 import { ASC, DESC } from '../../../../constants';
 
-import {
-  userFields,
-  userRelations,
-} from '../../../../utils/___test___/test.helper';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
-const schema = zodSortQuery(userFields, userRelations);
+const schema = zodSortQuery(usersEntityParamMapMockData);
 describe('zodSortQuery', () => {
   it('should create a Zod schema with target and relations', () => {
     const parsedData = schema.parse({
@@ -16,7 +13,6 @@ describe('zodSortQuery', () => {
       manager: { lastName: ASC },
       roles: { name: DESC },
       comments: { kind: DESC },
-      notes: { text: ASC },
       userGroup: { label: ASC },
     });
 
@@ -26,13 +22,12 @@ describe('zodSortQuery', () => {
       manager: { lastName: ASC },
       roles: { name: DESC },
       comments: { kind: DESC },
-      notes: { text: ASC },
       userGroup: { label: ASC },
     });
   });
 
   it('should throw an error for an invalid field in target', () => {
-    const schema = zodSortQuery(userFields, userRelations);
+    const schema = zodSortQuery(usersEntityParamMapMockData);
 
     expect(() => {
       schema.parse({
@@ -42,7 +37,7 @@ describe('zodSortQuery', () => {
   });
 
   it('should throw an error for invalid fields in relations', () => {
-    const schema = zodSortQuery(userFields, userRelations);
+    const schema = zodSortQuery(usersEntityParamMapMockData);
 
     expect(() => {
       schema.parse({
@@ -52,7 +47,7 @@ describe('zodSortQuery', () => {
   });
 
   it('should allow partial relations and target', () => {
-    const schema = zodSortQuery(userFields, userRelations);
+    const schema = zodSortQuery(usersEntityParamMapMockData);
 
     const parsedData = schema.parse({
       target: { id: ASC },
@@ -66,7 +61,7 @@ describe('zodSortQuery', () => {
   });
 
   it('should fail if an empty object is not allowed', () => {
-    const schema = zodSortQuery(userFields, userRelations);
+    const schema = zodSortQuery(usersEntityParamMapMockData);
 
     expect(() => {
       schema.parse({});
@@ -77,7 +72,7 @@ describe('zodSortQuery', () => {
   });
 
   it('should fail if the input is not a valid object', () => {
-    const schema = zodSortQuery(userFields, userRelations);
+    const schema = zodSortQuery(usersEntityParamMapMockData);
 
     expect(() => {
       schema.parse([]);

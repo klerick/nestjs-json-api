@@ -2,52 +2,45 @@ import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { DECORATORS } from '@nestjs/swagger/dist/constants';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { DiscoveryService } from '@nestjs/core';
-import { ObjectTyped } from '../../../utils/nestjs-shared';
+import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { PARAMTYPES_METADATA } from '@nestjs/common/constants';
 
 import {
-  CONTROL_OPTIONS_TOKEN,
+  CONTROLLER_OPTIONS_TOKEN,
   CURRENT_ENTITY,
   JSON_API_CONTROLLER_POSTFIX,
   JSON_API_DECORATOR_ENTITY,
-  PARAMS_FOR_ZOD_SCHEMA,
-  ENTITY_MAP_PROPS,
 } from '../../../constants';
-import { getProviderName, nameIt } from '../helper';
-import { JsonBaseController } from '../controller/json-base.controller';
-import { EntityClass, ObjectLiteral } from '../../../types';
-import {
-  DecoratorOptions,
-  EntityProps,
-  ZodEntityProps,
-  ZodParams,
-} from '../types';
+import { getProviderName, nameIt } from '../helpers';
+import { JsonBaseController } from '../controllers';
+import { DecoratorOptions } from '../types';
 import { FilterOperand } from './filter-operand-model';
 import { createApiModels } from './utils';
 import { Bindings } from '../config/bindings';
 
 import { swaggerMethod } from './method';
+import { EntityParamMapService } from '../service';
 
 @Injectable()
-export class SwaggerBindService<E extends ObjectLiteral>
+export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
   implements OnModuleInit
 {
   @Inject(CURRENT_ENTITY) private entity!: EntityClass<E>;
   @Inject(DiscoveryService) private discoveryService!: DiscoveryService;
-  @Inject(CONTROL_OPTIONS_TOKEN) private config!: DecoratorOptions;
+  @Inject(CONTROLLER_OPTIONS_TOKEN) private config!: DecoratorOptions;
 
-  @Inject(ENTITY_MAP_PROPS) private mapEntity!: Map<
-    EntityClass<E>,
-    ZodEntityProps<E>
+  @Inject(EntityParamMapService) private mapEntity!: EntityParamMapService<
+    E,
+    IdKey
   >;
 
-  onModuleInit(): any {
+  onModuleInit() {
     this.initSwagger();
   }
 
   public initSwagger() {
     const controllerName = nameIt(
-      getProviderName(this.entity.name, JSON_API_CONTROLLER_POSTFIX),
+      getProviderName(this.entity, JSON_API_CONTROLLER_POSTFIX),
       JsonBaseController
     ).name;
 
@@ -65,7 +58,7 @@ export class SwaggerBindService<E extends ObjectLiteral>
     if (!controllerInst)
       throw new Error(`Controller for ${this.entity.name} is empty`);
 
-    const mapProps = this.mapEntity.get(this.entity);
+    const mapProps = this.mapEntity.getParamMap(this.entity);
     if (!mapProps)
       throw new Error(`ZodEntityProps for ${this.entity.name} is empty`);
 

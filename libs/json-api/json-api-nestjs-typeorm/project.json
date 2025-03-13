@@ -1,0 +1,51 @@
+{
+  "name": "json-api-nestjs-typeorm",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "library",
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-typeorm", "type:publish"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": ["{projectRoot}/*.md"],
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-typeorm"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-typeorm {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
+    }
+  },
+  "implicitDependencies": ["json-api-nestjs"]
+}

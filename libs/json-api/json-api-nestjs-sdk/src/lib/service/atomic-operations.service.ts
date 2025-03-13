@@ -1,18 +1,22 @@
-import { AtomicVoidOperation, GenerateAtomicBody } from '../utils';
-import { JsonApiUtilsService } from './json-api-utils.service';
+import { Observable } from 'rxjs';
+import {
+  KEY_MAIN_INPUT_SCHEMA,
+  KEY_MAIN_OUTPUT_SCHEMA,
+  RelationKeys,
+} from '@klerick/json-api-nestjs-shared';
 import { map } from 'rxjs/operators';
+
+import { GenerateAtomicBody } from '../utils';
+import { JsonApiUtilsService } from './json-api-utils.service';
 
 import {
   AtomicBody,
   AtomicOperations,
-  Entity as EntityObject,
-  EntityRelation,
   HttpInnerClient,
   JsonApiSdkConfig,
   ReturnIfArray,
+  AtomicVoidOperation,
 } from '../types';
-import { Observable } from 'rxjs';
-import { KEY_MAIN_INPUT_SCHEMA, KEY_MAIN_OUTPUT_SCHEMA } from '../constants';
 
 type GetTypeBody<T extends unknown[]> = {
   [K in keyof T[number]]: GenerateAtomicBody<T>;
@@ -80,18 +84,16 @@ export class AtomicOperationsService<T extends unknown[]>
     );
   }
 
-  deleteOne<Entity extends EntityObject>(
-    entity: Entity
-  ): AtomicOperations<[...T]>;
-  deleteOne<Entity extends EntityObject>(
+  deleteOne<Entity extends object>(entity: Entity): AtomicOperations<[...T]>;
+  deleteOne<Entity extends object>(
     entity: Entity,
     skipEmpty: true
   ): AtomicOperations<[...T]>;
-  deleteOne<Entity extends EntityObject>(
+  deleteOne<Entity extends object>(
     entity: Entity,
     skipEmpty: false
   ): AtomicOperations<[...T, 'EMPTY']>;
-  deleteOne<Entity extends EntityObject>(
+  deleteOne<Entity extends object>(
     entity: Entity,
     skipEmpty?: boolean
   ): AtomicOperations<[...T, 'EMPTY'] | [...T]> {
@@ -102,28 +104,28 @@ export class AtomicOperationsService<T extends unknown[]>
     );
   }
 
-  public patchOne<Entity extends EntityObject>(
+  public patchOne<Entity extends object>(
     entity: Entity
   ): AtomicOperations<[...T, Entity]> {
     return this.setToBody('patchOne', entity);
   }
 
-  public postOne<Entity extends EntityObject>(
+  public postOne<Entity extends object>(
     entity: Entity
   ): AtomicOperations<[...T, Entity]> {
     return this.setToBody('postOne', entity);
   }
 
   public deleteRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    Rel extends RelationKeys<Entity>
   >(entity: Entity, relationType: Rel): AtomicOperations<T> {
     return this.setToBody('deleteRelationships', entity, relationType);
   }
 
   public patchRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    Rel extends RelationKeys<Entity>
   >(
     entity: Entity,
     relationType: Rel
@@ -132,8 +134,8 @@ export class AtomicOperationsService<T extends unknown[]>
   }
 
   public postRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    Rel extends RelationKeys<Entity>
   >(
     entity: Entity,
     relationType: Rel
@@ -141,39 +143,30 @@ export class AtomicOperationsService<T extends unknown[]>
     return this.setToBody('postRelationships', entity, relationType);
   }
 
-  private setToBody<Entity extends EntityObject>(
+  private setToBody<Entity extends object>(
     operationType: Extract<keyof AtomicVoidOperation, 'deleteOne'>,
     entity: Entity
   ): AtomicOperations<T>;
-  private setToBody<Entity extends EntityObject>(
+  private setToBody<Entity extends object>(
     operationType: Extract<keyof AtomicVoidOperation, 'deleteOne'>,
     entity: Entity,
     skipEmpty: boolean
   ): AtomicOperations<[...T, 'EMPTY']>;
-  private setToBody<Entity extends EntityObject>(
+  private setToBody<Entity extends object>(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteOne'>,
     entity: Entity
   ): AtomicOperations<[...T, Entity]>;
-  private setToBody<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
-  >(
+  private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: Extract<keyof AtomicVoidOperation, 'deleteRelationships'>,
     entity: Entity,
     relationType: Rel
   ): AtomicOperations<T>;
-  private setToBody<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
-  >(
+  private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteRelationships'>,
     entity: Entity,
     relationType: Rel
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>;
-  private setToBody<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
-  >(
+  private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: keyof AtomicVoidOperation,
     entity: Entity,
     relationType?: Rel | boolean

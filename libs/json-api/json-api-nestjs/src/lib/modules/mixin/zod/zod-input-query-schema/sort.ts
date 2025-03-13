@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { ASC, DESC } from '../../../../constants';
-import { ZodInfer } from '../../types';
 
 export function zodSortInputQuery() {
   return z
@@ -34,4 +33,4 @@ export function zodSortInputQuery() {
     });
 }
 
-export type ZodSortInputQuery = ZodInfer<typeof zodSortInputQuery>;
+export type ZodSortInputQuery = z.infer<ReturnType<typeof zodSortInputQuery>>;

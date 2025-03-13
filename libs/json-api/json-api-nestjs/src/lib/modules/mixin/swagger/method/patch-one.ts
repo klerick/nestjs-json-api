@@ -5,32 +5,24 @@ import {
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { generateSchema } from '@anatine/zod-openapi';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { TypeField, ZodEntityProps } from '../../types';
+import { TypeField } from '../../../../types';
+
 import { errorSchema, jsonSchemaResponse } from '../utils';
 import { zodPatch } from '../../zod';
-import { getParamsForOatchANdPostZod } from '../../factory';
+import { EntityParamMapService } from '../../service';
 
-export function patchOne<E extends ObjectLiteral>(
+export function patchOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const {
-    primaryColumnType,
-    typeName,
-    fieldWithType,
-    propsDb,
-    primaryColumnName,
-    relationArrayProps,
-    relationPopsName,
-    primaryColumnTypeForRel,
-  } = getParamsForOatchANdPostZod<E>(mapEntity, entity);
+  const primaryColumnType = mapEntity.entityParaMap.primaryColumnType;
 
   ApiOperation({
     summary: `Update item of resource "${entityName}"`,
@@ -46,18 +38,9 @@ export function patchOne<E extends ObjectLiteral>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: generateSchema(
-      zodPatch(
-        primaryColumnType,
-        typeName,
-        fieldWithType,
-        propsDb,
-        primaryColumnName,
-        relationArrayProps,
-        relationPopsName,
-        primaryColumnTypeForRel
-      )
-    ) as SchemaObject | ReferenceObject,
+    schema: generateSchema(zodPatch(mapEntity)) as
+      | SchemaObject
+      | ReferenceObject,
     required: true,
   })(controller, methodName, descriptor);
 

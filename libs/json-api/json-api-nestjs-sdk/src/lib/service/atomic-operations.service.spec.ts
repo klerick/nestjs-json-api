@@ -1,10 +1,8 @@
 import { lastValueFrom, of } from 'rxjs';
+import { KEY_MAIN_OUTPUT_SCHEMA } from '@klerick/json-api-nestjs-shared';
 import { AtomicOperationsService } from './atomic-operations.service';
-import { JsonApiUtilsService } from './';
+import { JsonApiUtilsService } from './index';
 import { HttpInnerClient, JsonApiSdkConfig } from '../types';
-import { KEY_MAIN_OUTPUT_SCHEMA } from '../constants';
-
-// jest.mock('../utils');
 
 class Users {
   public id!: number;

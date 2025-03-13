@@ -1,25 +1,36 @@
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
-import { ObjectTyped } from '../../../../utils/nestjs-shared';
+import {
+  ObjectTyped,
+  EntityClass,
+  FilterOperand,
+} from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { ZodEntityProps } from '../../types';
-import { errorSchema, getEntityMapProps, jsonSchemaResponse } from '../utils';
+import {
+  assertIsKeysOfObject,
+  errorSchema,
+  jsonSchemaResponse,
+} from '../utils';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
+import { EntityParamMapService } from '../../service';
 
-export function getAll<E extends ObjectLiteral>(
+export function getAll<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ): void {
   const { props, relations, relationProperty, primaryColumnName } =
-    getEntityMapProps(mapEntity, entity);
+    mapEntity.getParamMap(entity);
+
+  assertIsKeysOfObject(entity, props);
+  assertIsKeysOfObject(entity, relations);
+
   const entityRelationStructure = {} as any;
   const relationTree = ObjectTyped.entries(relationProperty).reduce(
     (acum, [name, props]) => {
-      const relMap = getEntityMapProps(mapEntity, props.entityClass);
+      const relMap = mapEntity.getParamMap(props.entityClass as any);
       acum.push(...relMap.props.map((i) => `${name.toLocaleString()}.${i}`));
       entityRelationStructure[name] = relMap.props;
       return acum;
@@ -65,13 +76,44 @@ export function getAll<E extends ObjectLiteral>(
     },
     description: `Object of field for select field from "${entity.name}" resource`,
   })(controller, methodName, descriptor);
-
+  // https://github.com/OAI/OpenAPI-Specification/issues/1706#issuecomment-2704374644 need wait fix deepObject
   ApiQuery({
     name: 'filter',
     required: false,
     style: 'deepObject',
     schema: {
       type: 'object',
+      properties: {
+        ...props.reduce((acum, i) => {
+          Reflect.set(acum, String(i), {
+            type: 'object',
+            properties: Object.keys(FilterOperand).reduce((acum, name) => {
+              Reflect.set(acum, String(name), {
+                type: 'string',
+              });
+              return acum;
+            }, {}),
+            minProperties: 1,
+            additionalProperties: false,
+          });
+          return acum;
+        }, {}),
+        ...relationTree.reduce((acum, i) => {
+          Reflect.set(acum, String(i), {
+            type: 'object',
+            properties: Object.keys(FilterOperand).reduce((acum, name) => {
+              Reflect.set(acum, String(name), {
+                type: 'string',
+              });
+              return acum;
+            }, {}),
+            minProperties: 1,
+            additionalProperties: false,
+          });
+          return acum;
+        }, {}),
+      },
+      additionalProperties: false,
     },
     examples: {
       simpleExample: {
@@ -125,14 +167,14 @@ export function getAll<E extends ObjectLiteral>(
   let sortSeveral = {
     summary: 'Sort several field',
     description: 'Sort several field',
-    value: `${props[1]},-${props[0]}`,
+    value: `${String(props[1])},-${String(props[0])}`,
   };
 
   if (relations.length > 0) {
     ApiQuery({
       name: 'include',
       required: false,
-      enum: relations,
+      enum: relations as any,
       style: 'simple',
       isArray: true,
       description: `"${entity.name}" resource item has been extended with existing relations`,
@@ -163,7 +205,9 @@ export function getAll<E extends ObjectLiteral>(
     sortSeveral = {
       summary: 'Sort several field with relation',
       description: 'Sort several field relation',
-      value: `${props[1]},-${relationTree[2]},${relationTree[1]},-${props[0]}`,
+      value: `${String(props[1])},-${relationTree[2]},${
+        relationTree[1]
+      },-${String(props[0])}`,
     };
   }
 
@@ -181,7 +225,7 @@ export function getAll<E extends ObjectLiteral>(
       sortDesc: {
         summary: 'Sort field by DESC',
         description: 'Sort field by DESC',
-        value: `-${props[1]}`,
+        value: `-${String(props[1])}`,
       },
       sortAscRelation,
       sortDescRelation,
@@ -195,16 +239,20 @@ export function getAll<E extends ObjectLiteral>(
     required: false,
     schema: {
       type: 'object',
+      examples: [
+        {
+          number: DEFAULT_QUERY_PAGE,
+          size: DEFAULT_PAGE_SIZE,
+        },
+      ],
       properties: {
         number: {
           type: 'integer',
           minimum: 1,
-          example: DEFAULT_QUERY_PAGE,
         },
         size: {
           type: 'integer',
           minimum: 1,
-          example: DEFAULT_PAGE_SIZE,
           maximum: 500,
         },
       },

@@ -1,13 +1,17 @@
 import { z } from 'zod';
-import { ObjectLiteral } from '../../../../types';
-import { ResultGetField } from '../../types';
 import { uniqueArray } from '../zod-utils';
+import { EntityParamMapService } from '../../service';
+import { NonEmptyStringTuple } from '../../../../types';
 
-export function zodIncludeQuery<E extends ObjectLiteral>(
-  relationList: ResultGetField<E>['relations']
+export function zodIncludeQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
+  const relationProps: NonEmptyStringTuple<
+    typeof entityParamMapService.entityParaMap.relations
+  > = entityParamMapService.entityParaMap.relations as any;
+
   return z
-    .enum(relationList)
+    .enum(relationProps)
     .array()
     .nonempty()
     .refine(uniqueArray(), {
@@ -16,7 +20,10 @@ export function zodIncludeQuery<E extends ObjectLiteral>(
     .nullable();
 }
 
-export type ZodIncludeQuery<E extends ObjectLiteral> = ReturnType<
-  typeof zodIncludeQuery<E>
+export type ZodIncludeQuery<
+  E extends object,
+  IdKey extends string
+> = ReturnType<typeof zodIncludeQuery<E, IdKey>>;
+export type IncludeQuery<E extends object, IdKey extends string> = z.infer<
+  ZodIncludeQuery<E, IdKey>
 >;
-export type IncludeQuery<E extends ObjectLiteral> = z.infer<ZodIncludeQuery<E>>;

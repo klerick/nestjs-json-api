@@ -2,55 +2,40 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DiscoveryModule } from '@nestjs/core';
 import { HttpException } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
-import { getDataSourceToken } from '@nestjs/typeorm';
-import { IMemoryDb } from 'pg-mem';
+import {
+  KEY_MAIN_OUTPUT_SCHEMA,
+  Operation,
+} from '@klerick/json-api-nestjs-shared';
 
 import { OperationController } from './operation.controller';
 import { ExecuteService, ExplorerService } from '../service';
-import { InputArray, Operation } from '../utils';
-import { JsonBaseController } from '../../mixin/controller/json-base.controller';
-import {
-  mockDBTestModule,
-  providerEntities,
-  Users,
-} from '../../../mock-utils/typeorm';
+import { InputArray } from '../utils';
+import { JsonBaseController } from '../../mixin/controllers';
+
+import { Users } from '../../../utils/___test___/test-classes.helper';
 
 import {
   ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_OUTPUT_SCHEMA,
   MAP_CONTROLLER_ENTITY,
   MAP_ENTITY,
   ZOD_INPUT_OPERATION,
   MAP_CONTROLLER_INTERCEPTORS,
-  OPTIONS,
 } from '../constants';
 
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
-import { ObjectLiteral } from '../../../types';
-import {
-  CURRENT_DATA_SOURCE_TOKEN,
-  RUN_IN_TRANSACTION_FUNCTION,
-} from '../../../constants';
-import { createAndPullSchemaBase } from '../../../mock-utils';
+import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 
 describe('OperationController', () => {
-  let db: IMemoryDb;
   let operationController: OperationController;
   let explorerService: ExplorerService<Users>;
   let executeService: ExecuteService;
 
   beforeEach(async () => {
-    db = createAndPullSchemaBase();
     const app: TestingModule = await Test.createTestingModule({
-      imports: [DiscoveryModule, mockDBTestModule(db)],
+      imports: [DiscoveryModule],
       controllers: [OperationController],
       providers: [
-        ...providerEntities(getDataSourceToken()),
-        {
-          provide: CURRENT_DATA_SOURCE_TOKEN,
-          useValue: {},
-        },
         ExplorerService,
         ExecuteService,
         {
@@ -71,10 +56,6 @@ describe('OperationController', () => {
         },
         {
           provide: ZOD_INPUT_OPERATION,
-          useValue: {},
-        },
-        {
-          provide: OPTIONS,
           useValue: {},
         },
         {
@@ -127,7 +108,7 @@ describe('OperationController', () => {
       const getMethodNameByParamSpy = jest
         .spyOn(explorerService, 'getMethodNameByParam')
         .mockReturnValue(
-          paramsForExecuteMock[0].methodName as OperationMethode<ObjectLiteral>
+          paramsForExecuteMock[0].methodName as OperationMethode<object>
         );
       const getModulesByControllerSpy = jest
         .spyOn(explorerService, 'getParamsForMethod')

@@ -1,27 +1,20 @@
-import { QueryField } from '../../../../utils/nestjs-shared';
+import { QueryField } from '@klerick/json-api-nestjs-shared';
 import { z } from 'zod';
-import { RelationTree, ResultGetField } from '../../types';
-import { ObjectLiteral } from '../../../../types';
 
+import { EntityParamMapService } from '../../service';
 import { zodFieldsInputQuery } from './fields';
 import { zodFilterInputQuery } from './filter';
 import { zodIncludeInputQuery } from './include';
 import { zodSortInputQuery } from './sort';
 import { zodPageInputQuery } from '../zod-share';
 
-export function zodInputQuery<E extends ObjectLiteral>(
-  entityFieldsStructure: ResultGetField<E>,
-  entityRelationStructure: RelationTree<E>
+export function zodInputQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
   return z
     .object({
-      [QueryField.fields]: zodFieldsInputQuery<E>(
-        entityFieldsStructure.relations
-      ),
-      [QueryField.filter]: zodFilterInputQuery(
-        entityFieldsStructure.field,
-        entityRelationStructure
-      ),
+      [QueryField.fields]: zodFieldsInputQuery<E, IdKey>(entityParamMapService),
+      [QueryField.filter]: zodFilterInputQuery<E, IdKey>(entityParamMapService),
       [QueryField.include]: zodIncludeInputQuery(),
       [QueryField.sort]: zodSortInputQuery(),
       [QueryField.page]: zodPageInputQuery(),
@@ -33,7 +26,9 @@ export function zodInputQuery<E extends ObjectLiteral>(
     );
 }
 
-export type ZodInputQuery<E extends ObjectLiteral> = ReturnType<
-  typeof zodInputQuery<E>
+export type ZodInputQuery<E extends object, IdKey extends string> = ReturnType<
+  typeof zodInputQuery<E, IdKey>
 >;
-export type InputQuery<E extends ObjectLiteral> = z.infer<ZodInputQuery<E>>;
+export type InputQuery<E extends object, IdKey extends string> = z.infer<
+  ZodInputQuery<E, IdKey>
+>;

@@ -1,8 +1,7 @@
 import { Body, Param, Query, RequestMethod } from '@nestjs/common';
-import { ObjectTyped } from '../../../utils/nestjs-shared';
 
-import { BindingsConfig, MethodName } from '../types';
-import { JsonBaseController } from '../controller/json-base.controller';
+import { BindingsConfig } from '../types';
+import { JsonBaseController } from '../controllers/json-base.controller';
 import { PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID } from '../../../constants';
 
 import {
@@ -188,15 +187,3 @@ const Bindings: BindingsConfig = {
 };
 
 export { Bindings };
-
-export function excludeMethod(
-  names: Array<Partial<MethodName>>
-): Array<MethodName> {
-  const tmpObject = names.reduce(
-    (acum, key) => ((acum[key] = true), acum),
-    {} as Record<Partial<MethodName>, boolean>
-  );
-  return ObjectTyped.keys(Bindings).filter(
-    (method) => !tmpObject[method]
-  ) as Array<MethodName>;
-}

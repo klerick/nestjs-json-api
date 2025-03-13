@@ -26,7 +26,6 @@ describe('POST method:', () => {
   let addressAfterSave: Addresses;
   let user: Users;
   let userAfterSave: Users;
-  let bookListAfterSave: BookList;
   let comments: Comments;
   let commentsAfterSave: Comments;
 
@@ -53,8 +52,6 @@ describe('POST method:', () => {
     if (commentsAfterSave)
       await jsonSdk.jonApiSdkService.deleteOne(commentsAfterSave);
     if (userAfterSave) await jsonSdk.jonApiSdkService.deleteOne(userAfterSave);
-    if (bookListAfterSave)
-      await jsonSdk.jonApiSdkService.deleteOne(bookListAfterSave);
 
     await jsonSdk.jonApiSdkService.deleteOne(addressAfterSave);
   });

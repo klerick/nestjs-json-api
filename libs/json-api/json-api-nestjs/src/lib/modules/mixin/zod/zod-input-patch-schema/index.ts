@@ -9,67 +9,46 @@ import {
   zodType,
   ZodType,
 } from '../zod-share';
-import { ObjectLiteral } from '../../../../types';
-import {
-  EntityProps,
-  FieldWithType,
-  PropsForField,
-  RelationPrimaryColumnType,
-  RelationPropsArray,
-  RelationPropsTypeName,
-  TypeForId,
-} from '../../types';
-import { ZodPost } from '../zod-input-post-schema';
 
-type ZodPatchPatchShape<E extends ObjectLiteral, N extends string> = {
+import { EntityParamMapService } from '../../service';
+import { TypeForId } from '../../../../types';
+
+type ZodPatchPatchShape<E extends object, IdKey extends string> = {
   id: ZodId;
-  type: ZodType<N>;
-  attributes: ZodOptional<ZodAttributes<E, true>>;
-  relationships: ZodOptional<ZodRelationships<E, true>>;
+  type: ZodType<string>;
+  attributes: ZodOptional<ZodAttributes<E, IdKey, true>>;
+  relationships: ZodOptional<ZodRelationships<E, IdKey, true>>;
 };
 
-type ZodInputPatchSchema<E extends ObjectLiteral, N extends string> = ZodObject<
-  ZodPatchPatchShape<E, N>,
+type ZodInputPatchSchema<E extends object, IdKey extends string> = ZodObject<
+  ZodPatchPatchShape<E, IdKey>,
   'strict'
 >;
 
-type ZodInputPatchDataShape<E extends ObjectLiteral, N extends string> = {
-  data: ZodInputPatchSchema<E, N>;
+type ZodInputPatchDataShape<E extends object, IdKey extends string> = {
+  data: ZodInputPatchSchema<E, IdKey>;
 };
 
-function getShape<E extends ObjectLiteral, N extends string>(
-  typeId: TypeForId,
-  typeName: N,
-  fieldWithType: FieldWithType<E>,
-  propsDb: PropsForField<E>,
-  primaryColumn: EntityProps<E>,
-  relationArrayProps: RelationPropsArray<E>,
-  relationPopsName: RelationPropsTypeName<E>,
-  primaryColumnType: RelationPrimaryColumnType<E>
-): ZodInputPatchSchema<E, N> {
+function getShape<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+): ZodInputPatchSchema<E, IdKey> {
   const shape = {
-    id: zodId(typeId),
-    type: zodType(typeName),
-    attributes: zodAttributes(
-      fieldWithType,
-      propsDb,
-      primaryColumn,
-      true
-    ).optional(),
-    relationships: zodRelationships(
-      relationArrayProps,
-      relationPopsName,
-      primaryColumnType,
-      true
-    ).optional(),
+    id: zodId(
+      entityParamMapService.entityParaMap.primaryColumnType as TypeForId
+    ),
+    type: zodType(entityParamMapService.entityParaMap.typeName),
+    attributes: zodAttributes(entityParamMapService, true).optional(),
+    relationships: zodRelationships(entityParamMapService, true).optional(),
   };
 
   return z.object(shape).strict();
 }
 
-function zodDataShape<E extends ObjectLiteral, N extends string>(
-  shape: ZodInputPatchSchema<E, N>
-): ZodPatch<E, N> {
+export function zodPatch<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+): ZodPatch<E, IdKey> {
+  const shape = getShape(entityParamMapService);
+
   return z
     .object({
       data: shape,
@@ -77,35 +56,10 @@ function zodDataShape<E extends ObjectLiteral, N extends string>(
     .strict();
 }
 
-export function zodPatch<E extends ObjectLiteral, N extends string>(
-  typeId: TypeForId,
-  typeName: N,
-  fieldWithType: FieldWithType<E>,
-  propsDb: PropsForField<E>,
-  primaryColumn: EntityProps<E>,
-  relationArrayProps: RelationPropsArray<E>,
-  relationPopsName: RelationPropsTypeName<E>,
-  primaryColumnType: RelationPrimaryColumnType<E>
-): ZodPatch<E, N> {
-  const shape = getShape(
-    typeId,
-    typeName,
-    fieldWithType,
-    propsDb,
-    primaryColumn,
-    relationArrayProps,
-    relationPopsName,
-    primaryColumnType
-  );
-
-  return zodDataShape(shape);
-}
-
-export type ZodPatch<E extends ObjectLiteral, N extends string> = ZodObject<
-  ZodInputPatchDataShape<E, N>,
+export type ZodPatch<E extends object, IdKey extends string> = ZodObject<
+  ZodInputPatchDataShape<E, IdKey>,
   'strict'
 >;
-export type PatchData<
-  E extends ObjectLiteral,
-  N extends string = string
-> = z.infer<ZodPost<E, N>>['data'];
+export type PatchData<E extends object, IdKey extends string> = z.infer<
+  ZodPatch<E, IdKey>
+>['data'];

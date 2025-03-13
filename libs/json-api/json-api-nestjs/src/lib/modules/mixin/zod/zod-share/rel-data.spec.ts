@@ -1,6 +1,7 @@
 import { zodRelData, ZodRelData } from './rel-data';
-import { TypeField } from '../../types';
+
 import { ZodError } from 'zod';
+import { TypeField } from '../../../../types';
 
 describe('zodDataSchema', () => {
   let zodData: ZodRelData<string>;

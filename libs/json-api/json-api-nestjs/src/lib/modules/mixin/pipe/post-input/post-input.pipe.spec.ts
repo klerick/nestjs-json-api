@@ -9,12 +9,11 @@ import { PostInputPipe } from './post-input.pipe';
 import { PostData, ZodPost } from '../../zod';
 import { JSONValue } from '../../types';
 import { ZOD_POST_SCHEMA } from '../../../../constants';
-
-type MockEntity = { id: number; name: string };
+import { Users } from '../../../../utils/___test___/test-classes.helper';
 
 describe('PostInputPipe', () => {
-  let pipe: PostInputPipe<MockEntity>;
-  let mockSchema: ZodPost<MockEntity, 'id'>;
+  let pipe: PostInputPipe<Users>;
+  let mockSchema: ZodPost<Users, 'id'>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,13 +28,13 @@ describe('PostInputPipe', () => {
       ],
     }).compile();
 
-    pipe = module.get<PostInputPipe<MockEntity>>(PostInputPipe);
-    mockSchema = module.get<ZodPost<MockEntity, 'id'>>(ZOD_POST_SCHEMA);
+    pipe = module.get<PostInputPipe<Users>>(PostInputPipe);
+    mockSchema = module.get<ZodPost<Users, 'id'>>(ZOD_POST_SCHEMA);
   });
 
   it('should transform JSONValue to PostData on success', () => {
     const input: JSONValue = { key: 'value' } as any;
-    const expectedData: PostData<any> = { id: 1, key: 'value' } as any;
+    const expectedData: PostData<Users, 'id'> = { id: 1, key: 'value' } as any;
 
     jest
       .spyOn(mockSchema, 'parse')

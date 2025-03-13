@@ -20,6 +20,12 @@
       }
     },
     {
+      "files": ["*.test-d.ts"],
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    },
+    {
       "files": ["*.ts", "*.tsx"],
       "rules": {}
     },

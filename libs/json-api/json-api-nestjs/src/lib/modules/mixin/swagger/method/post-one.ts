@@ -5,31 +5,20 @@ import {
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { ZodEntityProps } from '../../types';
 import { errorSchema, jsonSchemaResponse } from '../utils';
 import { zodPost } from '../../zod';
-import { getParamsForOatchANdPostZod } from '../../factory';
+import { EntityParamMapService } from '../../service';
 
-export function postOne<E extends ObjectLiteral>(
+export function postOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
-  const {
-    primaryColumnType,
-    typeName,
-    fieldWithType,
-    propsDb,
-    primaryColumnName,
-    relationArrayProps,
-    relationPopsName,
-    primaryColumnTypeForRel,
-  } = getParamsForOatchANdPostZod<E>(mapEntity, entity);
 
   ApiOperation({
     summary: `Create item of resource "${entityName}"`,
@@ -38,18 +27,9 @@ export function postOne<E extends ObjectLiteral>(
 
   ApiBody({
     description: `Json api schema for new "${entityName}" item`,
-    schema: generateSchema(
-      zodPost(
-        primaryColumnType,
-        typeName,
-        fieldWithType,
-        propsDb,
-        primaryColumnName,
-        relationArrayProps,
-        relationPopsName,
-        primaryColumnTypeForRel
-      )
-    ) as SchemaObject | ReferenceObject,
+    schema: generateSchema(zodPost(mapEntity)) as
+      | SchemaObject
+      | ReferenceObject,
     required: true,
   })(controller, methodName, descriptor);
 

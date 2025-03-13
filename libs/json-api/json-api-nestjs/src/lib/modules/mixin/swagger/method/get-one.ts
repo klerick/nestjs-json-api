@@ -1,16 +1,16 @@
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { ObjectTyped } from '../../../../utils/nestjs-shared';
+import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { Type } from '@nestjs/common';
 
-import { TypeField, ZodEntityProps } from '../../types';
-import { errorSchema, getEntityMapProps, jsonSchemaResponse } from '../utils';
-import { EntityClass, ObjectLiteral } from '../../../../types';
+import { errorSchema, jsonSchemaResponse } from '../utils';
+import { TypeField } from '../../../../types';
+import { EntityParamMapService } from '../../service';
 
-export function getOne<E extends ObjectLiteral>(
+export function getOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
@@ -21,11 +21,11 @@ export function getOne<E extends ObjectLiteral>(
     relationProperty,
     primaryColumnName,
     primaryColumnType,
-  } = getEntityMapProps(mapEntity, entity);
+  } = mapEntity.getParamMap(entity);
 
   const entityRelationStructure = ObjectTyped.entries(relationProperty).reduce(
     (acum, [name, props]) => {
-      const relMap = getEntityMapProps(mapEntity, props.entityClass);
+      const relMap = mapEntity.getParamMap(props.entityClass as any);
       acum[name] = relMap.props;
       return acum;
     },
@@ -81,7 +81,7 @@ export function getOne<E extends ObjectLiteral>(
     ApiQuery({
       name: 'include',
       required: false,
-      enum: relations,
+      enum: relations as any,
       style: 'simple',
       isArray: true,
       description: `"${entity.name}" resource item has been extended with existing relations`,

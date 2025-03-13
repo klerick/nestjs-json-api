@@ -1,4 +1,10 @@
-import { TypeField } from '../types';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+
+import { ZodType } from 'zod';
+
+import { EntityRelationProps, TypeField } from '../../../types';
+import { EntityParamMapService } from '../service';
+import { ResultSchema } from './zod-share';
 
 export const nonEmptyObject =
   () =>
@@ -66,4 +72,40 @@ export function guardIsKeyOfObject<R>(
     return void 0;
 
   throw new Error('Type guard error');
+}
+
+export function getRelationProps<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+) {
+  return ObjectTyped.entries(
+    entityParamMapService.entityParaMap.relationProperty
+  ).reduce((acum, [name, value]) => {
+    const relMap = entityParamMapService.getParamMap(value.entityClass as any);
+    Reflect.set(acum, name, relMap.props);
+    return acum;
+  }, {} as EntityRelationProps<E, IdKey>);
+}
+
+export function setOptionalOrNot<
+  Schema extends ZodType,
+  Null extends true | false,
+  isPatch extends true | false
+>(
+  schema: Schema,
+  isNullable: Null,
+  isPatch: isPatch
+): ResultSchema<Schema, Null, isPatch> {
+  if (isPatch) {
+    return (isNullable ? schema.nullable() : schema).optional() as ResultSchema<
+      Schema,
+      Null,
+      isPatch
+    >;
+  } else {
+    return (isNullable ? schema.nullable().optional() : schema) as ResultSchema<
+      Schema,
+      Null,
+      isPatch
+    >;
+  }
 }

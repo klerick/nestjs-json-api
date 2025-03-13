@@ -1,13 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 import { ParseRelationshipNamePipe } from './parse-relationship-name.pipe';
 import { CURRENT_ENTITY, CHECK_RELATION_NAME } from '../../../../constants';
-import { EntityTarget } from 'typeorm/common/EntityTarget';
+import { EntityParam } from '../../../../types';
 
 describe('CheckItemEntityPipe', () => {
-  let pipe: ParseRelationshipNamePipe<any, any>;
+  let pipe: ParseRelationshipNamePipe<
+    object,
+    keyof EntityParam<object, 'id'>['relationProperty']
+  >;
   let checkRelationNameMock: jest.Mock;
-  let mockEntityTarget: EntityTarget<any>;
+  let mockEntityTarget: EntityClass<object>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,10 +22,13 @@ describe('CheckItemEntityPipe', () => {
       ],
     }).compile();
 
-    pipe = module.get<ParseRelationshipNamePipe<any, any>>(
-      ParseRelationshipNamePipe
-    );
-    mockEntityTarget = module.get<EntityTarget<any>>(CURRENT_ENTITY);
+    pipe = module.get<
+      ParseRelationshipNamePipe<
+        object,
+        keyof EntityParam<object, 'id'>['relationProperty']
+      >
+    >(ParseRelationshipNamePipe);
+    mockEntityTarget = module.get<EntityClass<object>>(CURRENT_ENTITY);
     checkRelationNameMock = module.get<jest.Mock>(CHECK_RELATION_NAME);
   });
 

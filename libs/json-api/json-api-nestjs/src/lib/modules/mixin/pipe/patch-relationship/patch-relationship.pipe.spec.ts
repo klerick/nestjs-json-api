@@ -1,4 +1,3 @@
-import { IMemoryDb } from 'pg-mem';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   InternalServerErrorException,

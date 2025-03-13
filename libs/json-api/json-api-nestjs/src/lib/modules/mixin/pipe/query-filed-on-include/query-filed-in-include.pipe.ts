@@ -1,13 +1,13 @@
 import { BadRequestException, PipeTransform } from '@nestjs/common';
-import { ObjectTyped } from '../../../../utils/nestjs-shared';
+import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 
-import { ObjectLiteral, ValidateQueryError } from '../../../../types';
+import { ValidateQueryError } from '../../../../types';
 import { Query } from '../../zod';
 
-export class QueryFiledInIncludePipe<E extends ObjectLiteral>
-  implements PipeTransform<Query<E>, Query<E>>
+export class QueryFiledInIncludePipe<E extends object>
+  implements PipeTransform<Query<E, 'id'>, Query<E, 'id'>>
 {
-  transform(value: Query<E>): Query<E> {
+  transform(value: Query<E, 'id'>): Query<E, 'id'> {
     const errors: ValidateQueryError[] = [];
 
     const { fields, include, sort, filter } = value;

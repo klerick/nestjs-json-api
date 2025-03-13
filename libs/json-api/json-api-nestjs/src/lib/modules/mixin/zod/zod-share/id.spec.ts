@@ -1,7 +1,7 @@
 import { ZodError } from 'zod';
 
 import { ZodId, zodId } from './id';
-import { TypeField } from '../../types';
+import { TypeField } from '../../../../types';
 
 describe('zodIdSchema', () => {
   let numberStringSchema: ZodId;

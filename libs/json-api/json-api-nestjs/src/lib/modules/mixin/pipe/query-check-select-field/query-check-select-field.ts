@@ -1,17 +1,14 @@
 import { BadRequestException, Inject, PipeTransform } from '@nestjs/common';
-import { CONTROL_OPTIONS_TOKEN } from '../../../../constants';
-import {
-  ConfigParam,
-  ObjectLiteral,
-  ValidateQueryError,
-} from '../../../../types';
+import { CONTROLLER_OPTIONS_TOKEN } from '../../../../constants';
+import { ValidateQueryError } from '../../../../types';
 import { Query } from '../../zod';
+import { EntityControllerParam } from '../../types';
 
-export class QueryCheckSelectField<E extends ObjectLiteral>
-  implements PipeTransform<Query<E>, Query<E>>
+export class QueryCheckSelectField<E extends object>
+  implements PipeTransform<Query<E, 'id'>, Query<E, 'id'>>
 {
-  @Inject(CONTROL_OPTIONS_TOKEN) private configParam!: ConfigParam;
-  transform(value: Query<E>): Query<E> {
+  @Inject(CONTROLLER_OPTIONS_TOKEN) private configParam!: EntityControllerParam;
+  transform(value: Query<E, 'id'>): Query<E, 'id'> {
     if (this.configParam.requiredSelectField && value.fields === null) {
       const error: ValidateQueryError = {
         code: 'invalid_arguments',

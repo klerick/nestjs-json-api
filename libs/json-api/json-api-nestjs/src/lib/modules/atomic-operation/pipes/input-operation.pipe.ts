@@ -4,11 +4,12 @@ import {
   Inject,
   PipeTransform,
 } from '@nestjs/common';
+import { KEY_MAIN_INPUT_SCHEMA } from '@klerick/json-api-nestjs-shared';
 import { errorMap } from 'zod-validation-error';
 import { ZodError } from 'zod';
 import { JSONValue } from '../../mixin/types';
 import { InputArray, ZodInputOperation } from '../utils';
-import { KEY_MAIN_INPUT_SCHEMA, ZOD_INPUT_OPERATION } from '../constants';
+import { ZOD_INPUT_OPERATION } from '../constants';
 
 export class InputOperationPipe
   implements PipeTransform<JSONValue, InputArray>

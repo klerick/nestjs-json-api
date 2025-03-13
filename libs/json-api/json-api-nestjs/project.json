@@ -1,9 +1,9 @@
 {
   "name": "json-api-nestjs",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/json-api/json-api-nestjs/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs", "type:publish"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -11,32 +11,16 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/libs/json-api/json-api-nestjs",
-        "tsConfig": "libs/json-api/json-api-nestjs/tsconfig.lib.json",
-        "packageJson": "libs/json-api/json-api-nestjs/package.json",
-        "main": "libs/json-api/json-api-nestjs/src/index.ts",
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
         "assets": [
-          "libs/json-api/json-api-nestjs/*.md"
+          "{projectRoot}/*.md"
         ],
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "generateExportsField": true
-      }
-    },
-    "build-npm": {
-      "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
-      "options": {
-        "outputPath": "node_modules/@klerick/json-api-nestjs",
-        "tsConfig": "libs/json-api/json-api-nestjs/tsconfig.lib.json",
-        "packageJson": "libs/json-api/json-api-nestjs/package.json",
-        "main": "libs/json-api/json-api-nestjs/src/index.ts",
-        "assets": [
-          "libs/json-api/json-api-nestjs/*.md"
-        ],
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "generateExportsField": true
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "nx-release-publish": {
@@ -56,11 +40,26 @@
         "{workspaceRoot}/coverage/{projectRoot}"
       ],
       "options": {
-        "jestConfig": "libs/json-api/json-api-nestjs/jest.config.ts",
+        "jestConfig": "{projectRoot}/jest.config.ts",
         "codeCoverage": true,
         "coverageReporters": [
           "json-summary"
         ]
+      }
+    },
+    "ts-test": {
+      "dependsOn":[        {
+        "dependencies": true,
+        "target": "build",
+        "params": "ignore"
+      }],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsd --files \"src/**/*.test-d.ts\" -t src/lib/types/index.ts"
+        ],
+        "cwd": "{workspaceRoot}/{projectRoot}",
+        "parallel": false
       }
     },
     "upload-badge": {
@@ -76,8 +75,9 @@
         ],
         "cwd": "./",
         "parallel": false,
-        "outputPath": "{workspaceRoot}/libs/json-api/json-api-nestjs"
+        "outputPath": "{workspaceRoot}/projectRoot}"
       }
     }
-  }
+  },
+  "implicitDependencies": ["json-api-nestjs-shared"]
 }

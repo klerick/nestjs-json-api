@@ -1,20 +1,21 @@
 import { Type } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { TypeField, ZodEntityProps } from '../../types';
-import { EntityClass, ObjectLiteral } from '../../../../types';
-import { errorSchema, getEntityMapProps } from '../utils';
+import { TypeField } from '../../../../types';
+import { errorSchema } from '../utils';
+import { EntityParamMapService } from '../../service';
 
-export function deleteOne<E extends ObjectLiteral>(
+export function deleteOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
   descriptor: PropertyDescriptor,
   entity: EntityClass<E>,
-  mapEntity: Map<EntityClass<E>, ZodEntityProps<E>>,
+  mapEntity: EntityParamMapService<E, IdKey>,
   methodName: string
 ) {
   const entityName = entity.name;
 
-  const { primaryColumnType } = getEntityMapProps(mapEntity, entity);
+  const { primaryColumnType } = mapEntity.getParamMap(entity);
 
   ApiParam({
     name: 'id',

@@ -8,10 +8,11 @@
  */
 
 import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
+import { join } from 'path';
 
 import devkit from '@nx/devkit';
-const { readCachedProjectGraph } = devkit;
+const { readCachedProjectGraph, workspaceRoot } = devkit;
 
 function invariant(condition, message) {
   if (!condition) {
@@ -46,15 +47,59 @@ invariant(
 );
 
 process.chdir(outputPath);
+const sharedProperty = [
+  'license',
+  'contributors',
+  'repository',
+  'engines',
+  'private',
+  'files',
+];
 
 // Updating the version in "package.json" before publishing
 try {
+  const mainJson = JSON.parse(
+    readFileSync(join(workspaceRoot, 'package.json')).toString()
+  );
   const json = JSON.parse(readFileSync(`package.json`).toString());
   json.version = version;
+
+  for (const props of sharedProperty) {
+    if (!mainJson[props] || json[props]) continue;
+    json[props] = mainJson[props];
+  }
+  removeDepFromOtherLib(graph, name, json);
   writeFileSync(`package.json`, JSON.stringify(json, null, 2));
 } catch (e) {
+  console.log(e);
   console.error(`Error reading package.json file from library build output.`);
+}
+
+if (existsSync(join(workspaceRoot, outputPath, 'cjs', 'package.json'))) {
+  unlinkSync(join(workspaceRoot, outputPath, 'cjs', 'package.json'));
+}
+
+if (existsSync(join(workspaceRoot, outputPath, 'mjs', 'package.json'))) {
+  unlinkSync(join(workspaceRoot, outputPath, 'mjs', 'package.json'));
 }
 
 // Execute "npm publish" to publish
 execSync(`npm publish --access public --tag ${tag}`);
+
+function removeDepFromOtherLib(graph, name, json) {
+  const libsName = Object.values(graph.nodes)
+    .filter((i) => i.data.tags.includes('type:publish'))
+    .map((i) => i.data.metadata.js.packageName);
+
+  if (!('peerDependencies' in json)) return;
+
+  json['peerDependencies'] = Object.entries(json['peerDependencies']).reduce(
+    (acum, [name, value]) => {
+      if (libsName.includes(name)) {
+        acum[name] = `^${value}`;
+      }
+      return acum;
+    },
+    {}
+  );
+}

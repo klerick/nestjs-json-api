@@ -1,0 +1,116 @@
+name: 📦 Create Release
+
+defaults: &project_options
+  - ""
+  - json-api-nestjs
+  - json-api-nestjs-sdk
+  - nestjs-json-rpc
+  - nestjs-json-rpc-sdk
+  - json-api-nestjs-microorm
+  - json-api-nestjs-shared
+  - json-api-nestjs-typeorm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tagChoice:
+        description: "Select projects by tag"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - tag:type:publish
+          - tag:lib:json-api-nestjs
+          - tag:lib:nestjs-json-rpc
+      project1:
+        description: "Select project"
+        required: false
+        default: ""
+        type: choice
+        options: *project_options
+      project2:
+        description: "Select project"
+        required: false
+        default: ""
+        type: choice
+        options: *project_options
+      project3:
+        description: "Select project"
+        required: false
+        default: ""
+        type: choice
+        options: *project_options
+      project4:
+        description: "Select project"
+        required: false
+        default: ""
+        type: choice
+        options: *project_options
+      beta-release:
+        description: 'Is beta release?'
+        required: false
+        type: boolean
+        default: false
+      dry-run:
+        description: 'Is dry run?'
+        required: false
+        type: boolean
+        default: false
+
+
+jobs:
+  compute-projects:
+    uses: ./.github/workflows/compute-projects.yml
+    with:
+      tagChoice: ${{ github.event.inputs.tagChoice }}
+      project1: ${{ github.event.inputs.project1 }}
+      project2: ${{ github.event.inputs.project2 }}
+      project3: ${{ github.event.inputs.project3 }}
+      project4: ${{ github.event.inputs.project4 }}
+
+  test:
+    need: [compute-projects]
+    uses: ./.github/workflows/test.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  e2e-test:
+    needs: [test]
+    uses: ./.github/workflows/e2e-test.yaml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  build:
+    needs: [test, e2e-test]
+    uses: ./.github/workflows/build.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  upload-badge:
+    needs: [ test, e2e-test ]
+    uses: ./.github/workflows/upload-badge.yaml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      GIST_SECRET: ${{ secrets.GIST_SECRET }}
+      GIST_ID: ${{ secrets.GIST_ID }}
+
+  bump-version:
+    needs: [build]
+    uses: ./.github/workflows/bump-version.yml
+    with:
+      projects: ${{ needs.compute-projects.outputs.finalProjects }}
+      beta-release: ${{ github.event.inputs.beta-release }}
+      dry-run: ${{ github.event.inputs.dry-run }}
+    secrets:
+      NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+      GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
+      PAT: ${{secrets.PAT}}

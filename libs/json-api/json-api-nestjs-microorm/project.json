@@ -1,0 +1,71 @@
+{
+  "name": "json-api-nestjs-microorm",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "lib:json-api-nestjs",
+    "lib:json-api-nestjs-microorm",
+    "type:publish"
+  ],
+  "targets": {
+    "build": {
+      "dependsOn": [
+        {
+          "projects": [
+            "json-api-nestjs"
+          ],
+          "target": "build",
+          "params": "ignore"
+        }
+      ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": [
+          "{projectRoot}/*.md"
+        ],
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-microorm"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-microorm {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
+    }
+  },
+  "implicitDependencies": [
+    "json-api-nestjs"
+  ]
+}

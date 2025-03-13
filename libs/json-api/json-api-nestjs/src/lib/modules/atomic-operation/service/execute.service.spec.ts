@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
+import { KEY_MAIN_INPUT_SCHEMA } from '@klerick/json-api-nestjs-shared';
 import { ExecuteService, isZodError } from './execute.service';
 import { IterateFactory } from '../factory';
 import {
   ASYNC_ITERATOR_FACTORY,
-  KEY_MAIN_INPUT_SCHEMA,
   MAP_CONTROLLER_INTERCEPTORS,
-  OPTIONS,
 } from '../constants';
 
 import {
@@ -39,10 +38,6 @@ describe('ExecuteService', () => {
           useValue: {
             get() {},
           },
-        },
-        {
-          provide: OPTIONS,
-          useValue: {},
         },
         {
           provide: ASYNC_ITERATOR_FACTORY,

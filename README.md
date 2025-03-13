@@ -10,6 +10,8 @@
 - **[JSON:API](https://jsonapi.org/)** – A specification for building RESTful APIs with standardized request and response formats.
  
  > **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)** - This package enables you to quickly set up a server API that adheres to the JSON:API specification, handling standard CRUD operations for your resources.</br> 
+ > **[json-api-nestjs-microorm](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-microorm)** - This package is adapter for MicroOrm.</br> 
+ > **[json-api-nestjs-typeorm](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-typeorm)** - This package is adapter for TypeOrm.</br> 
  > **[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-sdk)** - tool for client, call api over *json-api-nestjs* 
 
 

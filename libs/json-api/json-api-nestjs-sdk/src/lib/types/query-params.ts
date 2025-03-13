@@ -1,24 +1,25 @@
-import { QueryField } from '../../shared';
-import { EntityProps, EntityRelation } from './entity';
-import { TypeOfArray } from './utils';
-import { Operands, OperandsRelation } from './filter-operand';
+import {
+  QueryField,
+  RelationKeys,
+  PropertyKeys,
+  TypeOfArray,
+} from '@klerick/json-api-nestjs-shared';
 
+import { Operands, OperandsRelation } from './filter-operand';
 export type SortType = 'ASC' | 'DESC';
 
-export { QueryField };
-
-export type Includes<T> = EntityRelation<T>[];
+export type Includes<T> = RelationKeys<T>[];
 
 type TargetField<E> = {
-  target?: EntityProps<E>[];
+  target?: PropertyKeys<E>[];
 };
 
 type RelationField<E> = {
-  [K in EntityRelation<E>]?: EntityProps<TypeOfArray<E[K]>>[];
+  [K in RelationKeys<E>]?: PropertyKeys<TypeOfArray<E[K]>>[];
 };
 
 type SortForEntity<E> = {
-  [K in EntityProps<E>]?: SortType;
+  [K in PropertyKeys<E>]?: SortType;
 };
 
 type TargetSort<E> = {
@@ -26,7 +27,7 @@ type TargetSort<E> = {
 };
 
 type RelationSort<E> = {
-  [K in EntityRelation<E>]?: SortForEntity<TypeOfArray<E[K]>>;
+  [K in RelationKeys<E>]?: SortForEntity<TypeOfArray<E[K]>>;
 };
 
 type Sort<E> = TargetSort<E> & RelationSort<E>;
@@ -39,11 +40,11 @@ export type Pagination = {
 };
 
 type TargetRelationFilter<E> = {
-  [P in EntityRelation<E>]?: OperandsRelation;
+  [P in RelationKeys<E>]?: OperandsRelation;
 };
 
 type EntityFilter<E> = {
-  [K in EntityProps<E>]?: Operands;
+  [K in PropertyKeys<E>]?: Operands;
 };
 
 type TargetFilter<E> = {
@@ -51,7 +52,7 @@ type TargetFilter<E> = {
 };
 
 type RelationFilter<E> = {
-  [K in EntityRelation<E>]?: EntityFilter<TypeOfArray<E[K]>>;
+  [K in RelationKeys<E>]?: EntityFilter<TypeOfArray<E[K]>>;
 };
 
 export type Filter<T> = TargetFilter<T> & RelationFilter<T>;

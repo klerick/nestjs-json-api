@@ -1,6 +1,4 @@
-import { FilterOperand } from '../../shared';
-
-export { FilterOperand };
+import { FilterOperand } from '@klerick/json-api-nestjs-shared';
 
 export type FilterOperandForString = Exclude<
   FilterOperand,

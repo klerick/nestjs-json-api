@@ -6,27 +6,28 @@ import {
 } from '../../../../constants';
 import { JsonApi } from './json-api.decorator';
 
-import { excludeMethod, Bindings } from '../../config/bindings';
+import { Bindings } from '../../config/bindings';
 import { DecoratorOptions } from '../../types';
+import { excludeMethod } from '../../helpers';
 
 describe('InjectServiceDecorator', () => {
   it('should save entity in class', () => {
-    const testedEntity = class SomeEntity {};
+    class SomeEntity {}
 
-    @JsonApi(testedEntity)
+    @JsonApi(SomeEntity)
     class SomeClass {}
 
     const data = Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, SomeClass);
-    expect(data).toBe(testedEntity);
+    expect(data).toBe(SomeEntity);
   });
 
   it('should save options in class', () => {
-    const testedEntity = class SomeEntity {};
+    class SomeEntity {}
     const apiOptions: DecoratorOptions = {
       allowMethod: ['getAll', 'deleteRelationship'],
     };
 
-    @JsonApi(testedEntity, apiOptions)
+    @JsonApi(SomeEntity, apiOptions)
     class SomeClass {}
 
     const data = Reflect.getMetadata(JSON_API_DECORATOR_OPTIONS, SomeClass);
@@ -34,13 +35,13 @@ describe('InjectServiceDecorator', () => {
   });
 
   it('should save options in class using helpFunction', () => {
-    const testedEntity = class SomeEntity {};
+    class SomeEntity {}
     const example = ['getAll', 'deleteRelationship'];
     const apiOptions: DecoratorOptions = {
       allowMethod: excludeMethod(example as any),
     };
 
-    @JsonApi(testedEntity, apiOptions)
+    @JsonApi(SomeEntity, apiOptions)
     class SomeClass {}
 
     const data: DecoratorOptions = Reflect.getMetadata(
@@ -54,13 +55,13 @@ describe('InjectServiceDecorator', () => {
   });
 
   it('should save options in class and correctly set overrideRoute', () => {
-    const testedEntity = class SomeEntity {};
+    class SomeEntity {}
     const apiOptions: DecoratorOptions = {
       allowMethod: ['getAll', 'deleteRelationship'],
       overrideRoute: '123',
     };
 
-    @JsonApi(testedEntity, apiOptions)
+    @JsonApi(SomeEntity, apiOptions)
     class SomeClass {}
 
     const data = Reflect.getMetadata(JSON_API_DECORATOR_OPTIONS, SomeClass);

@@ -1,20 +1,23 @@
+import {
+  RelationKeys,
+  ResourceObject,
+  EntityClass,
+} from '@klerick/json-api-nestjs-shared';
+
 import { EMPTY, expand, Observable, reduce, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import {
-  Entity as EntityObject,
-  EntityRelation,
-  EntityType,
   HttpInnerClient,
   JsonApiSdkConfig,
+  PatchData,
   QueryParams,
   QueryParamsForOneItem,
   RelationBodyData,
-  ResourceObject,
   ReturnIfArray,
 } from '../types';
 import { EntityArray, getTypeForReq } from '../utils';
-import { JsonApiUtilsService } from '../service';
+import { JsonApiUtilsService } from './json-api-utils.service';
 
 export class JsonApiSdkService {
   constructor(
@@ -23,47 +26,49 @@ export class JsonApiSdkService {
     private jsonApiSdkConfig: JsonApiSdkConfig
   ) {}
 
-  public getList<Entity>(
-    entity: EntityType<Entity>,
+  public getList<Entity extends object, IdKey extends string = 'id'>(
+    entity: EntityClass<Entity>,
     params?: QueryParams<Entity>
   ): Observable<EntityArray<Entity>> {
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
 
     return this.http
-      .get<Entity, 'array'>(
+      .get<Entity, 'array', IdKey>(
         this.jsonApiUtilsService.getUrlForResource(entity.name),
         {
           params: query.toObject(),
         }
       )
       .pipe(
-        map<ResourceObject<Entity, 'array'>, EntityArray<Entity>>((result) => {
-          const resource = params
-            ? this.jsonApiUtilsService.convertResponseData(
-                result,
-                params.include
-              )
-            : this.jsonApiUtilsService.convertResponseData(result);
-          const { totalItems, pageSize, pageNumber } = Object.assign(
-            {
-              totalItems: 0,
-              pageNumber: 0,
-              pageSize: 0,
-            },
-            result.meta
-          );
+        map<ResourceObject<Entity, 'array', null, IdKey>, EntityArray<Entity>>(
+          (result) => {
+            const resource = params
+              ? this.jsonApiUtilsService.convertResponseData(
+                  result,
+                  params.include
+                )
+              : this.jsonApiUtilsService.convertResponseData(result);
+            const { totalItems, pageSize, pageNumber } = Object.assign(
+              {
+                totalItems: 0,
+                pageNumber: 0,
+                pageSize: 0,
+              },
+              result.meta
+            );
 
-          return new EntityArray<Entity>(resource, {
-            totalItems,
-            pageNumber,
-            pageSize,
-          });
-        })
+            return new EntityArray<Entity>(resource, {
+              totalItems,
+              pageNumber,
+              pageSize,
+            });
+          }
+        )
       );
   }
 
-  getAll<Entity>(
-    entity: EntityType<Entity>,
+  getAll<Entity extends object>(
+    entity: EntityClass<Entity>,
     params?: QueryParams<Entity>,
     push = true
   ): Observable<EntityArray<Entity>> {
@@ -108,8 +113,8 @@ export class JsonApiSdkService {
     return request;
   }
 
-  getOne<Entity>(
-    entity: EntityType<Entity>,
+  getOne<Entity extends object>(
+    entity: EntityClass<Entity>,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
   ): Observable<Entity> {
@@ -118,6 +123,7 @@ export class JsonApiSdkService {
     }
 
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
+
     return this.http
       .get<Entity>(
         `${this.jsonApiUtilsService.getUrlForResource(entity.name)}/${id}`,
@@ -132,9 +138,7 @@ export class JsonApiSdkService {
       );
   }
 
-  public postOne<Entity extends EntityObject>(
-    entity: Entity
-  ): Observable<Entity> {
+  public postOne<Entity extends object>(entity: Entity): Observable<Entity> {
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
     const body = {
@@ -153,10 +157,9 @@ export class JsonApiSdkService {
       .pipe(map((r) => this.jsonApiUtilsService.convertResponseData(r)));
   }
 
-  public patchOne<Entity extends EntityObject>(
-    entity: Entity
-  ): Observable<Entity> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+  public patchOne<Entity extends object>(entity: Entity): Observable<Entity> {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -167,29 +170,35 @@ export class JsonApiSdkService {
 
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
+
     const body = {
       data: {
-        id: entity[this.jsonApiSdkConfig.idKey].toString(),
+        id: String(id),
         type: getTypeForReq(entity.constructor.name),
-        ...(Object.keys(attributes).length > 0 ? { attributes } : {}),
-        ...(Object.keys(relationships).length > 0 ? { relationships } : {}),
       },
-    };
+    } satisfies PatchData<Entity>;
+
+    if (Object.keys(relationships).length > 0) {
+      Reflect.set(body.data, 'relationships', relationships);
+    }
+
+    if (attributes && Object.keys(attributes).length > 0) {
+      Reflect.set(body.data, 'attributes', attributes);
+    }
 
     return this.http
       .patch<Entity>(
         `${this.jsonApiUtilsService.getUrlForResource(
           entity.constructor.name
-        )}/${entity[this.jsonApiSdkConfig.idKey]}`,
+        )}/${id}`,
         body
       )
       .pipe(map((r) => this.jsonApiUtilsService.convertResponseData(r)));
   }
 
-  public deleteOne<Entity extends EntityObject>(
-    entity: Entity
-  ): Observable<void> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+  public deleteOne<Entity extends object>(entity: Entity): Observable<void> {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -199,20 +208,22 @@ export class JsonApiSdkService {
     }
 
     return this.http.delete(
-      `${this.jsonApiUtilsService.getUrlForResource(entity.constructor.name)}/${
-        entity[this.jsonApiSdkConfig.idKey]
-      }`
+      `${this.jsonApiUtilsService.getUrlForResource(
+        entity.constructor.name
+      )}/${id}`
     );
   }
 
   public getRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    IdKey extends string = 'id',
+    Rel extends RelationKeys<Entity, IdKey> = RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
     relationType: Rel
   ): Observable<ReturnIfArray<Entity[Rel], string>> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -222,12 +233,10 @@ export class JsonApiSdkService {
     }
 
     return this.http
-      .get<Entity, Rel>(
+      .get<Entity, IdKey, Rel>(
         `${this.jsonApiUtilsService.getUrlForResource(
           entity.constructor.name
-        )}/${entity[this.jsonApiSdkConfig.idKey]}/relationships/${String(
-          relationType
-        )}`
+        )}/${id}/relationships/${String(relationType)}`
       )
       .pipe(
         map((result) => this.jsonApiUtilsService.getResultForRelation(result))
@@ -235,13 +244,15 @@ export class JsonApiSdkService {
   }
 
   public patchRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
     relationType: Rel
   ): Observable<ReturnIfArray<Entity[Rel], string>> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -260,18 +271,16 @@ export class JsonApiSdkService {
     }
 
     const body: RelationBodyData = {
-      data: this.jsonApiUtilsService.generateRelationshipsBody<
-        Entity[EntityRelation<Entity>]
-      >(entity[relationType]),
+      data: this.jsonApiUtilsService.generateRelationshipsBody(
+        entity[relationType] as object
+      ),
     };
 
     return this.http
-      .patch<Entity, Rel>(
+      .patch<Entity, IdKey, Rel>(
         `${this.jsonApiUtilsService.getUrlForResource(
           entity.constructor.name
-        )}/${entity[this.jsonApiSdkConfig.idKey]}/relationships/${String(
-          relationType
-        )}`,
+        )}/${id}/relationships/${String(relationType)}`,
         body
       )
       .pipe(
@@ -280,13 +289,15 @@ export class JsonApiSdkService {
   }
 
   public postRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
     relationType: Rel
   ): Observable<ReturnIfArray<Entity[Rel], string>> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -305,18 +316,16 @@ export class JsonApiSdkService {
     }
 
     const body = {
-      data: this.jsonApiUtilsService.generateRelationshipsBody<
-        Entity[EntityRelation<Entity>]
-      >(entity[relationType]),
+      data: this.jsonApiUtilsService.generateRelationshipsBody(
+        entity[relationType] as object
+      ),
     };
 
     return this.http
-      .post<Entity, Rel>(
+      .post<Entity, IdKey, Rel>(
         `${this.jsonApiUtilsService.getUrlForResource(
           entity.constructor.name
-        )}/${entity[this.jsonApiSdkConfig.idKey]}/relationships/${String(
-          relationType
-        )}`,
+        )}/${id}/relationships/${String(relationType)}`,
         body
       )
       .pipe(
@@ -325,10 +334,12 @@ export class JsonApiSdkService {
   }
 
   public deleteRelationships<
-    Entity extends EntityObject,
-    Rel extends EntityRelation<Entity>
+    Entity extends object,
+    IdKey extends string,
+    Rel extends RelationKeys<Entity, IdKey>
   >(entity: Entity, relationType: Rel): Observable<void> {
-    if (!entity[this.jsonApiSdkConfig.idKey]) {
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (!id) {
       return throwError(
         () =>
           new Error(
@@ -347,18 +358,16 @@ export class JsonApiSdkService {
     }
 
     const body = {
-      data: this.jsonApiUtilsService.generateRelationshipsBody<
-        Entity[EntityRelation<Entity>]
-      >(entity[relationType]),
+      data: this.jsonApiUtilsService.generateRelationshipsBody(
+        entity[relationType] as object
+      ),
     };
 
     return this.http
       .delete(
         `${this.jsonApiUtilsService.getUrlForResource(
           entity.constructor.name
-        )}/${entity[this.jsonApiSdkConfig.idKey]}/relationships/${String(
-          relationType
-        )}`,
+        )}/${id}/relationships/${String(relationType)}`,
         body
       )
       .pipe(map(() => void 0));

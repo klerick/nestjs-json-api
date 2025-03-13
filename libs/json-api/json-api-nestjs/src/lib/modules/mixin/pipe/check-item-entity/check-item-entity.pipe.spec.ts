@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
 import { CheckItemEntityPipe } from './check-item-entity.pipe';
 import { CURRENT_ENTITY, FIND_ONE_ROW_ENTITY } from '../../../../constants';
-import { EntityTarget } from 'typeorm/common/EntityTarget';
 
 describe('CheckItemEntityPipe', () => {
   let pipe: CheckItemEntityPipe<any, any>;
   let mockFindOneRowEntity: jest.Mock;
-  let mockEntityTarget: EntityTarget<any>;
+  let mockEntityTarget: EntityClass<any>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('CheckItemEntityPipe', () => {
     }).compile();
 
     pipe = module.get<CheckItemEntityPipe<any, any>>(CheckItemEntityPipe);
-    mockEntityTarget = module.get<EntityTarget<any>>(CURRENT_ENTITY);
+    mockEntityTarget = module.get<EntityClass<any>>(CURRENT_ENTITY);
     mockFindOneRowEntity = module.get<jest.Mock>(FIND_ONE_ROW_ENTITY);
   });
 

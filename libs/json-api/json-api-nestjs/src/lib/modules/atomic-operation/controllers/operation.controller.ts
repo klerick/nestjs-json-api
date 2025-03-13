@@ -8,14 +8,16 @@ import {
   Type,
 } from '@nestjs/common';
 import { Module } from '@nestjs/core/injector/module';
-
+import {
+  KEY_MAIN_INPUT_SCHEMA,
+  KEY_MAIN_OUTPUT_SCHEMA,
+} from '@klerick/json-api-nestjs-shared';
 import { InputArray } from '../utils';
 import { InputOperationPipe } from '../pipes/input-operation.pipe';
 import { ExecuteService, ExplorerService } from '../service';
-import { KEY_MAIN_INPUT_SCHEMA, KEY_MAIN_OUTPUT_SCHEMA } from '../constants';
 import { OperationMethode, ParamsForExecute } from '../types';
-import { JsonBaseController } from '../../mixin/controller/json-base.controller';
-import { ObjectLiteral as Entity, ValidateQueryError } from '../../../types';
+import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
+import { ValidateQueryError } from '../../../types';
 
 @Controller('/')
 export class OperationController {
@@ -32,8 +34,8 @@ export class OperationController {
         op,
       } = dataInput;
 
-      let controller: Type<JsonBaseController<Entity>>;
-      let methodName: OperationMethode<Entity>;
+      let controller: Type<JsonBaseController<object>>;
+      let methodName: OperationMethode<object>;
       let module: Module;
       try {
         controller = this.explorerService.getControllerByEntityName(type);
@@ -63,7 +65,7 @@ export class OperationController {
       const params = this.explorerService.getParamsForMethod(
         methodName,
         dataInput
-      );
+      ) as any;
 
       try {
         module = this.explorerService.getModulesByController(controller);

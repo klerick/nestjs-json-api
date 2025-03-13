@@ -1,39 +1,9 @@
-import {
-  EntityProps,
-  FieldWithType,
-  PropsForField,
-  RelationPrimaryColumnType,
-  RelationPropsArray,
-  RelationPropsTypeName,
-  TypeField,
-  TypeForId,
-} from '../../types';
-import { Users } from '../../../../mock-utils/typeorm';
 import { zodPatch, PatchData } from './';
 import { ZodError } from 'zod';
 
-import {
-  fieldTypeUsers as fieldWithType,
-  propsDb,
-  relationArrayProps,
-  relationPopsName,
-  primaryColumnType,
-} from '../../../../utils/___test___/test.helper';
+import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
 
-const typeId: TypeForId = TypeField.number;
-
-const primaryColumn: EntityProps<Users> = 'id';
-
-const schema = zodPatch(
-  typeId,
-  'users',
-  fieldWithType,
-  propsDb,
-  primaryColumn,
-  relationArrayProps,
-  relationPopsName,
-  primaryColumnType
-);
+const schema = zodPatch(usersEntityParamMapMockData);
 
 describe('zodPatch', () => {
   it('should be ok', () => {
@@ -46,11 +16,11 @@ describe('zodPatch', () => {
       testArrayNull: null,
     };
     const relationships = {
-      notes: {
+      roles: {
         data: [
           {
-            type: 'notes',
-            id: 'dsfsdf',
+            type: 'roles',
+            id: '1',
           },
         ],
       },

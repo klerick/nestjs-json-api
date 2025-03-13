@@ -3,20 +3,19 @@ import {
   UnprocessableEntityException,
   Inject,
 } from '@nestjs/common';
-import { EntityRelation } from '../../../../utils/nestjs-shared';
-import { ValidateQueryError } from '../../../../types';
+import { EntityClass, getEntityName } from '@klerick/json-api-nestjs-shared';
+
+import { EntityParam, ValidateQueryError } from '../../../../types';
 import { CHECK_RELATION_NAME, CURRENT_ENTITY } from '../../../../constants';
-import { EntityTarget, ObjectLiteral } from '../../../../types';
-import { CheckRelationNme } from '../../types';
-import { getEntityName } from '../../helper';
+import { CheckRelationName } from '../../types';
 
 export class ParseRelationshipNamePipe<
-  E extends ObjectLiteral,
-  I extends EntityRelation<E>
+  E extends object,
+  I extends keyof EntityParam<E, 'id'>['relationProperty']
 > implements PipeTransform<string, I>
 {
-  @Inject(CURRENT_ENTITY) private currentEntity!: EntityTarget<E>;
-  @Inject(CHECK_RELATION_NAME) private checkRelationName!: CheckRelationNme<E>;
+  @Inject(CURRENT_ENTITY) private currentEntity!: EntityClass<E>;
+  @Inject(CHECK_RELATION_NAME) private checkRelationName!: CheckRelationName<E>;
 
   transform(value: string): I {
     if (!this.checkRelationName || typeof this.checkRelationName !== 'function')

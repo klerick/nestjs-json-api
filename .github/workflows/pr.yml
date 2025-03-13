@@ -1,0 +1,22 @@
+name: 📝 PR Checks
+
+on:
+  [pull_request]
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  e2e-test:
+    needs: [test]
+    uses: ./.github/workflows/e2e-test.yaml
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  build:
+    needs: [test, e2e-test]
+    uses: ./.github/workflows/build.yml
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}

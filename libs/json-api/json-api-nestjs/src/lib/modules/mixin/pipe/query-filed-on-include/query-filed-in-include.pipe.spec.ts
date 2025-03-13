@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
-import { QueryField } from '../../../../utils/nestjs-shared';
+import { QueryField } from '@klerick/json-api-nestjs-shared';
 import { QueryFiledInIncludePipe } from './query-filed-in-include.pipe';
-import { Users } from '../../../../mock-utils/typeorm';
+import { Users } from '../../../../utils/___test___/test-classes.helper';
 import { Query } from '../../zod';
 
 describe('QueryFiledInIncludePipe', () => {
@@ -12,7 +12,7 @@ describe('QueryFiledInIncludePipe', () => {
   });
 
   it('Should be ok', () => {
-    const check: Query<Users> = {
+    const check: Query<Users, 'id'> = {
       [QueryField.fields]: {
         roles: ['id'],
       },
@@ -28,7 +28,7 @@ describe('QueryFiledInIncludePipe', () => {
       },
     };
 
-    const check2: Query<Users> = {
+    const check2: Query<Users, 'id'> = {
       [QueryField.fields]: null,
       [QueryField.include]: ['roles'],
       [QueryField.filter]: {
@@ -51,7 +51,7 @@ describe('QueryFiledInIncludePipe', () => {
   });
 
   it('Should be not ok', () => {
-    const check: Query<Users> = {
+    const check: Query<Users, 'id'> = {
       [QueryField.fields]: {
         roles: ['id'],
       },
@@ -66,7 +66,7 @@ describe('QueryFiledInIncludePipe', () => {
         size: 1,
       },
     };
-    const check2: Query<Users> = {
+    const check2: Query<Users, 'id'> = {
       [QueryField.fields]: {
         roles: ['id'],
       },
@@ -86,7 +86,7 @@ describe('QueryFiledInIncludePipe', () => {
       },
     };
 
-    const check3: Query<Users> = {
+    const check3: Query<Users, 'id'> = {
       [QueryField.fields]: null,
       [QueryField.include]: null,
       [QueryField.filter]: {

@@ -1,22 +1,22 @@
 import { FactoryProvider } from '@nestjs/common';
+import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { MAP_CONTROLLER_ENTITY, ZOD_INPUT_OPERATION } from '../constants';
 import { MapController } from '../types';
 import { zodInputOperation, ZodInputOperation } from '../utils';
-import { ENTITY_MAP_PROPS } from '../../../constants';
-import { ZodEntityProps } from '../../mixin/types';
-import { EntityClass, ObjectLiteral } from '../../../types';
+import { ENTITY_PARAM_MAP } from '../../../constants';
+import { EntityParamMap } from '../../mixin/types';
 
-export function ZodInputOperation<E extends ObjectLiteral>(): FactoryProvider<
+export function ZodInputOperation<E extends object>(): FactoryProvider<
   ZodInputOperation<E>
 > {
   return {
     provide: ZOD_INPUT_OPERATION,
     useFactory(
       mapController: MapController<E>,
-      entityMapProps: Map<EntityClass<E>, ZodEntityProps<E>>
+      entityMapProps: EntityParamMap<EntityClass<AnyEntity>>
     ) {
       return zodInputOperation(mapController, entityMapProps);
     },
-    inject: [MAP_CONTROLLER_ENTITY, ENTITY_MAP_PROPS],
+    inject: [MAP_CONTROLLER_ENTITY, ENTITY_PARAM_MAP],
   };
 }

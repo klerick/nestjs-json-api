@@ -1,28 +1,107 @@
 {
   "name": "json-api-nestjs-shared",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/json-api/json-api-nestjs-shared/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "generatorOptions": {
-        "packageRoot": "dist/{projectRoot}",
-        "currentVersionResolver": "git-tag"
-      }
-    }
-  },
-  "tags": [],
+  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-shared", "type:publish"],
   "targets": {
-    "build": {
+    "build-cjs": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/libs/json-api/json-api-nestjs-shared",
-        "tsConfig": "libs/json-api/json-api-nestjs-shared/tsconfig.lib.json",
-        "packageJson": "libs/json-api/json-api-nestjs-shared/package.json",
-        "main": "libs/json-api/json-api-nestjs-shared/src/index.ts",
-        "assets": ["libs/json-api/json-api-nestjs-shared/*.md"]
+        "outputPath": "dist/{projectRoot}/cjs",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": [
+          {
+            "glob": "*.md",
+            "input": "{projectRoot}",
+            "output": "../"
+          }
+        ],
+        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "updateBuildableProjectDepsInPackageJson": true
       }
+    },
+    "build-mjs": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}/mjs",
+        "tsConfig": "{projectRoot}/tsconfig-mjs.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": [
+          {
+            "glob": "*.md",
+            "input": "{projectRoot}",
+            "output": "../"
+          }
+        ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-cjs",
+        "build-mjs"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "commands": [
+          {
+            "command": "[ ! -f dist/{projectRoot}/cjs/package.json ] ||  cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-shared",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-shared",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "ts-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsd --files \"src/**/*.test-d.ts\" -t src/lib/types/index.ts"
+        ],
+        "cwd": "{workspaceRoot}/{projectRoot}",
+        "parallel": false
+      }
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          "node tools/scripts/upload-badge.mjs json-api-nestjs-shared"
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs json-api-nestjs-shared {args.ver} {args.tag}",
+      "dependsOn": [
+        "build"
+      ]
     },
     "nx-release-publish": {
       "options": {

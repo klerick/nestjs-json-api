@@ -14,5 +14,3 @@ export type InnerError = {
 };
 
 export type ValidateQueryError = ZodIssue | InnerError;
-
-export type ErrorDescribe = ValidateQueryError;

@@ -1,11 +1,11 @@
 import { DynamicModule, ValueProvider } from '@nestjs/common';
 import { Type } from '@nestjs/common/interfaces/type.interface';
-import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
+import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { MapController } from '../types';
 import { MAP_CONTROLLER_ENTITY } from '../constants';
 
 export function MapControllerEntity(
-  entities: EntityClassOrSchema[],
+  entities: EntityClass<AnyEntity>[],
   entityModules: DynamicModule[]
 ): ValueProvider<MapController> {
   const mapController = entities.reduce((acum, entity, index) => {
@@ -16,7 +16,7 @@ export function MapControllerEntity(
     }
 
     return acum;
-  }, new Map<EntityClassOrSchema, Type<any>>());
+  }, new Map<EntityClass<AnyEntity>, Type<any>>());
 
   return {
     provide: MAP_CONTROLLER_ENTITY,

@@ -1,10 +1,9 @@
-import { EntityTarget, ObjectLiteral } from '../../../types';
-
 import {
-  EntityRelation,
   ResourceObject,
   ResourceObjectRelationships,
-} from '../../../utils/nestjs-shared';
+  RelationKeys,
+} from '@klerick/json-api-nestjs-shared';
+
 import {
   PatchData,
   PatchRelationshipData,
@@ -14,42 +13,42 @@ import {
   QueryOne,
 } from '../zod';
 
-export interface OrmService<E extends ObjectLiteral> {
-  getAll(query: Query<E>): Promise<ResourceObject<E, 'array'>>;
-  getOne(id: number | string, query: QueryOne<E>): Promise<ResourceObject<E>>;
+export interface OrmService<E extends object, IdKey extends string = 'id'> {
+  getAll(
+    query: Query<E, IdKey>
+  ): Promise<ResourceObject<E, 'array', null, IdKey>>;
+  getOne(
+    id: number | string,
+    query: QueryOne<E, IdKey>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
   deleteOne(id: number | string): Promise<void>;
-  postOne(inputData: PostData<E>): Promise<ResourceObject<E>>;
   patchOne(
     id: number | string,
-    inputData: PatchData<E>
-  ): Promise<ResourceObject<E>>;
-  getRelationship<Rel extends EntityRelation<E>>(
+    inputData: PatchData<E, IdKey>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+  postOne(
+    inputData: PostData<E, IdKey>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+
+  getRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: number | string,
     rel: Rel
-  ): Promise<ResourceObjectRelationships<E, Rel>>;
-  postRelationship<Rel extends EntityRelation<E>>(
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>;
+  postRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: number | string,
     rel: Rel,
     input: PostRelationshipData
-  ): Promise<ResourceObjectRelationships<E, Rel>>;
-  deleteRelationship<Rel extends EntityRelation<E>>(
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>;
+
+  deleteRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: number | string,
     rel: Rel,
     input: PostRelationshipData
   ): Promise<void>;
-  patchRelationship<Rel extends EntityRelation<E>>(
+
+  patchRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: number | string,
     rel: Rel,
     input: PatchRelationshipData
-  ): Promise<ResourceObjectRelationships<E, Rel>>;
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>;
 }
-
-export type FindOneRowEntity<E extends ObjectLiteral> = (
-  entity: EntityTarget<E>,
-  params: number | string
-) => Promise<E | null>;
-
-export type CheckRelationNme<E extends ObjectLiteral> = (
-  entity: EntityTarget<E>,
-  params: string
-) => boolean;

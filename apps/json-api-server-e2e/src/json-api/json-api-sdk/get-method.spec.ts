@@ -32,7 +32,7 @@ describe('GET method:', () => {
   beforeAll(async () => {
     jsonSdk = creatSdk();
 
-    const addressesPromise = Array.from(new Array(2)).map(() => {
+    const addressesPromise = Array.from(new Array(5)).map(() => {
       const address = new Addresses();
       address.city = faker.string.alpha(50);
       address.state = faker.string.alpha(50);
@@ -61,7 +61,7 @@ describe('GET method:', () => {
       const addressIndex = index % 2 === 0 ? 0 : 1;
       const user = getUser();
       user.isActive = !!addressIndex;
-      user.addresses = addressArray[addressIndex];
+      user.addresses = addressArray[index];
       return jsonSdk.jonApiSdkService.postOne(user);
     });
     usersArray = await Promise.all(usersPromise);
@@ -148,6 +148,16 @@ describe('GET method:', () => {
       users2.forEach((user) => {
         expect(user.isActive).toBe(false);
       });
+
+      const resultFindLike = await jsonSdk.jonApiSdkService.getAll(Users, {
+        filter: {
+          target: {
+            login: { [FilterOperand.like]: users2.at(0)?.login.slice(5, -5) },
+          },
+        },
+      });
+      expect(resultFindLike.length).toBe(1);
+      expect(resultFindLike.at(0)?.id).toBe(users2.at(0)?.id);
     });
 
     it('Should be get entities with filter by relation target', async () => {

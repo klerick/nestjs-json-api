@@ -1,9 +1,7 @@
 import { Injectable, ParseIntPipe } from '@nestjs/common';
-import { upperFirstLetter } from '../../../utils/nestjs-shared';
+import { pascalCase } from 'change-case-commonjs';
 
-import { PipeMixin } from '../../../types';
-import { MixinOptions } from '../types';
-import { nameIt } from '../helper';
+import { ModuleMixinOptions, PipeMixin } from '../../../types';
 
 import { QueryInputPipe } from './query-input';
 import { QueryPipe } from './query';
@@ -15,12 +13,17 @@ import { PatchInputPipe } from './patch-input';
 import { ParseRelationshipNamePipe } from './parse-relationship-name';
 import { PostRelationshipPipe } from './post-relationship';
 import { PatchRelationshipPipe } from './patch-relationship';
+import { nameIt } from '../helpers';
+import { EntityControllerParam } from '../types';
 
-export function factoryMixin(entity: MixinOptions['entity'], pipe: PipeMixin) {
+export function factoryMixin(
+  entity: ModuleMixinOptions['entity'],
+  pipe: PipeMixin
+) {
   const entityName = entity.name;
 
   const pipeClass = nameIt(
-    `${upperFirstLetter(entityName)}${pipe.name}`,
+    `${pascalCase(entityName)}${pipe.name}`,
     pipe
   ) as PipeMixin;
 
@@ -29,61 +32,67 @@ export function factoryMixin(entity: MixinOptions['entity'], pipe: PipeMixin) {
   return pipeClass;
 }
 
-export function queryInputMixin(entity: MixinOptions['entity']): PipeMixin {
+export function queryInputMixin(
+  entity: ModuleMixinOptions['entity']
+): PipeMixin {
   return factoryMixin(entity, QueryInputPipe);
 }
 
-export function queryMixin(entity: MixinOptions['entity']): PipeMixin {
+export function queryMixin(entity: ModuleMixinOptions['entity']): PipeMixin {
   return factoryMixin(entity, QueryPipe);
 }
 
 export function queryFiledInIncludeMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, QueryFiledInIncludePipe);
 }
 
 export function queryCheckSelectFieldMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, QueryCheckSelectField);
 }
 
 export function idPipeMixin(
-  entity: MixinOptions['entity'],
-  config?: MixinOptions['config']
+  entity: ModuleMixinOptions['entity'],
+  config?: EntityControllerParam
 ): PipeMixin {
   return config && config.pipeForId ? config.pipeForId : (ParseIntPipe as any);
 }
 
 export function checkItemEntityPipeMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, CheckItemEntityPipe);
 }
 
-export function postInputPipeMixin(entity: MixinOptions['entity']): PipeMixin {
+export function postInputPipeMixin(
+  entity: ModuleMixinOptions['entity']
+): PipeMixin {
   return factoryMixin(entity, PostInputPipe);
 }
 
-export function patchInputPipeMixin(entity: MixinOptions['entity']): PipeMixin {
+export function patchInputPipeMixin(
+  entity: ModuleMixinOptions['entity']
+): PipeMixin {
   return factoryMixin(entity, PatchInputPipe);
 }
 
 export function postRelationshipPipeMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, PostRelationshipPipe);
 }
 
 export function patchRelationshipPipeMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, PatchRelationshipPipe);
 }
 
 export function parseRelationshipNamePipeMixin(
-  entity: MixinOptions['entity']
+  entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, ParseRelationshipNamePipe);
 }

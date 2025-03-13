@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { JsonApiModule, TypeOrmJsonApiModule } from '@klerick/json-api-nestjs';
+import { JsonApiModule } from '@klerick/json-api-nestjs';
+import { TypeOrmJsonApiModule } from '@klerick/json-api-nestjs-typeorm';
 import {
   Users,
   Addresses,

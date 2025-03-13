@@ -10,7 +10,8 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true
   },
   "include": [
     "jest.config.ts",
