@@ -31,11 +31,13 @@ on:
     outputs:
       finalProjects:
         description: "Result Project"
-        value: ${{ steps.final.outputs.finalProjects }}
+        value: ${{ jobs.compute.outputs.finalProjects }}
 
 jobs:
   compute:
     runs-on: ubuntu-latest
+    outputs:
+      finalProjects: ${{ steps.final.outputs.finalProjects }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
