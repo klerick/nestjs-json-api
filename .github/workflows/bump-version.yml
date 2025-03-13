@@ -20,19 +20,23 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
-      GITHUB_TOKEN_SECRET:
+      GITHUB_TOKEN:
         required: true
       PAT:
         required: true
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_SECRET }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NPM_CONFIG_PROVENANCE: true
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: "write"
+      actions: "read"
+      id-token: "write"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
