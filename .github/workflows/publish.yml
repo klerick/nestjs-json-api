@@ -13,17 +13,19 @@ env:
 
 jobs:
   publish:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: ./.github/actions
+      - name: Setup Node.js
+        uses: ./.github/actions
 
-    - name: Build
-      run: npx nx affected -t build --parallel=3 --exclude='*,!tag:type:publish'
+      - name: Build
+        run: npx nx affected -t build --parallel=3 --exclude='*,!tag:type:publish'
 
-    - name: Publish packages
-      run: npx nx release publish
+      - name: Publish packages
+        run: npx nx release publish
 
