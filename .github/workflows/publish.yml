@@ -1,0 +1,29 @@
+name: ⚙️ Publish
+
+
+on:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_CONFIG_PROVENANCE: true
+
+jobs:
+  publish:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: ./.github/actions
+
+    - name: Build
+      run: npx nx affected -t build --parallel=3 --exclude='*,!tag:type:publish'
+
+    - name: Publish packages
+      run: npx nx release publish
+
