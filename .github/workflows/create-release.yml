@@ -79,7 +79,7 @@ jobs:
 
   e2e-test:
     needs: [test]
-    uses: ./.github/workflows/e2e-test.yaml
+    uses: e2e-test.yml
     with:
       mainBranch: "last-tag"
     secrets:
@@ -95,7 +95,7 @@ jobs:
 
   upload-badge:
     needs: [ test, e2e-test ]
-    uses: ./.github/workflows/upload-badge.yaml
+    uses: upload-badge.yml
     with:
       mainBranch: "last-tag"
     secrets:
