@@ -133,6 +133,6 @@ jobs:
       beta-release: ${{ github.event.inputs.beta-release }}
       dry-run: ${{ github.event.inputs.dry-run }}
     secrets:
-      NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
       PAT: ${{secrets.PAT}}
