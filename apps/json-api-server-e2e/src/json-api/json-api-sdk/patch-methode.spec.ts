@@ -129,6 +129,7 @@ describe('PATCH method:', () => {
     userWithEmptyAttr.id = userAfterSave.id;
     userWithEmptyAttr.addresses = newAddressAfterSave;
     userWithEmptyAttr.comments = [newCommentsAfterSave];
+    userWithEmptyAttr.lastName = null as any;
 
     await jsonSdk.jonApiSdkService.patchOne(userWithEmptyAttr);
     const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
