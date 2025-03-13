@@ -20,14 +20,14 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
-      GITHUB_TOKEN:
+      GITHUB_TOKEN_SECRET:
         required: true
       PAT:
         required: true
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_SECRET }}
   NPM_CONFIG_PROVENANCE: true
 
 jobs:

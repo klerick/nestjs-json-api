@@ -135,5 +135,5 @@ jobs:
       dry-run: ${{ fromJSON(github.event.inputs.dry-run) }}
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
       PAT: ${{secrets.PAT}}
