@@ -47,11 +47,6 @@ on:
         default: ""
         type: choice
         options: *project_options
-      first-release:
-        description: 'Is first release?'
-        required: false
-        type: boolean
-        default: false
       beta-release:
         description: 'Is beta release?'
         required: false
@@ -113,9 +108,8 @@ jobs:
     uses: ./.github/workflows/bump-version.yml
     with:
       projects: ${{ needs.compute-projects.outputs.finalProjects }}
-      first-release: ${{ needs.compute-projects.outputs.first-release }}
-      beta-release: ${{ needs.compute-projects.outputs.beta-release }}
-      dry-run: ${{ needs.compute-projects.outputs.dry-run }}
+      beta-release: ${{ github.event.inputs.beta-release }}
+      dry-run: ${{ github.event.inputs.dry-run }}
     secrets:
       NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
