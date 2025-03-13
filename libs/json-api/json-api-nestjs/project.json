@@ -71,11 +71,14 @@
       ],
       "options": {
         "commands": [
-          "node tools/scripts/upload-badge.mjs json-api-nestjs"
+          {
+            "command": "node tools/scripts/upload-badge.mjs json-api-nestjs",
+            "forwardAllArgs": false
+          }
         ],
         "cwd": "./",
         "parallel": false,
-        "outputPath": "{workspaceRoot}/projectRoot}"
+        "outputPath": "{workspaceRoot}/{projectRoot}"
       }
     }
   },

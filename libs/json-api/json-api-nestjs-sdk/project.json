@@ -89,6 +89,25 @@
         "parallel": false
       }
     },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          {
+            "command": "node tools/scripts/upload-badge.mjs json-api-nestjs-sdk",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
+    },
     "nx-release-publish": {
       "options": {
         "packageRoot": "dist/{projectRoot}"

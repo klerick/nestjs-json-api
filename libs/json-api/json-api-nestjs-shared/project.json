@@ -81,6 +81,19 @@
         "parallel": false
       }
     },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts",
+        "codeCoverage": true,
+        "coverageReporters": [
+          "json-summary"
+        ]
+      }
+    },
     "upload-badge": {
       "executor": "nx:run-commands",
       "dependsOn": [
@@ -90,7 +103,10 @@
       ],
       "options": {
         "commands": [
-          "node tools/scripts/upload-badge.mjs json-api-nestjs-shared"
+          {
+            "command": "node tools/scripts/upload-badge.mjs json-api-nestjs-shared",
+            "forwardAllArgs": false
+          }
         ],
         "cwd": "./",
         "parallel": false,

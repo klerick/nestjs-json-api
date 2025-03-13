@@ -46,7 +46,10 @@
       ],
       "options": {
         "commands": [
-          "node tools/scripts/upload-badge.mjs json-api-nestjs-microorm"
+          {
+            "command": "node tools/scripts/upload-badge.mjs json-api-nestjs-microorm",
+            "forwardAllArgs": false
+          }
         ],
         "cwd": "./",
         "parallel": false,
