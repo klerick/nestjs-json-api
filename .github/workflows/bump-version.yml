@@ -43,6 +43,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
+          persist-credentials: true
       - name: Npm install
         uses: ./.github/actions
       - name: Bump version
