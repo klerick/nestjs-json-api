@@ -1,6 +1,6 @@
 name: 📦 New Release
 
-defaults: &project_options
+projectDefaults: &project_options
   - ""
   - json-api-nestjs
   - json-api-nestjs-sdk
@@ -70,7 +70,7 @@ jobs:
       project4: ${{ github.event.inputs.project4 }}
 
   test:
-    need: [compute-projects]
+    needs: [compute-projects]
     uses: ./.github/workflows/test.yml
     with:
       mainBranch: "last-tag"
