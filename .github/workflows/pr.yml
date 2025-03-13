@@ -11,7 +11,7 @@ jobs:
 
   e2e-test:
     needs: [test]
-    uses: e2e-test.yml
+    uses: ./.github/workflows/e2e-test.yml
     secrets:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
