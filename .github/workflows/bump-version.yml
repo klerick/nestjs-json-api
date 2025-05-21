@@ -27,7 +27,7 @@ on:
 
 env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_SECRET }}
+  GITHUB_TOKEN: ${{ secrets.PAT }}
   NPM_CONFIG_PROVENANCE: true
 
 jobs:
