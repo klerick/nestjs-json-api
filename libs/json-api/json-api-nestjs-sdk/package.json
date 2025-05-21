@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-sdk",
-  "version": "9.0.0",
+  "version": "10.0.0-beta.0",
   "description": "Helper for client JsonAPi Plugin for NestJs",
   "keywords": [
     "nestjs",

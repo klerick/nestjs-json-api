@@ -1,3 +1,23 @@
+## 10.0.0-beta.0 (2025-05-21)
+
+### 🚀 Features
+
+- ⚠️  **json-api-nestjs:** remove module and refactoring ([f202ebc](https://github.com/klerick/nestjs-json-api/commit/f202ebc))
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** Some fix for swagger ([9a0f190](https://github.com/klerick/nestjs-json-api/commit/9a0f190))
+- **json-api-nestjs:** Use correct options for check is debug or not ([e52cc92](https://github.com/klerick/nestjs-json-api/commit/e52cc92))
+- **json-api-nestjs:** fix type in some place ([61f45e6](https://github.com/klerick/nestjs-json-api/commit/61f45e6))
+
+### ⚠️  Breaking Changes
+
+- **json-api-nestjs:** Change type signature, rename npm package
+
+### ❤️ Thank You
+
+- Alex H
+
 # 9.0.0 (2025-02-12)
 
 ### 🚀 Features
