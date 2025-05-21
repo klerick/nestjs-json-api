@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions
 
       - name: Build
-        run: npx nx run-many -t build --parallel=3 --exclude='*,!tag:type:publish'
+        run: npx nx affected -t build --parallel=3 --exclude='*,!tag:type:publish'
 
       - name: Publish packages
         run: npx nx release publish
