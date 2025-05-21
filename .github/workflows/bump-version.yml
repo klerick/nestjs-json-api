@@ -38,6 +38,16 @@ jobs:
       actions: "read"
       id-token: "write"
     steps:
+      - name: Check PAT
+        run: |
+          if [[ -z "${{ secrets.PAT }}" ]]; then
+            echo "### ❌ PAT Error" >> $GITHUB_STEP_SUMMARY
+            echo "The \`PAT\` secret is not set, which is required for git operations." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "### ✅ PAT Found" >> $GITHUB_STEP_SUMMARY
+          fi
+        shell: bash
       - name: Settings git
         run: |
           git config --global user.email "actions@github.com"
