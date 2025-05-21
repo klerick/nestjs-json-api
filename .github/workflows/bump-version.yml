@@ -46,7 +46,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
           token: ${{ secrets.PAT }}
       - name: Npm install
         uses: ./.github/actions
