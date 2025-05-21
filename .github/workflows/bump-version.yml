@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: "write"
-      actions: "read"
+      actions: "write"
       id-token: "write"
     steps:
       - name: Check PAT
