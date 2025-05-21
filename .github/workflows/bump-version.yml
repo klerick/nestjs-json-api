@@ -38,6 +38,7 @@ jobs:
       actions: "write"
       id-token: "write"
     steps:
+      ### Use only classic token
       - name: Check PAT
         run: |
           if [[ -z "${{ secrets.PAT }}" ]]; then
