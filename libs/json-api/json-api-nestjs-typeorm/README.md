@@ -1,4 +1,3 @@
-
 # json-api-nestjs-typeorm
 
 TypeOrm adapter for **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)**
