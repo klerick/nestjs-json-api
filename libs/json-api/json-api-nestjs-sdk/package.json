@@ -42,5 +42,8 @@
         "./mjs/src/ngModule.d.ts"
       ]
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

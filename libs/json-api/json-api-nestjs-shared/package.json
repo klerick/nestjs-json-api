@@ -19,5 +19,8 @@
   "type": "commonjs",
   "main": "./cjs/src/index.js",
   "types": "./cjs/src/index.d.ts",
-  "module": "./mjs/src/index.js"
+  "module": "./mjs/src/index.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

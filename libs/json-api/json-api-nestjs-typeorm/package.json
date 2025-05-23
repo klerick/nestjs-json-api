@@ -18,5 +18,8 @@
     "typeorm",
     "microorm",
     "CRUD"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
