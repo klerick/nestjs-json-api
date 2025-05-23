@@ -15,6 +15,7 @@
   "dependencies": {
     "tslib": ">2.3.0",
     "reflect-metadata": "^0.1.12 || ^0.2.0",
-    "rxjs": "^7.1.0"
+    "rxjs": "^7.1.0",
+    "@klerick/json-api-nestjs-shared": "0.0.0"
   }
 }
