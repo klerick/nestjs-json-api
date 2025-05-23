@@ -127,6 +127,7 @@ jobs:
 
   bump-version:
 #    needs: [build]
+    needs: [compute-projects]
     uses: ./.github/workflows/bump-version.yml
     with:
       projects: ${{ needs.compute-projects.outputs.finalProjects }}
