@@ -59,6 +59,9 @@
             "forwardAllArgs": false
           },
           {
+            "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-shared"
+          },
+          {
             "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-shared",
             "forwardAllArgs": false
           },

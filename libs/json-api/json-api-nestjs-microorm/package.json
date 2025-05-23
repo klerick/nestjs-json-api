@@ -1,21 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-microorm",
   "version": "0.1.0-beta.1",
-  "license": "MIT",
-  "private": false,
-  "contributors": [
-    {
-      "email": "klerick666@gmain.com",
-      "name": "Aleksandr Kharkovey"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/klerick/nestjs-json-api.git"
-  },
-  "engines": {
-    "node": ">= 20.0.0"
-  },
   "type": "commonjs",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -33,8 +18,5 @@
     "tslib": ">2.3.0",
     "reflect-metadata": "^0.1.12 || ^0.2.0",
     "rxjs": "^7.1.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

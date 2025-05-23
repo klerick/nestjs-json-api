@@ -10,7 +10,7 @@
     "type:publish"
   ],
   "targets": {
-    "build": {
+    "build-common": {
       "dependsOn": [
         {
           "projects": [
@@ -35,6 +35,30 @@
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "generateExportsField": true,
         "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-common"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "commands": [
+          {
+            "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-microorm"
+          },
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-microorm",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-microorm",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false
       }
     },
     "test": {

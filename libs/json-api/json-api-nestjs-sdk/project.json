@@ -77,6 +77,9 @@
             "forwardAllArgs": false
           },
           {
+            "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-sdk"
+          },
+          {
             "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-sdk",
             "forwardAllArgs": false
           },
