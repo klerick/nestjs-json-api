@@ -1,6 +1,21 @@
 {
   "name": "@klerick/json-api-nestjs-shared",
   "version": "1.0.0-beta.0",
+  "license": "MIT",
+  "private": false,
+  "contributors": [
+    {
+      "email": "klerick666@gmain.com",
+      "name": "Aleksandr Kharkovey"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klerick/nestjs-json-api.git"
+  },
+  "engines": {
+    "node": ">= 20.0.0"
+  },
   "description": "Shared Helper for JsonApi Plugin for NestJs",
   "keywords": [
     "nestjs",
@@ -19,8 +34,5 @@
   "type": "commonjs",
   "main": "./cjs/src/index.js",
   "types": "./cjs/src/index.d.ts",
-  "module": "./mjs/src/index.js",
-  "publishConfig": {
-    "access": "public"
-  }
+  "module": "./mjs/src/index.js"
 }
