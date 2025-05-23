@@ -1,3 +1,13 @@
+## 10.0.0-beta.3 (2025-05-23)
+
+### 🚀 Features
+
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([42b6b82](https://github.com/klerick/nestjs-json-api/commit/42b6b82))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.0 (2025-05-21)
 
 ### 🚀 Features

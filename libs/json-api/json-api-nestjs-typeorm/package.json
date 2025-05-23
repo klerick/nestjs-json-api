@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-typeorm",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "dependencies": {
     "tslib": ">2.3.0",
     "reflect-metadata": "^0.1.12 || ^0.2.0",
