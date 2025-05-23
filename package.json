@@ -140,5 +140,8 @@
       "libs/microorm-database/src/lib/config-cli.ts"
     ],
     "tsConfigPath": "./libs/microorm-database/tsconfig.lib.json"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
