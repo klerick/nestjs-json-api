@@ -1,3 +1,13 @@
+## 10.0.0-beta.4 (2025-05-23)
+
+### 🚀 Features
+
+- **json-api-nestjs:** Update package.json dep ([87519a0](https://github.com/klerick/nestjs-json-api/commit/87519a0))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.3 (2025-05-23)
 
 ### 🚀 Features
