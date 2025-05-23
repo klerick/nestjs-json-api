@@ -82,64 +82,64 @@ on:
 
 
 jobs:
-#  compute-projects:
-#    uses: ./.github/workflows/compute-projects.yml
-#    with:
-#      tagChoice: ${{ github.event.inputs.tagChoice }}
-#      project1: ${{ github.event.inputs.project1 }}
-#      project2: ${{ github.event.inputs.project2 }}
-#      project3: ${{ github.event.inputs.project3 }}
-#      project4: ${{ github.event.inputs.project4 }}
-#
-#  test:
-#    needs: [compute-projects]
-#    uses: ./.github/workflows/test.yml
-#    with:
-#      mainBranch: "last-tag"
-#    secrets:
-#      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-#
-#  e2e-test:
-#    needs: [test]
-#    uses: ./.github/workflows/e2e-test.yml
-#    with:
-#      mainBranch: "last-tag"
-#    secrets:
-#      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-#
-#  build:
-#    needs: [test, e2e-test]
-#    uses: ./.github/workflows/build.yml
-#    with:
-#      mainBranch: "last-tag"
-#    secrets:
-#      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-#
-#  upload-badge:
-#    needs: [ test, e2e-test ]
-#    uses: ./.github/workflows/upload-badge.yml
-#    with:
-#      mainBranch: "last-tag"
-#    secrets:
-#      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-#      GIST_SECRET: ${{ secrets.GIST_SECRET }}
-#      GIST_ID: ${{ secrets.GIST_ID }}
+  compute-projects:
+    uses: ./.github/workflows/compute-projects.yml
+    with:
+      tagChoice: ${{ github.event.inputs.tagChoice }}
+      project1: ${{ github.event.inputs.project1 }}
+      project2: ${{ github.event.inputs.project2 }}
+      project3: ${{ github.event.inputs.project3 }}
+      project4: ${{ github.event.inputs.project4 }}
 
-#  bump-version:
-#    needs: [build]
-#    uses: ./.github/workflows/bump-version.yml
-#    with:
-#      projects: ${{ needs.compute-projects.outputs.finalProjects }}
-#      beta-release: ${{ fromJSON(github.event.inputs.beta-release) }}
-#      dry-run: ${{ fromJSON(github.event.inputs.dry-run) }}
-#    secrets:
-#      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#      GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
-#      PAT: ${{secrets.PAT}}
+  test:
+    needs: [compute-projects]
+    uses: ./.github/workflows/test.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  e2e-test:
+    needs: [test]
+    uses: ./.github/workflows/e2e-test.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  build:
+    needs: [test, e2e-test]
+    uses: ./.github/workflows/build.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  upload-badge:
+    needs: [ test, e2e-test ]
+    uses: ./.github/workflows/upload-badge.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      GIST_SECRET: ${{ secrets.GIST_SECRET }}
+      GIST_ID: ${{ secrets.GIST_ID }}
+
+  bump-version:
+    needs: [build]
+    uses: ./.github/workflows/bump-version.yml
+    with:
+      projects: ${{ needs.compute-projects.outputs.finalProjects }}
+      beta-release: ${{ fromJSON(github.event.inputs.beta-release) }}
+      dry-run: ${{ fromJSON(github.event.inputs.dry-run) }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN_SECRET: ${{ secrets.GITHUB_TOKEN }}
+      PAT: ${{secrets.PAT}}
 
   publish:
     if: ${{ fromJSON(github.event.inputs.dry-run) == false }}
-#    needs: [bump-version]
+    needs: [bump-version]
     uses: ./.github/workflows/publish.yml
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

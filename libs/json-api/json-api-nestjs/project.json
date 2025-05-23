@@ -5,7 +5,7 @@
   "projectType": "library",
   "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs", "type:publish"],
   "targets": {
-    "build": {
+    "build-common": {
       "executor": "@nx/js:tsc",
       "outputs": [
         "{options.outputPath}"
@@ -21,6 +21,27 @@
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "generateExportsField": true,
         "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-common"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "commands": [
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false
       }
     },
     "nx-release-publish": {
