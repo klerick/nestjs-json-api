@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-microorm",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "type": "commonjs",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",

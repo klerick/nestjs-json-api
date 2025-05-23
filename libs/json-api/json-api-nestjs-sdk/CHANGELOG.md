@@ -1,3 +1,13 @@
+## 10.0.0-beta.2 (2025-05-23)
+
+### 🚀 Features
+
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([4c559e2](https://github.com/klerick/nestjs-json-api/commit/4c559e2))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.0 (2025-05-21)
 
 This was a version bump only for json-api-nestjs-sdk to align it with other projects, there were no code changes.
