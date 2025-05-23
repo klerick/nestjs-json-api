@@ -40,13 +40,36 @@ try {
 function removeDepFromOtherLib(graph, name, json) {
   const libsName = Object.values(graph.nodes)
     .filter((i) => i.data.tags.includes('type:publish'))
-    .map((i) => i.data.metadata.js.packageName);
+    .reduce((acum, i) => {
+      acum[i.data.metadata.js.packageName] = i.data.root;
+      return acum;
+    }, {});
 
+  for (const [name] of Object.entries(json.dependencies)) {
+    if (!Object.keys(libsName).includes(name)) {
+      continue;
+    }
+    try {
+      const jsonDep = JSON.parse(
+        readFileSync(
+          join(workspaceRoot, libsName[name], 'package.json')
+        ).toString()
+      );
+      json.dependencies[name] = jsonDep.version;
+    } catch (e) {
+      console.warn(
+        'Can parse:',
+        join(workspaceRoot, libsName[name], 'package.json')
+      );
+    }
+
+    console.log(libsName[name]);
+  }
   if (!('peerDependencies' in json)) return;
 
   json['peerDependencies'] = Object.entries(json['peerDependencies']).reduce(
     (acum, [name, value]) => {
-      if (libsName.includes(name)) {
+      if (Object.keys(libsName).includes(name)) {
         acum[name] = `^${value}`;
       }
       return acum;
