@@ -1,5 +1,4 @@
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import devkit from '@nx/devkit';
@@ -30,6 +29,10 @@ try {
     if (!mainJson[props] || json[props]) continue;
     json[props] = mainJson[props];
   }
+  if (json.dependencies['@mikro-orm/postgresql']) {
+    delete json.dependencies['@mikro-orm/postgresql'];
+  }
+
   removeDepFromOtherLib(graph, name, json);
   writeFileSync(`package.json`, JSON.stringify(json, null, 2));
 } catch (e) {
