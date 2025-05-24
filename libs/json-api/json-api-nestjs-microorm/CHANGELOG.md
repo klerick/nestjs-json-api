@@ -1,3 +1,13 @@
+## 0.1.0-beta.4 (2025-05-24)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** Remove @mikro-orm/postgresql dependencies in package.json ([277f61c](https://github.com/klerick/nestjs-json-api/commit/277f61c))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.3 (2025-05-23)
 
 ### 🚀 Features
