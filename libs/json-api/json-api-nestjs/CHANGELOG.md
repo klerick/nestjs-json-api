@@ -1,3 +1,13 @@
+## 10.0.0-beta.5 (2025-05-30)
+
+### 🚀 Features
+
+- **json-api-nestjs:** Export `Params` type in index.ts ([bd509a5](https://github.com/klerick/nestjs-json-api/commit/bd509a5))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.4 (2025-05-23)
 
 ### 🚀 Features
