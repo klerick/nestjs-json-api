@@ -13,6 +13,7 @@ export {
   UnionToTuple,
   EntityParam,
   TypeField,
+  Params,
 } from './lib/types';
 export {
   JsonApiTransformerService,
