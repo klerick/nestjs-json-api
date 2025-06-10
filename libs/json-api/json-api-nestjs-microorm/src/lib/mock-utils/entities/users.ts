@@ -77,7 +77,7 @@ export class Users {
   @Property({
     name: 'is_active',
     type: 'boolean',
-    nullable: true,
+    nullable: false,
     default: false,
   })
   public isActive!: boolean;
@@ -85,7 +85,7 @@ export class Users {
   @Property({
     name: 'test_date',
     type: Date,
-    nullable: true,
+    nullable: false,
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
     columnType: 'timestamp(0) without time zone',
   })

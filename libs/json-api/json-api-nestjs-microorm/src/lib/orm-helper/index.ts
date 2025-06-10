@@ -72,7 +72,11 @@ export const getPropsNullable = <E extends object>(
     .map((i) => {
       // @ts-ignore
       const props = entityMetadata.properties[i];
-      return props.nullable || props.default !== undefined ? i : false;
+      return props.nullable ||
+        props.default !== undefined ||
+        props.defaultRaw !== undefined
+        ? i
+        : false;
     })
     .filter((i) => !!i) as unknown as EntityParam<E>['propsNullable'];
 };
