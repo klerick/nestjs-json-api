@@ -1,3 +1,13 @@
+## 0.1.0-beta.6 (2025-06-10)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** ensure `applyFilters` is invoked in query builders for consistency ([391f4bb](https://github.com/klerick/nestjs-json-api/commit/391f4bb))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.5 (2025-06-10)
 
 ### 🩹 Fixes
