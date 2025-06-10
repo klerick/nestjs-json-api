@@ -19,6 +19,9 @@ export async function getAll<E extends object, IdKey extends string>(
   >(this, ...[query]);
 
   const skip = (page.number - 1) * page.size;
+
+  await countSubQuery.applyFilters();
+
   const paginationQuery = countSubQuery
     .clone()
     .select(this.microOrmUtilService.currentPrimaryColumn)

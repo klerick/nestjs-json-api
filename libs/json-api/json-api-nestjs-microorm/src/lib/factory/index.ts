@@ -154,12 +154,11 @@ export function FindOneRowEntityFactory<
     inject: [MicroOrmUtilService],
     useFactory(microOrmUtilService: MicroOrmUtilService<E, IdKey>) {
       return async (entity, value) => {
-        return microOrmUtilService
-          .queryBuilder(entity)
-          .where({
-            [microOrmUtilService.currentPrimaryColumn]: value,
-          })
-          .getSingleResult();
+        const qb = microOrmUtilService.queryBuilder(entity).where({
+          [microOrmUtilService.currentPrimaryColumn]: value,
+        });
+        await qb.applyFilters();
+        return qb.getSingleResult();
       };
     },
   };

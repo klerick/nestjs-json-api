@@ -12,10 +12,14 @@ export async function getOne<E extends object, IdKey extends string>(
     [this.microOrmUtilService.currentPrimaryColumn]: id,
   });
 
-  const resultItem = await this.microOrmUtilService
-    .prePareQueryBuilder(queryBuilder, query as any)
-    .getSingleResult();
+  const resultQueryBuilder = this.microOrmUtilService.prePareQueryBuilder(
+    queryBuilder,
+    query as any
+  );
 
+  await resultQueryBuilder.applyFilters();
+
+  const resultItem = await resultQueryBuilder.getSingleResult();
   if (!resultItem) {
     const error: ValidateQueryError = {
       code: 'invalid_arguments',
