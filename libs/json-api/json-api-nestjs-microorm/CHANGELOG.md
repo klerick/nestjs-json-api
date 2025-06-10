@@ -1,3 +1,13 @@
+## 0.1.0-beta.5 (2025-06-10)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** Handle defaultRaw in nullable props check and update entity properties ([6d7a24f](https://github.com/klerick/nestjs-json-api/commit/6d7a24f))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.4 (2025-05-24)
 
 ### 🩹 Fixes
