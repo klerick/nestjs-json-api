@@ -1,3 +1,13 @@
+## 0.1.0-beta.7 (2025-06-23)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** add format for mikroorm error ([c1cafc2](https://github.com/klerick/nestjs-json-api/commit/c1cafc2))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.6 (2025-06-10)
 
 ### 🩹 Fixes
