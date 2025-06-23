@@ -4,6 +4,7 @@ import {
   PrepareParams,
   MODULE_OPTIONS_TOKEN,
   NestProvider,
+  ErrorFormatService,
 } from '@klerick/json-api-nestjs';
 import { MicroOrmParam } from './type';
 
@@ -18,7 +19,7 @@ import {
   CheckRelationNameFactory,
   FindOneRowEntityFactory,
 } from './factory';
-import { MicroOrmUtilService } from './service/micro-orm-util.service';
+import { MicroOrmUtilService, MikroOrmFormatErrorService } from './service';
 
 export class MicroOrmJsonApiModule {
   static forRoot(options: PrepareParams<MicroOrmParam>): DynamicModule {
@@ -40,6 +41,10 @@ export class MicroOrmJsonApiModule {
       CurrentEntityMetadata(),
       RunInTransactionFactory(),
       EntityPropsMap(options.entities),
+      {
+        provide: ErrorFormatService,
+        useClass: MikroOrmFormatErrorService,
+      },
     ];
 
     const currentImport = [
