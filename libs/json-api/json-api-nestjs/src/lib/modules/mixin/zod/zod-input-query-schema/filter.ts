@@ -64,7 +64,7 @@ function getZodRulesForFilterOperator() {
     .strict()
     .partial()
     .refine(oneOf(Object.values(FilterOperand)), {
-      message: `Must have one of: "${Object.values(FilterOperand).join(
+      error: `Must have one of: "${Object.values(FilterOperand).join(
         '","'
       )}"`,
     });
@@ -98,6 +98,7 @@ function getZodRulesForRelation() {
 }
 
 type ZodRulesForRelation = ReturnType<typeof getZodRulesForRelation>;
+type CastPropertyKey<T> = T extends PropertyKey ? T : never;
 
 export type ConcatRelationField<
   E extends object,
@@ -105,7 +106,7 @@ export type ConcatRelationField<
 > = UnionToTuple<
   {
     [K in keyof EntityRelationProps<E, IdKey>]: `${K &
-      string}.${EntityRelationProps<E, IdKey>[K][number] & string}`;
+    string}.${EntityRelationProps<E, IdKey>[K][number] & string}`;
   }[keyof EntityRelationProps<E, IdKey>]
 >;
 
@@ -134,55 +135,49 @@ export function shapeForArray<
   Z extends ZodType,
   IdKey extends string,
   PropsList extends ShapeArrayInput<E, IdKey>
->(fields: PropsList, zodSchema: Z) {
+>(fields: PropsList, zodSchema: Z): Record<CastPropertyKey<PropsList[number]>, Z> {
   return fields.reduce(
     (acum, item) => ({
       ...acum,
       [item as PropertyKey]: zodSchema,
     }),
-    {} as {
-      [K in PropsList[number] & PropertyKey]: Z;
-    }
+    {} as Record<CastPropertyKey<PropsList[number]>, Z>
   );
 }
 
 export function zodFilterInputQuery<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
-  const target = z.object(
-    shapeForArray<
-      E,
-      ZodRulesForFilterOperator,
-      IdKey,
-      EntityParam<E, IdKey>['props']
-    >(entityParamMapService.entityParaMap.props, getZodRulesForFilterOperator())
-  );
+  const target = shapeForArray<
+    E,
+    ZodRulesForFilterOperator,
+    IdKey,
+    EntityParam<E, IdKey>['props']
+  >(entityParamMapService.entityParaMap.props, getZodRulesForFilterOperator());
 
-  const relations = z.object(
-    shapeForArray<
-      E,
-      ZodRulesForRelation,
-      IdKey,
-      EntityParam<E, IdKey>['relations']
-    >(entityParamMapService.entityParaMap.relations, getZodRulesForRelation())
-  );
+  const relations = shapeForArray<
+    E,
+    ZodRulesForRelation,
+    IdKey,
+    EntityParam<E, IdKey>['relations']
+  >(entityParamMapService.entityParaMap.relations, getZodRulesForRelation());
 
   const relationList = getRelationProps(entityParamMapService);
 
-  const relationFields = z.object(
-    shapeForArray<
-      E,
-      ZodRulesForFilterOperator,
-      IdKey,
-      ConcatRelationField<E, IdKey>
-    >(
-      getTupleConcatRelationFields(relationList),
-      getZodRulesForFilterOperator()
-    )
+  const relationFields = shapeForArray<
+    E,
+    ZodRulesForFilterOperator,
+    IdKey,
+    ConcatRelationField<E, IdKey>
+  >(
+    getTupleConcatRelationFields(relationList),
+    getZodRulesForFilterOperator()
   );
-  return target
-    .merge(relations)
-    .merge(relationFields)
+  return z.object({
+    ...target,
+    ...relations,
+    ...relationFields
+  })
     .optional()
     .transform((data) => {
       if (!data) {

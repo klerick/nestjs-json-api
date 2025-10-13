@@ -22,7 +22,7 @@ type ZodInputPostShape<E extends object, IdKey extends string> = {
 
 type ZodInputPostSchema<E extends object, IdKey extends string> = ZodObject<
   ZodInputPostShape<E, IdKey>,
-  'strict'
+  z.core.$strict
 >;
 
 type ZodInputPostDataShape<E extends object, IdKey extends string> = {
@@ -41,30 +41,21 @@ function getShape<E extends object, IdKey extends string>(
     relationships: zodRelationships(entityParamMapService, false).optional(),
   };
 
-  return z.object(shape).strict();
-}
-
-function zodDataShape<E extends object, IdKey extends string>(
-  shape: ZodInputPostSchema<E, IdKey>
-): ZodPost<E, IdKey> {
-  return z
-    .object({
-      data: shape,
-    })
-    .strict();
+  return z.strictObject(shape);
 }
 
 export function zodPost<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ): ZodPost<E, IdKey> {
-  const shape = getShape(entityParamMapService);
-
-  return zodDataShape(shape);
+  return z
+    .strictObject({
+      data: getShape(entityParamMapService),
+    })
 }
 
 export type ZodPost<E extends object, IdKey extends string> = ZodObject<
   ZodInputPostDataShape<E, IdKey>,
-  'strict'
+  z.core.$strict
 >;
 export type Post<E extends object, IdKey extends string> = z.infer<
   ZodPost<E, IdKey>

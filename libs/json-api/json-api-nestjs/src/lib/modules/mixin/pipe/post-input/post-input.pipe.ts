@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { ZodError } from 'zod';
-import { errorMap } from 'zod-validation-error';
 
 import { PostData, ZodPost } from '../../zod';
 import { ZOD_POST_SCHEMA } from '../../../../constants';
@@ -17,9 +16,7 @@ export class PostInputPipe<E extends object>
   @Inject(ZOD_POST_SCHEMA) private zodInputPostSchema!: ZodPost<E, 'id'>;
   transform(value: JSONValue): PostData<E, 'id'> {
     try {
-      return this.zodInputPostSchema.parse(value, {
-        errorMap: errorMap,
-      })['data'] as PostData<E, 'id'>;
+      return this.zodInputPostSchema.parse(value)['data'] as PostData<E, 'id'>;
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);

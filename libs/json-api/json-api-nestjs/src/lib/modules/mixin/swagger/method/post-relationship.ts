@@ -1,5 +1,5 @@
 import { Type } from '@nestjs/common';
-import { generateSchema } from '@anatine/zod-openapi';
+import { z } from 'zod';
 import {
   ReferenceObject,
   SchemaObject,
@@ -40,7 +40,7 @@ export function postRelationship<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: generateSchema(zodPatchRelationship) as
+    schema: z.toJSONSchema(zodPatchRelationship) as
       | SchemaObject
       | ReferenceObject,
     required: true,

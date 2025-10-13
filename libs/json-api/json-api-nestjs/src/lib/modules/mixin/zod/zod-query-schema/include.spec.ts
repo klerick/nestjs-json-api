@@ -1,5 +1,6 @@
 import { zodIncludeQuery } from './include';
 import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
+import { ZodError } from 'zod';
 
 const schema = zodIncludeQuery(usersEntityParamMapMockData);
 
@@ -18,11 +19,7 @@ describe('zodIncludeQuery', () => {
 
   it('should throw an error if the array is empty', () => {
     expect(() => schema.parse([])).toThrowError(
-      expect.objectContaining({
-        message: expect.stringContaining(
-          'Array must contain at least 1 element'
-        ),
-      })
+      ZodError
     );
   });
 
@@ -36,9 +33,7 @@ describe('zodIncludeQuery', () => {
 
   it('should throw an error if the input contains invalid relations', () => {
     expect(() => schema.parse(['invalid_relation'])).toThrowError(
-      expect.objectContaining({
-        message: expect.stringContaining('Invalid enum value. Expected'),
-      })
+      ZodError
     );
   });
 });

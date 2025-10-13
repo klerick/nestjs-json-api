@@ -14,7 +14,6 @@ import {
   ZodObject,
   ZodOptional,
   ZodString,
-  ZodType,
   ZodUnion,
 } from 'zod';
 import { kebabCase } from 'change-case-commonjs';
@@ -24,15 +23,8 @@ import { MapController } from '../../types';
 import { UnionToTuple } from '../../../../types';
 import { EntityParamMap } from '../../../mixin/types';
 
-const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-type Literal = z.infer<typeof literalSchema>;
-type Json = Literal | { [key: string]: Json } | Json[];
 
-const jsonSchema: ZodType<Json> = z.lazy(() =>
-  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
-);
-
-const zodGeneralData = jsonSchema.nullable();
+const zodGeneralData = z.json().nullable();
 type ZodGeneral = typeof zodGeneralData;
 
 export type ZodAdd<T extends string> = ReturnType<typeof zodAdd<T>>;
@@ -117,8 +109,7 @@ export type ZodInputArray = ZodArray<
       tmpId: ZodOptional<ZodUnion<[ZodNumber, ZodString]>>;
     }>;
     data: ZodOptional<ZodGeneral>;
-  }>,
-  'atleastone'
+  }>
 >;
 
 export type ZodInputOperation<E extends object> = ReturnType<
@@ -159,13 +150,13 @@ export function zodInputOperation<E extends object>(
     if (hasOwnProperty('deleteOne')) {
       array.push(zodRemove(typeName));
     }
-    if (hasOwnProperty('postRelationship')) {
+    if (hasOwnProperty('postRelationship') && relations.length > 0) {
       array.push(zodOperationRel(typeName, relations, Operation.add));
     }
-    if (hasOwnProperty('deleteRelationship')) {
+    if (hasOwnProperty('deleteRelationship') && relations.length > 0) {
       array.push(zodOperationRel(typeName, relations, Operation.remove));
     }
-    if (hasOwnProperty('patchRelationship')) {
+    if (hasOwnProperty('patchRelationship') && relations.length > 0) {
       array.push(zodOperationRel(typeName, relations, Operation.update));
     }
   }

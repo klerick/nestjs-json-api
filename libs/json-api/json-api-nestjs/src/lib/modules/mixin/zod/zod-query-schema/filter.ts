@@ -20,7 +20,7 @@ import {
 const zodRuleForString = z.union([
   z.literal('null').transform(() => null),
   z.string().refine(stringLongerThan(), {
-    message: 'String should be not empty',
+    error: 'String should be not empty',
   }),
 ]);
 
@@ -28,7 +28,7 @@ const zodRuleStringArray = zodRuleForString
   .array()
   .nonempty()
   .refine(arrayItemStringLongerThan(0), {
-    message: 'Array should be not empty',
+    error: 'Array should be not empty',
   });
 
 const zodNullRule = z.union([
@@ -59,7 +59,7 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
       ...acum,
       [val]: zodRuleForString
         .refine(stringMustBe(type), {
-          message: `String should be as ${type}`,
+          error: `String should be as ${type}`,
         })
         .optional(),
     }),
@@ -73,7 +73,7 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
       ...acum,
       [val]: zodRuleStringArray
         .refine(elementOfArrayMustBe(type), {
-          message: `String should be as ${type}`,
+          error: `String should be as ${type}`,
         })
         .optional(),
     }),
@@ -92,7 +92,7 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
         Object.values(FilterOperand).filter((i) => i !== FilterOperand.some)
       ),
       {
-        message: `Must have one of: "${Object.values(FilterOperand)
+        error: `Must have one of: "${Object.values(FilterOperand)
           .filter((i) => i !== FilterOperand.some)
           .join('","')}"`,
       }
@@ -212,14 +212,12 @@ export function zodFilterQuery<E extends object, IdKey extends string>(
 
   const targetShapeFilter = {
     target: z
-      .object(targetResult)
-      .strict()
+      .strictObject(targetResult)
       .optional()
       .refine(nonEmptyObject())
       .nullable(),
     relation: z
-      .object(relationFilterProps)
-      .strict()
+      .strictObject(relationFilterProps)
       .optional()
       .refine(nonEmptyObject())
       .nullable(),

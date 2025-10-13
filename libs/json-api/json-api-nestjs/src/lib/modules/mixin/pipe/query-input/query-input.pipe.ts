@@ -5,7 +5,6 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ZodError } from 'zod';
-import { errorMap } from 'zod-validation-error';
 import { ZOD_INPUT_QUERY_SCHEMA } from '../../../../constants';
 import { ZodInputQuery, InputQuery } from '../../zod';
 import { JSONValue } from '../../types';
@@ -18,9 +17,7 @@ export class QueryInputPipe<E extends object>
 
   transform(value: JSONValue): InputQuery<E, 'id'> {
     try {
-      return this.zodInputQuerySchema.parse(value, {
-        errorMap: errorMap,
-      });
+      return this.zodInputQuerySchema.parse(value);
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);

@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { KEY_MAIN_INPUT_SCHEMA } from '@klerick/json-api-nestjs-shared';
-import { errorMap } from 'zod-validation-error';
 import { ZodError } from 'zod';
 import { JSONValue } from '../../mixin/types';
 import { InputArray, ZodInputOperation } from '../utils';
@@ -19,9 +18,7 @@ export class InputOperationPipe
 
   transform(value: JSONValue): InputArray {
     try {
-      return this.zodInputOperation.parse(value, {
-        errorMap: errorMap,
-      })[KEY_MAIN_INPUT_SCHEMA];
+      return this.zodInputOperation.parse(value)[KEY_MAIN_INPUT_SCHEMA];
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);

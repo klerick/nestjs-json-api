@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { ZodError } from 'zod';
-import { errorMap } from 'zod-validation-error';
 
 import { JSONValue } from '../../types';
 import { PostRelationshipData, ZodPostRelationship } from '../../zod';
@@ -18,9 +17,7 @@ export class PostRelationshipPipe
   private zodInputPostRelationshipSchema!: ZodPostRelationship;
   transform(value: JSONValue): PostRelationshipData {
     try {
-      return this.zodInputPostRelationshipSchema.parse(value, {
-        errorMap: errorMap,
-      })['data'];
+      return this.zodInputPostRelationshipSchema.parse(value)['data'];
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);

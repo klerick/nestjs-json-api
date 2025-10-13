@@ -42,9 +42,7 @@ describe('PostInputPipe', () => {
       .mockReturnValue({ data: expectedData } as any);
 
     expect(pipe.transform(input)).toEqual(expectedData);
-    expect(mockSchema.parse).toHaveBeenCalledWith(input, {
-      errorMap: expect.any(Function),
-    });
+    expect(mockSchema.parse).toHaveBeenCalledWith(input);
   });
 
   it('should throw BadRequestException if ZodError occurs', () => {

@@ -36,6 +36,11 @@ describe('QueryPipe', () => {
     const inputQuery: InputQuery<Users, 'id'> = {
       [QueryField.fields]: {
         target: ['id', 'name'],
+        addresses: undefined,
+        manager: undefined,
+        roles: undefined,
+        comments: undefined,
+        userGroup: undefined
       },
       [QueryField.filter]: {
         relation: null,

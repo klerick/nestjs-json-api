@@ -2,16 +2,13 @@ import { FilterOperand, QueryField } from '@klerick/json-api-nestjs-shared';
 
 import { ASC } from '../../../../constants';
 import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';
-import { Users } from '../../../../utils/___test___/test-classes.helper';
-
-import { InputQuery } from '../zod-input-query-schema';
 import { zodQuery } from './index';
 
 const schemaQuery = zodQuery(usersEntityParamMapMockData);
 
 describe('schemaQuery.parse', () => {
   it('should successfully parse valid input', () => {
-    const validInput: InputQuery<Users, 'id'> = {
+    const validInput = {
       [QueryField.fields]: {
         target: [
           'id',
@@ -54,7 +51,7 @@ describe('schemaQuery.parse', () => {
   });
 
   it('should handle nested relations', () => {
-    const validInput: InputQuery<Users, 'id'> = {
+    const validInput = {
       [QueryField.fields]: {
         target: [
           'id',

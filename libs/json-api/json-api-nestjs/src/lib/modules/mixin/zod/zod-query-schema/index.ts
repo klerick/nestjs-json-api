@@ -33,8 +33,8 @@ function getShape<E extends object, IdKey extends string = 'id'>(
 
 function getZodResultSchema<E extends object, IdKey extends string>(
   shape: Shape<E, IdKey>
-): ZodObject<Shape<E, IdKey>, 'strict'> {
-  return z.object(shape).strict();
+): ZodObject<Shape<E, IdKey>, z.core.$strict> {
+  return z.strictObject(shape);
 }
 export function zodQuery<E extends object, IdKey extends string = 'id'>(
   entityParamMapService: EntityParamMapService<E, IdKey>
@@ -44,24 +44,23 @@ export function zodQuery<E extends object, IdKey extends string = 'id'>(
 
 export type ZodQuery<E extends object, IdKey extends string> = ZodObject<
   Shape<E, IdKey>,
-  'strict'
+  z.core.$strict
 >;
 export type Query<E extends object, IdKey extends string> = z.infer<
-  ZodObject<Shape<E, IdKey>, 'strict'>
+  ZodObject<Shape<E, IdKey>, z.core.$strict>
 >;
 
 function zodQueryOne<E extends object, IdKey extends string = 'id'>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ): ZodObject<
   Pick<Shape<E, IdKey>, QueryField.fields | QueryField.include>,
-  'strict'
+  z.core.$strict
 > {
   return z
-    .object({
+    .strictObject({
       [QueryField.fields]: zodFieldsQuery(entityParamMapService),
       [QueryField.include]: zodIncludeQuery(entityParamMapService),
-    })
-    .strict();
+    });
 }
 
 export type ZodQueryOne<E extends object, IdKey extends string> = ReturnType<

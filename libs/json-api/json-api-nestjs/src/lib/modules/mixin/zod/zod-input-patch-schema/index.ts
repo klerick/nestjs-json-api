@@ -22,7 +22,7 @@ type ZodPatchPatchShape<E extends object, IdKey extends string> = {
 
 type ZodInputPatchSchema<E extends object, IdKey extends string> = ZodObject<
   ZodPatchPatchShape<E, IdKey>,
-  'strict'
+  z.core.$strict
 >;
 
 type ZodInputPatchDataShape<E extends object, IdKey extends string> = {
@@ -41,7 +41,7 @@ function getShape<E extends object, IdKey extends string>(
     relationships: zodRelationships(entityParamMapService, true).optional(),
   };
 
-  return z.object(shape).strict();
+  return z.strictObject(shape);
 }
 
 export function zodPatch<E extends object, IdKey extends string>(
@@ -50,15 +50,14 @@ export function zodPatch<E extends object, IdKey extends string>(
   const shape = getShape(entityParamMapService);
 
   return z
-    .object({
+    .strictObject({
       data: shape,
-    })
-    .strict();
+    });
 }
 
 export type ZodPatch<E extends object, IdKey extends string> = ZodObject<
   ZodInputPatchDataShape<E, IdKey>,
-  'strict'
+  z.core.$strict
 >;
 export type PatchData<E extends object, IdKey extends string> = z.infer<
   ZodPatch<E, IdKey>

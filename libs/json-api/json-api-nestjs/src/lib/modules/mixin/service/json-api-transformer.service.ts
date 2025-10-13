@@ -121,7 +121,7 @@ export class JsonApiTransformerService<
     query: Query<T, TIdKey>
   ): ResourceData<T, TIdKey> {
     const { fields } = query;
-    const targetField = fields && fields.target ? fields.target : null;
+    const targetField = fields && 'target' in fields ? fields.target : null;
     assertColumnName(item, mapProps.primaryColumnName);
     const props = ObjectTyped.keys(mapProps.propsType).filter((i) => {
       if (i.toString() === mapProps.primaryColumnName.toString()) {
@@ -186,7 +186,8 @@ export class JsonApiTransformerService<
     query: Query<T, TIdKey>
   ): Relationships<T, TIdKey> {
     const { include } = query;
-    const includeMap = new Map((include || []).map((i) => [i, true]));
+    const includeMap = new Map<Query<T, TIdKey>['include'], boolean>((include || [])
+      .map((i) => [i, true]));
     const primaryColumnName = mapProps.primaryColumnName;
     assertColumnName<typeof item>(item, primaryColumnName);
 
@@ -313,7 +314,7 @@ export class JsonApiTransformerService<
               this.transformItem<typeof i, 'id'>(
                 i,
                 relationMapProp as unknown as EntityParam<typeof i>,
-                queryForInclude as Query<typeof i, 'id'>
+                queryForInclude as unknown as Query<typeof i, 'id'>
               )
             );
           }

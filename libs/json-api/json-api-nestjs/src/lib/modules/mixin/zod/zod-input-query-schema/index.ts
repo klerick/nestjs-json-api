@@ -8,22 +8,23 @@ import { zodIncludeInputQuery } from './include';
 import { zodSortInputQuery } from './sort';
 import { zodPageInputQuery } from '../zod-share';
 
+export {zodFieldsInputQuery}
+
 export function zodInputQuery<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
   return z
-    .object({
+    .strictObject({
       [QueryField.fields]: zodFieldsInputQuery<E, IdKey>(entityParamMapService),
       [QueryField.filter]: zodFilterInputQuery<E, IdKey>(entityParamMapService),
       [QueryField.include]: zodIncludeInputQuery(),
       [QueryField.sort]: zodSortInputQuery(),
       [QueryField.page]: zodPageInputQuery(),
-    })
-    .strict(
-      `Query object should contain only allow params: "${Object.keys(
+    }, {
+      error: (err) => err.code === 'unrecognized_keys' ? `Query object should contain only allow params: "${Object.keys(
         QueryField
-      ).join('"."')}"`
-    );
+      ).join('"."')}"` : err.message,
+    });
 }
 
 export type ZodInputQuery<E extends object, IdKey extends string> = ReturnType<

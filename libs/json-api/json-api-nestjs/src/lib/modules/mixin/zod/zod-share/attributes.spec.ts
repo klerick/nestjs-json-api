@@ -99,6 +99,7 @@ describe('attributes', () => {
 
   describe('Attributes for patch', () => {
     type SchemaTypeUsers = Attributes<Users, 'id', true>;
+    type a = SchemaTypeUsers['testDate']
     type SchemaTypeAddresses = Attributes<Addresses, 'id', true>;
     let schemaUsers: ZodAttributes<Users, 'id', true>;
     let schemaAddresses: ZodAttributes<Addresses, 'id', true>;
@@ -114,6 +115,8 @@ describe('attributes', () => {
         testDate: date.toISOString() as any,
         firstName: '',
         testReal: [],
+        createdAt: undefined,
+        updatedAt: undefined,
       };
 
       const check2: SchemaTypeAddresses = {
@@ -131,6 +134,8 @@ describe('attributes', () => {
         testDate: date.toISOString() as any,
         login: '',
         firstName: '',
+        createdAt: undefined,
+        updatedAt: undefined,
       };
 
       expect(schemaUsers.parse(check)).toEqual({

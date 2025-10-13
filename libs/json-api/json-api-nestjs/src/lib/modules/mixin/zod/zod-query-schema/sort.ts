@@ -56,7 +56,7 @@ type ZodSortShape<E extends object, IdKey extends string> = ZodSortTarget<
 
 function zodSortObject<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
-): ZodObject<ZodSortShape<E, IdKey>, 'strict'> {
+): ZodObject<ZodSortShape<E, IdKey>, z.core.$strict> {
   const zodSortRule = getZodSortRule();
   const relationList = getRelationProps(entityParamMapService);
 
@@ -75,8 +75,7 @@ function zodSortObject<E extends object, IdKey extends string>(
       ),
     } as ZodSortShape<E, IdKey>
   );
-
-  return z.object(sortShape).strict();
+  return z.strictObject(sortShape)
 }
 
 export function zodSortQuery<E extends object, IdKey extends string>(
