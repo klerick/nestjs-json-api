@@ -1,4 +1,6 @@
 import { PostData } from '@klerick/json-api-nestjs';
+import { EntityData } from '@mikro-orm/core';
+
 import { MicroOrmService } from '../../service';
 
 export async function postOne<E extends object, IdKey extends string>(
@@ -14,7 +16,7 @@ export async function postOne<E extends object, IdKey extends string>(
   const attributesObject = {
     ...attributes,
     ...idObject,
-  };
+  } as unknown as EntityData<E>;
 
   const entityIns = this.microOrmUtilService.createEntity(attributesObject);
 

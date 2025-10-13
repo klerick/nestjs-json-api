@@ -456,10 +456,9 @@ export class MicroOrmUtilService<
       ...[...(include || []), ...ObjectTyped.keys(relationFields)],
     ]);
 
-    for (const item of resultInclude) {
-      const relationProps = this.getRelation(
-        item as unknown as EntityKey<E, false>
-      );
+    for (const itemFromloop of resultInclude) {
+      const item = itemFromloop as unknown as EntityKey<E, false>;
+      const relationProps = this.getRelation(item);
       const relationEntity = relationProps.entity() as EntityClass<E>;
       const relationAlias = this.getAliasForEntity(relationEntity);
       const mainAlias = this.currentAlias;
