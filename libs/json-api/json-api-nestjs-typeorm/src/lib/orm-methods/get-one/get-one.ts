@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { ValidateQueryError, QueryOne } from '@klerick/json-api-nestjs';
 import { ObjectTyped, ResourceObject } from '@klerick/json-api-nestjs-shared';
-import { TypeOrmService } from '../../service';
+import { RelationAlias, TypeOrmService } from '../../service';
 
 export async function getOne<E extends object, IdKey extends string>(
   this: TypeOrmService<E, IdKey>,
@@ -34,7 +34,7 @@ export async function getOne<E extends object, IdKey extends string>(
           selectFields.add(
             this.typeormUtilsService.getAliasPath(
               itemFieldRel,
-              this.typeormUtilsService.getAliasForRelation(rel as any)
+              this.typeormUtilsService.getAliasForRelation(rel as keyof RelationAlias<E>)
             )
           );
         }
@@ -43,7 +43,8 @@ export async function getOne<E extends object, IdKey extends string>(
   }
 
   if (include) {
-    for (const rel of include) {
+    for (const relFromLoop of include) {
+      const rel = relFromLoop as keyof RelationAlias<E>
       const currentIncludeAlias =
         this.typeormUtilsService.getAliasForRelation(rel);
 

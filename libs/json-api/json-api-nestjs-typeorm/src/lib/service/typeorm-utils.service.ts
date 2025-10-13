@@ -10,8 +10,6 @@ import {
   Equal,
   In,
   Repository,
-  ILike,
-  FindOperator,
 } from 'typeorm';
 import { RelationMetadata as TypeOrmRelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import {
@@ -40,7 +38,7 @@ import {
 import { CURRENT_ENTITY_REPOSITORY } from '../constants';
 import { DriverUtils } from 'typeorm/driver/DriverUtils';
 
-type RelationAlias<E> = {
+export type RelationAlias<E> = {
   [K in UnionToTuple<RelationKeys<E>>[number] & PropertyKey]: string;
 };
 type RelationMetadata<E> = {
