@@ -1,18 +1,11 @@
 import { z } from 'zod';
 
-const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-type Literal = z.infer<typeof literalSchema>;
-type Json = Literal | { [key: string]: Json } | Json[];
-const jsonSchema: z.ZodType<Json> = z.lazy(() =>
-  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
-);
-
 const zParams = z.union([
   z.string(),
   z.number(),
   z.boolean(),
   z.null(),
-  jsonSchema,
+  z.json(),
 ]);
 
 export const zVersion = z.literal('2.0');
@@ -20,7 +13,7 @@ const zMethod = z.string().transform((params, ctx) => {
   const result = params.split('.');
   if (result.length !== 2) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'Not a 2 items',
     });
     return z.NEVER;
@@ -32,7 +25,7 @@ const zMethod = z.string().transform((params, ctx) => {
 });
 
 const zRpcParams = z
-  .union([z.array(zParams), z.record(zParams)])
+  .union([z.array(zParams), z.record(z.string(), zParams)])
   .transform((params) =>
     Array.isArray(params) ? params : Object.values(params)
   );
