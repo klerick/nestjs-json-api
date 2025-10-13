@@ -34,8 +34,7 @@ export class QueryFiledInIncludePipe<E extends object>
     }
 
     if (fields) {
-      const { target: targetResourceFields, ...relationFields } = fields;
-      const selectRelationFields = ObjectTyped.keys(relationFields);
+      const selectRelationFields = ObjectTyped.keys(fields).filter( (key) => key !== 'target');
       const fieldsErrors = selectRelationFields
         .filter((i) => !includeSet.has(i.toString()))
         .map<ValidateQueryError>((i) => ({
@@ -48,8 +47,7 @@ export class QueryFiledInIncludePipe<E extends object>
     }
 
     if (sort) {
-      const { target: targetResourceSorts, ...relationSorts } = sort;
-      const selectRelationFields = ObjectTyped.keys(relationSorts);
+      const selectRelationFields = ObjectTyped.keys(sort).filter( (key) => key !== 'target');
       const fieldsErrors = selectRelationFields
         .filter((i) => !includeSet.has(i.toString()))
         .map<ValidateQueryError>((i) => ({

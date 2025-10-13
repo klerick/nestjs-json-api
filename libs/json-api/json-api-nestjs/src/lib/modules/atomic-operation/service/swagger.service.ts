@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { generateSchema } from '@anatine/zod-openapi';
+import { z } from 'zod';
 import {
   ReferenceObject,
   SchemaObject,
@@ -34,7 +34,7 @@ export class SwaggerService implements OnModuleInit {
 
     ApiBody({
       description: `Json api schema for new atomic operatiom`,
-      schema: generateSchema(this.typeZodInputOperation) as
+      schema: z.toJSONSchema(this.typeZodInputOperation) as
         | SchemaObject
         | ReferenceObject,
       required: true,

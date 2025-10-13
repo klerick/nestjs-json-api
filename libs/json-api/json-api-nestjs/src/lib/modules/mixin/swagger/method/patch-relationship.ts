@@ -3,7 +3,7 @@ import {
   ReferenceObject,
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { generateSchema } from '@anatine/zod-openapi';
+import { z } from 'zod';
 import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
@@ -48,7 +48,7 @@ export function patchRelationship<
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: generateSchema(zodPatchRelationship) as
+    schema: z.toJSONSchema(zodPatchRelationship) as
       | SchemaObject
       | ReferenceObject,
     required: true,

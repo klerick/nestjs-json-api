@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { z } from 'zod';
 
 import {
   EntityParam,

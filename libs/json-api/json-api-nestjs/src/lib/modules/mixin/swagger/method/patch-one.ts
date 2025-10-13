@@ -1,15 +1,19 @@
 import { Type } from '@nestjs/common';
+import { z } from 'zod';
 import {
   ReferenceObject,
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { generateSchema } from '@anatine/zod-openapi';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
 
-import { errorSchema, jsonSchemaResponse } from '../utils';
+import {
+  errorSchema,
+  jsonSchemaResponse,
+  zodToJSONSchemaParams,
+} from '../utils';
 import { zodPatch } from '../../zod';
 import { EntityParamMapService } from '../../service';
 
@@ -38,7 +42,7 @@ export function patchOne<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: generateSchema(zodPatch(mapEntity)) as
+    schema: z.toJSONSchema(zodPatch(mapEntity), zodToJSONSchemaParams) as
       | SchemaObject
       | ReferenceObject,
     required: true,

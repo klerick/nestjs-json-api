@@ -36,9 +36,7 @@ describe('QueryInputPipe', () => {
 
     const result = pipe.transform(input);
     expect(result).toBe(input);
-    expect(zodSchemaMock.parse).toHaveBeenCalledWith(input, {
-      errorMap: expect.any(Function),
-    });
+    expect(zodSchemaMock.parse).toHaveBeenCalledWith(input);
   });
 
   it('should throw a BadRequestException when ZodError occurs', () => {

@@ -1,4 +1,4 @@
-import { zodPatch, PatchData } from './';
+import { zodPatch } from './';
 import { ZodError } from 'zod';
 
 import { usersEntityParamMapMockData } from '../../../../utils/___test___/test.helper';

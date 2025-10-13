@@ -15,7 +15,7 @@ export function zodIncludeQuery<E extends object, IdKey extends string>(
     .array()
     .nonempty()
     .refine(uniqueArray(), {
-      message: 'Include should have unique relation',
+      error: 'Include should have unique relation',
     })
     .nullable();
 }

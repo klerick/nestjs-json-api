@@ -34,7 +34,7 @@ describe('zodFieldsQuerySchema', () => {
     expect.assertions(2);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toContain('Expected array');
+      expect(result.error.issues[0].message).toContain('expected array');
     }
   });
 
@@ -57,7 +57,7 @@ describe('zodFieldsQuerySchema', () => {
     }
   });
 
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is unique', () => {
     const input = { target: ['id', 'id'] };
     const result = schema.safeParse(input);
     expect.assertions(2);
@@ -68,8 +68,7 @@ describe('zodFieldsQuerySchema', () => {
       );
     }
   });
-
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is strict and does not allow extra fields with not unique', () => {
     const input = { target1: ['id', 'id'] };
     const result = schema.safeParse(input);
     expect.assertions(2);
@@ -81,7 +80,7 @@ describe('zodFieldsQuerySchema', () => {
     }
   });
 
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is strict and does not allow extra fields with empty object', () => {
     const input = {};
     const result = schema.safeParse(input);
     expect.assertions(2);
@@ -92,27 +91,27 @@ describe('zodFieldsQuerySchema', () => {
       );
     }
   });
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is strict and does not allow extra fields with empty array', () => {
     const input: [] = [];
     const result = schema.safeParse(input);
     expect.assertions(2);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toContain('Expected object');
+      expect(result.error.issues[0].message).toContain('expected object');
     }
   });
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is strict and does not allow extra fields with input null', () => {
     const input = null;
     const result = schema.safeParse(input);
     expect(result.success).toBe(true);
   });
-  it('should ensure the schema is strict and does not allow extra fields', () => {
+  it('should ensure the schema is strict and does not allow extra fields with input empty string', () => {
     const input = '';
     const result = schema.safeParse(input);
     expect.assertions(2);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toContain('Expected object');
+      expect(result.error.issues[0].message).toContain('expected object');
     }
   });
 });

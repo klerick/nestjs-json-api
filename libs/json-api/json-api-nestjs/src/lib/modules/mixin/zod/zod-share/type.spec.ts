@@ -1,5 +1,5 @@
-import { zodType, ZodType } from './type';
 import { ZodError } from 'zod';
+import { zodType, ZodType } from './type';
 
 describe('type', () => {
   const literal = 'users';

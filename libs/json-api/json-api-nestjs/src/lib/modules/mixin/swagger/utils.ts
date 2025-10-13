@@ -12,6 +12,8 @@ import { EntityParam, RelationProperty, TypeField } from '../../../types';
 
 import { EntityParamMap } from '../types';
 import { EntityParamMapService } from '../service';
+import { toJSONSchema } from 'zod';
+import { mapTransformFunctionToJsonShema } from '../zod';
 
 export function assertIsKeysOfObject<E extends object>(
   object: EntityClass<E>,
@@ -340,4 +342,19 @@ export function getEntityMapProps<E extends object>(
   const entityMap = mapEntity.get(entity);
   if (!entityMap) throw new Error('Entity not found in map');
   return entityMap;
+}
+
+
+export const zodToJSONSchemaParams: Parameters<typeof toJSONSchema>[1] = {
+  unrepresentable: 'any',
+  override(ctx){
+    const def = ctx.zodSchema._zod.def
+
+    if (!def || !def?.type) return
+    if (def.type === 'transform'){
+      const shema = mapTransformFunctionToJsonShema.get(def.transform.name)
+      if (!shema) return;
+      Object.assign(ctx.jsonSchema, shema)
+    }
+  }
 }

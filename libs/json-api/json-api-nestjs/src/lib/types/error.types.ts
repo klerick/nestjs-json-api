@@ -1,9 +1,10 @@
-import { ZodIssue } from 'zod';
+import { z } from 'zod';
 
 export type InnerErrorType =
   | 'invalid_arguments'
   | 'unrecognized_keys'
-  | 'internal_error';
+  | 'internal_error'
+  | 'invalid_intersection_types';
 
 export type InnerError = {
   code: InnerErrorType;
@@ -13,4 +14,4 @@ export type InnerError = {
   error?: Error;
 };
 
-export type ValidateQueryError = ZodIssue | InnerError;
+export type ValidateQueryError = z.core.$ZodIssue | InnerError;

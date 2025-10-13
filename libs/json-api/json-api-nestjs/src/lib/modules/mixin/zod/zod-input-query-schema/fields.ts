@@ -4,62 +4,77 @@ import { z } from 'zod';
 import { EntityParam } from '../../../../types';
 import { nonEmptyObject, getValidationErrorForStrict } from '../zod-utils';
 import { EntityParamMapService } from '../../service';
+import { transformStringToArray } from '../map-transform-to-json-shema';
 
 function getZodRules() {
   return z
     .string()
     .optional()
-    .transform((input) => (input ? input.split(',') : undefined));
+    .transform(transformStringToArray);
 }
 
 type ZodRule = ReturnType<typeof getZodRules>;
+type CastPropertyKey<T> = T extends PropertyKey ? T : never;
+type ZorRelationType<E extends object, IdKey extends string> = Record<CastPropertyKey<EntityParam<E, IdKey>['relations'][number]>, ZodRule>;
 
 export function zodFieldsInputQuery<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
-  const target = z.object({
-    target: getZodRules(),
-  });
+  const {relations} = entityParamMapService.entityParaMap;
 
-  const relation = entityParamMapService.entityParaMap.relations.reduce(
+  const relation = relations.reduce(
     (acum, item) => ({
       ...acum,
       [item as PropertyKey]: getZodRules(),
     }),
-    {} as {
-      [K in EntityParam<E, IdKey>['relations'][number] & PropertyKey]: ZodRule;
-    }
+    {} as ZorRelationType<E, IdKey>
   );
 
-  return target
-    .merge(z.object(relation))
-    .strict(
-      getValidationErrorForStrict(
-        [
-          'target',
-          ...(entityParamMapService.entityParaMap.relations as string[]),
-        ],
-        'Fields'
+  return (
+    z
+      .strictObject(
+        {
+          target: getZodRules(),
+          ...relation,
+        },
+        {
+          error: (err) =>
+            err.code === 'unrecognized_keys'
+              ? getValidationErrorForStrict(
+                [
+                  'target',
+                  ...(entityParamMapService.entityParaMap
+                    .relations as string[]),
+                ],
+                'Fields'
+              )
+              : err.message,
+        }
       )
-    )
-    .refine(nonEmptyObject(), {
-      message: 'Validation error: Need select field for target or relation',
-    })
-    .optional()
-    .transform((input) => {
-      if (!input) return null;
+      .refine(nonEmptyObject(), {
+        message: 'Validation error: Need select field for target or relation',
+      })
+      .optional()
+      .transform((input) => {
+        if (!input) return null;
 
-      const result = ObjectTyped.entries(input).reduce((acum, [key, value]) => {
-        if (!value || value.length === 0) return acum;
+        const result = ObjectTyped.entries(input).reduce(
+          (acum, entries) => {
+            const [key, value] = entries as unknown as [key: keyof typeof input, z.infer<ZodRule>];
 
-        return {
-          ...acum,
-          [key]: value,
-        };
-      }, {} as typeof input);
+            if (!value || value.length === 0) return acum;
 
-      return Object.keys(result).length > 0 ? result : null;
-    });
+            return {
+              ...acum,
+              [key]: value,
+            };
+          },
+          {} as typeof input
+        );
+
+        return Object.keys(result).length > 0 ? result : null;
+      })
+  );
 }
 
 export type ZodFieldsInputQuery<

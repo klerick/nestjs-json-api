@@ -21,8 +21,8 @@ export type RelData<T extends string> = z.infer<ZodRelData<T>>;
 export function zodData() {
   return z
     .object({
-      type: z.coerce.string(),
-      id: z.coerce.string(),
+      type: z.string(),
+      id: z.string(),
     })
     .strict()
     .refine(nonEmptyObject);

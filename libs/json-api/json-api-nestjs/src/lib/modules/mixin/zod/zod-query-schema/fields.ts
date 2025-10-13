@@ -21,7 +21,7 @@ function getZodFieldRule<
     .array()
     .nonempty()
     .refine(uniqueArray(), {
-      message: 'Field should be unique',
+      error: 'Field should be unique',
     })
     .optional();
 }
@@ -36,7 +36,7 @@ type ZodFieldRule<
   PropsList extends ShapeArrayInput<E, IdKey>
 > = ReturnType<typeof getZodFieldRule<E, IdKey, PropsList>>;
 
-type ZodFieldsShape<E extends object, IdKey extends string> = {
+export type ZodFieldsShape<E extends object, IdKey extends string> = {
   target: ZodFieldRule<E, IdKey, EntityParam<E, IdKey>['props']>;
 } & {
   [K in keyof EntityRelationProps<E, IdKey>]: ZodFieldRule<
@@ -48,7 +48,7 @@ type ZodFieldsShape<E extends object, IdKey extends string> = {
 
 function getShapeFields<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
-): ZodObject<ZodFieldsShape<E, IdKey>, 'strict'> {
+): ZodObject<ZodFieldsShape<E, IdKey>, z.core.$strict> {
   const relationList = getRelationProps(entityParamMapService);
 
   const fieldShape = ObjectTyped.entries(relationList).reduce(
@@ -63,7 +63,12 @@ function getShapeFields<E extends object, IdKey extends string>(
     } as ZodFieldsShape<E, IdKey>
   );
 
-  return z.object(fieldShape).strict('Should be only target of relation');
+  return z.strictObject(fieldShape, {
+    error: (err) =>
+      err.code === 'unrecognized_keys'
+        ? 'Should be only target of relation'
+        : err.message,
+  });
 }
 
 export function zodFieldsQuery<E extends object, IdKey extends string>(

@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { ZodError } from 'zod';
-import { errorMap } from 'zod-validation-error';
 
 import { JSONValue } from '../../types';
 import { PatchRelationshipData, ZodPatchRelationship } from '../../zod';
@@ -18,9 +17,7 @@ export class PatchRelationshipPipe
   private zodInputPatchRelationshipSchema!: ZodPatchRelationship;
   transform(value: JSONValue): PatchRelationshipData {
     try {
-      return this.zodInputPatchRelationshipSchema.parse(value, {
-        errorMap: errorMap,
-      })['data'];
+      return this.zodInputPatchRelationshipSchema.parse(value)['data'];
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);
