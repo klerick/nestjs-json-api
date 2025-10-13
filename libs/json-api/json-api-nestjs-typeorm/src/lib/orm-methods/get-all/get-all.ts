@@ -1,7 +1,7 @@
 import { Query, ASC, DESC } from '@klerick/json-api-nestjs';
 import { ObjectTyped, ResourceObject } from '@klerick/json-api-nestjs-shared';
 
-import { TypeOrmService } from '../../service';
+import { RelationAlias, TypeOrmService } from '../../service';
 
 import {
   ALIAS_FOR_PAGINATION,
@@ -173,7 +173,7 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
   }
   if (include) {
     for (const rel of include) {
-      includeRel.add(rel);
+      includeRel.add(`${rel}`);
     }
   }
   const fieldsCast = fields as Query<Record<string, any>, IdKey>['fields'];
@@ -181,9 +181,9 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
     if (include) {
       for (const rel of include) {
         const currentIncludeAlias =
-          this.typeormUtilsService.getAliasForRelation(rel);
+          this.typeormUtilsService.getAliasForRelation(rel as keyof RelationAlias<E>);
         const primaryColumnName =
-          this.typeormUtilsService.getPrimaryColumnForRel(rel);
+          this.typeormUtilsService.getPrimaryColumnForRel(rel as keyof RelationAlias<E>);
         selectFields.add(`${currentIncludeAlias}.${primaryColumnName}`);
       }
     }
