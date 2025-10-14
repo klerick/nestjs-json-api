@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/json-rpc/nestjs-json-rpc/src",
   "projectType": "library",
+  "tags": ["type:lib", "lib:nestjs-json-rpc", "type:publish"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -49,6 +50,5 @@
         "packageRoot": "dist/libs/json-rpc/nestjs-json-rpc"
       }
     }
-  },
-  "tags": ["type:lib", "lib:nestjs-json-rpc", "lib:nestjs-json-rpc", "type:publish"]
+  }
 }
