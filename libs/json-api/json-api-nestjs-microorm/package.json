@@ -17,5 +17,6 @@
   "peerDependencies": {
     "@klerick/json-api-nestjs": "0.0.0",
     "@mikro-orm/nestjs": "^6.1.0"
-  }
+  },
+  "dependencies": {}
 }
