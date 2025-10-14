@@ -12,6 +12,7 @@
     "CRUD"
   ],
   "dependencies": {},
+  "peerDependencies": {},
   "type": "commonjs",
   "main": "./cjs/src/index.js",
   "types": "./cjs/src/index.d.ts",
