@@ -168,12 +168,12 @@ export class JsonApiTransformerService<
       })) as BaseMainData<E, IdKey, Rel>['data'];
     } else {
       assertColumnName(item[rel] as any, relationMapPops.primaryColumnName);
-      return props
-        ? ({
+      return (props
+        ? {
             type: relationMapPops.typeName,
             id: (props[relationMapPops.primaryColumnName] as any).toString(),
-          } as any)
-        : null;
+          }
+        : null) as BaseMainData<E, IdKey, Rel>['data'];
     }
   }
 

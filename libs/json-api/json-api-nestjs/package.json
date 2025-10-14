@@ -12,10 +12,17 @@
     "microorm",
     "CRUD"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "tslib": ">2.3.0",
     "reflect-metadata": "^0.1.12 || ^0.2.0",
     "rxjs": "^7.1.0",
-    "@klerick/json-api-nestjs-shared": "0.0.0"
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/core": "^11.1.0",
+    "@nestjs/swagger": "^11.2.0"
+  },
+  "dependencies": {
+    "@klerick/json-api-nestjs-shared": "0.0.0",
+    "zod": "^4.1.0",
+    "zod-validation-error": "^4.0.0"
   }
 }
