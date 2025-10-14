@@ -22,7 +22,7 @@ describe('QueryPipe', () => {
         {
           provide: ZOD_QUERY_SCHEMA,
           useValue: {
-            parse: jest.fn(),
+            parse: vi.fn(),
           },
         },
       ],
@@ -71,7 +71,7 @@ describe('QueryPipe', () => {
       [QueryField.page]: { number: 1, size: 10 },
     };
 
-    jest.spyOn(zodQuerySchemaMock, 'parse').mockReturnValue(parsedQuery);
+    vi.spyOn(zodQuerySchemaMock, 'parse').mockReturnValue(parsedQuery);
 
     const result = queryPipe.transform(inputQuery);
 
@@ -86,7 +86,7 @@ describe('QueryPipe', () => {
     } as unknown as InputQuery<Users, 'id'>;
     const zodError = new ZodError([]);
 
-    jest.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {
+    vi.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {
       throw zodError;
     });
 
@@ -100,7 +100,7 @@ describe('QueryPipe', () => {
     } as unknown as InputQuery<Users, 'id'>;
     const unexpectedError = new Error('Unexpected error');
 
-    jest.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {
+    vi.spyOn(zodQuerySchemaMock, 'parse').mockImplementation(() => {
       throw unexpectedError;
     });
 

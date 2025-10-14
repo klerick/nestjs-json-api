@@ -22,7 +22,7 @@ describe('Check util module', () => {
   });
 
   it('onApplicationBootstrap', async () => {
-    jest
+    vi
       .spyOn(explorerService, 'explore')
       .mockReturnValue([TestClass, Test2Class]);
     utilModule.onApplicationBootstrap();

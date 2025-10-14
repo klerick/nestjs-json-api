@@ -25,31 +25,31 @@ describe('JsonApiUtilsService', () => {
 
   it('should call all helper functions with correct parameters', () => {
     // Mock the helper functions
-    const includeSpy = jest
+    const includeSpy = vi
       // @ts-ignore
       .spyOn(service, 'getIncludeParam')
       // @ts-ignore
       .mockReturnValue(new HttpParams());
 
-    const sortSpy = jest
+    const sortSpy = vi
       // @ts-ignore
       .spyOn(service, 'getSortParam')
       // @ts-ignore
       .mockReturnValue(new HttpParams());
 
-    const pageSpy = jest
+    const pageSpy = vi
       // @ts-ignore
       .spyOn(service, 'getPageParam')
       // @ts-ignore
       .mockReturnValue(new HttpParams());
 
-    const fieldSpy = jest
+    const fieldSpy = vi
       // @ts-ignore
       .spyOn(service, 'getFieldParam')
       // @ts-ignore
       .mockReturnValue(new HttpParams());
 
-    const filterSpy = jest
+    const filterSpy = vi
       // @ts-ignore
       .spyOn(service, 'getFilterParam')
       // @ts-ignore

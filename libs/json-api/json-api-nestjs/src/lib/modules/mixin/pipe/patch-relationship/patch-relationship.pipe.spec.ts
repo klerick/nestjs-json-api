@@ -35,8 +35,8 @@ describe('PatchInputPipe', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('It should be ok', () => {
@@ -46,14 +46,14 @@ describe('PatchInputPipe', () => {
     const check = {
       data,
     };
-    jest
+    vi
       .spyOn(zodInputPatchRelationshipSchema, 'parse')
       .mockImplementationOnce(() => check as any);
     expect(patchRelationshipPipe.transform(check)).toEqual(data);
   });
 
   it('Should be not ok', () => {
-    jest
+    vi
       .spyOn(zodInputPatchRelationshipSchema, 'parse')
       .mockImplementationOnce(() => {
         throw new ZodError([]);
@@ -67,7 +67,7 @@ describe('PatchInputPipe', () => {
   });
 
   it('Should be 500', () => {
-    jest
+    vi
       .spyOn(zodInputPatchRelationshipSchema, 'parse')
       .mockImplementationOnce(() => {
         throw new Error('Error mock');

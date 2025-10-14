@@ -1,11 +1,11 @@
 import { RpcBatchFactory, RpcBatchFactoryPromise } from './rpc-batch';
 import { WrapperCall } from './wrapper-call';
 import { RpcError } from '../types';
-import { of } from 'rxjs';
+import { lastValueFrom, of } from 'rxjs';
 
 describe('rpc-batch', () => {
-  it('RpcBatchFactory', (done) => {
-    const transport = jest.fn().mockImplementationOnce((data) => {
+  it('RpcBatchFactory', async () => {
+    const transport = vi.fn().mockImplementationOnce((data) => {
       expect(data.map((i: any) => i.id)).toEqual([1, 2, 3]);
       const errorObj = {
         error: {
@@ -47,17 +47,17 @@ describe('rpc-batch', () => {
       transport
     ) as any;
 
-    rpcBatch(call3, call1, call2).subscribe((result) => {
-      const [r3, r1, r2] = result;
-      expect(r3).toBeInstanceOf(RpcError);
-      expect(r2).toEqual(call2.arg);
-      expect(r1).toEqual(call1.arg);
-      done();
-    });
+    const result = await lastValueFrom(rpcBatch(call3, call1, call2))
+    const [r3, r1, r2] = result;
+    expect(r3).toBeInstanceOf(RpcError);
+    expect(r2).toEqual(call2.arg);
+    expect(r1).toEqual(call1.arg);
+
+
   });
 
   it('RpcBatchFactoryPromise', async () => {
-    const transport = jest.fn().mockImplementationOnce((data) => {
+    const transport = vi.fn().mockImplementationOnce((data) => {
       expect(data.map((i: any) => i.id)).toEqual([4, 5, 6]);
       const errorObj = {
         error: {

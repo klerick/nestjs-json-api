@@ -62,12 +62,12 @@ describe('patchRelationship', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('Should be ok', async () => {
-    jest
+    vi
       .spyOn(transformDataService, 'transformRel')
       // @ts-ignore
       .mockImplementation((item, rel) => {

@@ -4,16 +4,6 @@
   "sourceRoot": "libs/type-for-rpc/src",
   "projectType": "library",
   "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/type-for-rpc",
-        "main": "libs/type-for-rpc/src/index.ts",
-        "tsConfig": "libs/type-for-rpc/tsconfig.lib.json",
-        "assets": ["libs/type-for-rpc/*.md"]
-      }
-    }
   },
   "tags": []
 }

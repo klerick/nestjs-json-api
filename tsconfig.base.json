@@ -15,11 +15,17 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@klerick/json-api-nestjs": [
+        "libs/json-api/json-api-nestjs/src/index.ts"
+      ],
       "@klerick/json-api-nestjs-microorm": [
-        "dist/libs/json-api/json-api-nestjs-microorm"
+        "libs/json-api/json-api-nestjs-microorm/src/index.ts"
+      ],
+      "@klerick/json-api-nestjs-shared": [
+        "libs/json-api/json-api-nestjs-shared/src/index.ts"
       ],
       "@klerick/json-api-nestjs-typeorm": [
-        "dist/libs/json-api/json-api-nestjs-typeorm"
+        "libs/json-api/json-api-nestjs-typeorm/src/index.ts"
       ],
       "@klerick/nestjs-json-rpc": [
         "libs/json-rpc/nestjs-json-rpc/src/index.ts"

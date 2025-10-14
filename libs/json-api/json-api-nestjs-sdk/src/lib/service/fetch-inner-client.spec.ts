@@ -1,9 +1,10 @@
-import { of } from 'rxjs';
+import { lastValueFrom, of } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
 
 import { FetchInnerClient } from './fetch-inner-client';
+import { Mock } from 'vitest';
 
-jest.mock('rxjs/fetch');
+vi.mock('rxjs/fetch');
 
 describe('FetchInnerClient', () => {
   let fetchInnerClient: FetchInnerClient;
@@ -13,7 +14,7 @@ describe('FetchInnerClient', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('delete', () => {
@@ -22,7 +23,7 @@ describe('FetchInnerClient', () => {
       const expectedRequestInit: RequestInit = {
         method: 'delete',
       };
-      const requestSpy = jest
+      const requestSpy = vi
         .spyOn(fetchInnerClient as any, 'request')
         .mockReturnValue(of(null));
 
@@ -39,7 +40,7 @@ describe('FetchInnerClient', () => {
         body: JSON.stringify(body),
       };
 
-      const requestSpy = jest
+      const requestSpy = vi
         .spyOn(fetchInnerClient as any, 'request')
         .mockReturnValue(of(null)); // Mock request method return
 
@@ -54,7 +55,7 @@ describe('FetchInnerClient', () => {
     const expectedParams = { params: { key: 'value' } }; // please update these params based on your test case
     const expectedResult = 'test'; // please update this based on your expect result
 
-    const requestSpy = jest
+    const requestSpy = vi
       .spyOn(fetchInnerClient as any, 'request')
       .mockReturnValue(of(expectedResult));
 
@@ -75,7 +76,7 @@ describe('FetchInnerClient', () => {
     const expectedBody = { key: 'value' } as any; // update this with your test body data
     const expectedResult = 'test'; // update this with your expected result
 
-    const requestSpy = jest
+    const requestSpy = vi
       .spyOn(fetchInnerClient as any, 'request')
       .mockReturnValue(of(expectedResult));
 
@@ -92,50 +93,42 @@ describe('FetchInnerClient', () => {
     });
   });
 
-  it('should call the request method with the correct URL, method and body when post is called', (done) => {
+  it('should call the request method with the correct URL, method and body when post is called', async () => {
     const expectedURL = 'https://yourtesturl.com/path'; // update this with your test URL
     const expectedBody = { key: 'value' } as any; // update this with your test body data
     const expectedResult = 'test'; // update this with your expected result
 
-    const requestSpy = jest
+    const requestSpy = vi
       .spyOn(fetchInnerClient as any, 'request')
       .mockReturnValue(of(expectedResult));
 
-    fetchInnerClient.post(expectedURL, expectedBody).subscribe({
-      next: (res) => {
-        expect(res).toBe(expectedResult);
-      },
-      complete: () => {
-        expect(requestSpy).toBeCalledWith(expectedURL, {
-          method: 'post',
-          body: JSON.stringify(expectedBody),
-        });
-        done();
-      },
+    const stream$ = fetchInnerClient.post(expectedURL, expectedBody);
+    const res = await lastValueFrom(stream$);
+    expect(res).toBe(expectedResult);
+    expect(requestSpy).toBeCalledWith(expectedURL, {
+      method: 'post',
+      body: JSON.stringify(expectedBody),
     });
   });
 
-  it('should correctly call fromFetch function with the provided url and request data when request is called', (done) => {
+  it('should correctly call fromFetch function with the provided url and request data when request is called', async () => {
     const expectedURL = 'https://yourtesturl.com/path'; // update with your test URL
     const expectedInitData: RequestInit = { method: 'get' }; // update with your test request data
 
-    const mockResponse = { json: jest.fn() }; // a mock response object, modify as needed.
+    const mockResponse = { json: vi.fn() }; // a mock response object, modify as needed.
 
-    (fromFetch as jest.Mock).mockReturnValue(of(mockResponse));
+    (fromFetch as Mock).mockReturnValue(of(mockResponse));
 
     const observable = (fetchInnerClient as any).request(
       expectedURL,
       expectedInitData
     );
 
-    observable.subscribe({
-      complete: () => {
-        expect(fromFetch).toHaveBeenCalledWith(expectedURL, {
-          ...expectedInitData,
-          selector: expect.any(Function),
-        });
-        done();
-      },
+
+    await lastValueFrom(observable);
+    expect(fromFetch).toHaveBeenCalledWith(expectedURL, {
+      ...expectedInitData,
+      selector: expect.any(Function),
     });
   });
 

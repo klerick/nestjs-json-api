@@ -61,12 +61,12 @@ describe('getRelationship', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('Should be ok', async () => {
-    const spyOnTransformData = jest.spyOn(transformDataService, 'transformRel');
+    const spyOnTransformData = vi.spyOn(transformDataService, 'transformRel');
     const id = 1;
     const rel = 'roles';
     const check = await userRepository.findOne({

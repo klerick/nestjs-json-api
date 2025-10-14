@@ -18,10 +18,11 @@ import {
 import { ParamsForExecute } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import { Mock } from 'vitest';
 
 describe('ExecuteService', () => {
   let service: ExecuteService;
-  let runInTransaction: jest.Mock;
+  let runInTransaction:  Mock;
   let moduleRef: ModuleRef;
   let asyncIteratorFactory: IterateFactory;
   const mapControllerInterceptors = new Map();
@@ -31,18 +32,18 @@ describe('ExecuteService', () => {
         ExecuteService,
         {
           provide: RUN_IN_TRANSACTION_FUNCTION,
-          useValue: jest.fn(),
+          useValue: vi.fn(),
         },
         {
           provide: ModuleRef,
           useValue: {
-            get() {},
+            get: () => void 0,
           },
         },
         {
           provide: ASYNC_ITERATOR_FACTORY,
           useValue: {
-            createIterator: () => {},
+            createIterator: () => void 0,
           },
         },
         {
@@ -57,7 +58,7 @@ describe('ExecuteService', () => {
     }).compile();
 
     service = module.get<ExecuteService>(ExecuteService);
-    runInTransaction = module.get<jest.Mock>(RUN_IN_TRANSACTION_FUNCTION);
+    runInTransaction = module.get<Mock>(RUN_IN_TRANSACTION_FUNCTION);
     moduleRef = module.get<ModuleRef>(ModuleRef);
     asyncIteratorFactory = module.get<IterateFactory>(ASYNC_ITERATOR_FACTORY);
     mapControllerInterceptors.clear();
@@ -78,7 +79,7 @@ describe('ExecuteService', () => {
 
       runInTransaction.mockImplementationOnce((args: () => {}) => args());
 
-      jest.spyOn(service as any, 'executeOperations').mockImplementation(() => {
+      vi.spyOn(service as any, 'executeOperations').mockImplementation(() => {
         throw new NotFoundException();
       });
 
@@ -91,7 +92,7 @@ describe('ExecuteService', () => {
       const params: ParamsForExecute[] = [];
 
       runInTransaction.mockImplementationOnce((args: () => {}) => args());
-      jest.spyOn(service as any, 'executeOperations').mockReturnValue([]);
+      vi.spyOn(service as any, 'executeOperations').mockReturnValue([]);
 
       const result = await service.run(params, []);
       expect(result).toEqual([]);
@@ -107,17 +108,17 @@ describe('ExecuteService', () => {
           methodName: 'someMethod',
         },
       ] as unknown as ParamsForExecute[];
-      const callback = jest.fn().mockReturnValue({ value: 'test' });
+      const callback = vi.fn().mockReturnValue({ value: 'test' });
       const mapController = {
         someMethod: callback,
       };
-      jest
+      vi
         .spyOn(service as any, 'getControllerInstance')
         .mockReturnValue(mapController);
 
       mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
       let callCount = 0;
-      jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
+      vi.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
         [Symbol.asyncIterator]: () =>
           ({
             next: () => {
@@ -144,18 +145,18 @@ describe('ExecuteService', () => {
         },
       ] as unknown as ParamsForExecute[];
 
-      const callback = jest.fn().mockReturnValue('not an object');
+      const callback = vi.fn().mockReturnValue('not an object');
       const mapController = {
         someMethod: callback,
       };
-      jest
+      vi
         .spyOn(service as any, 'getControllerInstance')
         .mockReturnValue(mapController);
 
       mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
 
       let callCount = 0;
-      jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
+      vi.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
         [Symbol.asyncIterator]: () =>
           ({
             next: () => {
@@ -182,20 +183,20 @@ describe('ExecuteService', () => {
         },
       ] as unknown as ParamsForExecute[];
 
-      const callback = jest.fn().mockImplementation(() => {
+      const callback = vi.fn().mockImplementation(() => {
         throw new HttpException('Test exception', 400);
       });
       const mapController = {
         someMethod: callback,
       };
-      jest
+      vi
         .spyOn(service as any, 'getControllerInstance')
         .mockReturnValue(mapController);
 
       mapControllerInterceptors.set(mapController, new Map([[callback, []]]));
 
       let callCount = 0;
-      jest.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
+      vi.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
         [Symbol.asyncIterator]: () =>
           ({
             next: () => {
@@ -209,7 +210,7 @@ describe('ExecuteService', () => {
           } as any),
       });
 
-      const processExceptionSpy = jest.spyOn(
+      const processExceptionSpy = vi.spyOn(
         service as any,
         'processException'
       );
@@ -236,7 +237,7 @@ describe('ExecuteService', () => {
 
     it('should return controller instance if controller is found', () => {
       const controllerInstance = {
-        someMethod: jest.fn().mockReturnValue('test'),
+        someMethod: vi.fn().mockReturnValue('test'),
       };
       function TestController() {}
       const params: ParamsForExecute = {
@@ -276,10 +277,10 @@ describe('ExecuteService', () => {
               'test',
             ]);
           } else {
-            fail('Exception response is not a ZodError');
+            assert.fail('Exception response is not a ZodError');
           }
         } else {
-          fail('Caught exception is not a HttpException');
+          assert.fail('Caught exception is not a HttpException');
         }
       }
     });
@@ -296,7 +297,7 @@ describe('ExecuteService', () => {
   describe('runOneOperation', () => {
     it('should correctly run operation', async () => {
       const controllerInstance = {
-        someMethod: jest.fn().mockReturnValue('test'),
+        someMethod: vi.fn().mockReturnValue('test'),
       };
       function TestController() {}
       const pipes = [
@@ -321,7 +322,7 @@ describe('ExecuteService', () => {
         'someMethod'
       );
 
-      const runPipesSpy = jest
+      const runPipesSpy = vi
         .spyOn(service as any, 'runPipes')
         .mockImplementation((param) => `modified_${param}`);
 
@@ -341,7 +342,7 @@ describe('ExecuteService', () => {
 
     it('should not call runPipes if metadata is empty', async () => {
       const controllerInstance = {
-        someMethod: jest.fn().mockReturnValue('test'),
+        someMethod: vi.fn().mockReturnValue('test'),
       };
       function TestController() {}
       const params: ParamsForExecute = {
@@ -362,7 +363,7 @@ describe('ExecuteService', () => {
         'someMethod'
       );
 
-      const runPipesSpy = jest
+      const runPipesSpy = vi
         .spyOn(service as any, 'runPipes')
         .mockImplementation((param) => `modified_${param}`);
 
@@ -378,16 +379,16 @@ describe('ExecuteService', () => {
       const pipes = [new ParseBoolPipe(), new ParseIntPipe()];
       const module = {} as any;
 
-      jest
+      vi
         .spyOn(pipes[0], 'transform')
         // @ts-ignore
         .mockImplementation((val) => `validated_${val}`);
 
-      jest
+      vi
         .spyOn(pipes[1], 'transform')
         // @ts-ignore
         .mockImplementation((val) => `parsed_${val}`);
-      const getPipeInstanceSpy = jest
+      const getPipeInstanceSpy = vi
         .spyOn(service as any, 'getPipeInstance')
         .mockImplementation((pipe) =>
           pipe instanceof ParseBoolPipe ? pipes[0] : pipes[1]
@@ -408,7 +409,7 @@ describe('ExecuteService', () => {
       const value = 'test';
       const module = {} as any;
 
-      const getPipeInstanceSpy = jest.spyOn(service as any, 'getPipeInstance');
+      const getPipeInstanceSpy = vi.spyOn(service as any, 'getPipeInstance');
 
       const result = await (service as any).runPipes(value, module, []);
 
@@ -421,7 +422,7 @@ describe('ExecuteService', () => {
     it('should return pipe instance from module if it exists', () => {
       const pipe = new ParseBoolPipe();
       const module = {
-        getProviderByKey: jest.fn().mockReturnValue({ instance: pipe }),
+        getProviderByKey: vi.fn().mockReturnValue({ instance: pipe }),
       } as any;
 
       const result = (service as any).getPipeInstance(ParseBoolPipe, module);
@@ -433,9 +434,9 @@ describe('ExecuteService', () => {
     it('should return pipe instance from moduleRef if it does not exist in module', () => {
       const pipe = new ParseBoolPipe();
       const module = {
-        getProviderByKey: jest.fn().mockReturnValue(null),
+        getProviderByKey: vi.fn().mockReturnValue(null),
       } as any;
-      jest.spyOn(service['moduleRef'], 'get').mockReturnValue(pipe);
+      vi.spyOn(service['moduleRef'], 'get').mockReturnValue(pipe);
 
       const result = (service as any).getPipeInstance(ParseBoolPipe, module);
 

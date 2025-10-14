@@ -57,7 +57,7 @@ describe('QueryCheckSelectField', () => {
 
   it('Is invalid', () => {
     const query = getDefaultQuery<Users>();
-    jest.mocked(configParam).requiredSelectField = true;
+    vi.mocked(configParam).requiredSelectField = true;
     expect.assertions(1);
     try {
       queryCheckSelectField.transform(query);
@@ -67,7 +67,7 @@ describe('QueryCheckSelectField', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 });
