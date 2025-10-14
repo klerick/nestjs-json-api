@@ -10,8 +10,8 @@ import { Params } from '../types';
 describe('module-helper', () => {
   describe('getController', () => {
     beforeAll(() => {
-      Reflect.defineMetadata = jest.fn();
-      Reflect.getMetadata = jest.fn((key, target) => {
+      Reflect.defineMetadata = vi.fn();
+      Reflect.getMetadata = vi.fn((key, target) => {
         if (key === JSON_API_DECORATOR_ENTITY && (target as any).entity) {
           return (target as any).entity;
         }

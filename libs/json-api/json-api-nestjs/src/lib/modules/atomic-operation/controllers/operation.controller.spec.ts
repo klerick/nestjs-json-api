@@ -75,8 +75,8 @@ describe('OperationController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('index', () => {
@@ -102,25 +102,25 @@ describe('OperationController', () => {
 
       const mockReturnData = { data: { someData: '' } };
 
-      const getControllerByEntityNameSpy = jest
+      const getControllerByEntityNameSpy = vi
         .spyOn(explorerService, 'getControllerByEntityName')
         .mockReturnValue(paramsForExecuteMock[0].controller);
-      const getMethodNameByParamSpy = jest
+      const getMethodNameByParamSpy = vi
         .spyOn(explorerService, 'getMethodNameByParam')
         .mockReturnValue(
           paramsForExecuteMock[0].methodName as OperationMethode<object>
         );
-      const getModulesByControllerSpy = jest
+      const getModulesByControllerSpy = vi
         .spyOn(explorerService, 'getParamsForMethod')
         .mockReturnValue(
           paramsForExecuteMock[0].params as Parameters<
             JsonBaseController<Users>['deleteOne']
           >
         );
-      const getParamsForMethodSpy = jest
+      const getParamsForMethodSpy = vi
         .spyOn(explorerService, 'getModulesByController')
         .mockReturnValue(paramsForExecuteMock[0].module);
-      const runSpy = jest
+      const runSpy = vi
         .spyOn(executeService, 'run')
         .mockResolvedValue([mockReturnData] as never);
 
@@ -157,7 +157,7 @@ describe('OperationController', () => {
         },
       ];
 
-      jest
+      vi
         .spyOn(explorerService, 'getControllerByEntityName')
         .mockImplementationOnce(() => {
           throw new HttpException('Resource does not exist', 404);
@@ -182,11 +182,11 @@ describe('OperationController', () => {
         },
       ];
 
-      jest
+      vi
         .spyOn(explorerService, 'getControllerByEntityName')
         .mockReturnValue(Promise.resolve({}) as any);
 
-      jest
+      vi
         .spyOn(explorerService, 'getMethodNameByParam')
         .mockImplementationOnce(() => {
           throw new HttpException('Operation not allowed', 405);

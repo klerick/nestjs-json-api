@@ -5,6 +5,7 @@
   "prefix": "nestjs-json-api",
   "sourceRoot": "apps/json-api-front/src",
   "tags": [],
+  "implicitDependencies": ["json-api-nestjs-sdk"],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
@@ -60,7 +61,8 @@
           "buildTarget": "json-api-front:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "dependsOn": ["json-api-server:serve"]
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -68,6 +70,5 @@
         "buildTarget": "json-api-front:build"
       }
     }
-  },
-  "implicitDependencies": ["json-api-nestjs-sdk"]
+  }
 }

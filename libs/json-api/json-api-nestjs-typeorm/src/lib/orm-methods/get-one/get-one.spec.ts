@@ -63,12 +63,12 @@ describe('getOne', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('Get one item', async () => {
-    const spyOnTransformData = jest.spyOn(
+    const spyOnTransformData = vi.spyOn(
       transformDataService,
       'transformData'
     );
@@ -87,7 +87,7 @@ describe('getOne', () => {
     expect(spyOnTransformData).toBeCalledWith(checkData, query);
   });
   it('Get one item with select', async () => {
-    const spyOnTransformData = jest.spyOn(
+    const spyOnTransformData = vi.spyOn(
       transformDataService,
       'transformData'
     );

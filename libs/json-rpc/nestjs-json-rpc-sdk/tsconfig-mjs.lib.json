@@ -9,7 +9,7 @@
     "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "angularCompilerOptions": {
     "compilationMode": "partial",
     "enableI18nLegacyMessageIdFormat": false,

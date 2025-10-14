@@ -114,20 +114,6 @@
         "parallel": false
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
-        "codeCoverage": true,
-        "coverageReporters": [
-          "json-summary"
-        ],
-        "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig.spec.json"
-      }
-    },
     "upload-badge": {
       "executor": "nx:run-commands",
       "dependsOn": [

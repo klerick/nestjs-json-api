@@ -5,12 +5,36 @@
   "references": [
     {
       "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ],
   "compilerOptions": {
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "paths": {
+      "@nestjs-json-api/microorm-database": [
+        "libs/microorm-database/src/index.ts"
+      ],
+      "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
+      "@nestjs-json-api/typeorm-database": ["libs/typeorm-database/src/index.ts"],
+      "@klerick/json-api-nestjs": ["dist/libs/json-api/json-api-nestjs"],
+      "@klerick/json-api-nestjs-microorm": [
+        "dist/libs/json-api/json-api-nestjs-microorm"
+      ],
+      "@klerick/json-api-nestjs-sdk": ["dist/libs/json-api/json-api-nestjs-sdk"],
+      "@klerick/json-api-nestjs-shared": [
+        "dist/libs/json-api/json-api-nestjs-shared"
+      ],
+      "@klerick/json-api-nestjs-typeorm": [
+        "dist/libs/json-api/json-api-nestjs-typeorm"
+      ],
+      "@klerick/nestjs-json-rpc": [
+        "libs/json-rpc/nestjs-json-rpc/src/index.ts"
+      ],
+      "@klerick/nestjs-json-rpc-sdk": [
+        "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts"
+      ],
+      "@klerick/nestjs-json-rpc-sdk/ngModule": [
+        "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
+      ]
+    }
+  },
 }

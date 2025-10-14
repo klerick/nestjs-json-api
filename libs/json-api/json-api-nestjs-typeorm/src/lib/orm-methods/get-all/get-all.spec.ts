@@ -63,12 +63,12 @@ describe('getAll', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('order', async () => {
-    const spyOnTransformData = jest.spyOn(
+    const spyOnTransformData = vi.spyOn(
       transformDataService,
       'transformData'
     );
@@ -101,7 +101,7 @@ describe('getAll', () => {
   });
 
   it('include', async () => {
-    const spyOnTransformData = jest.spyOn(
+    const spyOnTransformData = vi.spyOn(
       transformDataService,
       'transformData'
     );
@@ -128,7 +128,7 @@ describe('getAll', () => {
   });
 
   it('select', async () => {
-    const spyOnTransformData = jest.spyOn(
+    const spyOnTransformData = vi.spyOn(
       transformDataService,
       'transformData'
     );
@@ -189,7 +189,7 @@ describe('getAll', () => {
     });
 
     it('Target props with null', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );
@@ -204,7 +204,7 @@ describe('getAll', () => {
     });
 
     it('Target props', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );
@@ -222,7 +222,7 @@ describe('getAll', () => {
     });
 
     it('Check relation with the same Entity', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );
@@ -260,7 +260,7 @@ describe('getAll', () => {
     // });
 
     it('Relation many-to-one', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );
@@ -292,7 +292,7 @@ describe('getAll', () => {
     });
 
     it('Relation one-to-many', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );
@@ -320,7 +320,7 @@ describe('getAll', () => {
     });
 
     it('Relation many-to-many', async () => {
-      const spyOnTransformData = jest.spyOn(
+      const spyOnTransformData = vi.spyOn(
         transformDataService,
         'transformData'
       );

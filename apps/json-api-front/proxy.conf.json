@@ -7,5 +7,9 @@
     "target": "http://localhost:3000",
     "secure": false,
     "ws": true
+  },
+  "/json-api-server-api": {
+    "target": "http://localhost:3000",
+    "secure": false
   }
 }

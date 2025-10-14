@@ -22,7 +22,7 @@ describe('PostInputPipe', () => {
         {
           provide: ZOD_POST_SCHEMA,
           useValue: {
-            parse: jest.fn(),
+            parse: vi.fn(),
           },
         },
       ],
@@ -36,7 +36,7 @@ describe('PostInputPipe', () => {
     const input: JSONValue = { key: 'value' } as any;
     const expectedData: PostData<Users, 'id'> = { id: 1, key: 'value' } as any;
 
-    jest
+    vi
       .spyOn(mockSchema, 'parse')
       .mockReturnValue({ data: expectedData } as any);
 
@@ -47,7 +47,7 @@ describe('PostInputPipe', () => {
   it('should throw BadRequestException if ZodError occurs', () => {
     const input: JSONValue = { key: 'value' };
 
-    jest.spyOn(mockSchema, 'parse').mockImplementation(() => {
+    vi.spyOn(mockSchema, 'parse').mockImplementation(() => {
       throw new ZodError([]);
     });
 
@@ -57,7 +57,7 @@ describe('PostInputPipe', () => {
   it('should throw InternalServerErrorException for non-Zod errors', () => {
     const input: JSONValue = { key: 'value' };
 
-    jest.spyOn(mockSchema, 'parse').mockImplementation(() => {
+    vi.spyOn(mockSchema, 'parse').mockImplementation(() => {
       throw new Error('Unexpected Error');
     });
 

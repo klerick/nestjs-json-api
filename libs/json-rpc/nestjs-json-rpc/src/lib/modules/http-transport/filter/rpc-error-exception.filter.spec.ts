@@ -35,7 +35,7 @@ describe('rpc-error-exception.filter', () => {
       ErrorCodeType.InvalidRequest,
       'InvalidRequest'
     );
-    const spySend = jest.spyOn(response, 'send');
+    const spySend = vi.spyOn(response, 'send');
     filter.catch(exception, argumentsHost);
     expect(spySend).toHaveBeenCalledWith(
       fromRpcErrorToRpcErrorObject(exception)
@@ -45,7 +45,7 @@ describe('rpc-error-exception.filter', () => {
   it('should catch Error and transform it to RpcErrorObject', () => {
     const filter = new RpcErrorExceptionFilter();
     const exception = new Error('Test Error');
-    const spySend = jest.spyOn(response, 'send');
+    const spySend = vi.spyOn(response, 'send');
     filter.catch(exception, argumentsHost);
     expect(spySend).toHaveBeenCalledWith(
       fromRpcErrorToRpcErrorObject(
