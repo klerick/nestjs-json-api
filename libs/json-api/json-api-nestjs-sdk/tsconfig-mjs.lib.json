@@ -5,13 +5,10 @@
     "declaration": true,
     "module": "es2015",
     "target": "ES2022",
-    "types": [
-      "node"
-    ]
+    "types": ["node"],
+    "moduleResolution": "bundler"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "jest.config.ts",
     "src/**/*.spec.ts",
