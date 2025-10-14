@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { AxiosStatic, AxiosResponse } from 'axios';
 import { Observable } from 'rxjs';
 
 import {
@@ -11,7 +11,7 @@ import {
 import { map } from 'rxjs/operators';
 
 export function axiosTransportFactory<T extends LoopFunc>(
-  axios: Axios
+  axios: AxiosStatic
 ): HttpAgentFactory<T> {
   return (url: string) => (body: PayloadRpc<T>) => {
     const controller = new AbortController();

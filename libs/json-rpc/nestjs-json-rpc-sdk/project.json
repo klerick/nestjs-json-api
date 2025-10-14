@@ -3,28 +3,31 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/json-rpc/nestjs-json-rpc-sdk/src",
   "projectType": "library",
+  "tags": [
+    "type:lib",
+    "lib:nestjs-json-rpc",
+    "lib:nestjs-json-rpc-sdk",
+    "type:publish"
+  ],
   "targets": {
     "compile-for-angular": {
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "libs/json-rpc/nestjs-json-rpc-sdk/ng-package.json"
+        "project": "libs/json-rpc/nestjs-json-rpc-sdk/ng-package.json",
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
       },
       "configurations": {
         "production": {
           "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
         },
-        "development": {
-          "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
-        }
+        "development": {}
       },
       "defaultConfiguration": "production"
     },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-cjs"
-      ],
+      "dependsOn": ["build-cjs"],
       "options": {
         "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk",
         "commands": [
@@ -38,17 +41,13 @@
     "build-cjs": {
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
-      "dependsOn": [
-        "build-mjs"
-      ],
+      "dependsOn": ["build-mjs"],
       "options": {
         "outputPath": "dist/libs/json-rpc/nestjs-json-rpc-sdk/cjs",
         "main": "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts",
         "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.lib.json",
         "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"],
-        "external": "none",
-        "updateBuildableProjectDepsInPackageJson": true,
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "updateBuildableProjectDepsInPackageJson": false,
         "additionalEntryPoints": [
           "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
         ],
@@ -63,9 +62,7 @@
         "main": "libs/json-rpc/nestjs-json-rpc-sdk/src/index.ts",
         "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json",
         "assets": ["libs/json-rpc/nestjs-json-rpc-sdk/*.md"],
-        "external": "none",
-        "updateBuildableProjectDepsInPackageJson": true,
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
+        "updateBuildableProjectDepsInPackageJson": false,
         "additionalEntryPoints": [
           "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
         ],
@@ -101,9 +98,9 @@
       "options": {
         "jestConfig": "libs/json-rpc/nestjs-json-rpc-sdk/jest.config.ts",
         "codeCoverage": true,
-        "coverageReporters": ["json-summary"]
+        "coverageReporters": ["json-summary"],
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.spec.json"
       }
     }
-  },
-  "tags": ["type:lib", "lib:nestjs-json-rpc", "lib:nestjs-json-rpc-sdk", "type:publish"]
+  }
 }

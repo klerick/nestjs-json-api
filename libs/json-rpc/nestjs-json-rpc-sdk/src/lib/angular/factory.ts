@@ -1,8 +1,8 @@
-import { inject, InjectionToken } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/internal/observable/dom/WebSocketSubject';
-import { Socket } from 'socket.io-client';
+import { type Socket } from 'socket.io-client';
 
 import {
   LoopFunc,
