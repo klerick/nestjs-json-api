@@ -3,13 +3,16 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-shared", "type:publish"],
+  "tags": [
+    "type:lib",
+    "lib:json-api-nestjs",
+    "lib:json-api-nestjs-shared",
+    "type:publish"
+  ],
   "targets": {
     "build-cjs": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/{projectRoot}/cjs",
         "tsConfig": "{projectRoot}/tsconfig.lib.json",
@@ -19,7 +22,7 @@
           {
             "glob": "*.md",
             "input": "{projectRoot}",
-            "output": "../"
+            "output": "/../"
           }
         ],
         "buildableProjectDepsInPackageJsonType": "peerDependencies",
@@ -28,9 +31,7 @@
     },
     "build-mjs": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/{projectRoot}/mjs",
         "tsConfig": "{projectRoot}/tsconfig-mjs.lib.json",
@@ -40,22 +41,27 @@
           {
             "glob": "*.md",
             "input": "{projectRoot}",
-            "output": "../"
+            "output": "/../"
           }
         ]
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-cjs",
-        "build-mjs"
-      ],
+      "dependsOn": ["build-cjs", "build-mjs"],
       "options": {
         "outputPath": "dist/{projectRoot}",
         "commands": [
           {
             "command": "[ ! -f dist/{projectRoot}/cjs/package.json ] ||  cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/cjs/package.json",
             "forwardAllArgs": false
           },
           {
@@ -86,15 +92,11 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.ts",
         "codeCoverage": true,
-        "coverageReporters": [
-          "json-summary"
-        ]
+        "coverageReporters": ["json-summary"]
       }
     },
     "upload-badge": {
@@ -118,9 +120,7 @@
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs json-api-nestjs-shared {args.ver} {args.tag}",
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     },
     "nx-release-publish": {
       "options": {
