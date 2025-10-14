@@ -80,6 +80,40 @@
         "parallel": false
       }
     },
+    "build-common": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-cjs", "build-mjs"],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "commands": [
+          {
+            "command": "[ ! -f dist/{projectRoot}/cjs/package.json ] ||  cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/cjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-shared"
+          },
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-shared",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/json-api-nestjs-shared",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
     "ts-test": {
       "executor": "nx:run-commands",
       "options": {
@@ -88,15 +122,6 @@
         ],
         "cwd": "{workspaceRoot}/{projectRoot}",
         "parallel": false
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
-        "codeCoverage": true,
-        "coverageReporters": ["json-summary"]
       }
     },
     "upload-badge": {

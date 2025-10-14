@@ -49,15 +49,6 @@
         "packageRoot": "dist/{projectRoot}"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
-        "codeCoverage": true,
-        "coverageReporters": ["json-summary"]
-      }
-    },
     "upload-badge": {
       "executor": "nx:run-commands",
       "dependsOn": [
