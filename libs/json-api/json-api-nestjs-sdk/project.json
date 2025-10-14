@@ -3,7 +3,15 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-sdk", "type:publish"],
+  "tags": [
+    "type:lib",
+    "lib:json-api-nestjs",
+    "lib:json-api-nestjs-sdk",
+    "type:publish"
+  ],
+  "implicitDependencies": [
+    "json-api-nestjs-shared"
+  ],
   "targets": {
     "build-cjs": {
       "dependsOn": [
@@ -16,23 +24,28 @@
         }
       ],
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/{projectRoot}/cjs",
         "main": "{projectRoot}/src/index.ts",
         "tsConfig": "{projectRoot}/tsconfig.lib.json",
-        "assets": [{
-          "glob": "*.md",
-          "input": "{projectRoot}",
-          "output": "../"
-        }],
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "generateExportsField": true,
-        "updateBuildableProjectDepsInPackageJson": true,
+        "assets": [
+          {
+            "glob": "*.md",
+            "input": "{projectRoot}",
+            "output": "../"
+          }
+        ],
+        "generateExportsField": false,
+        "updateBuildableProjectDepsInPackageJson": false,
         "additionalEntryPoints": [
           "{projectRoot}/src/ngModule.ts"
         ],
-        "externalBuildTargets": ["build-cjs"]
+        "externalBuildTargets": [
+          "build-cjs"
+        ]
       }
     },
     "build-mjs": {
@@ -46,19 +59,20 @@
         }
       ],
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/{projectRoot}/mjs",
         "main": "{projectRoot}/src/index.ts",
         "tsConfig": "{projectRoot}/tsconfig-mjs.lib.json",
-        "assets": [{
-          "glob": "*.md",
-          "input": "{projectRoot}",
-          "output": "../"
-        }],
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
-        "generateExportsField": true,
-        "updateBuildableProjectDepsInPackageJson": true,
+        "assets": [
+          {
+            "glob": "*.md",
+            "input": "{projectRoot}",
+            "output": "../"
+          }
+        ],
         "additionalEntryPoints": [
           "{projectRoot}/src/ngModule.ts"
         ]
@@ -74,6 +88,14 @@
         "commands": [
           {
             "command": "cp dist/{projectRoot}/cjs/package.json dist/{projectRoot}/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "rm -f dist/{projectRoot}/cjs/package.json",
             "forwardAllArgs": false
           },
           {
@@ -102,7 +124,8 @@
         "codeCoverage": true,
         "coverageReporters": [
           "json-summary"
-        ]
+        ],
+        "tsConfig": "libs/json-api/json-api-nestjs-sdk/tsconfig.spec.json"
       }
     },
     "upload-badge": {
@@ -135,6 +158,5 @@
         "build"
       ]
     }
-  },
-  "implicitDependencies": ["json-api-nestjs-shared"]
+  }
 }

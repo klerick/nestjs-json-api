@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
     "module": "commonjs",
-    "moduleResolution": "node10",
+    "moduleResolution": "bundler",
     "types": ["jest", "node"],
     "paths": {
       "@klerick/json-api-nestjs-shared": [
