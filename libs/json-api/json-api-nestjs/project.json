@@ -49,9 +49,16 @@
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs json-api-nestjs {args.ver} {args.tag}",
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts",
+        "codeCoverage": true,
+        "coverageReporters": ["json-summary"]
+      }
     },
     "ts-test": {
       "dependsOn": [
