@@ -81,6 +81,7 @@ delete mjsJson.dependencies;
 
 writeFileSync(`package.json`, JSON.stringify(mjsJson, null, 2));
 writeFileSync('README.md', readFileSync(join('mjs', 'README.md').toString()));
+writeFileSync('CHANGELOG.md', readFileSync(join('mjs', 'CHANGELOG.md').toString()));
 try {
   unlinkSync(join('cjs', 'package.json'));
 } catch (e) {}
@@ -92,4 +93,10 @@ try {
 } catch (e) {}
 try {
   unlinkSync(join('cjs', 'README.md'));
+} catch (e) {}
+try {
+  unlinkSync(join('mjs', 'CHANGELOG.md'));
+} catch (e) {}
+try {
+  unlinkSync(join('cjs', 'CHANGELOG.md'));
 } catch (e) {}

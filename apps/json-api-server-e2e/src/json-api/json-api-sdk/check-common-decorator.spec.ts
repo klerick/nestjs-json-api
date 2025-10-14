@@ -87,7 +87,7 @@ describe('Check common decorator', () => {
       } catch (e) {
         expect(e).toBeInstanceOf(AxiosError);
         expect((e as AxiosError).response?.status).toBe(418);
-        expect(((e as AxiosError).response?.data as any)?.path).toBe(
+        expect(decodeURI(((e as AxiosError).response?.data as any)?.path)).toBe(
           '/api/users?filter[firstName][eq]=testControllerFilter'
         );
         expect(((e as AxiosError).response?.data as any)?.method).toBe(false);
@@ -108,7 +108,7 @@ describe('Check common decorator', () => {
         expect.assertions(4);
         expect(e).toBeInstanceOf(AxiosError);
         expect((e as AxiosError).response?.status).toBe(412);
-        expect(((e as AxiosError).response?.data as any)?.path).toBe(
+        expect(decodeURI(((e as AxiosError).response?.data as any)?.path)).toBe(
           '/api/users?filter[firstName][eq]=testMethodFilter'
         );
         expect(((e as AxiosError).response?.data as any)?.method).toBe(true);

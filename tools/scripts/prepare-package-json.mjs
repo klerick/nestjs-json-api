@@ -29,9 +29,15 @@ try {
     if (!mainJson[props] || json[props]) continue;
     json[props] = mainJson[props];
   }
-  if (json.dependencies['@mikro-orm/postgresql']) {
-    delete json.dependencies['@mikro-orm/postgresql'];
-  }
+  // if (json.dependencies['@mikro-orm/postgresql']) {
+  //   delete json.dependencies['@mikro-orm/postgresql'];
+  // }
+  // if (json.dependencies['@mikro-orm/sql-highlighter']){
+  //   delete json.dependencies['@mikro-orm/sql-highlighter'];
+  // }
+  // if (json.dependencies['knex']){
+  //   delete json.dependencies['knex'];
+  // }
 
   removeDepFromOtherLib(graph, name, json);
   writeFileSync(`package.json`, JSON.stringify(json, null, 2));
@@ -48,6 +54,37 @@ function removeDepFromOtherLib(graph, name, json) {
       return acum;
     }, {});
 
+  for (const [name] of Object.entries(json.peerDependencies)) {
+    if (!Object.keys(libsName).includes(name)) {
+      continue;
+    }
+    try {
+      const jsonDep = JSON.parse(
+        readFileSync(
+          join(workspaceRoot, 'dist', libsName[name], 'package.json')
+        ).toString()
+      );
+
+      json.peerDependencies[name] = `^${jsonDep.version}`;
+      for (const [name, version] of Object.entries(jsonDep.dependencies)) {
+        if (json.dependencies[name]) {
+          delete json.dependencies[name];
+        }
+      }
+      for (const [name, version] of Object.entries(jsonDep.peerDependencies)) {
+        if (json.peerDependencies[name]) {
+          json.peerDependencies[name] = version;
+        }
+      }
+    } catch (e) {
+      console.warn(
+        'Cant parse:',
+        join(workspaceRoot, libsName[name], 'package.json')
+      );
+    }
+
+  }
+
   for (const [name] of Object.entries(json.dependencies)) {
     if (!Object.keys(libsName).includes(name)) {
       continue;
@@ -55,28 +92,38 @@ function removeDepFromOtherLib(graph, name, json) {
     try {
       const jsonDep = JSON.parse(
         readFileSync(
-          join(workspaceRoot, libsName[name], 'package.json')
+          join(workspaceRoot, 'dist', libsName[name], 'package.json')
         ).toString()
       );
-      json.dependencies[name] = jsonDep.version;
+
+      json.dependencies[name] = `^${jsonDep.version}`;
+      for (const [name, version] of Object.entries(jsonDep.dependencies)) {
+        if (json.dependencies[name]) {
+          delete json.dependencies[name];
+        }
+      }
+      for (const [name, version] of Object.entries(jsonDep.peerDependencies)) {
+        if (json.peerDependencies[name]) {
+          json.peerDependencies[name] = version;
+        }
+      }
     } catch (e) {
       console.warn(
-        'Can parse:',
+        'Cant parse:',
         join(workspaceRoot, libsName[name], 'package.json')
       );
     }
 
-    console.log(libsName[name]);
   }
-  if (!('peerDependencies' in json)) return;
+  // if (('peerDependencies' in json)) return;
 
-  json['peerDependencies'] = Object.entries(json['peerDependencies']).reduce(
-    (acum, [name, value]) => {
-      if (Object.keys(libsName).includes(name)) {
-        acum[name] = `^${value}`;
-      }
-      return acum;
-    },
-    {}
-  );
+  // json['peerDependencies'] = Object.entries(json['peerDependencies']).reduce(
+  //   (acum, [name, value]) => {
+  //     if (Object.keys(libsName).includes(name)) {
+  //       acum[name] = `^${value}`;
+  //     }
+  //     return acum;
+  //   },
+  //   json['peerDependencies']
+  // );
 }
