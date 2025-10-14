@@ -3,7 +3,13 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
-  "tags": ["type:lib", "lib:json-api-nestjs", "lib:json-api-nestjs-typeorm", "type:publish"],
+  "tags": [
+    "type:lib",
+    "lib:json-api-nestjs",
+    "lib:json-api-nestjs-typeorm",
+    "type:publish"
+  ],
+  "implicitDependencies": ["json-api-nestjs"],
   "targets": {
     "build-common": {
       "executor": "@nx/js:tsc",
@@ -14,22 +20,17 @@
         "packageJson": "{projectRoot}/package.json",
         "main": "{projectRoot}/src/index.ts",
         "assets": ["{projectRoot}/*.md"],
-        "buildableProjectDepsInPackageJsonType": "peerDependencies",
         "generateExportsField": true,
-        "updateBuildableProjectDepsInPackageJson": true
+        "updateBuildableProjectDepsInPackageJson": false
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-common"
-      ],
+      "dependsOn": ["build-common"],
       "options": {
         "outputPath": "dist/{projectRoot}",
         "commands": [
-          {
-            "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-typeorm"
-          },
+
           {
             "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/json-api-nestjs-typeorm",
             "forwardAllArgs": false
@@ -50,15 +51,11 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.ts",
         "codeCoverage": true,
-        "coverageReporters": [
-          "json-summary"
-        ]
+        "coverageReporters": ["json-summary"]
       }
     },
     "upload-badge": {
@@ -82,10 +79,7 @@
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs json-api-nestjs-typeorm {args.ver} {args.tag}",
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     }
-  },
-  "implicitDependencies": ["json-api-nestjs"]
+  }
 }
