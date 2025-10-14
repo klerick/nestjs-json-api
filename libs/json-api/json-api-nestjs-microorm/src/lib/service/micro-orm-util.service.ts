@@ -18,7 +18,7 @@ import {
   Collection,
 } from '@mikro-orm/core';
 import {
-  Knex,
+  type Knex,
   SqlEntityManager,
   QueryBuilder,
   type Field,
