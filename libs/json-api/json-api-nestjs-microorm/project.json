@@ -12,7 +12,13 @@
   "implicitDependencies": ["json-api-nestjs"],
   "targets": {
     "build-common": {
-      "dependsOn": ["^build", "^build-cjs", "^build-mjs"],
+      "dependsOn": [
+        {
+          "projects": ["json-api-nestjs"],
+          "target": "build",
+          "params": "ignore"
+        }
+      ],
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -47,6 +53,15 @@
         ],
         "cwd": "./",
         "parallel": false
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts",
+        "codeCoverage": true,
+        "coverageReporters": ["json-summary"]
       }
     },
     "upload-badge": {

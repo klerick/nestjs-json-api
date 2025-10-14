@@ -4,7 +4,7 @@
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
     "types": ["node"],
-    "target": "es2023",
+    "target": "es2021",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
@@ -12,10 +12,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*.test-d.ts"],
-  "paths": {
-    "@klerick/json-api-nestjs-shared": [
-      "dist/libs/json-api/json-api-nestjs-shared"
-    ]
-  }
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts", "/src/lib/mock-utils/**/*"]
 }
