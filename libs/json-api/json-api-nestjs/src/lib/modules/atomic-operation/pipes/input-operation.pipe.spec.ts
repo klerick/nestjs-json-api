@@ -33,8 +33,8 @@ describe('PatchInputPipe', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('It should be ok', () => {
@@ -44,14 +44,14 @@ describe('PatchInputPipe', () => {
     const check = {
       [KEY_MAIN_INPUT_SCHEMA]: data,
     };
-    jest
+    vi
       .spyOn(zodInputOperation, 'parse')
       .mockImplementationOnce(() => check as any);
     expect(patchInputPipe.transform(check)).toEqual(data);
   });
 
   it('Should be not ok', () => {
-    jest.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
+    vi.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
       throw new ZodError([]);
     });
     expect.assertions(1);
@@ -63,7 +63,7 @@ describe('PatchInputPipe', () => {
   });
 
   it('Should be 500', () => {
-    jest.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
+    vi.spyOn(zodInputOperation, 'parse').mockImplementationOnce(() => {
       throw new Error('Error mock');
     });
     expect.assertions(1);

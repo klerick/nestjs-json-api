@@ -54,7 +54,7 @@ function removeDepFromOtherLib(graph, name, json) {
       return acum;
     }, {});
 
-  for (const [name] of Object.entries(json.peerDependencies)) {
+  for (const [name] of Object.entries(json.peerDependencies || {})) {
     if (!Object.keys(libsName).includes(name)) {
       continue;
     }

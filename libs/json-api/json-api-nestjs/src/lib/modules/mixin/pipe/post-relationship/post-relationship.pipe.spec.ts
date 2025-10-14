@@ -34,8 +34,8 @@ describe('PostInputPipe', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('It should be ok', () => {
@@ -45,14 +45,14 @@ describe('PostInputPipe', () => {
     const check = {
       data,
     };
-    jest
+    vi
       .spyOn(zodInputPostRelationshipSchema, 'parse')
       .mockImplementationOnce(() => check as any);
     expect(postRelationshipPipe.transform(check)).toEqual(data);
   });
 
   it('Should be not ok', () => {
-    jest
+    vi
       .spyOn(zodInputPostRelationshipSchema, 'parse')
       .mockImplementationOnce(() => {
         throw new ZodError([]);
@@ -66,7 +66,7 @@ describe('PostInputPipe', () => {
   });
 
   it('Should be 500', () => {
-    jest
+    vi
       .spyOn(zodInputPostRelationshipSchema, 'parse')
       .mockImplementationOnce(() => {
         throw new Error('Error mock');

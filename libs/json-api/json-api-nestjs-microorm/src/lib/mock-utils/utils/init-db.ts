@@ -4,7 +4,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
 import Knex from 'knex';
-import * as ClientPgLite from 'knex-pglite';
+import ClientPgLite from 'knex-pglite';
 
 import {
   Addresses,
@@ -18,9 +18,6 @@ import {
 let knexInst: TypeKnex;
 
 export async function sharedConnect(): Promise<TypeKnex> {
-  // @ts-ignore
-  // return globalThis.pgLite;
-
   if (knexInst) {
     return knexInst;
   }
@@ -37,7 +34,6 @@ export async function sharedConnect(): Promise<TypeKnex> {
   );
 
   knexInst = Knex({
-    // @ts-ignore
     client: ClientPgLite,
     dialect: 'postgres',
     // @ts-ignore

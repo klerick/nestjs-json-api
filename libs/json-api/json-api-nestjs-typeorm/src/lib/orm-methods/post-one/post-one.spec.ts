@@ -146,12 +146,12 @@ describe('postOne', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should be ok without relation and with id', async () => {
-    const spyOnTransformData = jest
+    const spyOnTransformData = vi
       .spyOn(transformDataServicePods, 'transformData')
       .mockImplementationOnce(() => ({
         data: {} as any,
@@ -180,7 +180,7 @@ describe('postOne', () => {
   });
 
   it('should be ok without relation', async () => {
-    const spyOnTransformData = jest
+    const spyOnTransformData = vi
       .spyOn(transformDataService, 'transformData')
       .mockImplementationOnce(() => ({
         data: {} as any,
@@ -199,7 +199,7 @@ describe('postOne', () => {
   });
 
   it('should be ok with relation', async () => {
-    const spyOnTransformData = jest
+    const spyOnTransformData = vi
       .spyOn(transformDataService, 'transformData')
       .mockImplementationOnce(() => ({
         data: {} as any,

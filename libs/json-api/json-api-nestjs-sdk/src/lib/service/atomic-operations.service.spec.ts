@@ -69,7 +69,7 @@ describe('atomicOperationService', () => {
 
   beforeEach(() => {
     httpInnerClient = {
-      post: jest.fn(),
+      post: vi.fn(),
     } as any;
 
     jsonApiUtilsService = new JsonApiUtilsService(jsonApiSdkConfig);
@@ -81,7 +81,7 @@ describe('atomicOperationService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Check atomicFactory', () => {
@@ -103,7 +103,7 @@ describe('atomicOperationService', () => {
 
       patchUser.addresses = postAddress;
 
-      const spyHttpInnerClient = jest
+      const spyHttpInnerClient = vi
         .spyOn(httpInnerClient, 'post')
         .mockImplementation(() =>
           of({
@@ -184,7 +184,7 @@ describe('atomicOperationService', () => {
 
       patchUser.addresses = postAddress;
 
-      const spyHttpInnerClient = jest
+      const spyHttpInnerClient = vi
         .spyOn(httpInnerClient, 'post')
         .mockImplementation(() =>
           of({
@@ -267,7 +267,7 @@ describe('atomicOperationService', () => {
 
     patchUser.addresses = postAddress;
 
-    const spyHttpInnerClient = jest
+    const spyHttpInnerClient = vi
       .spyOn(httpInnerClient, 'post')
       .mockImplementation(() =>
         of({

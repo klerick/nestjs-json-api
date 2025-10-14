@@ -118,8 +118,8 @@ describe('TypeormUtilsService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('TypeormUtilsService.currentAlias', () => {

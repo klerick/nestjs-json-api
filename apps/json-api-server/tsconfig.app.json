@@ -3,9 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
+    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
     "strictBindCallApply": true,
@@ -14,14 +13,5 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": [
-    "jest.config.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "**/*.test-d.ts"
-  ],
-  "include": [
-    "src/**/*.ts",
-    "*.test-d.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

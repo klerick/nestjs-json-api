@@ -1,6 +1,6 @@
 import { WrapperCall } from './wrapper-call';
 import { Transport } from '../types';
-import { of } from 'rxjs';
+import { lastValueFrom, of } from 'rxjs';
 
 function mockRPC(a: number, b: string): number {
   return 1;
@@ -18,22 +18,16 @@ describe('wrapper-call', () => {
     arg = [1, 'test'];
   });
 
-  it('should be init Observable', (done) => {
+  it('should be init Observable', async () => {
     const result = { result: 'result' };
-    transport = jest.fn().mockImplementationOnce((input) => {
+    transport = vi.fn().mockImplementationOnce((input) => {
       return of(result);
     });
     expect.assertions(2);
     const instWrapperCall = new WrapperCall(nameSpace, method, arg, transport);
-    instWrapperCall.subscribe({
-      next: (r) => {
-        expect(r).toEqual(result.result);
-      },
-      complete: () => {
-        expect(transport).toHaveBeenCalledWith(instWrapperCall.body);
-        done();
-      },
-      error: (err) => done(err),
-    });
+    const r = await lastValueFrom(instWrapperCall);
+    expect(r).toEqual(result.result);
+    expect(transport).toHaveBeenCalledWith(instWrapperCall.body);
+
   });
 });

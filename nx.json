@@ -30,9 +30,17 @@
       }
     },
     {
-      "plugin": "@nx/jest/plugin",
+      "plugin": "@nx/vite/plugin",
       "options": {
-        "targetName": "test"
+        "buildTargetName": "build",
+        "testTargetName": "test",
+        "serveTargetName": "serve",
+        "devTargetName": "dev",
+        "previewTargetName": "preview",
+        "serveStaticTargetName": "serve-static",
+        "typecheckTargetName": "typecheck",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
       }
     }
   ],
@@ -48,7 +56,13 @@
       "inputs": ["production", "^production"]
     },
     "test": {
-      "cache": true
+      "cache": true,
+      "executor": "@nx/vite:test",
+      "options": {
+        "reportsDirectory": "{projectRoot}/coverage",
+        "codeCoverage": true,
+        "coverageReporters": ["json-summary"]
+      }
     },
     "@nx/angular:ng-packagr-lite": {
       "cache": true,
@@ -131,13 +145,12 @@
       }
     },
     "projectsRelationship": "independent",
-    "projects": "tag:type:publish",
+    "projects": ["tag:type:publish", "test"],
     "version": {
       "preVersionCommand": "npx nx run-many --projects=tag:type:publish --target=build --parallel",
       "conventionalCommits": true,
-      "generatorOptions": {
-        "fallbackCurrentVersionResolver": "disk"
-      }
+      "fallbackCurrentVersionResolver": "disk",
+      "preserveLocalDependencyProtocols": false
     },
     "releaseTagPattern": "{projectName}@{version}"
   },

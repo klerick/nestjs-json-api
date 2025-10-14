@@ -31,7 +31,7 @@ describe('json-rpc.controller', () => {
         spaceName: 'test',
       },
     };
-    const spyHandlerServiceCallHandler = jest
+    const spyHandlerServiceCallHandler = vi
       .spyOn(handlerService, 'callHandler')
       .mockResolvedValue(result as any);
     const resultController = jsonRpcController.handler(input as any);

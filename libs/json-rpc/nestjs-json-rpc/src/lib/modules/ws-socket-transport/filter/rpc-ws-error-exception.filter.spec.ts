@@ -46,7 +46,7 @@ describe('rpc-ws-error-exception.filter', () => {
         'InvalidRequest'
       );
 
-      const spySend = jest.spyOn(WebSocketInst, 'send').mockImplementation();
+      const spySend = vi.spyOn(WebSocketInst, 'send').mockImplementation(() => true);
       filter.catch(exception, argumentsHost);
       expect(spySend).toHaveBeenCalledWith(
         JSON.stringify({
@@ -59,7 +59,7 @@ describe('rpc-ws-error-exception.filter', () => {
     it('should catch Error and transform it to RpcErrorObject', () => {
       const filter = new RpcWsErrorExceptionFilter();
       const exception = new Error('Test Error');
-      const spySend = jest.spyOn(WebSocketInst, 'send').mockImplementation();
+      const spySend = vi.spyOn(WebSocketInst, 'send').mockImplementation(() => true);
       filter.catch(exception, argumentsHost);
       expect(spySend).toHaveBeenCalledWith(
         JSON.stringify({
@@ -109,7 +109,7 @@ describe('rpc-ws-error-exception.filter', () => {
         'InvalidRequest'
       );
 
-      const spySend = jest.spyOn(WebSocketInst, 'emit').mockImplementation();
+      const spySend = vi.spyOn(WebSocketInst, 'emit').mockImplementation(() => true);
       filter.catch(exception, argumentsHost);
       expect(spySend).toHaveBeenCalledWith(
         WS_EVENT_NAME,
@@ -120,7 +120,7 @@ describe('rpc-ws-error-exception.filter', () => {
     it('should catch Error and transform it to RpcErrorObject', () => {
       const filter = new RpcWsErrorExceptionFilter();
       const exception = new Error('Test Error');
-      const spySend = jest.spyOn(WebSocketInst, 'emit').mockImplementation();
+      const spySend = vi.spyOn(WebSocketInst, 'emit').mockImplementation(() => true);
       filter.catch(exception, argumentsHost);
       expect(spySend).toHaveBeenCalledWith(
         WS_EVENT_NAME,

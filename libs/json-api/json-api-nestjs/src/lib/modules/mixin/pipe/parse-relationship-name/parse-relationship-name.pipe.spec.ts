@@ -4,13 +4,14 @@ import { EntityClass } from '@klerick/json-api-nestjs-shared';
 import { ParseRelationshipNamePipe } from './parse-relationship-name.pipe';
 import { CURRENT_ENTITY, CHECK_RELATION_NAME } from '../../../../constants';
 import { EntityParam } from '../../../../types';
+import { Mock, vi } from 'vitest';
 
 describe('CheckItemEntityPipe', () => {
   let pipe: ParseRelationshipNamePipe<
     object,
     keyof EntityParam<object, 'id'>['relationProperty']
   >;
-  let checkRelationNameMock: jest.Mock;
+  let checkRelationNameMock: Mock;
   let mockEntityTarget: EntityClass<object>;
 
   beforeEach(async () => {
@@ -18,7 +19,7 @@ describe('CheckItemEntityPipe', () => {
       providers: [
         ParseRelationshipNamePipe,
         { provide: CURRENT_ENTITY, useValue: {} },
-        { provide: CHECK_RELATION_NAME, useValue: jest.fn() },
+        { provide: CHECK_RELATION_NAME, useValue: vi.fn() },
       ],
     }).compile();
 
@@ -29,7 +30,7 @@ describe('CheckItemEntityPipe', () => {
       >
     >(ParseRelationshipNamePipe);
     mockEntityTarget = module.get<EntityClass<object>>(CURRENT_ENTITY);
-    checkRelationNameMock = module.get<jest.Mock>(CHECK_RELATION_NAME);
+    checkRelationNameMock = module.get<Mock>(CHECK_RELATION_NAME);
   });
 
   it('should call findOneRowEntity and return the entity', async () => {

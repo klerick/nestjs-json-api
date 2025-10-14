@@ -32,7 +32,7 @@ describe('QueryInputPipe', () => {
 
   it('should parse the input successfully', () => {
     const input = { key: 'value' };
-    jest.spyOn(zodSchemaMock, 'parse').mockReturnValue(input);
+    vi.spyOn(zodSchemaMock, 'parse').mockReturnValue(input);
 
     const result = pipe.transform(input);
     expect(result).toBe(input);
@@ -43,7 +43,7 @@ describe('QueryInputPipe', () => {
     const input = { invalid: 'data' };
     const mockZodError = new ZodError([]);
 
-    jest.spyOn(zodSchemaMock, 'parse').mockImplementation(() => {
+    vi.spyOn(zodSchemaMock, 'parse').mockImplementation(() => {
       throw mockZodError;
     });
 
@@ -54,7 +54,7 @@ describe('QueryInputPipe', () => {
     const input = { key: 'value' };
     const mockError = new Error('Unexpected error');
 
-    jest.spyOn(zodSchemaMock, 'parse').mockImplementation(() => {
+    vi.spyOn(zodSchemaMock, 'parse').mockImplementation(() => {
       throw mockError;
     });
 

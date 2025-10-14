@@ -44,7 +44,7 @@ describe('handler.service', () => {
     it('Should be result', async () => {
       const params = ['1', '2'];
       const jsonrpc = '2.0';
-      const handlerServiceCallHandlerSpy = jest
+      const handlerServiceCallHandlerSpy = vi
         .spyOn(handlerService, 'callHandler')
         .mockResolvedValue({
           jsonrpc,
@@ -93,7 +93,7 @@ describe('handler.service', () => {
         },
       ];
       let i = 0;
-      const handlerServiceCallHandlerSpy = jest
+      const handlerServiceCallHandlerSpy = vi
         .spyOn(handlerService, 'callHandler')
         .mockImplementation(() => {
           return Promise.resolve({
@@ -123,7 +123,7 @@ describe('handler.service', () => {
       const jsonrpc = '2.0';
       const title = 'Title Error';
       const description = 'Describe Error';
-      const handlerServiceCallHandlerSpy = jest
+      const handlerServiceCallHandlerSpy = vi
         .spyOn(handlerService, 'callHandler')
         .mockRejectedValue(
           createError(ErrorCodeType.InvalidRequest, title, description)
@@ -153,7 +153,7 @@ describe('handler.service', () => {
       const params = ['1', '2'];
       const jsonrpc = '2.0';
       const title = 'Title Error';
-      const handlerServiceCallHandlerSpy = jest
+      const handlerServiceCallHandlerSpy = vi
         .spyOn(handlerService, 'callHandler')
         .mockRejectedValue(new Error(title));
       const rpcData: PayloadRpcData = {
@@ -327,8 +327,8 @@ describe('handler.service', () => {
     });
 
     it('should return the pipe from pipe type has in provider', async () => {
-      const moduleRefGetSoy = jest.spyOn(moduleRef, 'get');
-      const moduleRefCreateSoy = jest.spyOn(moduleRef, 'create');
+      const moduleRefGetSoy = vi.spyOn(moduleRef, 'get');
+      const moduleRefCreateSoy = vi.spyOn(moduleRef, 'create');
       const result = await handlerService.getPipeByType(ParseIntPipe);
       expect(result).toBeInstanceOf(ParseIntPipe);
       expect(moduleRefCreateSoy).toHaveBeenCalledTimes(0);
@@ -336,8 +336,8 @@ describe('handler.service', () => {
     });
 
     it('should return the pipe from pipe type has not in provider', async () => {
-      const moduleRefGetSoy = jest.spyOn(moduleRef, 'get');
-      const moduleRefCreateSoy = jest.spyOn(moduleRef, 'create');
+      const moduleRefGetSoy = vi.spyOn(moduleRef, 'get');
+      const moduleRefCreateSoy = vi.spyOn(moduleRef, 'create');
       const result = await handlerService.getPipeByType(ParseBoolPipe);
       expect(result).toBeInstanceOf(ParseBoolPipe);
       expect(moduleRefCreateSoy).toHaveBeenCalledTimes(1);
@@ -345,8 +345,8 @@ describe('handler.service', () => {
     });
 
     it('should return the pipe from pipe type has not in provider twice', async () => {
-      const moduleRefGetSoy = jest.spyOn(moduleRef, 'get');
-      const moduleRefCreateSoy = jest.spyOn(moduleRef, 'create');
+      const moduleRefGetSoy = vi.spyOn(moduleRef, 'get');
+      const moduleRefCreateSoy = vi.spyOn(moduleRef, 'create');
       const result = await handlerService.getPipeByType(ParseBoolPipe);
       expect(result).toBeInstanceOf(ParseBoolPipe);
       const result2 = await handlerService.getPipeByType(ParseBoolPipe);
