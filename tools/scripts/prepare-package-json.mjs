@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import devkit, { logger } from '@nx/devkit';
+import devkit from '@nx/devkit';
 const { readCachedProjectGraph, workspaceRoot } = devkit;
 const [, , name] = process.argv;
 const graph = readCachedProjectGraph();
@@ -54,7 +54,7 @@ function removeDepFromOtherLib(graph, name, json) {
       return acum;
     }, {});
 
-  for (const [name] of Object.entries(json.peerDependencies || {})) {
+  for (const [name] of Object.entries(json.peerDependencies)) {
     if (!Object.keys(libsName).includes(name)) {
       continue;
     }
@@ -66,27 +66,26 @@ function removeDepFromOtherLib(graph, name, json) {
       );
 
       json.peerDependencies[name] = `^${jsonDep.version}`;
-      for (const [name, version] of Object.entries(jsonDep.dependencies || {})) {
-        if (json.dependencies && json.dependencies[name]) {
+      for (const [name, version] of Object.entries(jsonDep.dependencies)) {
+        if (json.dependencies[name]) {
           delete json.dependencies[name];
         }
       }
-      for (const [name, version] of Object.entries(jsonDep.peerDependencies || {})) {
-        if (json.peerDependencies && json.peerDependencies[name]) {
+      for (const [name, version] of Object.entries(jsonDep.peerDependencies)) {
+        if (json.peerDependencies[name]) {
           json.peerDependencies[name] = version;
         }
       }
-
     } catch (e) {
-      console.log(e);
-      logger.warn(
-        'Cant parse:' + join(workspaceRoot, 'dist', libsName[name], 'package.json')
+      console.warn(
+        'Cant parse:',
+        join(workspaceRoot, libsName[name], 'package.json')
       );
     }
 
   }
 
-  for (const [name] of Object.entries(json.dependencies || {})) {
+  for (const [name] of Object.entries(json.dependencies)) {
     if (!Object.keys(libsName).includes(name)) {
       continue;
     }
@@ -98,18 +97,18 @@ function removeDepFromOtherLib(graph, name, json) {
       );
 
       json.dependencies[name] = `^${jsonDep.version}`;
-      for (const [name, version] of Object.entries(jsonDep.dependencies || {})) {
-        if (json.dependencies || json.dependencies[name]) {
+      for (const [name, version] of Object.entries(jsonDep.dependencies)) {
+        if (json.dependencies[name]) {
           delete json.dependencies[name];
         }
       }
-      for (const [name, version] of Object.entries(jsonDep.peerDependencies || {})) {
-        if (json.peerDependencies || json.peerDependencies[name]) {
+      for (const [name, version] of Object.entries(jsonDep.peerDependencies)) {
+        if (json.peerDependencies[name]) {
           json.peerDependencies[name] = version;
         }
       }
     } catch (e) {
-      logger.warn(
+      console.warn(
         'Cant parse:',
         join(workspaceRoot, libsName[name], 'package.json')
       );
