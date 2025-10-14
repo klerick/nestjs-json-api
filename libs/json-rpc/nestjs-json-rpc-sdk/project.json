@@ -10,6 +10,21 @@
     "type:publish"
   ],
   "targets": {
+    "compile-for-angular": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/json-rpc/nestjs-json-rpc-sdk/ng-package.json",
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig-mjs.lib.json"
+        },
+        "development": {}
+      },
+      "defaultConfiguration": "production"
+    },
     "build": {
       "executor": "nx:run-commands",
       "dependsOn": ["build-cjs"],
@@ -75,6 +90,16 @@
     "nx-release-publish": {
       "options": {
         "packageRoot": "dist/libs/json-rpc/nestjs-json-rpc-sdk"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/json-rpc/nestjs-json-rpc-sdk/jest.config.ts",
+        "codeCoverage": true,
+        "coverageReporters": ["json-summary"],
+        "tsConfig": "libs/json-rpc/nestjs-json-rpc-sdk/tsconfig.spec.json"
       }
     }
   }
