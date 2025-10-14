@@ -12,9 +12,6 @@
     "CRUD"
   ],
   "dependencies": {},
-  "peerDependencies": {
-    "tslib": ">2.3.0"
-  },
   "type": "commonjs",
   "main": "./cjs/src/index.js",
   "types": "./cjs/src/index.d.ts",
