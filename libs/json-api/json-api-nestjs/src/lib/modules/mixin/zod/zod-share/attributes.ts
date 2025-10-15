@@ -26,7 +26,7 @@ function getZodRulesForDate<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
-  return setOptionalOrNot(z.iso.datetime(), isNullable, isPatch).transform(transformDateString);
+  return setOptionalOrNot(z.iso.datetime(), isNullable, isPatch).transform(transformDateString<Null, isPatch>);
 }
 
 function getZodRulesForBoolean<

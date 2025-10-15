@@ -34,9 +34,9 @@ type CheckAttrPatch = {
   login?: string | undefined;
   firstName?: string | undefined;
   testArrayNull?: number[] | null | undefined;
-  testDate?: Date | undefined;
-  createdAt?: Date | undefined;
-  updatedAt?: Date | undefined;
+  testDate: Date | undefined;
+  createdAt: Date | undefined;
+  updatedAt: Date | undefined;
   lastName?: string | null | undefined;
   isActive?: string | null | undefined;
 };
