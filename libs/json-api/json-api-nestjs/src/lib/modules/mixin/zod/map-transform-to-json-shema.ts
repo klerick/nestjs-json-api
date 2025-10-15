@@ -1,7 +1,23 @@
 import type { JSONSchema } from 'zod/v4/core';
 
-export function transformDateString(i: string | null | undefined) {
-  return i === null || i === undefined ? i : new Date(i);
+type DateStringTransform<
+  Null extends true | false,
+  isPatch extends true | false
+> = isPatch extends true
+  ?
+    Null extends true ? Date | null | undefined : Date | undefined
+  :
+    Null extends true ? Date | null | undefined : Date;
+
+export function transformDateString<
+  Null extends true | false,
+  isPatch extends true | false
+>(i: string | null | undefined): DateStringTransform<Null, isPatch> {
+
+  if (i === null || i === undefined) {
+    return i as DateStringTransform<Null, isPatch>;
+  }
+  return new Date(i)
 }
 
 export function transformStringToArray(input: string | undefined) {
