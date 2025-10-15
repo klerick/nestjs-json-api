@@ -2,7 +2,7 @@
   "name": "json-api-server-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "implicitDependencies": [
-    "json-api-server"
+    "json-api-server", "json-api-nestjs-sdk"
   ],
   "projectType": "application",
   "targets": {

@@ -41,8 +41,8 @@ import { AtomicInterceptor } from '../../service/atomic.interceptor';
 @UseInterceptors(ControllerInterceptor)
 @JsonApi(Users)
 export class ExtendUserController extends JsonBaseController<Users, 'id'> {
-  @InjectService() public service: JsonApiService<Users>;
-  @Inject(ExampleService) protected exampleService: ExampleService;
+  @InjectService() public service!: JsonApiService<Users>;
+  @Inject(ExampleService) protected exampleService!: ExampleService;
   override getOne(
     id: string | number,
     query: QueryOne<Users, 'id'>
