@@ -22,6 +22,7 @@ type ModuleCommonOptions = {
   debug?: boolean;
   pipeForId?: PipeMixin;
   operationUrl?: string;
+  allowSetId?: boolean
 };
 
 type ModuleOptionsParams<OrmParams = NonNullable<unknown>> = IfEquals<

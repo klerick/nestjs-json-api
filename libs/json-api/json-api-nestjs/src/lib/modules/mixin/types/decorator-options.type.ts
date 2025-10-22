@@ -5,6 +5,7 @@ import { PrepareParams } from '../../../types';
 type ControllerOptions = {
   allowMethod: Array<MethodName>;
   overrideRoute: string;
+  allowSetId: boolean
 };
 
 export type DecoratorOptions<OrmParams = NonNullable<unknown>> = Partial<
