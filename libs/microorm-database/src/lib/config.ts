@@ -1,13 +1,8 @@
-import { Options } from '@mikro-orm/core';
+import { pgConfig } from './config-pg';
 
-import ormConfig from './config-cli';
-
-const { entitiesTs, ...configOther } = ormConfig;
-
-export const config: Options = {
-  discovery: { requireEntitiesArray: true },
+export const config = {
+  ...pgConfig,
   contextName: 'default',
   // @ts-ignore
-  registerRequestContext: false,
-  ...configOther,
+  registerRequestContext: false
 };

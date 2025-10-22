@@ -7,7 +7,9 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true
+    "noPropertyAccessFromIndexSignature": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node16"
   },
   "files": [],
   "include": [],

@@ -25,24 +25,28 @@ let saveApp: INestApplication;
 export const port = 3000;
 export const globalPrefix = 'api';
 export const run = async () => {
-  if (saveApp) return saveApp;
-  const moduleRef = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
-  const app = moduleRef.createNestApplication<NestExpressApplication>({
-    bufferLogs: true,
-    logger: false,
-  });
-  app.useLogger(app.get(Logger));
-  // const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix(globalPrefix);
-  app.useWebSocketAdapter(new WsAdapter(app));
-  app.set('query parser', 'extended');
-  await app.init();
-  await app.listen(port);
 
-  saveApp = app;
-  return app;
+  // if (saveApp) return saveApp;
+  // const moduleRef = await Test.createTestingModule({
+  //   imports: [AppModule],
+  // }).compile();
+  // const app = moduleRef.createNestApplication<NestExpressApplication>({
+  //   bufferLogs: true,
+  //   logger: false,
+  // });
+  // app.useLogger(app.get(Logger));
+  // // const app = await NestFactory.create(AppModule);
+  // app.setGlobalPrefix(globalPrefix);
+  // app.useWebSocketAdapter(new WsAdapter(app));
+  // app.set('query parser', 'extended');
+  // await app.init();
+  // await app.listen(port);
+  //
+  // saveApp = app;
+  // return app;
+  return {
+    close(){}
+  } as any
 };
 
 export const creatSdk = (config: Partial<JsonConfig> = {}) =>

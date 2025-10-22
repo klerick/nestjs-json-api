@@ -39,7 +39,7 @@ export class Comments {
     name: 'created_at',
     type: 'timestamp',
     nullable: true,
-    default: 'CURRENT_TIMESTAMP',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   public createdAt!: Date;
 
@@ -47,7 +47,7 @@ export class Comments {
     name: 'updated_at',
     type: 'timestamp',
     nullable: true,
-    default: 'CURRENT_TIMESTAMP',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   public updatedAt!: Date;
 

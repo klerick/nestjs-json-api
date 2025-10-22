@@ -1,16 +1,20 @@
 import { FactorizedAttrs, Factory } from '@jorgebodega/typeorm-factory';
-import { DataSource } from 'typeorm';
+import { DataSource, SaveOptions } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import { Roles } from '../../entities';
+import { Promise } from 'ts-toolbelt/out/Any/Promise';
 
 export class RolesFactory extends Factory<Roles> {
   protected entity = Roles;
   protected rolesList = ['USERS', 'ADMIN', 'OTHER'];
   protected attrs(): FactorizedAttrs<Roles> {
-    const key = faker.number.int(this.rolesList.length - 1);
+    const role = this.rolesList.shift();
+    if (!role) {
+      throw new Error('Role is empty');
+    }
     return {
-      name: this.rolesList[key].toLowerCase(),
-      key: this.rolesList[key],
+      name: role.toLowerCase(),
+      key: role,
     };
   }
 

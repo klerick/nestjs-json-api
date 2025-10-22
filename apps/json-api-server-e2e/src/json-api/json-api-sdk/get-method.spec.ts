@@ -11,6 +11,7 @@ import { faker } from '@faker-js/faker';
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { getUser } from '../utils/data-utils';
 import { creatSdk, run } from '../utils/run-application';
+import { AxiosError } from 'axios';
 
 let app: INestApplication;
 
@@ -124,6 +125,9 @@ describe('GET method:', () => {
             },
           },
         },
+      }).catch((e: AxiosError) => {
+        console.log(e);
+        throw e;
       });
       expect(users).toBeDefined();
       expect(users.length).toBe(2);

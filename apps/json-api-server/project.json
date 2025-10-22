@@ -61,6 +61,26 @@
           "buildTarget": "json-api-server:build:production"
         }
       }
+    },
+    "serve-microorm": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx nx run json-api-server:serve",
+        "env": {
+          "ORM_TYPE": "microorm"
+        }
+      }
+    },
+    "serve-typeorm": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx nx run json-api-server:serve",
+        "env": {
+          "ORM_TYPE": "typeorm"
+        }
+      }
     }
   },
   "tags": []

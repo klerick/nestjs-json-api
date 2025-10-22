@@ -8,30 +8,6 @@ import path from 'node:path';
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/json-api-server-e2e',
-  // resolve: {
-  //   alias: {
-  //     '@klerick/json-api-nestjs': path.resolve(
-  //       __dirname,
-  //       '../../dist/libs/json-api/json-api-nestjs'
-  //     ),
-  //     '@klerick/json-api-nestjs-microorm': path.resolve(
-  //       __dirname,
-  //       '../../dist/libs/json-api/json-api-nestjs-microorm'
-  //     ),
-  //     '@klerick/json-api-nestjs-shared': path.resolve(
-  //       __dirname,
-  //       '../../dist/libs/json-api/json-api-nestjs-shared'
-  //     ),
-  //     '@klerick/json-api-nestjs-typeorm': path.resolve(
-  //       __dirname,
-  //       '../../dist/libs/json-api/json-api-nestjs-typeorm'
-  //     ),
-  //     '@klerick/json-api-nestjs-sdk': path.resolve(
-  //       __dirname,
-  //       '../../dist/libs/json-api/json-api-nestjs-sdk'
-  //     ),
-  //   },
-  // },
   plugins: [
     nxViteTsPaths(),
     swc.vite({
