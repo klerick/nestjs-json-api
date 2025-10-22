@@ -86,12 +86,14 @@ export class MikroOrmFormatErrorService extends ErrorFormatService {
   }
 
   private prepareDataBaseError(error: DriverException) {
+
+    const driverName = this.em
+      .getPlatform()
+      .getConfig()
+      .getDriver()
+      .constructor.name
     if (
-      !this.em
-        .getPlatform()
-        .getConfig()
-        .getDriver()
-        .constructor.name.startsWith('Postgre')
+      !(driverName.startsWith('Postgre') || driverName.startsWith('PGliteDriver'))
     ) {
       return super.formatError(error);
     }

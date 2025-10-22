@@ -26,12 +26,12 @@ import {
   OrmServiceFactory,
   EntityPropsMap,
 } from '../factory';
-import { MicroOrmUtilService } from '../service/micro-orm-util.service';
+import { MicroOrmUtilService } from '../service';
 
 export * from './entities';
 export * from './utils';
 
-import { sharedConnect, initMikroOrm, pullAllData } from './utils';
+import { initMikroOrm, pullAllData } from './utils';
 import { DEFAULT_ARRAY_TYPE } from '../constants';
 
 export const entities = [Users, UserGroups, Roles, Comments, Addresses, Notes];
@@ -39,10 +39,7 @@ export const entities = [Users, UserGroups, Roles, Comments, Addresses, Notes];
 export function mockDbPgLiteTestModule(dbName = `test_db_${Date.now()}`) {
   const mikroORM = {
     provide: MikroORM,
-    useFactory: async function () {
-      const knexInst = await sharedConnect();
-      return initMikroOrm(knexInst, dbName);
-    },
+    useFactory: () => initMikroOrm(dbName),
   };
   return {
     module: MikroOrmModule,

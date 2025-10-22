@@ -3,9 +3,6 @@ import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 
-import Knex from 'knex';
-import ClientPgLite from 'knex-pglite';
-
 import {
   Addresses,
   Comments,
@@ -14,49 +11,26 @@ import {
   UserGroups,
   Users,
 } from '../entities';
+import { PGlite } from '@electric-sql/pglite';
+// @ts-ignore
+import { PGliteDriver, PGliteConnectionConfig } from 'mikro-orm-pglite';
+// @ts-ignore
+import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
 
-let knexInst: TypeKnex;
-
-export async function sharedConnect(): Promise<TypeKnex> {
-  if (knexInst) {
-    return knexInst;
-  }
-
-  const pgLite = await Promise.all([
-    import('@electric-sql/pglite'),
-    // @ts-ignore
-    import('@electric-sql/pglite/contrib/uuid_ossp'),
-  ]).then(
-    ([{ PGlite }, { uuid_ossp }]) =>
-      new PGlite({
-        extensions: { uuid_ossp },
-      })
-  );
-
-  knexInst = Knex({
-    client: ClientPgLite,
-    dialect: 'postgres',
-    // @ts-ignore
-    connection: { pglite: pgLite },
+export async function initMikroOrm(testDbName: string) {
+  const pgLite = new PGlite({
+    extensions: { uuid_ossp },
   });
-
-  return knexInst;
-}
-
-export async function initMikroOrm(knex: TypeKnex, testDbName: string) {
-  const result = await knex.raw(
-    `select 1 from pg_database where datname = '${testDbName}'`
-  );
-
-  if ((result['rows'] as []).length === 0) {
-    await knex.raw(`create database ??`, [testDbName]);
-  }
 
   const orm = await MikroORM.init<PostgreSqlDriver>({
     highlighter: new SqlHighlighter(),
-    driver: PostgreSqlDriver,
+    driver: PGliteDriver,
     dbName: testDbName,
-    driverOptions: knexInst,
+    driverOptions: {
+      connection: {
+        pglite: () => pgLite,
+      } satisfies PGliteConnectionConfig,
+    },
     entities: [Users, UserGroups, Roles, Comments, Addresses, Notes],
     allowGlobalContext: true,
     schema: 'public',
@@ -64,13 +38,10 @@ export async function initMikroOrm(knex: TypeKnex, testDbName: string) {
       process.env['DB_LOGGING'] !== '0' ? ['query', 'query-params'] : false,
   });
 
-  if ((result['rows'] as []).length === 0) {
-    const sql = await orm.getSchemaGenerator().getCreateSchemaSQL();
-    const statements = sql.split(';').filter((s) => s.trim().length > 0); // Разбиваем на отдельные команды
-
-    for (const statement of statements) {
-      await orm.em.execute(statement);
-    }
+  const sql = await orm.getSchemaGenerator().getCreateSchemaSQL();
+  const statements = sql.split(';').filter((s) => s.trim().length > 0); // Разбиваем на отдельные команды
+  for (const statement of statements) {
+    await orm.em.execute(statement);
   }
 
   return orm;
