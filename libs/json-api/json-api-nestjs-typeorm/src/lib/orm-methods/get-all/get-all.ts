@@ -181,9 +181,9 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
     if (include) {
       for (const rel of include) {
         const currentIncludeAlias =
-          this.typeormUtilsService.getAliasForRelation(rel as keyof RelationAlias<E>);
+          this.typeormUtilsService.getAliasForRelation(rel as unknown as keyof RelationAlias<E>);
         const primaryColumnName =
-          this.typeormUtilsService.getPrimaryColumnForRel(rel as keyof RelationAlias<E>);
+          this.typeormUtilsService.getPrimaryColumnForRel(rel as unknown as keyof RelationAlias<E>);
         selectFields.add(`${currentIncludeAlias}.${primaryColumnName}`);
       }
     }
