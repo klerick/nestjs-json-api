@@ -48,7 +48,7 @@ export class ExplorerService<E extends object = object> {
   ): OperationMethode<E> {
     switch (operation) {
       case Operation.add:
-        return id ? 'postRelationship' : 'postOne';
+        return rel ? 'postRelationship' : 'postOne';
       case Operation.remove:
         return rel ? 'deleteRelationship' : 'deleteOne';
       case Operation.update:

@@ -19,6 +19,7 @@ import { ParamsForExecute } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
 import { Mock } from 'vitest';
+import { ErrorFormatService } from '../../mixin/service';
 
 describe('ExecuteService', () => {
   let service: ExecuteService;
@@ -54,6 +55,10 @@ describe('ExecuteService', () => {
           provide: AsyncLocalStorage,
           useValue: new AsyncLocalStorage(),
         },
+        {
+          provide: ErrorFormatService,
+          useValue: {}
+        }
       ],
     }).compile();
 

@@ -57,9 +57,14 @@ describe('ExplorerService', () => {
   });
 
   describe('getMethodNameByParam()', () => {
-    it('should return the correct method name for given parameters', () => {
+    it('should return the correct method name for given parameters: postRelationship', () => {
       expect(service.getMethodNameByParam(Operation.add, 'id', 'rel')).toBe(
         'postRelationship'
+      );
+    });
+    it('should return the correct method name for given parameters: postOne', () => {
+      expect(service.getMethodNameByParam(Operation.add, 'id')).toBe(
+        'postOne'
       );
     });
   });

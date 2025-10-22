@@ -36,6 +36,7 @@ export const zodAdd = <T extends string>(type: T) =>
         .object({
           type: z.literal(type),
           tmpId: z.union([z.number(), z.string()]).optional(),
+          id: z.string().optional(),
         })
         .strict(),
       data: zodGeneralData,
