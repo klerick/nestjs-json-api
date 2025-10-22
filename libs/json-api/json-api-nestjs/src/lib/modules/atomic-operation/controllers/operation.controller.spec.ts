@@ -25,6 +25,7 @@ import {
 import { OperationMethode } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import { ErrorFormatService } from '@klerick/json-api-nestjs';
 
 describe('OperationController', () => {
   let operationController: OperationController;
@@ -66,6 +67,10 @@ describe('OperationController', () => {
           provide: AsyncLocalStorage,
           useValue: new AsyncLocalStorage(),
         },
+        {
+          provide: ErrorFormatService,
+          useValue: {}
+        }
       ],
     }).compile();
 

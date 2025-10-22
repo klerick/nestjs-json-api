@@ -19,6 +19,7 @@ import {
   AsyncIterate,
 } from './factory';
 import { MAP_CONTROLLER_INTERCEPTORS } from './constants';
+import { ErrorFormatService } from '../../modules/mixin/service';
 
 @Module({})
 export class AtomicOperationModule implements NestModule {
@@ -48,10 +49,16 @@ export class AtomicOperationModule implements NestModule {
     entityModules: DynamicModule[],
     commonModule: DynamicModule
   ): DynamicModule {
+
+    const errorFormat = (commonModule.providers || []).find(i => 'provide' in i && i.provide === ErrorFormatService )
+    if (!errorFormat) {
+      throw new Error('ErrorFormatService not found, should be provide in common orm module')
+    }
     return {
       module: AtomicOperationModule,
       controllers: [OperationController],
       providers: [
+        errorFormat,
         ExplorerService,
         ExecuteService,
         SwaggerService,
@@ -87,3 +94,5 @@ export class AtomicOperationModule implements NestModule {
       .forRoutes('{*splat}');
   }
 }
+
+

@@ -5,6 +5,7 @@ import {
   Injectable,
   PipeTransform,
   Type,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   INTERCEPTORS_METADATA,
@@ -36,6 +37,7 @@ import { IterateFactory } from '../factory';
 import { TypeFromType, ValidateQueryError } from '../../../types';
 import { RunInTransaction } from '../../mixin/types';
 import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import { ErrorFormatService } from '../../mixin/service';
 
 export function isZodError(
   param: string | unknown
@@ -70,6 +72,7 @@ export class ExecuteService {
   private mapControllerInterceptor!: MapControllerInterceptor;
 
   @Inject(AsyncLocalStorage) private asyncLocalStorage!: AsyncLocalStorage<any>;
+  @Inject(ErrorFormatService) private errorFormatService!: ErrorFormatService;
 
   private _interceptorsContextCreator!: InterceptorsContextCreator;
 
@@ -116,8 +119,8 @@ export class ExecuteService {
 
         const itemReplace = this.replaceTmpIds(paramsForExecute, tmpIdsMap);
         const body = itemReplace.at(-1);
-        const currentTmpId = tmpIds[i];
-
+        // First operation doesn't have tmpId'
+        const currentTmpId = i !== 0 ? tmpIds[i] : undefined;
         if (methodName === 'postOne' && currentTmpId && body) {
           if (typeof body === 'object' && 'attributes' in body) {
             body['id'] = `${currentTmpId}`;
@@ -293,7 +296,20 @@ export class ExecuteService {
       }
       throw new HttpException(response, e.getStatus());
     }
-    throw e;
+    const formatError = this.errorFormatService.formatError(e);
+
+    if (formatError instanceof InternalServerErrorException) {
+      throw formatError
+    }
+    const response = formatError.getResponse()
+    if (typeof response === 'object' && 'message' in response && Array.isArray(response['message'])) {
+      response['message'] = response['message'].map((m: any) => {
+        m['path'] = [KEY_MAIN_INPUT_SCHEMA, `${i}`, ...m['path']];
+        return m;
+      });
+      throw new HttpException(response, formatError.getStatus());
+    }
+    throw formatError;
   }
 
   private async runOneOperation(
