@@ -50,9 +50,7 @@ export function CurrentMicroOrmProvider(
 ): FactoryProvider<MikroORM> {
   return {
     provide: CURRENT_DATA_SOURCE_TOKEN,
-    useFactory: (mikroORM: MikroORM) => {
-      return mikroORM;
-    },
+    useFactory: (mikroORM: MikroORM) => mikroORM,
     inject: [connectionName ? getMikroORMToken(connectionName) : MikroORM],
   };
 }
@@ -132,9 +130,10 @@ export function EntityPropsMap<E extends object>(entities: EntityClass<E>[]) {
 export function RunInTransactionFactory(): FactoryProvider<RunInTransaction> {
   return {
     provide: RUN_IN_TRANSACTION_FUNCTION,
-    inject: [],
-    useFactory() {
-      return async (callback) => callback();
+    inject: [CURRENT_ENTITY_MANAGER_TOKEN],
+    useFactory(entityManager: EntityManager) {
+      return (callback) =>
+        entityManager.transactional(() => callback());
     },
   };
 }

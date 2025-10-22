@@ -335,7 +335,8 @@ export class MicroOrmUtilService<
   private extractedResultOperand(operand: FilterOperand) {
     if (
       operand === FilterOperand.like &&
-      this.entityManager.getDriver().constructor.name === 'PostgreSqlDriver'
+      (this.entityManager.getDriver().constructor.name === 'PostgreSqlDriver' ||
+        this.entityManager.getDriver().constructor.name === 'PGliteDriver')
     ) {
       return '$ilike';
     }

@@ -63,7 +63,7 @@ describe('post-relationshipa', () => {
       firstName: firstName,
       lastName: lastName,
       isActive: faker.datatype.boolean(),
-      login: faker.internet.userName({
+      login: faker.internet.username({
         lastName: firstName,
         firstName: lastName,
       }),
