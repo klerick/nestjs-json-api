@@ -99,7 +99,7 @@ describe('GenerateAtomicBody', () => {
 
       const expectedBodyData = {
         op: Operation.add,
-        ref: { type: 'book-list', tmpId: entity.id },
+        ref: { type: 'book-list', tmpId: entity.id, id: 'tmpId' },
         data: {
           attributes: {
             text: entity.text,
