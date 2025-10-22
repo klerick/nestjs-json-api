@@ -61,6 +61,22 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
         .refine(stringMustBe(type), {
           error: `String should be as ${type}`,
         })
+        .transform((r) => {
+          if (r === 'null' || r === null) {
+            return r;
+          }
+
+          switch (type) {
+            case TypeField.boolean:
+              return Boolean(r);
+            case TypeField.number:
+              return Number(r);
+            case TypeField.date:
+              return new Date(r);
+          }
+
+          return r;
+        })
         .optional(),
     }),
     {} as {

@@ -2,7 +2,11 @@ import { Body, Param, Query, RequestMethod } from '@nestjs/common';
 
 import { BindingsConfig } from '../types';
 import { JsonBaseController } from '../controllers/json-base.controller';
-import { PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID } from '../../../constants';
+import {
+  METHOD_NAME,
+  PARAMS_RELATION_NAME,
+  PARAMS_RESOURCE_ID,
+} from '../../../constants';
 
 import {
   queryInputMixin,
@@ -19,7 +23,7 @@ import {
 } from '../pipe';
 
 const Bindings: BindingsConfig = {
-  getAll: {
+  [METHOD_NAME.getAll]: {
     method: RequestMethod.GET,
     name: 'getAll',
     path: '/',
@@ -36,7 +40,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  getOne: {
+  [METHOD_NAME.getOne]: {
     method: RequestMethod.GET,
     name: 'getOne',
     path: `:${PARAMS_RESOURCE_ID}`,
@@ -58,7 +62,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  deleteOne: {
+  [METHOD_NAME.deleteOne]: {
     method: RequestMethod.DELETE,
     name: 'deleteOne',
     path: `:${PARAMS_RESOURCE_ID}`,
@@ -71,7 +75,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  postOne: {
+  [METHOD_NAME.postOne]: {
     method: RequestMethod.POST,
     name: 'postOne',
     path: '/',
@@ -83,7 +87,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  patchOne: {
+  [METHOD_NAME.patchOne]: {
     method: RequestMethod.PATCH,
     name: 'patchOne',
     path: `:${PARAMS_RESOURCE_ID}`,
@@ -100,7 +104,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  getRelationship: {
+  [METHOD_NAME.getRelationship]: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'getRelationship',
     method: RequestMethod.GET,
@@ -118,7 +122,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  postRelationship: {
+  [METHOD_NAME.postRelationship]: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'postRelationship',
     method: RequestMethod.POST,
@@ -140,7 +144,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  deleteRelationship: {
+  [METHOD_NAME.deleteRelationship]: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'deleteRelationship',
     method: RequestMethod.DELETE,
@@ -162,7 +166,7 @@ const Bindings: BindingsConfig = {
       },
     ],
   },
-  patchRelationship: {
+  [METHOD_NAME.patchRelationship]: {
     path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
     name: 'patchRelationship',
     method: RequestMethod.PATCH,

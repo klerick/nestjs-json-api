@@ -20,7 +20,17 @@ describe('Check "filter" zod schema', () => {
         relation: null,
       };
       const result = schema.parse(check1);
-      expect(result).toEqual(check1);
+
+      expect(result).toEqual({
+        ...check1,
+        target: {
+          ...check1.target,
+          id: {
+            gte: 1213,
+            ne: 12,
+          },
+        },
+      });
     });
 
     it('Valid schema - check2', () => {
@@ -42,7 +52,15 @@ describe('Check "filter" zod schema', () => {
         },
       };
       const result = schema.parse(check2);
-      expect(result).toEqual(check2);
+      expect(result).toEqual({
+        ...check2,
+        target: {
+          ...check2.target,
+          id: {
+            gte: 1213,
+          }
+        }
+      });
     });
 
     it('Valid schema - check3', () => {
@@ -71,7 +89,17 @@ describe('Check "filter" zod schema', () => {
         },
       };
       const result = schema.parse(check4);
-      expect(result).toEqual(check4);
+      expect(result).toEqual({
+        ...check4,
+        relation: {
+          ...check4.relation,
+          comments: {
+            id: {
+              lte: 123,
+            },
+          }
+        }
+      });
     });
 
     it('Valid schema - check5', () => {
@@ -108,7 +136,16 @@ describe('Check "filter" zod schema', () => {
         relation: null,
       };
       const result = schema.parse(check6);
-      expect(result).toEqual(check6);
+      expect(result).toEqual({
+        ...check6,
+        target: {
+          ...check6.target,
+          id:{
+            gte: 1213,
+            ne: 123,
+          }
+        },
+      });
     });
 
     it('Valid schema - check7', () => {
@@ -121,7 +158,12 @@ describe('Check "filter" zod schema', () => {
         relation: null,
       };
       const result = schema.parse(check7);
-      expect(result).toEqual(check7);
+      expect(result).toEqual({
+        ...check7,
+        target: {
+          ...check7.target,
+        },
+      });
     });
 
     it('Valid schema - check8', () => {
@@ -134,7 +176,15 @@ describe('Check "filter" zod schema', () => {
         relation: null,
       };
       const result = schema.parse(check8);
-      expect(result).toEqual(check8);
+      expect(result).toEqual({
+        ...check8,
+        target: {
+          ...check8.target,
+          createdAt: {
+            eq: new Date('2023-12-08T09:40:58.020Z'),
+          },
+        },
+      });
     });
 
     it('Valid schema - check9', () => {
@@ -170,6 +220,10 @@ describe('Check "filter" zod schema', () => {
         ...check,
         target: {
           ...check.target,
+          id: {
+            gte: 1213,
+            ne: 123,
+          },
           addresses: {
             eq: 'null',
           },

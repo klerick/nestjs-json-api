@@ -2,13 +2,14 @@ import { Controller, Inject, UseInterceptors } from '@nestjs/common';
 import { kebabCase } from 'change-case-commonjs';
 import { ModuleMixinOptions, NestController } from '../../../types';
 import { DecoratorOptions } from '../types';
-import { getProviderName, nameIt } from './utils';
+import { entityForClass, getProviderName, nameIt } from './utils';
 import { JsonBaseController } from '../controllers';
 import {
   JSON_API_DECORATOR_OPTIONS,
   ORM_SERVICE_PROPS,
   ORM_SERVICE,
   JSON_API_CONTROLLER_POSTFIX,
+  JSON_API_DECORATOR_ENTITY,
 } from '../../../constants';
 import { ErrorInterceptors, LogTimeInterceptors } from '../interceptors';
 import { getEntityName } from '@klerick/json-api-nestjs-shared';
@@ -24,6 +25,9 @@ export function createController(
       JsonBaseController
     );
 
+  if(!entityForClass(controllerClass)){
+    Reflect.defineMetadata(JSON_API_DECORATOR_ENTITY, entity, controllerClass)
+  }
   const entityName = getEntityName(entity);
 
   if (
