@@ -83,6 +83,7 @@ describe('module-helper', () => {
           operationUrl: undefined,
           requiredSelectField: false,
           debug: false,
+          allowSetId: false,
           pipeForId: ParseIntPipe,
         },
       });
@@ -115,6 +116,7 @@ describe('module-helper', () => {
       const result = prepareConfig(moduleParams);
 
       expect(result.options).toEqual({
+        allowSetId: false,
         operationUrl: 'http://example.com',
         requiredSelectField: false,
         debug: true,
@@ -179,6 +181,7 @@ describe('module-helper', () => {
       expect(result.entities).toBe(entities);
       expect(result).toHaveProperty('options');
       expect(result.options).toEqual({
+        allowSetId: false,
         operationUrl: undefined,
         requiredSelectField: false,
         debug: false,

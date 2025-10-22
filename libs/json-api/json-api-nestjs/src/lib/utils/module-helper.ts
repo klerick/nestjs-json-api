@@ -29,7 +29,8 @@ export function prepareConfig<OrmParams>(
       requiredSelectField: !!options['requiredSelectField'],
       debug: !!options['debug'],
       pipeForId: options['pipeForId'] || ParseIntPipe,
-    },
+      allowSetId: !!options['allowSetId']
+    }
   };
 }
 
