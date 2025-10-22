@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 import { faker, Sex, Faker } from '@faker-js/faker';
 
 import { Users } from '../../entities';
-import { AddressesFactory, CommentsFactory } from '.';
+import { AddressesFactory, CommentsFactory, BookListFactory } from '.';
 
 export class UserFactory extends Factory<Users> {
   protected genderList: Record<number, Sex> = {
@@ -23,15 +23,16 @@ export class UserFactory extends Factory<Users> {
     const firstName = faker.person.firstName(gender);
     const lastName = faker.person.lastName(gender);
     return {
-      login: faker.internet.userName({ firstName, lastName }),
-      isActive: faker.datatype.boolean(),
+      login: faker.internet.username({ firstName, lastName }),
       firstName: firstName,
       lastName: lastName,
+      isActive: faker.datatype.boolean(),
       comments: new CollectionSubfactory(
         new CommentsFactory(this.dataSource),
         faker.number.int(100)
       ),
       addresses: new SingleSubfactory(new AddressesFactory(this.dataSource)),
+      books: new CollectionSubfactory(new BookListFactory(this.dataSource), faker.number.int(20))
     };
   }
 

@@ -1,11 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { pgConfig } from './config-db';
 
-import { config as ormConfig } from './config-cli';
-import * as allEntities from './entities';
-
-export const config: TypeOrmModuleOptions = {
-  ...ormConfig,
-  ...{
-    entities: Object.values(allEntities) as any,
-  },
-};
+export const config: TypeOrmModuleOptions = pgConfig;

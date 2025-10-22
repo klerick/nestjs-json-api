@@ -10,6 +10,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';
 import { run, creatSdk } from '../utils/run-application';
+import { AxiosError } from 'axios';
 
 let app: INestApplication;
 
@@ -189,14 +190,22 @@ describe('Atomic method:', () => {
     roles.name = faker.string.alpha(50);
     roles.key = faker.string.alpha(50);
 
+    const userAddress = new Addresses();
+
+    userAddress.city = faker.string.alpha(50);
+    userAddress.state = faker.string.alpha(50);
+    userAddress.country = faker.string.alpha(50);
+    userAddress.id = 10003;
+
     const user = getUser();
-    user.addresses = address;
+    user.addresses = userAddress;
     user.manager = manager;
     user.roles = [roles];
 
-    const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
+    const [addressPost, userAddressPost, managerPost, rolesPost, userPost] = await jsonSdk
       .atomicFactory()
       .postOne(address)
+      .postOne(userAddress)
       .postOne(manager)
       .postOne(roles)
       .postOne(user)
@@ -218,9 +227,9 @@ describe('Atomic method:', () => {
     expect(selectManager.addresses.id).toBe(addressPost.id);
     expect(selectUser.manager.id).toBe(managerPost.id);
     expect(selectUser.roles).toEqual([rolesPost]);
-    expect(selectUser.addresses).toEqual(addressPost);
+    expect(selectUser.addresses.id).toEqual(userAddressPost.id);
 
-    addressArray.push(addressPost);
+    addressArray.push(addressPost, userAddressPost);
     rolesArray.push(rolesPost);
     usersId.push(managerPost.id);
     usersId.push(userPost.id);

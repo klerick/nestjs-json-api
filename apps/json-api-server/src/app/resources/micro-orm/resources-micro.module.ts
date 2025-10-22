@@ -13,6 +13,8 @@ import { ExtendBookListController } from './controllers/extend-book-list/extend-
 import { ExtendUserController } from './controllers/extend-user/extend-user.controller';
 import { ExampleService } from './service/example.service';
 
+import { wrapperJsonApiController } from '@klerick/acl-json-api-nestjs';
+
 @Module({
   imports: [
     JsonApiModule.forRoot(MicroOrmJsonApiModule, {
@@ -24,6 +26,9 @@ import { ExampleService } from './service/example.service';
         requiredSelectField: false,
         operationUrl: 'operation',
       },
+      // hooks: {
+      //   afterCreateController: wrapperJsonApiController,
+      // },
     }),
   ],
 })

@@ -7,11 +7,7 @@
   "projectType": "application",
   "targets": {
     "e2e": {
-      "dependsOn":[        {
-        "dependencies": true,
-        "target": "build",
-        "params": "ignore"
-      }],
+      "dependsOn": ["json-api-server:build", "json-api-nestjs-sdk:build"],
       "executor": "@nx/vite:test",
       "outputs": [
         "{workspaceRoot}/coverage/{e2eProjectRoot}"
@@ -23,11 +19,7 @@
       }
     },
     "e2e-micro": {
-      "dependsOn":[        {
-        "dependencies": true,
-        "target": "build",
-        "params": "ignore"
-      }],
+      "dependsOn": ["json-api-server:build", "json-api-nestjs-sdk:build"],
       "executor": "@nx/vite:test",
       "outputs": [
         "{workspaceRoot}/coverage/{e2eProjectRoot}"

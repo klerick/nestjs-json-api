@@ -12,7 +12,9 @@ export type IBookList = BookList;
 
 @Entity('book_list')
 export class BookList {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid', {
+    name: 'id',
+  })
   public id!: string;
 
   @Column({
@@ -25,7 +27,7 @@ export class BookList {
     name: 'created_at',
     type: 'timestamp',
     nullable: true,
-    default: 'CURRENT_TIMESTAMP',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   public createdAt!: Date;
 
@@ -33,7 +35,7 @@ export class BookList {
     name: 'updated_at',
     type: 'timestamp',
     nullable: true,
-    default: 'CURRENT_TIMESTAMP',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   public updatedAt!: Date;
 

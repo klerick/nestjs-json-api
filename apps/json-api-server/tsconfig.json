@@ -34,6 +34,9 @@
       ],
       "@klerick/nestjs-json-rpc-sdk/ngModule": [
         "libs/json-rpc/nestjs-json-rpc-sdk/src/ngModule.ts"
+      ],
+      "@klerick/acl-json-api-nestjs": [
+        "libs/acl-permissions/nestjs-acl-permissions/src-new/index.ts"
       ]
     }
   },
