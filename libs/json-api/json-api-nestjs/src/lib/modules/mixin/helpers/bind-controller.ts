@@ -41,12 +41,22 @@ export function bindController(
 
     if (!Object.prototype.hasOwnProperty.call(controller.prototype, name)) {
       // need uniq descriptor for correct work swagger
+
+      const func = function (this: typeof controller.prototype,
+        ...arg: Parameters<typeof implementation>
+      ): ReturnType<typeof implementation> {
+        return this.constructor.__proto__.prototype[name].call(this, ...arg);
+      };
+
+      Object.defineProperty(func, 'name', {
+        value: name,
+        writable: false,
+        enumerable: false,
+        configurable: true
+      });
+
       Reflect.defineProperty(controller.prototype, name, {
-        value: function (
-          ...arg: Parameters<typeof implementation>
-        ): ReturnType<typeof implementation> {
-          return this.constructor.__proto__.prototype[name].call(this, ...arg);
-        },
+        value: func,
         writable: true,
         enumerable: false,
         configurable: true,

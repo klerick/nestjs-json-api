@@ -55,7 +55,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
     userObject.firstName = faker.person.firstName();
     userObject.lastName = faker.person.lastName();
     userObject.isActive = null;
-    userObject.login = faker.internet.userName({
+    userObject.login = faker.internet.username({
       lastName: userObject.lastName,
       firstName: userObject.firstName,
     });
@@ -331,7 +331,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
       userObject.manager = {
         id: 1,
-        login: faker.internet.userName({
+        login: faker.internet.username({
           lastName: faker.person.lastName(),
           firstName: faker.person.firstName(),
         }),

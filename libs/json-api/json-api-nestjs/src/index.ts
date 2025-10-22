@@ -32,6 +32,7 @@ export {
   DEFAULT_PAGE_SIZE,
   DEFAULT_QUERY_PAGE,
   CURRENT_ENTITY,
+  METHOD_NAME
 } from './lib/constants';
 export {
   OrmService,
@@ -41,6 +42,7 @@ export {
   FindOneRowEntity,
   RunInTransaction,
   EntityParamMap,
+  MethodName
 } from './lib/modules/mixin/types';
 export {
   PatchData,
