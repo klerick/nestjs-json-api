@@ -46,6 +46,9 @@ export class GenerateAtomicBody<
     const rel = relationType ? { relationship: String(relationType) } : {};
     const tmpId =
       op === 'add' && id && !relationType ? { tmpId: String(id) } : {};
+    if (op === 'add' && id && !relationType) {
+      idObj['id'] = String(id);
+    }
     this.bodyData = {
       op,
       ref: { type, ...idObj, ...rel, ...tmpId },
