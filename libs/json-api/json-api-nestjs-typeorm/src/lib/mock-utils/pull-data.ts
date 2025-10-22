@@ -47,7 +47,7 @@ export async function pullUser(userPero: Repository<Users>) {
   user.firstName = faker.person.firstName();
   user.lastName = faker.person.lastName();
   user.isActive = faker.datatype.boolean();
-  user.login = faker.internet.userName({
+  user.login = faker.internet.username({
     lastName: user.lastName,
     firstName: user.firstName,
   });

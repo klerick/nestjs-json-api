@@ -52,7 +52,7 @@ describe('patchOne', () => {
   beforeEach(async () => {
     firstName = faker.person.firstName();
     isActive = false;
-    login = faker.internet.userName({
+    login = faker.internet.username({
       lastName: firstName,
       firstName: faker.person.lastName(),
     });
