@@ -111,6 +111,7 @@ describe('ExecuteService', () => {
         {
           controller: { name: 'TestController' },
           methodName: 'someMethod',
+          module: {}
         },
       ] as unknown as ParamsForExecute[];
       const callback = vi.fn().mockReturnValue({ value: 'test' });
@@ -147,6 +148,7 @@ describe('ExecuteService', () => {
         {
           controller: { name: 'TestController' },
           methodName: 'someMethod',
+          module: {}
         },
       ] as unknown as ParamsForExecute[];
 
@@ -185,6 +187,7 @@ describe('ExecuteService', () => {
         {
           controller: { name: 'TestController' },
           methodName: 'someMethod',
+          module: {}
         },
       ] as unknown as ParamsForExecute[];
 

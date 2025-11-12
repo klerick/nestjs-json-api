@@ -8,8 +8,6 @@ import { deleteRelationship } from './delete-relationship';
 import { postRelationship } from './post-relationship';
 import { patchRelationship } from './patch-relationship';
 
-import { OrmService } from '../../types';
-
 export const swaggerMethod = {
   getAll,
   getOne,
@@ -22,6 +20,3 @@ export const swaggerMethod = {
   patchRelationship,
 } as const;
 
-export type SwaggerMethod<E extends object> = {
-  [Key in keyof OrmService<E>]?: (typeof swaggerMethod)[Key];
-};

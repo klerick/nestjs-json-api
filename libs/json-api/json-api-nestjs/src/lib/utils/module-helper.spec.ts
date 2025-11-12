@@ -79,6 +79,9 @@ describe('module-helper', () => {
         providers: [],
         controllers: [],
         entities: [],
+        hooks: {
+          afterCreateController: result.hooks.afterCreateController,
+        },
         options: {
           operationUrl: undefined,
           requiredSelectField: false,
