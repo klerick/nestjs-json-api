@@ -6,7 +6,4 @@ export * from './comments';
 export * from './book-list';
 
 // ACL test entities
-// export * from './user-acl';
-// export * from './post-acl';
-// export * from './comment-acl';
-// export * from './tag-acl';
+export * from './acl-test';
