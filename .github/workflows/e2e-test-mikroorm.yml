@@ -61,5 +61,5 @@ jobs:
 
 #      - run: npm run typeorm migration:run
 #      - run: npm run seed:run
-      - run: npx nx run json-api-server-e2e:e2e --parallel=1
-#      - run: npx nx run json-api-server-e2e:e2e-micro --parallel=1
+#      - run: npx nx run json-api-server-e2e:e2e --parallel=1
+      - run: npx nx run json-api-server-e2e:e2e-micro --parallel=1
