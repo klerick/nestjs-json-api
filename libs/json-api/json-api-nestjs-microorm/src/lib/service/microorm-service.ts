@@ -1,8 +1,10 @@
 import { Inject } from '@nestjs/common';
 import {
+  ObjectTyped,
   QueryField,
   ResourceObject,
   ResourceObjectRelationships,
+  RelationKeys
 } from '@klerick/json-api-nestjs-shared';
 import {
   JsonApiTransformerService,
@@ -27,7 +29,6 @@ import {
   postRelationship,
 } from '../orm-methods';
 import { MicroOrmUtilService } from './micro-orm-util.service';
-import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 
 export class MicroOrmService<E extends object, IdKey extends string = 'id'>
   implements OrmService<E, IdKey>
@@ -41,14 +42,29 @@ export class MicroOrmService<E extends object, IdKey extends string = 'id'>
 
   async getAll(
     query: Query<E, IdKey>
-  ): Promise<ResourceObject<E, 'array', null, IdKey>> {
+  ): Promise<ResourceObject<E, 'array', null, IdKey>>;
+  async getAll(
+    query: Query<E, IdKey>,
+    transformData?: boolean,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'array', null, IdKey>>;
+  async getAll(
+    query: Query<E, IdKey>,
+    transformData = true,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<
+    ResourceObject<E, 'array', null, IdKey> | { totalItems: number; items: E[] }
+  > {
     const { page } = query;
     const { totalItems, items } = await getAll.call<
       MicroOrmService<E, IdKey>,
       Parameters<typeof getAll<E, IdKey>>,
       ReturnType<typeof getAll<E, IdKey>>
-    >(this, query);
+    >(this, query, additionalQueryParams);
 
+    if (!transformData) {
+      return { totalItems, items };
+    }
     const { data, included } = this.jsonApiTransformerService.transformData(
       items,
       query
@@ -70,12 +86,29 @@ export class MicroOrmService<E extends object, IdKey extends string = 'id'>
   async getOne(
     id: number | string,
     query: QueryOne<E, IdKey>
-  ): Promise<ResourceObject<E, 'object', null, IdKey>> {
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+  async getOne(
+    id: number | string,
+    query: QueryOne<E, IdKey>,
+    transformData?: boolean,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey> | E>;
+  async getOne(
+    id: number | string,
+    query: QueryOne<E, IdKey>,
+    transformData = true,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey> | E> {
     const result = await getOne.call<
       MicroOrmService<E, IdKey>,
       Parameters<typeof getOne<E, IdKey>>,
       ReturnType<typeof getOne<E, IdKey>>
-    >(this, id, query);
+    >(this, id, query, additionalQueryParams);
+
+    if (!transformData) {
+      return result;
+    }
+
     const { data, included } = this.jsonApiTransformerService.transformData(
       result,
       query
@@ -225,5 +258,24 @@ export class MicroOrmService<E extends object, IdKey extends string = 'id'>
       meta: {},
       data: this.jsonApiTransformerService.transformRel(result, rel),
     };
+  }
+
+  async loadRelations(
+    relationships: PatchData<E, IdKey>['relationships'] | PostData<E, IdKey>['relationships']
+  ): Promise<{
+    [K in RelationKeys<E>]: E[K];
+  }> {
+      const result = {} as { [K in RelationKeys<E> ]: E[K]; };
+
+      for await (const item of this.microOrmUtilService.asyncIterateFindRelationships(
+        relationships as any
+      )) {
+        const itemProps = ObjectTyped.entries(item).at(0);
+        if (!itemProps) continue;
+        const [nameProps, data] = itemProps;
+        Reflect.set(result, nameProps, data);
+      }
+
+      return result;
   }
 }

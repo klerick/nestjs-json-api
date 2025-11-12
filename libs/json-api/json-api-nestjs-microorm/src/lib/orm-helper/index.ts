@@ -1,4 +1,5 @@
 import { EntityKey, EntityMetadata } from '@mikro-orm/core';
+import { Logger } from '@nestjs/common';
 import {
   EntityParam,
   TypeField,
@@ -6,6 +7,7 @@ import {
 } from '@klerick/json-api-nestjs';
 import { MicroOrmParam } from '../type';
 import { DEFAULT_ARRAY_TYPE } from '../constants';
+
 
 export const getRelation = <E extends object>(
   entityMetadata: EntityMetadata<E>
@@ -30,6 +32,7 @@ export const getPropsType = <E extends object>(
   entityMetadata: EntityMetadata<E>,
   config: PrepareParams<MicroOrmParam>['options']['arrayType'] = DEFAULT_ARRAY_TYPE
 ): EntityParam<E>['propsType'] => {
+  const logger = new Logger('JSON-API:MkroORM: init');
   const field = getProps(entityMetadata);
 
   const result = {} as any;
@@ -54,6 +57,10 @@ export const getPropsType = <E extends object>(
         typeProps = TypeField.boolean;
         break;
       case 'object':
+        typeProps = TypeField.object;
+        break;
+      case 'any':
+        logger.warn(`The field "${item}" in entity ${entityMetadata.name} has runtime type "any". Should be use object type.`);
         typeProps = TypeField.object;
         break;
       default:

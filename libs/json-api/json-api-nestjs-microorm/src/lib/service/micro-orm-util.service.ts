@@ -567,7 +567,7 @@ export class MicroOrmUtilService<
     });
   }
 
-  private async *asyncIterateFindRelationships(
+  async *asyncIterateFindRelationships(
     relationships: NonNullable<Relationships<E, IdKey>>
   ): AsyncGenerator<RelationshipsResult<E>> {
     for (const entries of ObjectTyped.entries(relationships)) {

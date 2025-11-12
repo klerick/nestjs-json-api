@@ -6,7 +6,8 @@ import { getQueryForCount, getSortObject } from './get-query-for-count';
 
 export async function getAll<E extends object, IdKey extends string>(
   this: MicroOrmService<E, IdKey>,
-  query: Query<E, IdKey>
+  query: Query<E, IdKey>,
+  additionalQueryParams?: Record<string, unknown>
 ): Promise<{
   totalItems: number;
   items: E[];
@@ -17,6 +18,10 @@ export async function getAll<E extends object, IdKey extends string>(
     Parameters<typeof getQueryForCount<E, IdKey>>,
     ReturnType<typeof getQueryForCount<E, IdKey>>
   >(this, ...[query]);
+
+  if (additionalQueryParams) {
+    countSubQuery.andWhere(additionalQueryParams);
+  }
 
   const skip = (page.number - 1) * page.size;
 
