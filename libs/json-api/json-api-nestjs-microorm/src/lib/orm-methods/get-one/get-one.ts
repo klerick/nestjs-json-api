@@ -6,7 +6,8 @@ import { MicroOrmService } from '../../service';
 export async function getOne<E extends object, IdKey extends string>(
   this: MicroOrmService<E, IdKey>,
   id: number | string,
-  query: QueryOne<E, IdKey>
+  query: QueryOne<E, IdKey>,
+  additionalQueryParams?: Record<string, unknown>
 ): Promise<E> {
   const queryBuilder = this.microOrmUtilService.queryBuilder().where({
     [this.microOrmUtilService.currentPrimaryColumn]: id,
@@ -16,6 +17,10 @@ export async function getOne<E extends object, IdKey extends string>(
     queryBuilder,
     query as any
   );
+
+  if (additionalQueryParams) {
+    resultQueryBuilder.andWhere(additionalQueryParams);
+  }
 
   await resultQueryBuilder.applyFilters();
 
