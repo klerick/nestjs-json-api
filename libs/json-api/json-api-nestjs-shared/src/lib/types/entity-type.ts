@@ -13,8 +13,8 @@ export type CastIteratorType<T> = T extends {
 type RelationCheck<T, IdKey extends string> = T extends never
   ? 0
   : T extends Promise<infer U>
-  ? HasId<U, IdKey>
-  : HasId<CastIteratorType<T>, IdKey>;
+  ? RelationCheck<U, IdKey>
+  : HasId<Exclude<CastIteratorType<T>, undefined>, IdKey>;
 
 export type RelationKeys<E, IdKey extends string = 'id'> = {
   [K in keyof E]: Exclude<E[K], null> extends never
