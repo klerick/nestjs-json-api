@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import {
   Addresses,
@@ -9,18 +8,7 @@ import {
 } from '@nestjs-json-api/typeorm-database';
 import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';
-import { run, creatSdk } from '../utils/run-application';
-import { AxiosError } from 'axios';
-
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatSdk } from '../utils/run-application';
 
 describe('Atomic method:', () => {
   let jsonSdk: JsonSdkPromise;

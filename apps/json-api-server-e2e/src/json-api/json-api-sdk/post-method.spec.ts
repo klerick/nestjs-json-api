@@ -1,6 +1,5 @@
 import {
   Addresses,
-  BookList,
   CommentKind,
   Comments,
   Users,
@@ -8,17 +7,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 
-import { creatSdk, run } from '../utils/run-application';
-import { INestApplication } from '@nestjs/common';
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatSdk } from '../utils/run-application';
 
 describe('POST method:', () => {
   let jsonSdk: JsonSdkPromise;

@@ -1,19 +1,8 @@
-import { INestApplication } from '@nestjs/common';
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { AxiosError } from 'axios';
 import { Users } from '@nestjs-json-api/typeorm-database';
 
-import { run, creatSdk } from '../utils/run-application';
-
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatSdk } from '../utils/run-application';
 
 describe('Check common decorator', () => {
   let jsonSdk: JsonSdkPromise;

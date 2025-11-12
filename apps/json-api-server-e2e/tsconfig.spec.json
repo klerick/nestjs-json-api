@@ -24,6 +24,9 @@
       "@nestjs-json-api/microorm-database": [
         "libs/microorm-database/src/index.ts"
       ],
+      "@nestjs-json-api/microorm-database/entity": [
+        "libs/microorm-database/src/lib/entities/index.ts"
+      ],
       "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
       "@nestjs-json-api/typeorm-database": ["libs/typeorm-database/src/index.ts"],
       "@klerick/json-api-nestjs": ["dist/libs/json-api/json-api-nestjs"],
@@ -53,6 +56,7 @@
     "vite.config.mts",
     "vitest.config.ts",
     "vitest.config.mts",
+    "src/**/*.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
     "src/**/*.d.ts"
