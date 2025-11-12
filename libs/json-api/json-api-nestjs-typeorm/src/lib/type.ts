@@ -23,6 +23,7 @@ export const OperandsMapExpression = {
   [FilterOperand.nin]: `NOT IN (:...${EXPRESSION})`,
   [FilterOperand.some]: `&& :${EXPRESSION}`,
   ilike: `ILIKE :${EXPRESSION}`,
+  contains: `@> :${EXPRESSION}`, // PostgreSQL array contains operator
 };
 
 export const OperandMapExpressionForNull = {

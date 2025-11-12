@@ -10,11 +10,13 @@ import {
   EntityControllerParam,
   JsonApiTransformerService,
   CONTROLLER_OPTIONS_TOKEN,
+  Relationships,
 } from '@klerick/json-api-nestjs';
 import {
   ResourceObject,
   RelationKeys,
   ResourceObjectRelationships,
+  ObjectTyped,
 } from '@klerick/json-api-nestjs-shared';
 
 import { Repository } from 'typeorm';
@@ -46,14 +48,26 @@ export class TypeOrmService<E extends object, IdKey extends string = 'id'>
   public config!: EntityControllerParam<TypeOrmParam>;
   @Inject(CURRENT_ENTITY_REPOSITORY) public repository!: Repository<E>;
 
-  getAll(
+  async getAll(
     query: Query<E, IdKey>
-  ): Promise<ResourceObject<E, 'array', null, IdKey>> {
+  ): Promise<ResourceObject<E, 'array', null, IdKey>>;
+  async getAll(
+    query: Query<E, IdKey>,
+    transformData?: boolean,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'array', null, IdKey>>;
+  async getAll(
+    query: Query<E, IdKey>,
+    transformData = true,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<
+    ResourceObject<E, 'array', null, IdKey> | { totalItems: number; items: E[] }
+  > {
     return getAll.call<
       TypeOrmService<E, IdKey>,
       Parameters<typeof getAll<E, IdKey>>,
       ReturnType<typeof getAll<E, IdKey>>
-    >(this, query);
+    >(this, query, transformData, additionalQueryParams);
   }
 
   deleteOne(id: number | string): Promise<void> {
@@ -76,15 +90,27 @@ export class TypeOrmService<E extends object, IdKey extends string = 'id'>
     >(this, id, rel, input);
   }
 
-  getOne(
+  async getOne(
     id: number | string,
     query: QueryOne<E, IdKey>
-  ): Promise<ResourceObject<E, 'object', null, IdKey>> {
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+  async getOne(
+    id: number | string,
+    query: QueryOne<E, IdKey>,
+    transformData?: boolean,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey> | E>;
+  async getOne(
+    id: number | string,
+    query: QueryOne<E, IdKey>,
+    transformData = true,
+    additionalQueryParams?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey> | E> {
     return getOne.call<
       TypeOrmService<E, IdKey>,
       Parameters<typeof getOne<E, IdKey>>,
       ReturnType<typeof getOne<E, IdKey>>
-    >(this, id, query);
+    >(this, id, query, transformData, additionalQueryParams);
   }
 
   getRelationship<Rel extends RelationKeys<E, IdKey>>(
@@ -141,5 +167,24 @@ export class TypeOrmService<E extends object, IdKey extends string = 'id'>
       Parameters<typeof postRelationship<E, IdKey, Rel>>,
       ReturnType<typeof postRelationship<E, IdKey, Rel>>
     >(this, id, rel, input);
+  }
+
+  async loadRelations(
+    relationships: NonNullable<Relationships<E, IdKey>>
+  ): Promise<{
+    [K in RelationKeys<E>]: E[K];
+  }> {
+    const result = {} as { [K in RelationKeys<E> ]: E[K]; };
+
+    for await (const item of this.typeormUtilsService.asyncIterateFindRelationships(
+      relationships as any
+    )) {
+      const itemProps = ObjectTyped.entries(item).at(0);
+      if (!itemProps) continue;
+      const [nameProps, data] = itemProps;
+      Reflect.set(result, nameProps, data);
+    }
+
+    return result;
   }
 }

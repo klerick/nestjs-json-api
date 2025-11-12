@@ -2,12 +2,18 @@ import { NotFoundException } from '@nestjs/common';
 import { ValidateQueryError, QueryOne } from '@klerick/json-api-nestjs';
 import { ObjectTyped, ResourceObject } from '@klerick/json-api-nestjs-shared';
 import { RelationAlias, TypeOrmService } from '../../service';
+import {
+  applyAclRulesToQueryBuilder,
+  extractRelationsFromRules,
+} from '../../orm-helper';
 
 export async function getOne<E extends object, IdKey extends string>(
   this: TypeOrmService<E, IdKey>,
   id: number | string,
-  query: QueryOne<E, IdKey>
-): Promise<ResourceObject<E, 'object', null, IdKey>> {
+  query: QueryOne<E, IdKey>,
+  transformData?: boolean,
+  additionalQueryParams?: Record<string, unknown>
+): Promise<ResourceObject<E, 'object', null, IdKey> | E> {
   const { include, fields } = query;
   const selectFields = new Set<string>();
   const builder = this.repository.createQueryBuilder(
@@ -34,7 +40,9 @@ export async function getOne<E extends object, IdKey extends string>(
           selectFields.add(
             this.typeormUtilsService.getAliasPath(
               itemFieldRel,
-              this.typeormUtilsService.getAliasForRelation(rel as keyof RelationAlias<E>)
+              this.typeormUtilsService.getAliasForRelation(
+                rel as keyof RelationAlias<E>
+              )
             )
           );
         }
@@ -44,7 +52,7 @@ export async function getOne<E extends object, IdKey extends string>(
 
   if (include) {
     for (const relFromLoop of include) {
-      const rel = relFromLoop as keyof RelationAlias<E>
+      const rel = relFromLoop as unknown as keyof RelationAlias<E>;
       const currentIncludeAlias =
         this.typeormUtilsService.getAliasForRelation(rel);
 
@@ -67,16 +75,51 @@ export async function getOne<E extends object, IdKey extends string>(
     builder.select([...selectFields]);
   }
   const paramsId = 'paramsId';
-  const result = await builder
-    .where(
-      `${this.typeormUtilsService.getAliasPath(
-        this.typeormUtilsService.currentPrimaryColumn
-      )} = :${paramsId}`,
-      {
-        [paramsId]: id,
+  builder.where(
+    `${this.typeormUtilsService.getAliasPath(
+      this.typeormUtilsService.currentPrimaryColumn
+    )} = :${paramsId}`,
+    {
+      [paramsId]: id,
+    }
+  );
+
+  if (additionalQueryParams) {
+
+    // Extract relations from ACL rules
+    const aclRelations = extractRelationsFromRules(
+      additionalQueryParams,
+      this.typeormUtilsService
+    );
+
+    // Add JOINs for ACL relations that aren't already in the query
+    for (const rel of aclRelations) {
+      const relationAlias = this.typeormUtilsService.getAliasForRelation(
+        rel as any
+      );
+
+      // Check if this alias already exists in the query
+      const aliasExists = builder.expressionMap.aliases.some(
+        (alias) => alias.name === relationAlias
+      );
+
+      if (!aliasExists) {
+        builder.leftJoin(
+          this.typeormUtilsService.getAliasPath(rel as any),
+          relationAlias
+        );
       }
-    )
-    .getOne();
+    }
+
+    builder.andWhere(
+      applyAclRulesToQueryBuilder(
+        additionalQueryParams,
+        this.typeormUtilsService
+      )
+    );
+  }
+
+  const result = await builder.getOne();
 
   if (!result) {
     const error: ValidateQueryError = {
@@ -86,6 +129,9 @@ export async function getOne<E extends object, IdKey extends string>(
     };
     throw new NotFoundException([error]);
   }
+
+  if (!transformData) return result;
+
   const { included, data } = this.transformDataService.transformData(
     result,
     query
