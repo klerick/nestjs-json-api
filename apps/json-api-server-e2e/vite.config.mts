@@ -3,7 +3,17 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 import swc from 'unplugin-swc';
 import { defineConfig } from 'vite';
-import path from 'node:path';
+import { BaseSequencer } from 'vitest/node';
+
+class CustomSequencer extends BaseSequencer {
+  async sort(files: any[]) {
+    return [...files].sort((a, b) => {
+      const pathA = typeof a === 'string' ? a : a[1];
+      const pathB = typeof b === 'string' ? b : b[1];
+      return pathA.localeCompare(pathB);
+    });
+  }
+}
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -12,6 +22,7 @@ export default defineConfig(() => ({
     nxViteTsPaths(),
     swc.vite({
       module: { type: 'es6' },
+      tsconfigFile: './tsconfig.spec.json',
       jsc: {
         target: 'es2022',
         parser: {
@@ -28,6 +39,9 @@ export default defineConfig(() => ({
       },
     }),
   ],
+  optimizeDeps: {
+    exclude: ['@electric-sql/pglite'],
+  },
   test: {
     name: 'json-api-server-e2e',
     watch: false,
@@ -45,14 +59,18 @@ export default defineConfig(() => ({
       provider: 'v8' as const,
     },
     fileParallelism: false,
-    pool: 'threads',
-    singleThread: true,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     sequence: {
+      sequencer: CustomSequencer,
       concurrent: false,
       shuffle: false,
     },
-    maxWorkers: 1,
-    minWorkers: 1,
+    maxConcurrency: 1,
     env: {
       VITEST: 'true',
       NODE_ENV: 'test',

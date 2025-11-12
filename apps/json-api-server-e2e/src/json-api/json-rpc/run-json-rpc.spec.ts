@@ -1,21 +1,10 @@
-import { INestApplication } from '@nestjs/common';
 import {
   ResultRpcFactoryPromise,
   ErrorCodeType,
   RpcError,
 } from '@klerick/nestjs-json-rpc-sdk';
 
-import { creatRpcSdk, MapperRpc, run } from '../utils/run-application';
-
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatRpcSdk, MapperRpc } from '../utils/run-application';
 
 describe('Run json rpc:', () => {
   let rpc: ResultRpcFactoryPromise<MapperRpc>['rpc'];

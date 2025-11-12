@@ -1,20 +1,9 @@
-import { INestApplication } from '@nestjs/common';
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { BookList, Users } from '@nestjs-json-api/typeorm-database';
 import { AxiosError } from 'axios';
 import { faker } from '@faker-js/faker';
 import { lastValueFrom } from 'rxjs';
-import { creatSdk, run, axiosAdapter } from '../utils/run-application';
-
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatSdk, axiosAdapter } from '../utils/run-application';
 
 describe('Other call type:', () => {
   let jsonSdk: JsonSdkPromise;
@@ -52,13 +41,14 @@ describe('Other call type:', () => {
 
       expect(newBook.id).toBeDefined();
       const bookResultSource = await lastValueFrom(
-        axiosAdapter.get<BookList>(`${url}/${newBook.id}`)
+        // By default id is number bu I test uuid
+        axiosAdapter.get<BookList>(`${url}/${newBookSource.data.id}`)
       );
       const bookResult =
         jsonSdk.jsonApiUtilsService.convertResponseData(bookResultSource);
       expect(bookResult.id).toBe(newBook.id);
       await lastValueFrom(
-        axiosAdapter.delete(`${url}/${bookResult.id}`, {
+        axiosAdapter.delete(`${url}/${newBookSource.data.id}`, {
           data: {
             id: bookResult.id,
             type: 'book-list',

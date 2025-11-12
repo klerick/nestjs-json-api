@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import {
   ResultRpcFactoryPromise,
   ErrorCodeType,
@@ -8,20 +7,14 @@ import {
 import {
   creatWsRpcSdk,
   MapperRpc,
-  run,
   destroySubject,
 } from '../utils/run-application';
 
-let app: INestApplication;
 
-beforeAll(async () => {
-  app = await run();
-});
 
 afterAll(async () => {
   destroySubject.next(true);
   destroySubject.complete();
-  await app.close();
 });
 
 describe('Run ws json rpc:', () => {

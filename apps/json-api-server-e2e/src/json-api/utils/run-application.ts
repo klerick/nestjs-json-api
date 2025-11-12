@@ -1,6 +1,4 @@
-import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import { adapterForAxios, JsonApiJs } from '@klerick/json-api-nestjs-sdk';
+import { adapterForAxios, JsonApiJs, JsonConfig } from '@klerick/json-api-nestjs-sdk';
 import {
   RpcFactory,
   axiosTransportFactory,
@@ -9,45 +7,14 @@ import {
 import { RpcService } from '@nestjs-json-api/type-for-rpc';
 import { TransportType } from '@klerick/nestjs-json-rpc-sdk';
 import axios from 'axios';
-import { Logger } from 'nestjs-pino';
 import { WebSocket } from 'ws';
 
-import { AppModule } from '../../../../json-api-server/src/app/app.module';
-
-import { JsonConfig } from '../../../../../libs/json-api/json-api-nestjs-sdk/src/lib/types';
-import { WsAdapter } from '@nestjs/platform-ws';
 import { Subject } from 'rxjs';
-import { NestExpressApplication } from '@nestjs/platform-express';
 
 export const axiosAdapter = adapterForAxios(axios);
-let saveApp: INestApplication;
 
 export const port = 3000;
 export const globalPrefix = 'api';
-export const run = async () => {
-
-  // if (saveApp) return saveApp;
-  // const moduleRef = await Test.createTestingModule({
-  //   imports: [AppModule],
-  // }).compile();
-  // const app = moduleRef.createNestApplication<NestExpressApplication>({
-  //   bufferLogs: true,
-  //   logger: false,
-  // });
-  // app.useLogger(app.get(Logger));
-  // // const app = await NestFactory.create(AppModule);
-  // app.setGlobalPrefix(globalPrefix);
-  // app.useWebSocketAdapter(new WsAdapter(app));
-  // app.set('query parser', 'extended');
-  // await app.init();
-  // await app.listen(port);
-  //
-  // saveApp = app;
-  // return app;
-  return {
-    close(){}
-  } as any
-};
 
 export const creatSdk = (config: Partial<JsonConfig> = {}) =>
   JsonApiJs(

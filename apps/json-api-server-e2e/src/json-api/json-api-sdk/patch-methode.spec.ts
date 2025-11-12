@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import {
   Addresses,
   CommentKind,
@@ -8,17 +7,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 
-import { creatSdk, run } from '../utils/run-application';
-
-let app: INestApplication;
-
-beforeAll(async () => {
-  app = await run();
-});
-
-afterAll(async () => {
-  await app.close();
-});
+import { creatSdk } from '../utils/run-application';
 
 describe('PATCH method:', () => {
   let jsonSdk: JsonSdkPromise;
