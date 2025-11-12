@@ -59,5 +59,9 @@
       "dependsOn": ["build"]
     }
   },
-  "tags": []
+  "tags": [
+    "type:lib",
+    "lib:nestjs-acl-permissions",
+    "type:publish"
+  ]
 }
