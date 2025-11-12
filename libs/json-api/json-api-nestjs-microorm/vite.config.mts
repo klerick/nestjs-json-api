@@ -46,7 +46,7 @@ export default defineConfig(() => ({
     reporters: ['default'],
     coverage: {
       enabled: true,
-      reporter: ['json'],
+      reporter: ['json-summary'],
       reportsDirectory: '../../../coverage/json-api-nestjs-microorm',
       provider: 'v8' as const,
     },
