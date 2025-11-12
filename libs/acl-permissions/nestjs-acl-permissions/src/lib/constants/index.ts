@@ -1,15 +1,17 @@
-import {
-  Actions,
-  Method,
-  MethodActionMap as MethodActionMapType,
-} from '../types';
+/**
+ * Token for injecting ACL module options
+ */
+export const ACL_MODULE_OPTIONS = Symbol('ACL_MODULE_OPTIONS');
 
-export const IS_PUBLIC_META_KEY = Symbol('IS_PUBLIC_META_KEY');
-export const GET_PERMISSION_RULES = Symbol('GET_PERMISSION_RULES');
+/**
+ * Metadata key for @AclController decorator
+ */
+export const ACL_CONTROLLER_METADATA = Symbol('ACL_CONTROLLER_METADATA');
+/**
+ * Key for storing ACL data in context
+ */
+export const ACL_CONTEXT_KEY = Symbol('ACL_CONTEXT_KEY');
 
-export const MethodActionMap: MethodActionMapType = {
-  [Method.DELETE]: Actions.delete,
-  [Method.GET]: Actions.read,
-  [Method.PATCH]: Actions.update,
-  [Method.POST]: Actions.create,
-};
+
+export const MODULE_REF_PROPS = Symbol('MODULE_REF_PROPS');
+export const ORIGINAL_ORM_SERVICE = Symbol('ORIGINAL_ORM_SERVICE');
