@@ -6,7 +6,6 @@ import {
   OneToOne,
   Collection,
   OneToMany,
-  ArrayType,
 } from '@mikro-orm/core';
 
 import { Roles, Addresses, IAddresses, Comments, BookList } from './';

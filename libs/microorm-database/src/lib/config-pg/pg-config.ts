@@ -9,7 +9,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { PGliteDriver, PGliteConnectionConfig } from "mikro-orm-pglite";
 import * as allEntities from '../entities';
 
-const pgDir = process.env['TEST'] ? './tmp/pg-test/mikroorm' : './tmp/pg/mikroorm'
+const pgDir = process.env['TEST'] ? './tmp/pg-test/microorm' : './tmp/pg/microorm'
 
 mkdirSync(pgDir, { recursive: true });
 
