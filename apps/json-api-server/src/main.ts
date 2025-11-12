@@ -3,16 +3,18 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WsAdapter } from '@nestjs/platform-ws';
+import { Logger as PinoLogger } from 'nestjs-pino';
 
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+  const logger = app.get(PinoLogger)
+  app.useLogger(logger);
   app.useWebSocketAdapter(new WsAdapter(app));
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
@@ -35,7 +37,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
 
   await app.listen(port);
-  Logger.log(
+  logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
 }
