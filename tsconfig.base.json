@@ -10,13 +10,16 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2022", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
+      "@klerick/acl-json-api-nestjs": [
+        "libs/acl-permissions/nestjs-acl-permissions/src/index.ts"
+      ],
       "@klerick/json-api-nestjs": [
         "libs/json-api/json-api-nestjs/src/index.ts"
       ],
@@ -40,6 +43,9 @@
       ],
       "@nestjs-json-api/microorm-database": [
         "libs/microorm-database/src/index.ts"
+      ],
+      "@nestjs-json-api/microorm-database/entity": [
+        "libs/microorm-database/src/lib/entities/index.ts"
       ],
       "@nestjs-json-api/type-for-rpc": ["libs/type-for-rpc/src/index.ts"],
       "@nestjs-json-api/typeorm-database": [

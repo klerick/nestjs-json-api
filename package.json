@@ -21,12 +21,15 @@
   ],
   "scripts": {
     "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/typeorm/cli.js -d libs/typeorm-database/src/lib/config-cli.ts",
-    "typeorm:run": "npm run typeorm migration:run",
+    "typeorm:up:remove": "rm -rf ./tmp/pg/typeorm && npm run typeorm migration:run",
+    "typeorm:up": "npm run typeorm migration:run",
     "typeorm:revert": "npm run typeorm migration:revert",
     "typeorm:generate": "npm run typeorm migration:generate",
-    "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/typeorm-database/src/lib/config-cli.ts seed libs/typeorm-database/src/lib/seeders/root.seeder.ts",
+    "typeorm:seeder": "ts-node -r tsconfig-paths/register -r dotenv/config --project libs/typeorm-database/tsconfig.lib.json ./node_modules/@jorgebodega/typeorm-seeding/dist/cli.js -d libs/typeorm-database/src/lib/config-cli.ts seed libs/typeorm-database/src/lib/seeders/database.seeder.ts",
     "microorm": "ts-node -r tsconfig-paths/register -r dotenv/config -P ./libs/microorm-database/tsconfig.lib.json ./node_modules/@mikro-orm/cli/cli.js",
+    "microorm:up:remove": "rm -rf ./tmp/pg/microorm && npm run microorm migration:up",
     "microorm:up": "npm run microorm migration:up",
+    "microorm:seeder": "npm run microorm seeder:run",
     "demo:json-api": "nx run json-api-server:serve:development",
     "demo:json-api-front": "nx run json-api-front:serve:development"
   },
@@ -39,12 +42,14 @@
     "@angular/platform-browser": "20.3.4",
     "@angular/platform-browser-dynamic": "20.3.4",
     "@angular/router": "20.3.4",
+    "@casl/ability": "^6.7.3",
     "@mikro-orm/cli": "^6.4.0",
     "@mikro-orm/core": "^6.4.0",
     "@mikro-orm/migrations": "^6.4.0",
     "@mikro-orm/mysql": "^6.4.0",
     "@mikro-orm/nestjs": "^6.1.0",
     "@mikro-orm/postgresql": "^6.4.0",
+    "@mikro-orm/seeder": "^6.4.0",
     "@mikro-orm/sql-highlighter": "^1.0.0",
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
@@ -59,9 +64,12 @@
     "change-case-commonjs": "^5.4.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "mikro-orm-pglite": "^0.5.1",
+    "nestjs-cls": "^6.0.1",
     "nestjs-pino": "4.3.0",
     "pg": "8.11.3",
     "pino-http": "10.4.0",
+    "pino-pretty": "^13.1.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "socket.io-client": "^4.7.5",
@@ -83,8 +91,8 @@
     "@angular/cli": "~20.3.0",
     "@angular/compiler-cli": "20.3.4",
     "@angular/language-service": "20.3.4",
-    "@electric-sql/pglite": "^0.2.16",
-    "@faker-js/faker": "^8.4.1",
+    "@electric-sql/pglite": "^0.3.0",
+    "@faker-js/faker": "^10.0.0",
     "@jorgebodega/typeorm-factory": "^1.4.0",
     "@jorgebodega/typeorm-seeding": "^6.0.1",
     "@nestjs/schematics": "11.0.9",
@@ -101,6 +109,9 @@
     "@nx/webpack": "21.6.2",
     "@nx/workspace": "21.6.2",
     "@schematics/angular": "20.3.5",
+    "@suites/di.nestjs": "^3.0.1",
+    "@suites/doubles.vitest": "^3.0.1",
+    "@suites/unit": "^3.0.1",
     "@swc-node/register": "1.10.9",
     "@swc/cli": "~0.6.0",
     "@swc/core": "1.11.7",
@@ -119,7 +130,6 @@
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
-    "knex-pglite": "^0.11.0",
     "ng-packagr": "20.3.0",
     "nx": "21.6.2",
     "pg-mem": "^3.0.2",
@@ -149,5 +159,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "overrides": {
+    "mikro-orm-pglite": {
+      "@mikro-orm/postgresql": "^6.4.0"
+    }
   }
 }

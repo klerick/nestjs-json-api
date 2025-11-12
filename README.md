@@ -1,41 +1,258 @@
+<h1 align="center">Smart Tools for NestJS</h1>
+
 <p align="center">
-<a href="http://nestjs.com/" target="blank">NestJS</a> JSON API & JSON RPC Suite
+  A comprehensive monorepo of <strong>NestJS</strong> libraries for building standardized APIs with <strong>JSON:API</strong> and <strong>JSON-RPC 2.0</strong> specifications, with fine-grained access control and resource permissions.
 </p>
 
-<p>
-   This monorepo contains a set of several libraries designed to simplify the development of server and client applications using NestJS. These tools help you work with two popular protocols:
-</p>
+---
 
+## 📚 Table of Contents
 
-- **[JSON:API](https://jsonapi.org/)** – A specification for building RESTful APIs with standardized request and response formats.
- 
- > **[json-api-nestjs](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs)** - This package enables you to quickly set up a server API that adheres to the JSON:API specification, handling standard CRUD operations for your resources.</br> 
- > **[json-api-nestjs-microorm](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-microorm)** - This package is adapter for MicroOrm.</br> 
- > **[json-api-nestjs-typeorm](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-typeorm)** - This package is adapter for TypeOrm.</br> 
- > **[json-api-nestjs-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-sdk)** - tool for client, call api over *json-api-nestjs* 
+- [Overview](#-overview)
+- [Prerequisites](#-prerequisites)
+- [Packages](#-packages)
+  - [JSON:API](#1-jsonapi)
+  - [JSON-RPC](#2-json-rpc)
+  - [Access Control (ACL)](#3-access-control-acl)
+- [Quick Start](#-quick-start)
+  - [Installation](#installation)
+  - [Running Demo Applications](#running-demo-applications)
+- [License](#-license)
 
+---
 
-- **[JSON-RPC](https://www.jsonrpc.org/)** – A protocol for remote procedure calls using JSON.
+## 🎯 Overview
 
-> **[nestjs-json-rpc](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc)** - Use this package to implement remote procedure call (RPC) functionality in your NestJS applications, enabling efficient inter-service communication.</br>
-> **[nestjs-json-rpc-sdk](https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc-sdk)** - This tool offers a straightforward way to call remote procedures from your client-side code, ensuring smooth communication with your JSON-RPC server.
+This monorepo provides a complete set of tools to simplify the development of server and client applications using **NestJS**. It supports two popular protocols:
 
-- **ACL tools** - tool for acl over *json-api-nestjs*(coming soon...)
-## Installation
+- **[JSON:API](https://jsonapi.org/)** – Build RESTful APIs with standardized request/response formats
+- **[JSON-RPC 2.0](https://www.jsonrpc.org/)** – Implement remote procedure calls using JSON
+- **[CASL](https://casl.js.org/)** – Fine-grained access control with full integration for JSON:API resources
+
+All packages are designed to work seamlessly with modern ORMs like **TypeORM** and **MikroORM**, and include built-in support for [PGlite](https://github.com/electric-sql/pglite) for local development.
+
+---
+
+## 📋 Prerequisites
+
+- **Node.js** >= 20.0.0
+- **npm** or **yarn**
+
+---
+
+## 📦 Packages
+
+### 1. JSON:API
+
+Build production-ready **JSON:API** compliant REST APIs with automatic CRUD generation, filtering, sorting, pagination, and relationship handling.
+
+<table>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs">json-api-nestjs</a></strong>
+</td>
+<td>
+Core library for creating JSON:API compliant servers. Automatically generates endpoints for CRUD operations, relationships, filtering, sorting, pagination, and atomic operations. Supports TypeORM and MikroORM adapters.
+</td>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-typeorm">json-api-nestjs-typeorm</a></strong>
+</td>
+<td>
+TypeORM adapter for json-api-nestjs. Enables JSON:API functionality with TypeORM entities, migrations, and repositories.
+</td>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-microorm">json-api-nestjs-microorm</a></strong>
+</td>
+<td>
+MikroORM adapter for json-api-nestjs. Provides JSON:API support with MikroORM entities, migrations, and advanced query features.
+</td>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-api/json-api-nestjs-sdk">json-api-nestjs-sdk</a></strong>
+</td>
+<td>
+Type-safe client SDK for consuming JSON:API endpoints. Works with Axios, Fetch API, and Angular HttpClient. Supports filtering, sorting, includes, atomic operations, and provides full TypeScript type inference.
+</td>
+</tr>
+</table>
+
+---
+
+### 2. JSON-RPC
+
+Implement **JSON-RPC 2.0** servers and clients with support for HTTP and WebSocket transports, batch requests, and automatic method discovery.
+
+<table>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc">nestjs-json-rpc</a></strong>
+</td>
+<td>
+JSON-RPC 2.0 server implementation for NestJS. Supports HTTP and WebSocket transports, batch requests, custom error handling, and automatic method registration via decorators.
+</td>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/json-rpc/nestjs-json-rpc-sdk">nestjs-json-rpc-sdk</a></strong>
+</td>
+<td>
+Type-safe JSON-RPC client SDK with automatic method inference, batch request support, and WebSocket/HTTP transport options.
+</td>
+</tr>
+</table>
+
+---
+
+### 3. Access Control (ACL)
+
+Add fine-grained **Access Control Lists** to your JSON:API endpoints using **[CASL](https://casl.js.org/)** with template-based rule materialization.
+
+<table>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>
+<strong><a href="https://github.com/klerick/nestjs-json-api/tree/master/libs/acl-permissions/nestjs-acl-permissions">nestjs-acl-permissions</a></strong>
+</td>
+<td>
+Type-safe ACL module with CASL integration for JSON:API endpoints. Features template interpolation, field-level permissions, context-based rules, lazy evaluation, and transparent ORM-level filtering. Can be used standalone or with automatic integration via <code>json-api-nestjs</code>.
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+This monorepo uses [Nx](https://nx.dev/) and supports **TypeORM** and **MikroORM** with [PGlite](https://github.com/electric-sql/pglite) for local development.
 
 ```bash
-$ npm install
-$ npm run typeorm:run
-$ npm run seed:run
+# Install dependencies
+npm install
 ```
 
-## Running the example app
+#### Setup TypeORM Database
 
 ```bash
-# dev server
-$ nx run json-api-server:serve:development
+# Initialize database and run migrations
+npm run typeorm:up:remove  # Removes existing DB and runs migrations
 
+# Or just run migrations (if DB exists)
+npm run typeorm:up
+
+# Seed the database
+npm run typeorm:seeder
 ```
-## License
 
-The plugin is [MIT licensed](LICENSE).
+#### Setup MikroORM Database
+
+```bash
+# Initialize database and run migrations
+npm run microorm:up:remove  # Removes existing DB and runs migrations
+
+# Or just run migrations (if DB exists)
+npm run microorm:up
+
+# Seed the database
+npm run microorm:seeder
+```
+
+---
+
+### Running Demo Applications
+
+#### JSON:API Server (TypeORM)
+
+```bash
+# Using npm script
+npm run demo:json-api
+
+# Or using nx directly
+nx run json-api-server:serve-typeorm
+```
+
+Server will start on `http://localhost:3000` (or configured port)
+
+Available endpoints:
+- `GET /api/users` - List all users
+- `GET /api/users/:id` - Get single user
+- `POST /api/users` - Create user
+- `PATCH /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
+- `GET /api/users/:id/relationships/:rel` - Get relationships
+- And more...
+
+#### JSON:API Server (MikroORM)
+
+```bash
+# Using nx
+nx run json-api-server:serve-microorm
+```
+
+---
+
+## 🌟 Features
+
+- **Automatic CRUD Generation** – Generate complete REST APIs from ORM entities
+- **JSON:API Compliant** – Full specification support including relationships, filtering, sorting, pagination, sparse fieldsets
+- **Atomic Operations** – Perform multiple operations in a single request
+- **Type Safety** – Full TypeScript support with type inference
+- **Multiple ORMs** – Support for TypeORM and MikroORM
+- **JSON-RPC 2.0** – Implement RPC servers with HTTP/WebSocket transports
+- **Access Control** – Fine-grained permissions with CASL integration
+- **Swagger/OpenAPI** – Automatic API documentation generation
+- **Extensible** – Override default controllers and services
+
+---
+
+## 📖 Documentation
+
+Each package has detailed documentation in its own README:
+
+- [json-api-nestjs](libs/json-api/json-api-nestjs/README.md)
+- [json-api-nestjs-typeorm](libs/json-api/json-api-nestjs-typeorm/README.md)
+- [json-api-nestjs-microorm](libs/json-api/json-api-nestjs-microorm/README.md)
+- [json-api-nestjs-sdk](libs/json-api/json-api-nestjs-sdk/README.md)
+- [nestjs-json-rpc](libs/json-rpc/nestjs-json-rpc/README.md)
+- [nestjs-json-rpc-sdk](libs/json-rpc/nestjs-json-rpc-sdk/README.md)
+- [nestjs-acl-permissions](libs/acl-permissions/nestjs-acl-permissions/README.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 📝 License
+
+This project is [MIT licensed](LICENSE).
+
+---
+
+<p align="center">Made with ❤️ by <a href="https://github.com/klerick">Aleksandr Kharkovey</a></p>

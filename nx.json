@@ -155,5 +155,8 @@
     "releaseTagPattern": "{projectName}@{version}"
   },
   "defaultBase": "master",
-  "nxCloudId": "67c859dd862a93f16da79c89"
+  "nxCloudId": "67c859dd862a93f16da79c89",
+  "tui": {
+    "enabled": false
+  }
 }
