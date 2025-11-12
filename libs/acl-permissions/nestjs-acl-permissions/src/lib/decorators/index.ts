@@ -1,0 +1,1 @@
+export { AclController } from './acl-controller.decorator';

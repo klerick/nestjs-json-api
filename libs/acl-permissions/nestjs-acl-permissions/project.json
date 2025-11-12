@@ -1,18 +1,57 @@
 {
   "name": "nestjs-acl-permissions",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/nestjs-acl-permissions/src",
+  "sourceRoot": "libs/acl-permissions/nestjs-acl-permissions",
   "projectType": "library",
+  "implicitDependencies": ["json-api-nestjs"],
   "targets": {
-    "build": {
+    "build-common": {
+      "dependsOn": ["^build", "^build-cjs", "^build-mjs"],
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/nestjs-acl-permissions",
-        "tsConfig": "libs/nestjs-acl-permissions/tsconfig.lib.json",
-        "packageJson": "libs/nestjs-acl-permissions/package.json",
-        "main": "libs/nestjs-acl-permissions/src/index.ts",
-        "assets": ["libs/nestjs-acl-permissions/*.md"]
+        "outputPath": "dist/{projectRoot}",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "packageJson": "{projectRoot}/package.json",
+        "main": "{projectRoot}/src/index.ts",
+        "assets": ["{projectRoot}/*.md"],
+        "generateExportsField": true,
+        "updateBuildableProjectDepsInPackageJson": false
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build-common"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "commands": [
+          {
+            "command": "node tools/scripts/prepare-package-json.mjs nestjs-acl-permissions"
+          },
+          {
+            "command": "mkdir -p node_modules/@klerick && rm -rf node_modules/@klerick/acl-json-api-nestjs",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "ln -s $(pwd)/dist/{projectRoot} node_modules/@klerick/acl-json-api-nestjs",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false
+      }
+    },
+    "build1": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/acl-permissions/nestjs-acl-permissions",
+        "tsConfig": "libs/acl-permissions/nestjs-acl-permissions/tsconfig.lib.json",
+        "packageJson": "libs/acl-permissions/nestjs-acl-permissions/package.json",
+        "main": "libs/acl-permissions/nestjs-acl-permissions/src/index.ts",
+        "assets": ["libs/acl-permissions/nestjs-acl-permissions/*.md"]
       }
     },
     "publish": {

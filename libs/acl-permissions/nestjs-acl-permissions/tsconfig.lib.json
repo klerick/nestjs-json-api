@@ -1,17 +1,24 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "outDir": "../../../dist/out-tsc",
     "declaration": true,
-    "types": ["node"],
-    "target": "es2021",
+    "types": [
+      "node"
+    ],
+    "target": "es2023",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
+    "strict": true,
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+  ],
   "exclude": [
-    "jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/**/*.test-d.ts",
+  ]
 }
