@@ -30,9 +30,9 @@ type RelationSort<E> = {
   [K in RelationKeys<E>]?: SortForEntity<TypeOfArray<E[K]>>;
 };
 
-type Sort<E> = TargetSort<E> & RelationSort<E>;
+export type Sort<E> = TargetSort<E> & RelationSort<E>;
 
-type Fields<E> = TargetField<E> & RelationField<E>;
+export type Fields<E> = TargetField<E> & RelationField<E>;
 
 export type Pagination = {
   number: number;
@@ -48,7 +48,7 @@ type EntityFilter<E> = {
 };
 
 type TargetFilter<E> = {
-  target: EntityFilter<E> & TargetRelationFilter<E>;
+  target?: EntityFilter<E> & TargetRelationFilter<E>;
 };
 
 type RelationFilter<E> = {
