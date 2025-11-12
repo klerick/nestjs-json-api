@@ -1,6 +1,8 @@
 import { EntityParam, TypeField } from '@klerick/json-api-nestjs';
 import { Repository } from 'typeorm';
 
+export * from './acl-rules-to-typeorm';
+
 export const getRelation = <E extends object>(repository: Repository<E>) =>
   repository.metadata.relations.map((i) => {
     return i.propertyName;
@@ -182,3 +184,5 @@ export const getArrayType = <E extends object>(
       return acum;
     }, {} as any);
 };
+
+export { applyAclRulesToQueryBuilder, extractRelationsFromRules } from './acl-rules-to-typeorm';

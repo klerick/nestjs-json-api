@@ -8,6 +8,8 @@ import {
   SUB_QUERY_ALIAS_FOR_PAGINATION,
 } from '../../constants';
 
+import { applyAclRulesToQueryBuilder } from '../../orm-helper';
+
 type OrderByCondition = Record<string, 'ASC' | 'DESC'>;
 
 function getSortObject(params: any, relationName: string) {
@@ -19,10 +21,14 @@ function getSortObject(params: any, relationName: string) {
 
 export async function getAll<E extends object, IdKey extends string = 'id'>(
   this: TypeOrmService<E, IdKey>,
-  query: Query<E, IdKey>
-): Promise<ResourceObject<E, 'array', null, IdKey>> {
+  query: Query<E, IdKey>,
+  transformData?: boolean,
+  additionalQueryParams?: Record<string, unknown>
+): Promise<
+  ResourceObject<E, 'array', null, IdKey> | { totalItems: number; items: E[] }
+> {
   const { fields, include, sort, page } = query;
-
+  let hasExistingWhere = false;
   let defaultSortObject: OrderByCondition = {
     [`${
       this.typeormUtilsService.currentAlias
@@ -86,6 +92,7 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
     .orderBy(defaultSortObject);
 
   for (const i in expressionArray) {
+    hasExistingWhere = true
     const { params, alias, selectInclude, expression } = expressionArray[i];
     const expressionTempArray: string[] = [];
     if (alias) {
@@ -116,7 +123,28 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
       currentIncludeAlias
     );
   }
+  if (additionalQueryParams) {
+    const brackets = applyAclRulesToQueryBuilder(
+      additionalQueryParams,
+      this.typeormUtilsService,
+    );
+    for (const item of include || []) {
+      const currentIncludeAlias = this.typeormUtilsService.getAliasForRelation(
+        item as any
+      );
+      if (!currentIncludeAlias) continue;
+      queryBuilderForCount.leftJoin(
+        this.typeormUtilsService.getAliasPath(item),
+        currentIncludeAlias
+      );
+    }
+    if (hasExistingWhere) {
+      queryBuilderForCount.andWhere(brackets);
+    } else {
+      queryBuilderForCount.where(brackets);
+    }
 
+  }
   const count = await queryBuilderForCount.getCount();
   const meta = {
     pageNumber: page.number,
@@ -125,10 +153,15 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
   };
 
   if (count === 0) {
-    return {
-      meta,
-      data: [],
-    };
+    return transformData
+      ? {
+          meta,
+          data: [],
+        }
+      : {
+          totalItems: 0,
+          items: [],
+        };
   }
 
   const aliasForIdResultPagination = this.typeormUtilsService.getAliasPath(
@@ -181,9 +214,13 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
     if (include) {
       for (const rel of include) {
         const currentIncludeAlias =
-          this.typeormUtilsService.getAliasForRelation(rel as unknown as keyof RelationAlias<E>);
+          this.typeormUtilsService.getAliasForRelation(
+            rel as unknown as keyof RelationAlias<E>
+          );
         const primaryColumnName =
-          this.typeormUtilsService.getPrimaryColumnForRel(rel as unknown as keyof RelationAlias<E>);
+          this.typeormUtilsService.getPrimaryColumnForRel(
+            rel as unknown as keyof RelationAlias<E>
+          );
         selectFields.add(`${currentIncludeAlias}.${primaryColumnName}`);
       }
     }
@@ -249,6 +286,12 @@ export async function getAll<E extends object, IdKey extends string = 'id'>(
     );
   }
   const resultData = await resultQuery.getMany();
+  if (!transformData) {
+    return {
+      totalItems: count,
+      items: resultData,
+    };
+  }
   const { included, data } = this.transformDataService.transformData(
     resultData,
     query
