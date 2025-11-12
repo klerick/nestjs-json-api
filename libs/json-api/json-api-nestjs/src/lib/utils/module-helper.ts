@@ -30,6 +30,9 @@ export function prepareConfig<OrmParams>(
       debug: !!options['debug'],
       pipeForId: options['pipeForId'] || ParseIntPipe,
       allowSetId: !!options['allowSetId']
+    },
+    hooks: {
+      afterCreateController: moduleParams['hooks'] && moduleParams['hooks']['afterCreateController'] || (() => void 0)
     }
   };
 }

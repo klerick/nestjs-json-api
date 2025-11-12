@@ -6,6 +6,7 @@ import {
   PipeTransform,
   Type,
   InternalServerErrorException,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   INTERCEPTORS_METADATA,
@@ -24,6 +25,11 @@ import {
   InterceptorsConsumer,
   InterceptorsContextCreator,
 } from '@nestjs/core/interceptors';
+import {
+  FORBIDDEN_MESSAGE,
+  GuardsConsumer,
+  GuardsContextCreator,
+} from '@nestjs/core/guards';
 import { Controller } from '@nestjs/common/interfaces';
 import { lastValueFrom } from 'rxjs';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -75,6 +81,7 @@ export class ExecuteService {
   @Inject(ErrorFormatService) private errorFormatService!: ErrorFormatService;
 
   private _interceptorsContextCreator!: InterceptorsContextCreator;
+  private _guardsContextCreator!: GuardsContextCreator;
 
   get interceptorsContextCreator() {
     if (!this._interceptorsContextCreator) {
@@ -87,7 +94,19 @@ export class ExecuteService {
     return this._interceptorsContextCreator;
   }
 
+  get guardsContextCreator() {
+    if (!this._guardsContextCreator) {
+      this._guardsContextCreator = new GuardsContextCreator(
+        this.moduleRef.container,
+        this.moduleRef.applicationConfig
+      );
+    }
+
+    return this._guardsContextCreator;
+  }
+
   private interceptorsConsumer = new InterceptorsConsumer();
+  private guardsConsumer = new GuardsConsumer();
 
   async run(params: ParamsForExecute[], tmpIds: (string | number)[]) {
     return this.runInTransaction(() => this.executeOperations(params, tmpIds));
@@ -127,6 +146,17 @@ export class ExecuteService {
             itemReplace[itemReplace.length - 1];
           }
         }
+        const guarFunction = this.getCanActivateFn(
+          controller,
+          controller[methodName],
+          currentParams.module
+        );
+
+        if (guarFunction) {
+          await guarFunction(
+            Object.values(this.asyncLocalStorage.getStore() || {})
+          );
+        }
 
         const interceptors = this.getInterceptorsArray(
           controller,
@@ -165,6 +195,32 @@ export class ExecuteService {
       this.processException(e, i);
     }
     return resultArray;
+  }
+
+  private getCanActivateFn(
+    controller: Controller,
+    callback: (...arg: any) => any,
+    module: ParamsForExecute['module']
+  ) {
+    const guards = this.guardsContextCreator.create(
+      controller,
+      callback,
+      module.token
+    );
+
+    const canActivateFn = async (args: any[]) => {
+      const canActivate = await this.guardsConsumer.tryActivate(
+        guards,
+        args,
+        controller,
+        callback,
+        'http'
+      );
+      if (!canActivate) {
+        throw new ForbiddenException(FORBIDDEN_MESSAGE);
+      }
+    };
+    return guards.length ? canActivateFn : null;
   }
 
   private getInterceptorsArray(
@@ -299,10 +355,14 @@ export class ExecuteService {
     const formatError = this.errorFormatService.formatError(e);
 
     if (formatError instanceof InternalServerErrorException) {
-      throw formatError
+      throw formatError;
     }
-    const response = formatError.getResponse()
-    if (typeof response === 'object' && 'message' in response && Array.isArray(response['message'])) {
+    const response = formatError.getResponse();
+    if (
+      typeof response === 'object' &&
+      'message' in response &&
+      Array.isArray(response['message'])
+    ) {
       response['message'] = response['message'].map((m: any) => {
         m['path'] = [KEY_MAIN_INPUT_SCHEMA, `${i}`, ...m['path']];
         return m;

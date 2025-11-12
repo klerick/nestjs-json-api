@@ -89,7 +89,7 @@ function getZodRulesForField(type: TypeField = TypeField.string) {
       ...acum,
       [val]: zodRuleStringArray
         .refine(elementOfArrayMustBe(type), {
-          error: `String should be as ${type}`,
+          error: `String element of array should be as ${type}`,
         })
         .optional(),
     }),

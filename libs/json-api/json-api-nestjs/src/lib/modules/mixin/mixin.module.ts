@@ -36,6 +36,8 @@ export class MixinModule {
 
     bindController(controllerClass, entity, moduleConfig);
 
+    mixinOptions.config.hooks.afterCreateController(controllerClass)
+
     const optionProvider = {
       provide: CONTROLLER_OPTIONS_TOKEN,
       useValue: moduleConfig,

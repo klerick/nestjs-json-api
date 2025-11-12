@@ -18,6 +18,7 @@ export {
 export {
   JsonApiTransformerService,
   ErrorFormatService,
+  EntityParamMapService
 } from './lib/modules/mixin/service';
 export {
   MODULE_OPTIONS_TOKEN,
