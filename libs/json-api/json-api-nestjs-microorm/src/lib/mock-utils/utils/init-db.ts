@@ -34,8 +34,8 @@ export async function initMikroOrm(testDbName: string) {
     entities: [Users, UserGroups, Roles, Comments, Addresses, Notes],
     allowGlobalContext: true,
     schema: 'public',
-    debug:
-      process.env['DB_LOGGING'] !== '0' ? ['query', 'query-params'] : false,
+    debug: false
+      // process.env['DB_LOGGING'] !== '0' ? ['query', 'query-params'] : false,
   });
 
   const sql = await orm.getSchemaGenerator().getCreateSchemaSQL();
