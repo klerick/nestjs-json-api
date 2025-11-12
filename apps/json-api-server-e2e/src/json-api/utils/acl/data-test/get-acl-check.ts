@@ -15,21 +15,6 @@ export const CheckFieldAndInclude: Permissions = {
     can('patchRelationship', 'UsersAcl', ['posts', 'aclComments']);
   },
   user({ can, cannot }) {
-
-    // can('getAll', 'UserProfileAcl', {
-    //   'lastName': 'test',
-    // });
-    // cannot('getAll', 'UserProfileAcl', {
-    //   'lastName': 'test2',
-    //   'avatar': {
-    //     $ne: null
-    //   }
-    // });
-    // cannot('getAll', 'UserProfileAcl', {
-    //   'user.id': {
-    //     $eq: '${currentUser.id}'
-    //   },
-    // });
     can(
       'getAll',
       'UserProfileAcl',
