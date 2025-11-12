@@ -34,7 +34,7 @@ export class Roles {
   @Column({
     name: 'is_default',
     type: 'boolean',
-    default: 'false',
+    default: () => 'false',
   })
   public isDefault!: boolean;
 
