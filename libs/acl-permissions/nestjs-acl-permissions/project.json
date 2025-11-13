@@ -43,17 +43,6 @@
         "parallel": false
       }
     },
-    "build1": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/acl-permissions/nestjs-acl-permissions",
-        "tsConfig": "libs/acl-permissions/nestjs-acl-permissions/tsconfig.lib.json",
-        "packageJson": "libs/acl-permissions/nestjs-acl-permissions/package.json",
-        "main": "libs/acl-permissions/nestjs-acl-permissions/src/index.ts",
-        "assets": ["libs/acl-permissions/nestjs-acl-permissions/*.md"]
-      }
-    },
     "publish": {
       "command": "node tools/scripts/publish.mjs nestjs-acl-permissions {args.ver} {args.tag}",
       "dependsOn": ["build"]
