@@ -23,10 +23,13 @@
 
 ## 🎯 Overview
 
-This monorepo provides a complete set of tools to simplify the development of server and client applications using **NestJS**. It supports two popular protocols:
+This monorepo provides a complete set of tools to simplify the development of server and client applications using **NestJS**. It includes support for two popular API protocols and a powerful access control system:
 
+**API Protocols:**
 - **[JSON:API](https://jsonapi.org/)** – Build RESTful APIs with standardized request/response formats
 - **[JSON-RPC 2.0](https://www.jsonrpc.org/)** – Implement remote procedure calls using JSON
+
+**Access Control:**
 - **[CASL](https://casl.js.org/)** – Fine-grained access control with full integration for JSON:API resources
 
 All packages are designed to work seamlessly with modern ORMs like **TypeORM** and **MikroORM**, and include built-in support for [PGlite](https://github.com/electric-sql/pglite) for local development.
