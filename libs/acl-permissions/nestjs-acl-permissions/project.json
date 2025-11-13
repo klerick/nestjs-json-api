@@ -57,6 +57,25 @@
     "publish": {
       "command": "node tools/scripts/publish.mjs nestjs-acl-permissions {args.ver} {args.tag}",
       "dependsOn": ["build"]
+    },
+    "upload-badge": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "test"
+        }
+      ],
+      "options": {
+        "commands": [
+          {
+            "command": "node tools/scripts/upload-badge.mjs nestjs-acl-permissions",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "./",
+        "parallel": false,
+        "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
     }
   },
   "tags": [
