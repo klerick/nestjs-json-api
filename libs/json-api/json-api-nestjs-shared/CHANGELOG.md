@@ -1,3 +1,18 @@
+## 1.0.0-beta.4 (2025-11-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-shared:** fix after update nx ([e4ef59f](https://github.com/klerick/nestjs-json-api/commit/e4ef59f))
+- **json-api-nestjs-shared:** fix after update nx ([4c7a42d](https://github.com/klerick/nestjs-json-api/commit/4c7a42d))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-shared:** refine `RelationCheck` type logic to handle nested promises and exclude undefined types ([d5c1ea7](https://github.com/klerick/nestjs-json-api/commit/d5c1ea7))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 1.0.0-beta.3 (2025-05-23)
 
 ### 🚀 Features

@@ -1,3 +1,14 @@
+## 2.1.0 (2025-11-13)
+
+### 🚀 Features
+
+- **nestjs-json-rpc-sdk:** fix after update nx ([5a044e6](https://github.com/klerick/nestjs-json-api/commit/5a044e6))
+- **nestjs-json-rpc-sdk:** fix after update nx ([4d35fd6](https://github.com/klerick/nestjs-json-api/commit/4d35fd6))
+
+### ❤️ Thank You
+
+- Alex H
+
 # 2.0.0 (2024-12-18)
 
 ### 🚀 Features

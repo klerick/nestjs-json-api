@@ -1,3 +1,14 @@
+## 1.1.0 (2025-11-13)
+
+### 🚀 Features
+
+- **nestjs-json-rpc:** fix after update nx ([fb0c8ab](https://github.com/klerick/nestjs-json-api/commit/fb0c8ab))
+- **nestjs-json-rpc:** simplify `zParams` definition and improve type safety in `zRpcParams` ([5d07b34](https://github.com/klerick/nestjs-json-api/commit/5d07b34))
+
+### ❤️ Thank You
+
+- Alex H
+
 # 1.0.0 (2024-04-12)
 
 

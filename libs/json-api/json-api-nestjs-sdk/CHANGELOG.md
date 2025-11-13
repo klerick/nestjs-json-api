@@ -1,3 +1,23 @@
+## 10.0.0-beta.4 (2025-11-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** expand types to include JsonConfig, Filter, Includes, Sort, Pagination, and Fields ([ea56805](https://github.com/klerick/nestjs-json-api/commit/ea56805))
+- **json-api-nestjs-sdk:** fix after update nx ([f11d5b8](https://github.com/klerick/nestjs-json-api/commit/f11d5b8))
+- **json-api-nestjs-sdk:** fix after update nx ([94aad23](https://github.com/klerick/nestjs-json-api/commit/94aad23))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** add id field in atomic body for add operation with tmpId if set Id should be use as id and tmpId. ([3d16bf7](https://github.com/klerick/nestjs-json-api/commit/3d16bf7))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.4
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.3 (2025-05-23)
 
 ### 🚀 Features

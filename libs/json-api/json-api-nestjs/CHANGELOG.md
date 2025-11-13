@@ -1,3 +1,28 @@
+## 10.0.0-beta.6 (2025-11-13)
+
+### 🚀 Features
+
+- **json-api-nestjs:** add hooks support and enhance guards handling with `afterCreateController` hook and guards logic - prepare for acl libs ([5059530](https://github.com/klerick/nestjs-json-api/commit/5059530))
+- **json-api-nestjs:** add `allowSetId` option for enhanced control over entity ID assignment during POST operations ([ce269ad](https://github.com/klerick/nestjs-json-api/commit/ce269ad))
+- **json-api-nestjs:** fix after update nx ([e51f07c](https://github.com/klerick/nestjs-json-api/commit/e51f07c))
+- **json-api-nestjs:** bump zod to v4 ([19888e9](https://github.com/klerick/nestjs-json-api/commit/19888e9))
+- **json-api-nestjs:** Add JSON_API_DECORATOR_ENTITY metadata to controller ([d2deb39](https://github.com/klerick/nestjs-json-api/commit/d2deb39))
+- **json-api-nestjs:** fix after update nx ([5d87f95](https://github.com/klerick/nestjs-json-api/commit/5d87f95))
+- **json-api-nestjs:** bump zod to v4 ([23709bd](https://github.com/klerick/nestjs-json-api/commit/23709bd))
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** replace deprecated faker methods, enhance zod schemas with transformations and update constants with METHOD_NAME. change name for method function ([e382bce](https://github.com/klerick/nestjs-json-api/commit/e382bce))
+- **json-api-nestjs:** use ErrorFormatService for format error in AtomicOperationModule fix work with tmpId ([6d166ba](https://github.com/klerick/nestjs-json-api/commit/6d166ba))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.4
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.5 (2025-05-30)
 
 ### 🚀 Features

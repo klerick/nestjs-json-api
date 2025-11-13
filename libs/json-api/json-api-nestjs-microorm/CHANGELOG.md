@@ -1,3 +1,25 @@
+## 0.1.0-beta.8 (2025-11-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-microorm:** enhance `getOne` and `getAll` with transform toggles and additional query params, add relationship loading utility and improve logging ([bb808cd](https://github.com/klerick/nestjs-json-api/commit/bb808cd))
+- **json-api-nestjs-microorm:** fix after update nx ([03da82f](https://github.com/klerick/nestjs-json-api/commit/03da82f))
+- **json-api-nestjs-microorm:** fix after update nx ([5cdf997](https://github.com/klerick/nestjs-json-api/commit/5cdf997))
+- **json-api-nestjs-microorm:** improve type handling and simplify relation processing in utility service and `postOne` method ([1a47099](https://github.com/klerick/nestjs-json-api/commit/1a47099))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** replace deprecated faker methods and add PGlite compatibility in MikroORM setup ([1d0b83b](https://github.com/klerick/nestjs-json-api/commit/1d0b83b))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.4
+- Updated json-api-nestjs to 10.0.0-beta.6
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.7 (2025-06-23)
 
 ### 🩹 Fixes

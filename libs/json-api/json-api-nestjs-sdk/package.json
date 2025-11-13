@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-sdk",
-  "version": "10.0.0-beta.3",
+  "version": "10.0.0-beta.4",
   "description": "Helper for client JsonAPi Plugin for NestJs",
   "keywords": [
     "nestjs",
@@ -12,7 +12,7 @@
     "CRUD"
   ],
   "dependencies": {
-    "@klerick/json-api-nestjs-shared": "0.0.0"
+    "@klerick/json-api-nestjs-shared": "1.0.0-beta.4"
   },
   "peerDependencies": {
     "axios": "^1.6.0",
