@@ -3,7 +3,7 @@
   <a href="https://www.npmjs.com/package/acl-json-api-nestjs" target="_blank"><img src="https://img.shields.io/npm/l/acl-json-api-nestjs.svg" alt="Package License" /></a>
   <a href="https://www.npmjs.com/package/acl-json-api-nestjs" target="_blank"><img src="https://img.shields.io/npm/dm/acl-json-api-nestjs.svg" alt="NPM Downloads" /></a>
   <a href="http://commitizen.github.io/cz-cli/" target="_blank"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly" /></a>
-  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/klerick/02a4c98cf7008fea2af70dc2d50f4cb7/raw/acl-json-api-nestjs.json" alt="Coverage Badge" />
+  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/klerick/02a4c98cf7008fea2af70dc2d50f4cb7/raw/nestjs-acl-permissions.json" alt="Coverage Badge" />
 </p>
 
 # acl-json-api-nestjs
