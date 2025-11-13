@@ -13,6 +13,7 @@ on:
           - tag:type:publish
           - tag:lib:json-api-nestjs
           - tag:lib:nestjs-json-rpc
+          - lib:nestjs-acl-permissions
       project1:
         description: "Select project"
         required: false
@@ -27,6 +28,7 @@ on:
           - json-api-nestjs-microorm
           - json-api-nestjs-shared
           - json-api-nestjs-typeorm
+          - nestjs-acl-permissions
       project2:
         description: "Select project"
         required: false
@@ -41,6 +43,7 @@ on:
           - json-api-nestjs-microorm
           - json-api-nestjs-shared
           - json-api-nestjs-typeorm
+          - nestjs-acl-permissions
       project3:
         description: "Select project"
         required: false
@@ -55,6 +58,7 @@ on:
           - json-api-nestjs-microorm
           - json-api-nestjs-shared
           - json-api-nestjs-typeorm
+          - nestjs-acl-permissions
       project4:
         description: "Select project"
         required: false
@@ -69,6 +73,7 @@ on:
           - json-api-nestjs-microorm
           - json-api-nestjs-shared
           - json-api-nestjs-typeorm
+          - nestjs-acl-permissions
       beta-release:
         description: 'Is beta release?'
         required: false
@@ -102,6 +107,13 @@ jobs:
   e2e-test:
     needs: [test]
     uses: ./.github/workflows/e2e-test.yml
+    with:
+      mainBranch: "last-tag"
+    secrets:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  e2e-test-mikroorm:
+    needs: [ test ]
+    uses: ./.github/workflows/e2e-test-mikroorm.yml
     with:
       mainBranch: "last-tag"
     secrets:
