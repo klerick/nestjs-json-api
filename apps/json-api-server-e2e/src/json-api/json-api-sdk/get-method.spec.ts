@@ -12,7 +12,21 @@ import { getUser } from '../utils/data-utils';
 import { creatSdk} from '../utils/run-application';
 import { AxiosError } from 'axios';
 
-describe('GET method:', () => {
+/**
+ * JSON API: GET Operations - Fetching and Filtering Resources
+ *
+ * This test suite demonstrates how to use the JSON API SDK to fetch resources
+ * with various filtering, pagination, field selection, and relationship options.
+ *
+ * Examples include:
+ * - Basic filtering with operators (eq, ne, in, like)
+ * - Filtering by relationship fields
+ * - Pagination and sorting
+ * - Sparse fieldsets (selecting specific fields)
+ * - Including and filtering relationships
+ * - Fetching relationship data
+ */
+describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
   let jsonSdk: JsonSdkPromise;
   let usersArray: Users[];
   let addressArray: Addresses[];
@@ -94,15 +108,15 @@ describe('GET method:', () => {
     );
   });
 
-  describe('Check filter', () => {
-    it('Should be get all entities', async () => {
+  describe('Filtering Resources', () => {
+    it('should fetch all users without filters', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users);
       expect(users).toBeDefined();
       expect(users).toBeInstanceOf(Array);
       expect(users.length).toBeGreaterThan(0);
     });
 
-    it('Should be get entities with filter', async () => {
+    it('should filter users by target attributes using eq, ne, in, and like operators', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users, {
         filter: {
           target: {
@@ -153,7 +167,7 @@ describe('GET method:', () => {
       expect(resultFindLike.at(0)?.id).toBe(users2.at(0)?.id);
     });
 
-    it('Should be get entities with filter by relation target', async () => {
+    it('should filter users by relationship existence (null/not null check)', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users, {
         filter: {
           target: {
@@ -191,7 +205,7 @@ describe('GET method:', () => {
       });
     });
 
-    it('Should be get entities with filter by relation', async () => {
+    it('should filter users by related resource attributes (roles.name)', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users, {
         filter: {
           target: {
@@ -215,8 +229,8 @@ describe('GET method:', () => {
     });
   });
 
-  describe('Check pagination', () => {
-    it('Check limit', async () => {
+  describe('Pagination and Sorting', () => {
+    it('should return first page with page size limit', async () => {
       const users = await jsonSdk.jonApiSdkService.getList(Users, {
         filter: {
           target: {
@@ -240,7 +254,7 @@ describe('GET method:', () => {
       expect(users.length).toBe(1);
       expect(users[0].id).toBe(usersArray.sort((a, b) => a.id - b.id)[0].id);
     });
-    it('Check limit second page', async () => {
+    it('should return second page when page number is 2', async () => {
       const users = await jsonSdk.jonApiSdkService.getList(Users, {
         filter: {
           target: {
@@ -265,8 +279,8 @@ describe('GET method:', () => {
     });
   });
 
-  describe('Check select', () => {
-    it('Check target field', async () => {
+  describe('Sparse Fieldsets (Field Selection)', () => {
+    it('should return only specified target fields (id, isActive)', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users, {
         filter: {
           target: {
@@ -288,7 +302,7 @@ describe('GET method:', () => {
         expect(user.firstName).toBeUndefined();
       });
     });
-    it('Check relation field', async () => {
+    it('should return specified fields for both target and related resources', async () => {
       const users = await jsonSdk.jonApiSdkService.getAll(Users, {
         filter: {
           target: {
@@ -328,8 +342,8 @@ describe('GET method:', () => {
     });
   });
 
-  describe('Get relation', () => {
-    it('Get relation by id result string', async () => {
+  describe('Fetching Relationship Data', () => {
+    it('should return relationship identifier for to-one relationship (addresses)', async () => {
       const userItem = usersArray[0];
 
       const result = await jsonSdk.jonApiSdkService.getRelationships(
@@ -346,7 +360,7 @@ describe('GET method:', () => {
       expect(result).toBe(`${resultGetOne.addresses.id}`);
     });
 
-    it('Get relation by id result string array', async () => {
+    it('should return relationship identifiers for to-many relationship (roles)', async () => {
       const userItem = usersArray.filter((i) => i.roles)[0];
 
       const result = await jsonSdk.jonApiSdkService.getRelationships(

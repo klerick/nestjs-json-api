@@ -1,3 +1,23 @@
+/**
+ * ACL: Atomic Operations - ACL Enforcement Across Batch Requests
+ *
+ * This test suite verifies ACL enforcement for atomic operations (batch requests)
+ * where multiple operations are executed together. ACL rules are evaluated for
+ * EACH individual operation within the atomic request.
+ *
+ * 1. Admin Role: Full atomic operation access
+ *    - Can execute multiple operations in one atomic request
+ *    - Can POST, PATCH, and DELETE in a single transaction
+ *    - All operations succeed when permissions allow
+ *
+ * 2. Moderator Role: Partial atomic operation access
+ *    - Can POST and PATCH in atomic request
+ *    - CANNOT DELETE (returns 403 Forbidden for entire atomic request)
+ *    - Atomic request fails if ANY operation violates ACL
+ *    - Error message indicates which operation failed (e.g., "deleteOne on ArticleAcl")
+ *    - Atomicity ensures either ALL operations succeed or ALL fail
+ */
+
 import { faker } from '@faker-js/faker';
 import {
   ArticleAcl,
@@ -11,9 +31,6 @@ import { AxiosError } from 'axios';
 import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
-
-
-
 
 const getArticleData = () => ({
   title: faker.lorem.sentence(),
@@ -30,7 +47,7 @@ const getArticleData = () => ({
   expiresAt: null,
 });
 
-describe('ACL atomic operation:', () => {
+describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   let articleAcl: ArticleAcl[];
@@ -51,7 +68,7 @@ describe('ACL atomic operation:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Atomic Operation Access', () => {
     let bobUser: UsersAcl;
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
@@ -69,7 +86,7 @@ describe('ACL atomic operation:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('create one publish article with moderator author', async () => {
+    it('should execute atomic operation with POST, PATCH, and DELETE all succeeding', async () => {
       const articleForCreate = Object.assign(
         new ArticleAcl(),
         getArticleData(),
@@ -82,7 +99,7 @@ describe('ACL atomic operation:', () => {
     });
   });
 
-  describe('With conditional but with fields: moderator', () => {
+  describe('Moderator Role: Partial Atomic Operation Access with DELETE Restriction', () => {
 
     let bobUser: UsersAcl;
     let moderatorUser: UsersAcl;
@@ -104,7 +121,7 @@ describe('ACL atomic operation:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('allow create and patch but delete not allow', async () => {
+    it('should return 403 Forbidden for entire atomic request when DELETE operation violates ACL (POST and PATCH allowed but DELETE forbidden)', async () => {
       const articleForCreate = Object.assign(
         new ArticleAcl(),
         getArticleData()

@@ -1,3 +1,25 @@
+/**
+ * ACL: GET All Resources - Permission and Field-Level Security
+ *
+ * This test suite verifies ACL (Access Control List) enforcement for fetching collections
+ * of resources. It tests three permission levels with different capabilities:
+ *
+ * 1. Admin Role: Full access without conditions
+ *    - Can read all resources and all fields
+ *    - Can include all relationships
+ *
+ * 2. Moderator Role: Full access with field restrictions
+ *    - Can read all resources
+ *    - Cannot read sensitive fields (salary, role in nested relations)
+ *    - Field filtering applied automatically by ACL
+ *
+ * 3. User Role: Conditional access with field restrictions
+ *    - Can read only public profiles OR their own profile
+ *    - Cannot read sensitive fields (salary, role, isPublic, createdAt, updatedAt)
+ *    - Can read own phone number but not others' phone numbers
+ *    - Row-level filtering applied automatically by ACL
+ */
+
 import {
   ContextTestAcl,
   UserRole,
@@ -9,8 +31,7 @@ import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
-
-describe('ACL getAll:', () => {
+describe('ACL: GET All Resources (Collection Fetching)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   contextTestAcl.aclRules = { rules: [] };
@@ -28,7 +49,7 @@ describe('ACL getAll:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Access Without Restrictions', () => {
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
       if (!adminUser) throw new Error('Daphne user not found');
@@ -38,18 +59,18 @@ describe('ACL getAll:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get all profile', async () => {
+    it('should fetch all profiles with all fields (no ACL restrictions)', async () => {
       await jsonSdk.jonApiSdkService.getAll(UserProfileAcl)
     })
 
-    it('get all users with profile', async () => {
+    it('should fetch all users with included profiles with all fields', async () => {
       await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
         include: ['profile'],
       });
     });
   })
 
-  describe('Without conditional but with fields: moderator', () => {
+  describe('Moderator Role: Full Access with Field-Level Restrictions', () => {
     beforeEach(async () => {
       const moderatorUser = usersAcl.find((user) => user.login === 'moderator');
       if (!moderatorUser) throw new Error('Sheila user not found');
@@ -59,7 +80,7 @@ describe('ACL getAll:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get all profile', async () => {
+    it('should fetch all profiles but exclude sensitive fields (role, salary)', async () => {
       const result = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl)
 
       for (const item of result) {
@@ -75,7 +96,7 @@ describe('ACL getAll:', () => {
       }
     })
 
-    it('get all users with profile', async () => {
+    it('should fetch all users with profiles but exclude salary from nested profile', async () => {
       const result = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
         include: ['profile'],
       });
@@ -87,7 +108,7 @@ describe('ACL getAll:', () => {
     });
   })
 
-  describe('With conditional: user', () => {
+  describe('User Role: Conditional Row-Level Access with Field Restrictions', () => {
     let countPublicProfile: UserProfileAcl[];
     beforeEach(async () => {
       countPublicProfile = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl, {
@@ -106,7 +127,7 @@ describe('ACL getAll:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('should be able to get allow profile', async () => {
+    it('should fetch only public profiles and own profile, with field restrictions and conditional phone visibility', async () => {
 
       const result = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl);
       expect(result.length).toBe(countPublicProfile.length + 1)

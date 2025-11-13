@@ -1,3 +1,29 @@
+/**
+ * ACL: PATCH One Resource - Update Permission and Field-Level Security
+ *
+ * This test suite verifies ACL enforcement for updating resources. It tests complex
+ * permission scenarios including field-level restrictions and conditional value validation.
+ *
+ * 1. Admin Role: Full update access without conditions
+ *    - Can update any resource with any field values
+ *
+ * 2. Moderator Role: Complex field and value restrictions
+ *    - CANNOT update published articles (status='published') - returns 403 Forbidden
+ *    - CANNOT update 'title' field in non-published articles - returns 403 Forbidden
+ *    - CANNOT set status to 'published' - returns 403 Forbidden
+ *    - CAN set status to 'review' for non-published articles
+ *    - Field-level and value-level ACL enforced
+ *
+ * 3. User Role: Owner-based conditional update access
+ *    a) coAuthor scenario:
+ *       - CANNOT add new coAuthorIds - returns 403 Forbidden
+ *       - CANNOT modify coAuthorIds while keeping themselves - returns 403 Forbidden
+ *       - CAN remove themselves from coAuthorIds
+ *    b) Author scenario:
+ *       - CAN update own articles
+ *       - Row-level security enforced (only own resources)
+ */
+
 import {
   ArticleAcl,
   ArticleStatus,
@@ -11,7 +37,7 @@ import { AxiosError } from 'axios';
 import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
-describe('ACL patchOne:', () => {
+describe('ACL: PATCH One Resource (Update Operations)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   let articleAcl: ArticleAcl[];
@@ -32,7 +58,7 @@ describe('ACL patchOne:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Update Access Without Restrictions', () => {
     let articleForUpdate: ArticleAcl;
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
@@ -52,13 +78,13 @@ describe('ACL patchOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('update one publish article', async () => {
+    it('should update any article with any field values (no ACL restrictions)', async () => {
       articleForUpdate.title = 'new title';
       await jsonSdk.jonApiSdkService.patchOne(articleForUpdate);
     });
   });
 
-  describe('Without conditional but with fields: moderator', () => {
+  describe('Moderator Role: Field and Value-Level Restrictions', () => {
     let articlePublishForUpdate: ArticleAcl;
     let articleNoPublishForUpdate: ArticleAcl;
     beforeEach(async () => {
@@ -85,7 +111,7 @@ describe('ACL patchOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('try update publish article, should be error', async () => {
+    it('should return 403 Forbidden when attempting to update published article', async () => {
       try {
         await jsonSdk.jonApiSdkService.patchOne(articlePublishForUpdate);
         assert.fail('should be error');
@@ -95,7 +121,7 @@ describe('ACL patchOne:', () => {
       }
     });
 
-    it('try update no publish article not allow field, should be error', async () => {
+    it('should return 403 Forbidden when attempting to update restricted field (title) in non-published article', async () => {
       const oldTitle = articleNoPublishForUpdate.title;
       try {
         articleNoPublishForUpdate.title = 'new title';
@@ -108,7 +134,7 @@ describe('ACL patchOne:', () => {
       }
     });
 
-    it('try update no publish article allow field not allow value, should be error', async () => {
+    it('should return 403 Forbidden when attempting to set status to forbidden value (published)', async () => {
       try {
         articleNoPublishForUpdate.status = ArticleStatus.PUBLISHED;
         await jsonSdk.jonApiSdkService.patchOne(articleNoPublishForUpdate);
@@ -119,7 +145,7 @@ describe('ACL patchOne:', () => {
       }
     });
 
-    it('try update no publish article allow field allow value', async () => {
+    it('should update non-published article with allowed field (status) and allowed value (review)', async () => {
       articleNoPublishForUpdate.status = ArticleStatus.REVIEW;
       // @ts-ignore
       delete articleNoPublishForUpdate.author;
@@ -127,7 +153,7 @@ describe('ACL patchOne:', () => {
     });
   });
 
-  describe('With conditional: user', () => {
+  describe('User Role: Owner-Based Conditional Update Access', () => {
     let aliceUser: UsersAcl;
     let bobUser: UsersAcl;
     let articleForUpdate: ArticleAcl;
@@ -155,7 +181,7 @@ describe('ACL patchOne:', () => {
       if (!posibleAliceArticle) throw new Error('article not found');
       articleForUpdateAlice = posibleAliceArticle;
     });
-    describe('coAuthor can update article if remove himself from coAuthorIds', () => {
+    describe('coAuthor Scenario: Can Only Remove Self from coAuthorIds', () => {
       beforeEach(async () => {
         contextTestAcl.context = { currentUser: bobUser };
         contextTestAcl.aclRules.rules = new AbilityBuilder(
@@ -179,7 +205,7 @@ describe('ACL patchOne:', () => {
         articleForUpdate = posibleArticle;
       });
 
-      it('try to update coAuthorIds with other coAuthorIds should be error', async () => {
+      it('should return 403 Forbidden when adding new coAuthorIds while keeping self', async () => {
         const save = articleForUpdate.coAuthorIds;
         try {
           articleForUpdate.coAuthorIds = [...articleForUpdate.coAuthorIds, 6];
@@ -193,7 +219,7 @@ describe('ACL patchOne:', () => {
           articleForUpdate.coAuthorIds = save;
         }
       });
-      it('try to update coAuthorIds with other coAuthorIds and remove himself should be error', async () => {
+      it('should return 403 Forbidden when modifying coAuthorIds with new ids even after removing self', async () => {
         const save = articleForUpdate.coAuthorIds;
         try {
           articleForUpdate.coAuthorIds = [
@@ -211,7 +237,7 @@ describe('ACL patchOne:', () => {
         }
       });
 
-      it('can update', async () => {
+      it('should update article when coAuthor removes only themselves from coAuthorIds', async () => {
         articleForUpdate.coAuthorIds = articleForUpdate.coAuthorIds.filter(
           (i) => i !== bobUser.id
         );
@@ -221,7 +247,7 @@ describe('ACL patchOne:', () => {
       });
     });
 
-    describe('Author can update article', () => {
+    describe('Author Scenario: Can Update Own Articles', () => {
       beforeEach(async () => {
         contextTestAcl.context = { currentUser: aliceUser };
         contextTestAcl.aclRules.rules = new AbilityBuilder(
@@ -229,7 +255,7 @@ describe('ACL patchOne:', () => {
         ).permissionsFor(UserRole.user).rules as any;
         await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
       });
-      it('can update', async () => {
+      it('should update own article (alice updating alice article)', async () => {
         articleForUpdateAlice.title = 'new Title';
         await jsonSdk.jonApiSdkService.patchOne(articleForUpdateAlice);
       });

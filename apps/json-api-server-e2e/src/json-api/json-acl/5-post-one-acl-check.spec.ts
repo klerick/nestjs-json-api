@@ -1,3 +1,25 @@
+/**
+ * ACL: POST One Resource - Create Permission and Field-Level Security
+ *
+ * This test suite verifies ACL enforcement for creating new resources. It tests
+ * complex permission scenarios including author assignment and status restrictions.
+ *
+ * 1. Admin Role: Full create access without conditions
+ *    - Can create articles with any author (including other users)
+ *    - Can set any status value
+ *
+ * 2. Moderator Role: Self-author-only restriction
+ *    - CAN create articles with self as author
+ *    - CANNOT create articles with other users as author - returns 403 Forbidden
+ *    - Conditional author validation enforced
+ *
+ * 3. User Role: Self-author and status restrictions
+ *    - CAN create articles with self as author AND status='draft'
+ *    - CANNOT create articles with status='published' - returns 403 Forbidden
+ *    - CANNOT create articles with other users as author - returns 403 Forbidden
+ *    - Combined field and conditional ACL enforced
+ */
+
 import {
   ArticleAcl,
   ArticleStatus,
@@ -28,7 +50,7 @@ const getArticleData = () => ({
   expiresAt: null,
 });
 
-describe('ACL postOne:', () => {
+describe('ACL: POST One Resource (Create Operations)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   let articleAcl: ArticleAcl[];
@@ -49,7 +71,7 @@ describe('ACL postOne:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Create Access Without Restrictions', () => {
     let bobUser: UsersAcl;
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
@@ -67,7 +89,7 @@ describe('ACL postOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('create one publish article with come other author', async () => {
+    it('should create article with any author (bob as author while admin is creating)', async () => {
       const articleForCreate = Object.assign(
         new ArticleAcl(),
         getArticleData()
@@ -77,7 +99,7 @@ describe('ACL postOne:', () => {
     });
   });
 
-  describe('With conditional but with fields: moderator', () => {
+  describe('Moderator Role: Self-Author-Only Restriction', () => {
     let bobUser: UsersAcl;
     let moderatorUser: UsersAcl;
     beforeEach(async () => {
@@ -98,7 +120,7 @@ describe('ACL postOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('create one publish article with moderator author', async () => {
+    it('should create article with self as author (moderator creating with moderator as author)', async () => {
       const articleForCreate = Object.assign(
         new ArticleAcl(),
         getArticleData()
@@ -107,7 +129,7 @@ describe('ACL postOne:', () => {
       await jsonSdk.jonApiSdkService.postOne(articleForCreate);
     });
 
-    it('create one publish article with come other author should be error', async () => {
+    it('should return 403 Forbidden when creating article with other user as author (moderator trying to set bob as author)', async () => {
       try {
         const articleForCreate = Object.assign(
           new ArticleAcl(),
@@ -122,7 +144,7 @@ describe('ACL postOne:', () => {
     });
   });
 
-  describe('With conditional: user', () => {
+  describe('User Role: Self-Author and Status Restrictions', () => {
     let aliceUser: UsersAcl;
     let bobUser: UsersAcl;
     beforeEach(async () => {
@@ -143,7 +165,7 @@ describe('ACL postOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('create one no publish article with bob author', async () => {
+    it('should create draft article with self as author (bob creating draft with bob as author)', async () => {
       const articleForCreate = Object.assign(
         new ArticleAcl(),
         getArticleData()
@@ -153,7 +175,7 @@ describe('ACL postOne:', () => {
       await jsonSdk.jonApiSdkService.postOne(articleForCreate);
     });
 
-    it('create one publish article with bob author should be error', async () => {
+    it('should return 403 Forbidden when creating published article (bob trying to create published article)', async () => {
       try {
         const articleForCreate = Object.assign(
           new ArticleAcl(),
@@ -168,7 +190,7 @@ describe('ACL postOne:', () => {
       }
     });
 
-    it('create article with some other author should be error', async () => {
+    it('should return 403 Forbidden when creating article with other user as author (bob trying to set alice as author)', async () => {
       try {
         const articleForCreate = Object.assign(
           new ArticleAcl(),

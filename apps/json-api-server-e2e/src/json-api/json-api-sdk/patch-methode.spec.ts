@@ -1,3 +1,17 @@
+/**
+ * JSON API: PATCH Operations - Updating Resources
+ *
+ * This test suite demonstrates how to use the JSON API SDK to update existing resources
+ * including their attributes and relationships.
+ *
+ * Examples include:
+ * - Updating resource attributes
+ * - Replacing one-to-one relationships
+ * - Replacing one-to-many relationships
+ * - Partial updates (updating only relationships without modifying attributes)
+ * - Automatic updatedAt timestamp management
+ */
+
 import {
   Addresses,
   CommentKind,
@@ -9,7 +23,7 @@ import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 
 import { creatSdk } from '../utils/run-application';
 
-describe('PATCH method:', () => {
+describe('Updating Resources (PATCH Operations)', () => {
   let jsonSdk: JsonSdkPromise;
   let address: Addresses;
   let addressAfterSave: Addresses;
@@ -55,7 +69,7 @@ describe('PATCH method:', () => {
       await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
   });
 
-  it('Should be update attributes', async () => {
+  it('should update resource attributes and automatically update the updatedAt timestamp', async () => {
     addressAfterSave.city = faker.location.city();
     const addressAfterUpdate = await jsonSdk.jonApiSdkService.patchOne(
       addressAfterSave
@@ -64,7 +78,7 @@ describe('PATCH method:', () => {
     expect(addressAfterSave).toEqual(addressAfterUpdate);
   });
 
-  it('Should be update attributes with relations', async () => {
+  it('should replace existing relationships with new resources', async () => {
     const newAddress = new Addresses();
     newAddress.city = faker.location.city();
     newAddress.state = faker.location.state();
@@ -93,7 +107,7 @@ describe('PATCH method:', () => {
     expect(userAfterUpdate.comments[0]).toEqual(newCommentsAfterSave);
   });
 
-  it('Should be update empty attributes with relations', async () => {
+  it('should update only relationships without modifying other attributes using partial resource object', async () => {
     const newAddress = new Addresses();
     newAddress.city = faker.location.city();
     newAddress.state = faker.location.state();

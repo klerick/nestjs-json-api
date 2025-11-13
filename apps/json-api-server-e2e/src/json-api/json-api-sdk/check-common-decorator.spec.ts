@@ -1,10 +1,24 @@
+/**
+ * JSON API: Common Decorators - Guards, Interceptors, and Filters
+ *
+ * This test suite demonstrates how NestJS common decorators work with the JSON API library.
+ * It verifies that standard NestJS decorators (Guards, Interceptors, Filters) can be applied
+ * at both controller and method levels to JSON API endpoints.
+ *
+ * Examples include:
+ * - Applying interceptors at controller and method levels
+ * - Using custom filters at controller and method levels
+ * - Protecting endpoints with guards at controller and method levels
+ * - Proper error handling and HTTP status codes
+ */
+
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { AxiosError } from 'axios';
 import { Users } from '@nestjs-json-api/typeorm-database';
 
 import { creatSdk } from '../utils/run-application';
 
-describe('Check common decorator', () => {
+describe('NestJS Common Decorators Integration', () => {
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
@@ -12,8 +26,8 @@ describe('Check common decorator', () => {
 
   afterEach(async () => {});
 
-  describe('Check Interceptor', () => {
-    it('Should be call controller interceptor', async () => {
+  describe('Interceptors', () => {
+    it('should trigger controller-level interceptor and return validation error', async () => {
       expect.assertions(3);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {
@@ -36,7 +50,7 @@ describe('Check common decorator', () => {
       }
     });
 
-    it('Should be call methode interceptor', async () => {
+    it('should trigger method-level interceptor and return validation error', async () => {
       expect.assertions(3);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {
@@ -60,8 +74,8 @@ describe('Check common decorator', () => {
     });
   });
 
-  describe('Check Filter', () => {
-    it('Should be able to filter controller by firstName', async () => {
+  describe('Exception Filters', () => {
+    it('should trigger controller-level exception filter and return custom HTTP status code', async () => {
       expect.assertions(4);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {
@@ -82,7 +96,7 @@ describe('Check common decorator', () => {
         expect(((e as AxiosError).response?.data as any)?.method).toBe(false);
       }
     });
-    it('Should be able to filter testMethodFilter by firstName', async () => {
+    it('should trigger method-level exception filter and return custom HTTP status code', async () => {
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {
           filter: {
@@ -105,8 +119,8 @@ describe('Check common decorator', () => {
     });
   });
 
-  describe('Check Guard', () => {
-    it('Should be be call controller guard', async () => {
+  describe('Guards', () => {
+    it('should trigger controller-level guard and deny access with 403 Forbidden', async () => {
       expect.assertions(3);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {
@@ -126,7 +140,7 @@ describe('Check common decorator', () => {
         );
       }
     });
-    it('Should be be call methode guard', async () => {
+    it('should trigger method-level guard and deny access with 403 Forbidden', async () => {
       expect.assertions(3);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {

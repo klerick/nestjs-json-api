@@ -1,3 +1,18 @@
+/**
+ * JSON-RPC 2.0: HTTP Transport Protocol Integration
+ *
+ * This test suite demonstrates JSON-RPC 2.0 protocol implementation over HTTP transport.
+ * It verifies that standard JSON-RPC requests, batch operations, and error handling
+ * conform to the JSON-RPC 2.0 specification.
+ *
+ * Examples include:
+ * - Single method invocations with various parameter types
+ * - Batch requests (multiple method calls in a single HTTP request)
+ * - Error handling for MethodNotFound, InvalidParams, and ServerError
+ * - Type-safe RPC client usage with TypeScript
+ * - Custom error responses with additional data
+ */
+
 import {
   ResultRpcFactoryPromise,
   ErrorCodeType,
@@ -6,7 +21,7 @@ import {
 
 import { creatRpcSdk, MapperRpc } from '../utils/run-application';
 
-describe('Run json rpc:', () => {
+describe('JSON-RPC 2.0 over HTTP', () => {
   let rpc: ResultRpcFactoryPromise<MapperRpc>['rpc'];
   let rpcBatch: ResultRpcFactoryPromise<MapperRpc>['rpcBatch'];
   let rpcForBatch: ResultRpcFactoryPromise<MapperRpc>['rpcForBatch'];
@@ -14,14 +29,14 @@ describe('Run json rpc:', () => {
     ({ rpc, rpcBatch, rpcForBatch } = creatRpcSdk());
   });
 
-  describe('Should be correct response', () => {
-    it('Should be call one method', async () => {
+  describe('Successful RPC Calls', () => {
+    it('should invoke a single RPC method and return the correct result', async () => {
       const input = 1;
       const result = await rpc.RpcService.someMethode(input);
       expect(result).toBe(input);
     });
 
-    it('Should be correct response batch', async () => {
+    it('should execute multiple RPC methods in a single batch request', async () => {
       const input = 1;
       const input2 = {
         a: 1,
@@ -40,8 +55,8 @@ describe('Run json rpc:', () => {
     });
   });
 
-  describe('Check error', () => {
-    it('Should throw an error ' + ErrorCodeType.MethodNotFound, async () => {
+  describe('Error Handling', () => {
+    it('should return MethodNotFound error (-32601) when calling non-existent service or method', async () => {
       const input = 1;
       expect.assertions(6);
       try {
@@ -62,7 +77,7 @@ describe('Run json rpc:', () => {
       }
     });
 
-    it('Should throw an error ' + ErrorCodeType.InvalidParams, async () => {
+    it('should return InvalidParams error (-32602) when providing incorrect parameter types', async () => {
       const input = 'llll';
       expect.assertions(3);
       try {
@@ -75,7 +90,7 @@ describe('Run json rpc:', () => {
       }
     });
 
-    it('Should throw an error ' + ErrorCodeType.ServerError, async () => {
+    it('should return ServerError (-32099) with custom error data when method throws an exception', async () => {
       const input = 5;
       expect.assertions(4);
       try {
