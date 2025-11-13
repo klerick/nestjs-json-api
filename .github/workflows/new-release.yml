@@ -120,7 +120,7 @@ jobs:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
   build:
-    needs: [test, e2e-test]
+    needs: [test, e2e-test, e2e-test-mikroorm]
     uses: ./.github/workflows/build.yml
     with:
       mainBranch: "last-tag"
@@ -128,7 +128,7 @@ jobs:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
   upload-badge:
-    needs: [ test, e2e-test ]
+    needs: [ test, e2e-test, e2e-test-mikroorm ]
     uses: ./.github/workflows/upload-badge.yml
     with:
       mainBranch: "last-tag"
