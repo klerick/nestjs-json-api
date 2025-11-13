@@ -6,149 +6,660 @@
   <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/klerick/02a4c98cf7008fea2af70dc2d50f4cb7/raw/json-api-nestjs-sdk.json" alt="Coverage Badge" />
 </p>
 
-# json-api-nestjs-sdk
+# JSON:API Client SDK
 
-The plugin of client for help work with JSON API over [json-api-nestjs](https://www.npmjs.com/package/json-api-nestjs)
+Type-safe TypeScript/JavaScript client for consuming [JSON:API](https://jsonapi.org/) endpoints built with [@klerick/json-api-nestjs](https://www.npmjs.com/package/@klerick/json-api-nestjs).
+
+## ✨ Features
+
+- 🎯 **Full Type Safety** - Complete TypeScript support with type inference from your entities
+- 🔍 **Advanced Filtering** - Rich query builder with operators (eq, ne, in, like, gt, lt, etc.)
+- 📦 **Relationship Handling** - Easy include, sparse fieldsets, and relationship management
+- ⚡ **Atomic Operations** - Batch multiple operations in a single request with rollback support
+- 🌐 **Multiple HTTP Clients** - Works with Axios, Fetch API, and Angular HttpClient
+- 📄 **Pagination & Sorting** - Built-in support for pagination and multi-field sorting
+- 🔄 **Observable or Promise** - Choose your async style (RxJS Observable or native Promise)
+- 🔗 **Relationship Operations** - Post, patch, and delete relationships independently
+
+## 📚 Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#-quick-start)
+  - [Basic Setup (Axios)](#basic-setup-axios)
+  - [Angular Setup](#angular-setup)
+- [Configuration](#-configuration)
+- [API Methods](#-api-methods)
+  - [Fetching Resources](#fetching-resources)
+  - [Creating Resources](#creating-resources)
+  - [Updating Resources](#updating-resources)
+  - [Deleting Resources](#deleting-resources)
+  - [Relationship Operations](#relationship-operations)
+- [Query Options](#-query-options)
+  - [Filtering](#filtering)
+  - [Sorting](#sorting)
+  - [Pagination](#pagination)
+  - [Including Relationships](#including-relationships)
+  - [Sparse Fieldsets](#sparse-fieldsets)
+- [Atomic Operations](#-atomic-operations)
+- [Examples](#-examples)
 
 
 ## Installation
 
-```bash $ 
-npm install @klerick/json-api-nestjs-sdk 
+```bash
+npm install @klerick/json-api-nestjs-sdk
 ```
 
-## Example
+---
 
-Once the installation process is complete, we can import the **JsonApiJs**.
+## 🚀 Quick Start
 
-```typescript  
-import {
-  adapterForAxios,
-  FilterOperand,
-  JsonApiJs,
-  JsonSdkPromise,
-} from '@klerick/json-api-nestjs-sdk';
-import { faker } from '@faker-js/faker';
+### Basic Setup (Axios)
+
+```typescript
+import { JsonApiJs, adapterForAxios, FilterOperand } from '@klerick/json-api-nestjs-sdk';
 import axios from 'axios';
+import { Users } from './entities'; // Your entity classes
 
-import {Users} from 'database'
-
+// 1. Create adapter
 const axiosAdapter = adapterForAxios(axios);
 
-const jsonConfig: JsonConfig = {
-  adapter: axiosAdapter,
-  apiHost: 'http://localhost:3000',
-  apiPrefix: 'api',
-  dateFields: ['createdAt', 'updatedAt'],
-  operationUrl: 'operation',
-}
-
+// 2. Configure SDK
 const jsonSdk = JsonApiJs(
-  jsonConfig,
-  true //by default all methods return Observable but you return promise
+  {
+    adapter: axiosAdapter,
+    apiHost: 'http://localhost:3000',
+    apiPrefix: 'api',
+    dateFields: ['createdAt', 'updatedAt'],
+    operationUrl: 'operation',
+  },
+  true // true = return Promises, false = return Observables
 );
 
-await jsonSdk.jonApiSdkService.getAll(Users, {
+// 3. Use SDK
+// Fetch all users
+const users = await jsonSdk.jonApiSdkService.getAll(Users);
+
+// Fetch with filtering and relationships
+const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
   filter: {
     target: {
-      id: { [FilterOperand.in]: usersId.map((i) => `${i}`) },
-    },
+      isActive: { [FilterOperand.eq]: 'true' }
+    }
   },
-  include: ['addresses', 'comments', 'roles', 'manager'],
+  include: ['addresses', 'roles']
 });
 
+// Get one user
+const user = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+  include: ['addresses', 'comments', 'roles', 'manager']
+});
 
-// Atomic Operation
+// Create a user
+const newUser = new Users();
+newUser.firstName = 'John';
+newUser.lastName = 'Doe';
+newUser.login = 'johndoe';
+newUser.isActive = true;
 
-const address = new Addresses();
+const createdUser = await jsonSdk.jonApiSdkService.postOne(newUser);
 
-address.city = faker.string.alpha(50);
-address.state = faker.string.alpha(50);
-address.country = faker.string.alpha(50);
-address.id = 10000;
+// Update a user
+createdUser.firstName = 'Jane';
+const updatedUser = await jsonSdk.jonApiSdkService.patchOne(createdUser);
 
-const manager = getUser();
-manager.id = 10001;
-manager.addresses = address;
-
-const roles = new Roles();
-roles.id = 10002;
-roles.name = faker.string.alpha(50);
-roles.key = faker.string.alpha(50);
-
-const user = getUser();
-user.addresses = address;
-user.manager = manager;
-user.roles = [roles];
-
-const [addressPost, managerPost, rolesPost, userPost] = await jsonSdk
-  .atomicFactory()
-  .postOne(address)
-  .postOne(manager)
-  .postOne(roles)
-  .postOne(user)
-  .run();
-
-
+// Delete a user
+await jsonSdk.jonApiSdkService.deleteOne(createdUser);
 ```
-or you can use Angular module:
+
+### Angular Setup
+
 ```typescript
-import { 
-  provideJsonApi, 
-  AtomicFactory, 
-  JsonApiSdkService 
+import {
+  provideJsonApi,
+  AtomicFactory,
+  JsonApiSdkService
 } from '@klerick/json-api-nestjs-sdk/ngModule';
 import {
   provideHttpClient,
   withFetch,
 } from '@angular/common/http';
+import { Component, inject } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 
-@Component({
-  standalone: true,
-  selector: 'nestjs-json-api-root',
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-})
-export class AppComponent {
-  private JsonApiSdkService = inject(JsonApiSdkService);
-  private atomicFactory = inject(AtomicFactory);
-}
-
-const angularConfig: JsonSdkConfig = {
-  apiHost: 'http://localhost:4200',
+// 1. Configure in your main.ts or app.config.ts
+const angularConfig = {
+  apiHost: 'http://localhost:3000',
   idKey: 'id',
   apiPrefix: 'api',
   operationUrl: 'operation',
-}
+  dateFields: ['createdAt', 'updatedAt']
+};
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withFetch()),
     provideJsonApi(angularConfig)
   ],
-}).catch((err) =>
-  console.error(err)
-);
+}).catch((err) => console.error(err));
 
+// 2. Use in your components
+@Component({
+  standalone: true,
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+})
+export class UsersComponent {
+  private jsonApiService = inject(JsonApiSdkService);
+  private atomicFactory = inject(AtomicFactory);
 
+  async loadUsers() {
+    const users = await this.jsonApiService.getAll(Users, {
+      include: ['addresses']
+    });
+    return users;
+  }
 
-```
-
-## Configuration params
-
-```typescript  
-type JsonSdkConfig = {
-  apiHost: string; // url for api
-  apiPrefix?: string; // prefex for api - api/v1/....
-  idKey?: string; // name for id field
-  idIsNumber?: boolean; // use parseInt for id field
-  operationUrl?: string; // url for atomic operation
-  dateFields: string[] // array of dateField for create date object - ;
-}  
-
-type JsonConfig = JsonSdkConfig & {
-  adapter?: HttpInnerClient; // by default use fetch for http request but you can change it
+  async createMultipleResources() {
+    const result = await this.atomicFactory()
+      .postOne(newUser)
+      .postOne(newAddress)
+      .run();
+  }
 }
 ```
-* You can see interface of [HttpInnerClient](https://github.com/klerick/nestjs-json-api/blob/master/libs/json-api/json-api-nestjs-sdk/src/lib/types/http-inner-client.ts)
-* More example you can see [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk) or [here](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-front/src/app/app.component.ts)
+
+## ⚙️ Configuration
+
+### JsonConfig Type
+
+```typescript
+type JsonSdkConfig = {
+  apiHost: string;          // Base URL of your API (e.g., 'http://localhost:3000')
+  apiPrefix?: string;       // API prefix (e.g., 'api' -> '/api/users')
+  idKey?: string;           // Name of ID field (default: 'id')
+  idIsNumber?: boolean;     // Parse IDs as numbers (default: false)
+  operationUrl?: string;    // URL path for atomic operations (default: 'operation')
+  dateFields?: string[];    // Fields to convert to Date objects (e.g., ['createdAt', 'updatedAt'])
+}
+
+type JsonConfig = JsonSdkConfig & {
+  adapter?: HttpInnerClient; // HTTP client adapter (default: fetch)
+}
+```
+
+### HTTP Adapters
+
+**Axios Adapter:**
+```typescript
+import { adapterForAxios } from '@klerick/json-api-nestjs-sdk';
+import axios from 'axios';
+
+const adapter = adapterForAxios(axios);
+```
+
+**Fetch API (default):**
+```typescript
+// No adapter needed, fetch is used by default
+const jsonSdk = JsonApiJs({
+  apiHost: 'http://localhost:3000',
+  apiPrefix: 'api',
+}, true);
+```
+
+**Custom Adapter:**
+
+See [HttpInnerClient interface](https://github.com/klerick/nestjs-json-api/blob/master/libs/json-api/json-api-nestjs-sdk/src/lib/types/http-inner-client.ts) for implementation details.
+
+---
+
+## 📖 API Methods
+
+### Fetching Resources
+
+#### `getAll(Entity, options?)`
+
+Fetch all resources with optional filtering, sorting, and relationships.
+
+```typescript
+import { FilterOperand } from '@klerick/json-api-nestjs-sdk';
+
+// Fetch all users
+const users = await jsonSdk.jonApiSdkService.getAll(Users);
+
+// With filtering
+const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      isActive: { [FilterOperand.eq]: 'true' },
+      id: { [FilterOperand.in]: ['1', '2', '3'] }
+    }
+  },
+  include: ['addresses', 'roles']
+});
+
+// Filter by relationship
+const usersWithRoles = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      id: { [FilterOperand.in]: ['1', '2'] }
+    },
+    roles: {
+      name: { [FilterOperand.eq]: 'admin' }
+    }
+  },
+  include: ['roles']
+});
+```
+
+#### `getList(Entity, options)`
+
+Fetch resources with pagination (returns paginated results).
+
+```typescript
+const firstPage = await jsonSdk.jonApiSdkService.getList(Users, {
+  page: {
+    number: 1,
+    size: 10
+  },
+  sort: {
+    target: {
+      id: 'ASC'
+    }
+  }
+});
+
+const secondPage = await jsonSdk.jonApiSdkService.getList(Users, {
+  page: {
+    number: 2,
+    size: 10
+  },
+  sort: {
+    target: {
+      createdAt: 'DESC'
+    }
+  }
+});
+```
+
+#### `getOne(Entity, id, options?)`
+
+Fetch a single resource by ID.
+
+```typescript
+// Simple fetch
+const user = await jsonSdk.jonApiSdkService.getOne(Users, '1');
+
+// With relationships
+const userWithRelations = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+  include: ['addresses', 'comments', 'roles', 'manager']
+});
+
+// With sparse fieldsets
+const userPartial = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+  fields: {
+    users: ['firstName', 'lastName', 'email']
+  }
+});
+```
+
+### Creating Resources
+
+#### `postOne(entity, options?)`
+
+Create a new resource.
+
+```typescript
+// Simple create
+const newUser = new Users();
+newUser.firstName = 'John';
+newUser.lastName = 'Doe';
+newUser.login = 'johndoe';
+newUser.isActive = true;
+
+const createdUser = await jsonSdk.jonApiSdkService.postOne(newUser);
+
+// Create with relationships
+const newAddress = new Addresses();
+newAddress.city = 'New York';
+newAddress.state = 'NY';
+newAddress.country = 'USA';
+
+const savedAddress = await jsonSdk.jonApiSdkService.postOne(newAddress);
+
+const user = new Users();
+user.firstName = 'Jane';
+user.lastName = 'Doe';
+user.login = 'janedoe';
+user.addresses = savedAddress; // Set relationship
+
+const createdUser = await jsonSdk.jonApiSdkService.postOne(user);
+```
+
+### Updating Resources
+
+#### `patchOne(entity, options?)`
+
+Update an existing resource.
+
+```typescript
+// Update attributes
+user.firstName = 'Updated Name';
+const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+
+// Update relationships
+const newAddress = await jsonSdk.jonApiSdkService.postOne(addressEntity);
+user.addresses = newAddress;
+
+const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+```
+
+### Deleting Resources
+
+#### `deleteOne(entity)`
+
+Delete a resource.
+
+```typescript
+await jsonSdk.jonApiSdkService.deleteOne(user);
+```
+
+### Relationship Operations
+
+#### `deleteRelationships(entity, relationshipName)`
+
+Remove relationships without deleting the related resources.
+
+```typescript
+// Remove all roles from user
+await jsonSdk.jonApiSdkService.deleteRelationships(user, 'roles');
+
+// Remove manager from user
+await jsonSdk.jonApiSdkService.deleteRelationships(user, 'manager');
+
+// Remove all comments from user
+await jsonSdk.jonApiSdkService.deleteRelationships(user, 'comments');
+```
+
+---
+
+## 🔍 Query Options
+
+### Filtering
+
+Available operators:
+
+```typescript
+enum FilterOperand {
+  eq = 'eq',     // Equal
+  ne = 'ne',     // Not equal
+  in = 'in',     // In array
+  nin = 'nin',   // Not in array
+  lt = 'lt',     // Less than
+  lte = 'lte',   // Less than or equal
+  gt = 'gt',     // Greater than
+  gte = 'gte',   // Greater than or equal
+  like = 'like', // SQL LIKE
+  re = 'regexp', // Regular expression
+}
+```
+
+**Examples:**
+
+```typescript
+// Equal
+const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      isActive: { [FilterOperand.eq]: 'true' }
+    }
+  }
+});
+
+// Not equal
+const inactiveUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      isActive: { [FilterOperand.ne]: 'true' }
+    }
+  }
+});
+
+// In array
+const specificUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      id: { [FilterOperand.in]: ['1', '2', '3'] }
+    }
+  }
+});
+
+// LIKE search
+const searchUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      login: { [FilterOperand.like]: 'john' }
+    }
+  }
+});
+
+// Check null/not null
+const usersWithManager = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      manager: { [FilterOperand.ne]: null }
+    }
+  }
+});
+
+const usersWithoutManager = await jsonSdk.jonApiSdkService.getAll(Users, {
+  filter: {
+    target: {
+      manager: { [FilterOperand.eq]: null }
+    }
+  }
+});
+```
+
+### Sorting
+
+```typescript
+// Sort by single field
+const users = await jsonSdk.jonApiSdkService.getList(Users, {
+  sort: {
+    target: {
+      id: 'ASC'
+    }
+  }
+});
+
+// Sort by multiple fields
+const sortedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
+  sort: {
+    target: {
+      createdAt: 'DESC',
+      lastName: 'ASC'
+    }
+  }
+});
+```
+
+### Pagination
+
+```typescript
+const paginatedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
+  page: {
+    number: 1,  // Page number (1-indexed)
+    size: 20    // Items per page
+  }
+});
+```
+
+### Including Relationships
+
+```typescript
+// Include single relationship
+const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+  include: ['addresses']
+});
+
+// Include multiple relationships
+const usersWithAll = await jsonSdk.jonApiSdkService.getAll(Users, {
+  include: ['addresses', 'roles', 'comments', 'manager']
+});
+
+// Include nested relationships
+const usersWithNested = await jsonSdk.jonApiSdkService.getAll(Users, {
+  include: ['addresses', 'manager.addresses', 'roles']
+});
+```
+
+### Sparse Fieldsets
+
+Request only specific fields to reduce payload size.
+
+```typescript
+const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+  fields: {
+    users: ['firstName', 'lastName', 'email'],
+    addresses: ['city', 'country']
+  },
+  include: ['addresses']
+});
+```
+
+---
+
+## ⚡ Atomic Operations
+
+Execute multiple operations in a single HTTP request. All operations succeed or fail together.
+
+### Basic Atomic Operation
+
+```typescript
+const newUser = new Users();
+newUser.firstName = 'John';
+newUser.lastName = 'Doe';
+newUser.login = 'johndoe';
+
+const result = await jsonSdk.atomicFactory()
+  .postOne(newUser)
+  .run();
+
+console.log(result[0]); // Created user
+```
+
+### Multiple Operations
+
+```typescript
+// Create multiple related resources
+const address = new Addresses();
+address.city = 'New York';
+address.state = 'NY';
+address.country = 'USA';
+
+const role = new Roles();
+role.name = 'Admin';
+role.key = 'admin';
+
+const user = new Users();
+user.firstName = 'Jane';
+user.lastName = 'Doe';
+user.login = 'janedoe';
+user.addresses = address;
+user.roles = [role];
+
+const [createdAddress, createdRole, createdUser] = await jsonSdk
+  .atomicFactory()
+  .postOne(address)
+  .postOne(role)
+  .postOne(user)
+  .run();
+```
+
+### Mixed Operations (POST, PATCH, Relationships)
+
+```typescript
+// Create user first
+const newUser = new Users();
+newUser.firstName = 'John';
+newUser.login = 'john';
+
+const [createdUser] = await jsonSdk.atomicFactory()
+  .postOne(newUser)
+  .run();
+
+// Then update and manage relationships atomically
+const patchUser = Object.assign(new Users(), createdUser);
+patchUser.firstName = 'John Updated';
+patchUser.roles = [role1];
+
+const patchUser2 = Object.assign(new Users(), createdUser);
+patchUser2.comments = [comment1];
+
+const patchUser3 = Object.assign(new Users(), createdUser);
+patchUser3.comments = [comment2];
+
+const result = await jsonSdk
+  .atomicFactory()
+  .patchOne(patchUser)                        // Update user attributes and set roles
+  .patchOne(patchUser2)                       // Set comments
+  .patchRelationships(patchUser2, 'comments') // Replace comments (keep only comment1)
+  .postRelationships(patchUser3, 'comments')  // Add comment2 to existing comments
+  .run();
+
+// result[0] - updated user
+// result[1] - updated user with comments
+// result[2] - array of comment IDs after replacement
+// result[3] - array of all comment IDs after addition
+```
+
+### Using Temporary IDs (lid)
+
+Reference resources created within the same atomic request using temporary IDs.
+
+```typescript
+const address = new Addresses();
+address.city = 'Boston';
+address.id = 10000; // Temporary ID
+
+const user = new Users();
+user.firstName = 'Alice';
+user.addresses = address; // Reference by temp ID
+
+const [createdAddress, createdUser] = await jsonSdk
+  .atomicFactory()
+  .postOne(address)
+  .postOne(user)
+  .run();
+
+// Server assigns real IDs
+console.log(createdAddress.id); // Real ID (e.g., 1)
+console.log(createdUser.addresses.id); // Same real ID
+```
+
+---
+
+## 💡 Examples
+
+For comprehensive real-world examples, see the [E2E test suite](https://github.com/klerick/nestjs-json-api/tree/master/apps/json-api-server-e2e/src/json-api/json-api-sdk):
+
+- **[GET Operations](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk/get-method.spec.ts)** - Fetching, filtering, pagination, sparse fieldsets
+- **[POST Operations](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk/post-method.spec.ts)** - Creating resources with relationships
+- **[PATCH Operations](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk/patch-methode.spec.ts)** - Updating resources and relationships
+- **[Atomic Operations](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk/atomic-sdk.spec.ts)** - Batch requests with rollback
+- **[Common Decorators](https://github.com/klerick/nestjs-json-api/blob/master/apps/json-api-server-e2e/src/json-api/json-api-sdk/check-common-decorator.spec.ts)** - Guards, interceptors, custom behavior
+
+---
+
+## 📝 License
+
+MIT
+
+---
+
+## 🔗 Related Packages
+
+- [@klerick/json-api-nestjs](https://www.npmjs.com/package/@klerick/json-api-nestjs) - JSON:API server implementation for NestJS
+- [@klerick/json-api-nestjs-typeorm](https://www.npmjs.com/package/@klerick/json-api-nestjs-typeorm) - TypeORM adapter
+- [@klerick/json-api-nestjs-microorm](https://www.npmjs.com/package/@klerick/json-api-nestjs-microorm) - MikroORM adapter
