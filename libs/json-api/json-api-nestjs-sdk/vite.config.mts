@@ -38,7 +38,7 @@ export default defineConfig(() => ({
     coverage: {
       enabled: true,
       reporter: ['json-summary'],
-      reportsDirectory: '../../../coverage/json-api-nestjs-sdk',
+      reportsDirectory: '../../../coverage/libs/json-api/json-api-nestjs-sdk',
       provider: 'v8' as const,
     },
   },

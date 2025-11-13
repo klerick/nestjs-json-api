@@ -38,7 +38,7 @@ export default defineConfig(() => ({
     coverage: {
       enabled: true,
       reporter: ['json-summary'],
-      reportsDirectory: '../../../coverage/nestjs-acl-permissions',
+      reportsDirectory: '../../../coverage/libs/acl-permissions/nestjs-acl-permissions',
       provider: 'v8' as const,
     },
   },
