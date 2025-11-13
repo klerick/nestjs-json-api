@@ -243,6 +243,41 @@ Each package has detailed documentation in its own README:
 
 ---
 
+## 📘 Examples & Usage
+
+For detailed usage examples and real-world scenarios, refer to the comprehensive **E2E test suites**. These tests serve as living documentation and demonstrate best practices:
+
+### JSON:API SDK Examples
+Learn how to use the JSON:API client SDK with various operations:
+
+- **[GET Operations](apps/json-api-server-e2e/src/json-api/json-api-sdk/get-method.spec.ts)** – Fetching resources, filtering, pagination, sparse fieldsets, and relationships
+- **[POST Operations](apps/json-api-server-e2e/src/json-api/json-api-sdk/post-method.spec.ts)** – Creating resources with relationships
+- **[PATCH Operations](apps/json-api-server-e2e/src/json-api/json-api-sdk/patch-methode.spec.ts)** – Updating resources and relationships
+- **[Atomic Operations](apps/json-api-server-e2e/src/json-api/json-api-sdk/atomic-sdk.spec.ts)** – Batch requests with multiple operations
+- **[Advanced Configuration](apps/json-api-server-e2e/src/json-api/json-api-sdk/check-othe-call.spec.ts)** – Custom routes, UUID IDs, validation pipes
+- **[Common Decorators](apps/json-api-server-e2e/src/json-api/json-api-sdk/check-common-decorator.spec.ts)** – Guards, interceptors, and exception filters
+
+### JSON-RPC Examples
+Explore JSON-RPC 2.0 client usage patterns:
+
+- **[HTTP Transport](apps/json-api-server-e2e/src/json-api/json-rpc/run-json-rpc.spec.ts)** – Single and batch RPC calls over HTTP, error handling
+- **[WebSocket Transport](apps/json-api-server-e2e/src/json-api/json-rpc/run-ws-json-rpc.spec.ts)** – Real-time RPC over WebSocket connections
+
+### Access Control (ACL) Examples
+Understand fine-grained permission enforcement with CASL integration:
+
+- **[GET All Resources](apps/json-api-server-e2e/src/json-api/json-acl/1-get-all-acl-check.spec.ts)** – Field-level and row-level filtering
+- **[GET One Resource](apps/json-api-server-e2e/src/json-api/json-acl/2-get-one-acl-check.spec.ts)** – Resource-level access control
+- **[GET Relationships](apps/json-api-server-e2e/src/json-api/json-acl/3-get-relationship-acl-check.spec.ts)** – Relationship endpoint permissions
+- **[PATCH Operations](apps/json-api-server-e2e/src/json-api/json-acl/4-patch-one-acl-check.spec.ts)** – Update permissions with field and value restrictions
+- **[POST Operations](apps/json-api-server-e2e/src/json-api/json-acl/5-post-one-acl-check.spec.ts)** – Create permissions with conditional validation
+- **[DELETE Operations](apps/json-api-server-e2e/src/json-api/json-acl/6-delete-one-acl-check.spec.ts)** – Conditional delete based on resource state
+- **[Atomic Operations ACL](apps/json-api-server-e2e/src/json-api/json-acl/10-atomic-operation.spec.ts)** – ACL enforcement across batch requests
+
+Each test file includes detailed JSDoc comments explaining the scenarios, ACL rules, and expected behavior.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
