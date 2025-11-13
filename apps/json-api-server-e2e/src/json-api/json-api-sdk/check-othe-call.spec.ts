@@ -1,3 +1,17 @@
+/**
+ * JSON API: Advanced Configuration - Custom Routes, Validation, and Resource Types
+ *
+ * This test suite demonstrates advanced JSON API configurations including custom route names,
+ * UUID-based resource IDs, custom validation pipes, and method restrictions.
+ *
+ * Examples include:
+ * - Using custom route names with @JsonApi({ overrideRoute: 'custom-name' })
+ * - Working with UUID resource identifiers instead of numeric IDs
+ * - Restricting available methods on specific resources
+ * - Applying custom query validation pipes
+ * - Direct HTTP client usage for advanced scenarios
+ */
+
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import { BookList, Users } from '@nestjs-json-api/typeorm-database';
 import { AxiosError } from 'axios';
@@ -5,7 +19,7 @@ import { faker } from '@faker-js/faker';
 import { lastValueFrom } from 'rxjs';
 import { creatSdk, axiosAdapter } from '../utils/run-application';
 
-describe('Other call type:', () => {
+describe('Advanced Configuration and Custom Routes', () => {
   let jsonSdk: JsonSdkPromise;
 
   beforeEach(async () => {
@@ -16,10 +30,10 @@ describe('Other call type:', () => {
 
   afterEach(async () => {});
 
-  describe('Check overrideRoute url name:', () => {
+  describe('Custom Route Names with UUID IDs', () => {
     let bookItem: BookList;
 
-    it('Should be be be create book', async () => {
+    it('should create, fetch, and delete a resource using custom route name with UUID identifier', async () => {
       bookItem = new BookList();
       bookItem.text = faker.string.alpha(50);
 
@@ -41,7 +55,7 @@ describe('Other call type:', () => {
 
       expect(newBook.id).toBeDefined();
       const bookResultSource = await lastValueFrom(
-        // By default id is number bu I test uuid
+        // By default, id is a number, but I test uuid
         axiosAdapter.get<BookList>(`${url}/${newBookSource.data.id}`)
       );
       const bookResult =
@@ -57,7 +71,7 @@ describe('Other call type:', () => {
       );
     });
 
-    it('Should be not allowed method', async () => {
+    it('should return error when accessing a restricted relationship endpoint', async () => {
       const url =
         jsonSdk.jsonApiUtilsService.getUrlForResource('override-book-list');
       expect.assertions(1);
@@ -68,7 +82,7 @@ describe('Other call type:', () => {
       }
     });
 
-    it('Should be error if id is number', async () => {
+    it('should return validation error when providing numeric ID instead of UUID', async () => {
       const url =
         jsonSdk.jsonApiUtilsService.getUrlForResource('override-book-list');
       expect.assertions(2);
@@ -81,8 +95,8 @@ describe('Other call type:', () => {
     });
   });
 
-  describe('Check custom query pipe', () => {
-    it('Should be error from custom query pipe', async () => {
+  describe('Custom Query Validation Pipes', () => {
+    it('should trigger custom query validation pipe and return validation error', async () => {
       expect.assertions(2);
       try {
         await jsonSdk.jonApiSdkService.getAll(Users, {

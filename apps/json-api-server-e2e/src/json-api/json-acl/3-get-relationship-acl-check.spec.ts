@@ -1,3 +1,25 @@
+/**
+ * ACL: GET Relationships - Relationship Access Control
+ *
+ * This test suite verifies ACL enforcement for fetching relationship data via
+ * the relationships endpoint (/resources/{id}/relationships/{relationshipName}).
+ * It tests three permission levels with different capabilities:
+ *
+ * 1. Admin Role: Full relationship access without conditions
+ *    - Can fetch any relationship for any resource
+ *    - Can access both 'profile' and 'posts' relationships
+ *
+ * 2. Moderator Role: Selective relationship access
+ *    - CANNOT fetch 'profile' relationship (returns 403 Forbidden)
+ *    - CAN fetch 'posts' relationship
+ *    - Relationship-level restrictions applied
+ *
+ * 3. User Role: Owner-only relationship access
+ *    - Can fetch relationships ONLY for own resources
+ *    - CANNOT fetch relationships for other users' resources (returns 403 Forbidden)
+ *    - Row-level security enforced at relationship endpoint level
+ */
+
 import {
   ContextTestAcl,
   UserRole,
@@ -9,8 +31,7 @@ import { AxiosError } from 'axios';
 import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
-
-describe('ACL getRelationship:', () => {
+describe('ACL: GET Relationships (Relationship Endpoint Access)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   contextTestAcl.aclRules = { rules: [] };
@@ -28,7 +49,7 @@ describe('ACL getRelationship:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Relationship Access Without Restrictions', () => {
     let userForGet: UsersAcl;
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
@@ -45,16 +66,16 @@ describe('ACL getRelationship:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get rel profile for user', async () => {
+    it('should fetch profile relationship for any user', async () => {
       await jsonSdk.jonApiSdkService.getRelationships(userForGet, 'profile');
     });
 
-    it('get rel post for user', async () => {
+    it('should fetch posts relationship for any user', async () => {
       await jsonSdk.jonApiSdkService.getRelationships(userForGet, 'posts');
     });
   });
 
-  describe('Without conditional but with fields: moderator', () => {
+  describe('Moderator Role: Selective Relationship Access', () => {
     let userForGet: UsersAcl;
     beforeEach(async () => {
       const moderatorUser = usersAcl.find((user) => user.login === 'moderator');
@@ -71,7 +92,7 @@ describe('ACL getRelationship:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get rel profile for user, shoudl be error', async () => {
+    it('should return 403 Forbidden when fetching profile relationship (restricted relationship)', async () => {
       try {
         await jsonSdk.jonApiSdkService.getRelationships(userForGet, 'profile');
         assert.fail('should be error');
@@ -81,12 +102,12 @@ describe('ACL getRelationship:', () => {
       }
     });
 
-    it('get rel post for user', async () => {
+    it('should fetch posts relationship for any user (allowed relationship)', async () => {
       await jsonSdk.jonApiSdkService.getRelationships(userForGet, 'posts');
     });
   });
 
-  describe('With conditional: user', () => {
+  describe('User Role: Owner-Only Relationship Access', () => {
     let bobUser: UsersAcl;
     let alisUser: UsersAcl;
     beforeEach(async () => {
@@ -105,14 +126,14 @@ describe('ACL getRelationship:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get rel post for bob user', async () => {
+    it('should fetch posts relationship for own user (bob accessing bob)', async () => {
       await jsonSdk.jonApiSdkService.getRelationships(bobUser, 'posts');
     });
-    it('get rel profile for bob user', async () => {
+    it('should fetch profile relationship for own user (bob accessing bob)', async () => {
       await jsonSdk.jonApiSdkService.getRelationships(bobUser, 'profile');
     });
 
-    it('get rel profile for alise, shoudl be error', async () => {
+    it('should return 403 Forbidden when fetching profile relationship for another user (bob accessing alice)', async () => {
       try {
         await jsonSdk.jonApiSdkService.getRelationships(alisUser, 'profile');
         assert.fail('should be error');
@@ -122,7 +143,7 @@ describe('ACL getRelationship:', () => {
       }
     });
 
-    it('get rel post for alise, should be error', async () => {
+    it('should return 403 Forbidden when fetching posts relationship for another user (bob accessing alice)', async () => {
       try {
         await jsonSdk.jonApiSdkService.getRelationships(alisUser, 'posts');
         assert.fail('should be error');

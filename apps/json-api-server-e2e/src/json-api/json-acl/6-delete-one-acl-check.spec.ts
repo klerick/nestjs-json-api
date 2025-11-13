@@ -1,3 +1,25 @@
+/**
+ * ACL: DELETE One Resource - Delete Permission with Conditional Restrictions
+ *
+ * This test suite verifies ACL enforcement for deleting resources. It tests
+ * complex permission scenarios based on article status and authorship.
+ *
+ * 1. Admin Role: Full delete access without conditions
+ *    - Can delete any article regardless of status or author
+ *
+ * 2. Moderator Role: Can delete published articles
+ *    - CAN delete published articles (even if not the author)
+ *    - Status-based delete permission
+ *
+ * 3. User Role: Conditional delete based on status
+ *    a) Author of published article:
+ *       - CANNOT delete own published article - returns 403 Forbidden
+ *       - Once published, article is protected from author deletion
+ *    b) Author of non-published article:
+ *       - CAN delete own non-published article (draft, review, etc.)
+ *       - Owner-based delete permission for unpublished content
+ */
+
 import {
   ContextTestAcl,
   UserRole,
@@ -10,7 +32,7 @@ import { AxiosError } from 'axios';
 import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
-describe('ACL deleteOne:', () => {
+describe('ACL: DELETE One Resource (Delete Operations)', () => {
   let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   let articleAcl: ArticleAcl[];
@@ -32,7 +54,7 @@ describe('ACL deleteOne:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
   });
 
-  describe('Without conditional: admin', () => {
+  describe('Admin Role: Full Delete Access Without Restrictions', () => {
     let articleForDelete: ArticleAcl;
     beforeEach(async () => {
       const adminUser = usersAcl.find((user) => user.login === 'admin');
@@ -52,12 +74,12 @@ describe('ACL deleteOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('delete one publish article', async () => {
+    it('should delete any article regardless of status or author (no ACL restrictions)', async () => {
       await jsonSdk.jonApiSdkService.deleteOne(articleForDelete);
     });
   });
 
-  describe('Without conditional but with fields: moderator', () => {
+  describe('Moderator Role: Can Delete Published Articles', () => {
     let articleForDelete: ArticleAcl;
     beforeEach(async () => {
       const moderatorUser = usersAcl.find((user) => user.login === 'moderator');
@@ -77,13 +99,13 @@ describe('ACL deleteOne:', () => {
       await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
     });
 
-    it('get one profile', async () => {
+    it('should delete published article (moderator deleting alice published article)', async () => {
       await jsonSdk.jonApiSdkService.deleteOne(articleForDelete);
     });
   });
 
-  describe('With conditional: user', () => {
-    describe('im author but article is published', () => {
+  describe('User Role: Conditional Delete Based on Article Status', () => {
+    describe('Author of Published Article: CANNOT Delete', () => {
       let aliceUser: UsersAcl;
       let articleAclAlice: ArticleAcl;
       beforeEach(async () => {
@@ -107,7 +129,7 @@ describe('ACL deleteOne:', () => {
         await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
       });
 
-      it('should be error to delete article', async () => {
+      it('should return 403 Forbidden when author attempts to delete own published article', async () => {
         try {
           await jsonSdk.jonApiSdkService.deleteOne(articleAclAlice);
           assert.fail('should be error');
@@ -117,7 +139,7 @@ describe('ACL deleteOne:', () => {
         }
       });
     });
-    describe('im author but article is not published', () => {
+    describe('Author of Non-Published Article: CAN Delete', () => {
       let bobUser: UsersAcl;
 
       let articleAclBobe: ArticleAcl;
@@ -139,7 +161,7 @@ describe('ACL deleteOne:', () => {
         await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
       });
 
-      it('should be to delete article', async () => {
+      it('should delete own non-published article (bob deleting bob draft article)', async () => {
         await jsonSdk.jonApiSdkService.deleteOne(articleAclBobe);
       });
     });

@@ -1,3 +1,17 @@
+/**
+ * JSON API: POST Operations - Creating Resources
+ *
+ * This test suite demonstrates how to use the JSON API SDK to create new resources
+ * with various relationship configurations.
+ *
+ * Examples include:
+ * - Creating simple resources with attributes
+ * - Creating resources with one-to-one relationships
+ * - Creating resources with one-to-many relationships
+ * - Automatic generation of timestamps and IDs
+ * - Verifying relationships are properly linked
+ */
+
 import {
   Addresses,
   CommentKind,
@@ -9,7 +23,7 @@ import { JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 
 import { creatSdk } from '../utils/run-application';
 
-describe('POST method:', () => {
+describe('Creating Resources (POST Operations)', () => {
   let jsonSdk: JsonSdkPromise;
   let address: Addresses;
   let addressAfterSave: Addresses;
@@ -45,7 +59,7 @@ describe('POST method:', () => {
     await jsonSdk.jonApiSdkService.deleteOne(addressAfterSave);
   });
 
-  it('Should be create Entity', async () => {
+  it('should create a new resource and automatically generate id and timestamps', async () => {
     addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
     const {
       id: addressId,
@@ -60,7 +74,7 @@ describe('POST method:', () => {
     expect(updatedAt).toBeInstanceOf(Date);
   });
 
-  it('Should be create Entity with relations', async () => {
+  it('should create a resource with a one-to-one relationship and verify the relationship is properly linked', async () => {
     addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
     user.addresses = addressAfterSave;
 
@@ -90,7 +104,7 @@ describe('POST method:', () => {
     expect(addresses).toEqual(fromUser.addresses);
   });
 
-  it('Should be create Entity with relations array', async () => {
+  it('should create a resource with both one-to-one and one-to-many relationships', async () => {
     addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
     commentsAfterSave = await jsonSdk.jonApiSdkService.postOne(comments);
     user.addresses = addressAfterSave;

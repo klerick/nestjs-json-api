@@ -1,3 +1,18 @@
+/**
+ * JSON API: Atomic Operations - Batch Requests
+ *
+ * This test suite demonstrates how to use the JSON API SDK's atomic operations
+ * to execute multiple operations in a single request. Atomic operations ensure
+ * that all operations succeed or fail together.
+ *
+ * Examples include:
+ * - Executing multiple POST, PATCH, and relationship operations in one request
+ * - Using temporary IDs (lid) to reference resources created within the same request
+ * - Updating relationships (replacing and appending) atomically
+ * - Maintaining referential integrity across multiple operations
+ * - Handling complex resource graphs with dependencies
+ */
+
 import { FilterOperand, JsonSdkPromise } from '@klerick/json-api-nestjs-sdk';
 import {
   Addresses,
@@ -10,7 +25,7 @@ import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';
 import { creatSdk } from '../utils/run-application';
 
-describe('Atomic method:', () => {
+describe('Atomic Operations (Batch Requests)', () => {
   let jsonSdk: JsonSdkPromise;
   let addressArray: Addresses[];
   let rolesArray: Roles[];
@@ -91,7 +106,7 @@ describe('Atomic method:', () => {
     }
   });
 
-  it('Try check intreceptor', async () => {
+  it('should execute a simple atomic operation with a single POST request', async () => {
     const newUser = getUser();
     newUser.addresses = addressArray[0];
     try {
@@ -102,7 +117,7 @@ describe('Atomic method:', () => {
     }
   });
 
-  it('Should be correct work', async () => {
+  it('should execute multiple operations atomically: POST, PATCH, patchRelationships, and postRelationships', async () => {
     const newUser = getUser();
     newUser.addresses = addressArray[0];
     const resultCreate = await jsonSdk.atomicFactory().postOne(newUser).run();
@@ -161,7 +176,7 @@ describe('Atomic method:', () => {
     usersId.push(resultCreate[0].id);
   });
 
-  it('Should be correct work with tmp Id', async () => {
+  it('should create multiple related resources using temporary IDs (lid) to reference resources within the same atomic request', async () => {
     const address = new Addresses();
 
     address.city = faker.string.alpha(50);
