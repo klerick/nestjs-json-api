@@ -5,7 +5,7 @@ on:
       projects:
         description: 'Package Bump'
         required: true
-        default: 'json-api-nestjs,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk'
+        default: 'json-api-nestjs,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk,nestjs-acl-permissions'
       first-release:
         description: 'Is first release?'
         required: false
