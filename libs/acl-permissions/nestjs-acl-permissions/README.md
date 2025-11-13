@@ -1770,7 +1770,7 @@ GET /posts
 - ✅ **Per-item field restrictions**: Each item can have different visible fields
 - ✅ **Meta information**: `fieldRestrictions` tells which fields were hidden
 - ✅ **Empty results**: If no records match ACL conditions, returns empty array per JSON:API spec
-- ⚠️ **No `__current` support**: Cannot use `${@input.*}` in getAll (no single entity context)
+- ⚠️ **No `__current` support**: Can use only `${@input.*}` without `__current`. `${@input}` is each row from a query result
 - ⚠️ **Multiple rules merge**: If multiple rules match, fields are combined (union)
 
 **Empty Result Example:**
@@ -1953,7 +1953,7 @@ GET /posts/:id
 - ✅ **Field restrictions**: Single item can have hidden fields
 - ✅ **Meta information**: `fieldRestrictions` tells which fields were hidden
 - ⚠️ **404 if not found**: If entity doesn't exist OR doesn't match ACL conditions → 404
-- ⚠️ **No `__current` support**: Cannot use `${@input.*}` in getOne (no entity context yet)
+- ⚠️ **No `__current` support**: Can use only `${@input.*}` without `__current`. `${@input}` is row from a query result
 - ⚠️ **Multiple rules merge**: If multiple rules match, fields are combined (union)
 
 **404 Not Found vs 403 Forbidden:**
