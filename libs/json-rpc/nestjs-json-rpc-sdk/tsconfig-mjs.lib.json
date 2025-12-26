@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "types": ["node"],
-    "module": "es2015",
+    "module": "preserve",
     "target": "ES2022",
     "removeComments": false,
     "declaration": true,

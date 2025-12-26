@@ -2,8 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
-    "module": "ES2022",
-    "moduleResolution": "node10",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictNullChecks": true,
@@ -20,6 +20,7 @@
     ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "isolatedModules": true
   },
   "include": [
     "vite.config.ts",

@@ -10,7 +10,9 @@
     "noFallthroughCasesInSwitch": true,
     "inlineSources": true,
     "inlineSourceMap": true,
-    "sourceMap": false
+    "sourceMap": false,
+    "module": "preserve",
+    "moduleResolution": "bundler"
   },
   "files": [],
   "include": [],
