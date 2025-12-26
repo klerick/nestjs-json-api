@@ -1,17 +1,13 @@
 {
   "name": "json-api-server-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": [
-    "json-api-server", "json-api-nestjs-sdk"
-  ],
   "projectType": "application",
+  "implicitDependencies": ["json-api-server", "json-api-nestjs-sdk"],
   "targets": {
     "e2e": {
       "dependsOn": ["json-api-server:build", "json-api-nestjs-sdk:build"],
-      "executor": "@nx/vite:test",
-      "outputs": [
-        "{workspaceRoot}/coverage/{e2eProjectRoot}"
-      ],
+      "executor": "@nx/vitest:test",
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
         "config": "apps/json-api-server-e2e/vite.config.mts",
         "passWithNoTests": true,
@@ -20,10 +16,8 @@
     },
     "e2e-micro": {
       "dependsOn": ["json-api-server:build", "json-api-nestjs-sdk:build"],
-      "executor": "@nx/vite:test",
-      "outputs": [
-        "{workspaceRoot}/coverage/{e2eProjectRoot}"
-      ],
+      "executor": "@nx/vitest:test",
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
         "config": "apps/json-api-server-e2e/vite.config.mts",
         "passWithNoTests": true,

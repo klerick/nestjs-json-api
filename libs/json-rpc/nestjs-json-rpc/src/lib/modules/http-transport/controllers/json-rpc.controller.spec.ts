@@ -34,9 +34,9 @@ describe('json-rpc.controller', () => {
     const spyHandlerServiceCallHandler = vi
       .spyOn(handlerService, 'callHandler')
       .mockResolvedValue(result as any);
-    const resultController = jsonRpcController.handler(input as any);
+    const resultController = await jsonRpcController.handler(input as any);
     expect(spyHandlerServiceCallHandler).toHaveBeenCalledWith(input);
     expect(spyHandlerServiceCallHandler).toHaveBeenCalledTimes(1);
-    expect(resultController).resolves.toEqual(result);
+    expect(resultController).toEqual(result);
   });
 });

@@ -33,7 +33,6 @@
       "plugin": "@nx/vite/plugin",
       "options": {
         "buildTargetName": "build",
-        "testTargetName": "test",
         "serveTargetName": "serve",
         "devTargetName": "dev",
         "previewTargetName": "preview",
@@ -41,6 +40,12 @@
         "typecheckTargetName": "typecheck",
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
+      }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test"
       }
     }
   ],
@@ -57,7 +62,7 @@
     },
     "test": {
       "cache": true,
-      "executor": "@nx/vite:test",
+      "executor": "@nx/vitest:test",
       "options": {
         "reportsDirectory": "{projectRoot}/coverage",
         "codeCoverage": true,
@@ -152,7 +157,9 @@
       "fallbackCurrentVersionResolver": "disk",
       "preserveLocalDependencyProtocols": false
     },
-    "releaseTagPattern": "{projectName}@{version}"
+    "releaseTag": {
+      "pattern": "{projectName}@{version}"
+    }
   },
   "defaultBase": "master",
   "nxCloudId": "67c859dd862a93f16da79c89",
