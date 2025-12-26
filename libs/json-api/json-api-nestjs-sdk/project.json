@@ -9,24 +9,18 @@
     "lib:json-api-nestjs-sdk",
     "type:publish"
   ],
-  "implicitDependencies": [
-    "json-api-nestjs-shared"
-  ],
+  "implicitDependencies": ["json-api-nestjs-shared"],
   "targets": {
     "build-cjs": {
       "dependsOn": [
         {
-          "projects": [
-            "json-api-nestjs-shared"
-          ],
+          "projects": ["json-api-nestjs-shared"],
           "target": "build",
           "params": "ignore"
         }
       ],
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/{projectRoot}/cjs",
         "main": "{projectRoot}/src/index.ts",
@@ -40,28 +34,19 @@
         ],
         "generateExportsField": false,
         "updateBuildableProjectDepsInPackageJson": false,
-        "additionalEntryPoints": [
-          "{projectRoot}/src/ngModule.ts"
-        ],
-        "externalBuildTargets": [
-          "build-cjs"
-        ]
+        "additionalEntryPoints": ["{projectRoot}/src/ngModule.ts"]
       }
     },
     "build-mjs": {
       "dependsOn": [
         {
-          "projects": [
-            "json-api-nestjs-shared"
-          ],
+          "projects": ["json-api-nestjs-shared"],
           "target": "build",
           "params": "ignore"
         }
       ],
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/{projectRoot}/mjs",
         "main": "{projectRoot}/src/index.ts",
@@ -73,16 +58,12 @@
             "output": "../"
           }
         ],
-        "additionalEntryPoints": [
-          "{projectRoot}/src/ngModule.ts"
-        ]
+        "additionalEntryPoints": ["{projectRoot}/src/ngModule.ts"]
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-cjs", "build-mjs"
-      ],
+      "dependsOn": ["build-cjs", "build-mjs"],
       "options": {
         "outputPath": "dist/{projectRoot}",
         "commands": [
@@ -140,9 +121,7 @@
     },
     "publish": {
       "command": "node tools/scripts/publish.mjs json-api-nestjs-sdk {args.ver} {args.tag}",
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"]
     }
   }
 }

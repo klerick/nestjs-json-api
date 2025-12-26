@@ -28,8 +28,8 @@
     "JSON-RPC"
   ],
   "peerDependencies": {
-    "@angular/common": "20.0.0",
-    "@angular/core": "20.0.0",
+    "@angular/common": "^19.0.0 || ^20.0.0 || ^21.0.0",
+    "@angular/core": "^19.0.0 || ^20.0.0 || ^21.0.0",
     "axios": "^1.1.0",
     "socket.io-client": "^4.7.0"
   }
