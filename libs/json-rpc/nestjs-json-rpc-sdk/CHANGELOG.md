@@ -1,3 +1,13 @@
+## 2.2.0-beta.0 (2025-12-26)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk,nestjs-json-rpc-sdk:** update TS config for module and resolution, extend Angular peerDependency range ([58fbd8b](https://github.com/klerick/nestjs-json-api/commit/58fbd8b))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 2.1.0 (2025-11-13)
 
 ### 🚀 Features

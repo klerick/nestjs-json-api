@@ -1,3 +1,9 @@
+## 0.1.1-beta.0 (2025-12-26)
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs to 10.0.0-beta.7
+
 ## 0.1.0 (2025-11-13)
 
 ### 🚀 Features
