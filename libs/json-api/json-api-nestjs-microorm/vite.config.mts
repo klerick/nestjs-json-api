@@ -30,7 +30,6 @@ export default defineConfig(() => ({
   test: {
     fileParallelism: false,
     pool: 'threads',
-    singleThread: true,
     sequence: {
       concurrent: false,
       shuffle: false,

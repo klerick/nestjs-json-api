@@ -1,9 +1,9 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'nestjs-json-api-nx-welcome',
-  imports: [CommonModule],
+  imports: [],
   standalone: true,
   template: `
     <!--

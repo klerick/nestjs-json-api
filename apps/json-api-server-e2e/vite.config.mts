@@ -8,8 +8,9 @@ import { BaseSequencer } from 'vitest/node';
 class CustomSequencer extends BaseSequencer {
   async sort(files: any[]) {
     return [...files].sort((a, b) => {
-      const pathA = typeof a === 'string' ? a : a[1];
-      const pathB = typeof b === 'string' ? b : b[1];
+      // Vitest 4: files are TestSpecification objects with moduleId property
+      const pathA = typeof a === 'string' ? a : (a.moduleId ?? a[1] ?? '');
+      const pathB = typeof b === 'string' ? b : (b.moduleId ?? b[1] ?? '');
       return pathA.localeCompare(pathB);
     });
   }
@@ -60,11 +61,7 @@ export default defineConfig(() => ({
     },
     fileParallelism: false,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    maxWorkers: 1,
     sequence: {
       sequencer: CustomSequencer,
       concurrent: false,
