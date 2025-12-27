@@ -1,3 +1,13 @@
+## 10.0.0-beta.6 (2025-12-27)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** extend adapter to accept AxiosInstance as well as AxiosStatic ([cfb119e](https://github.com/klerick/nestjs-json-api/commit/cfb119e))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.5 (2025-12-26)
 
 ### 🚀 Features
