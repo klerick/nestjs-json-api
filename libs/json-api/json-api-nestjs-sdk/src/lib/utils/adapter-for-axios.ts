@@ -3,7 +3,7 @@ import {
   ResourceObject,
   ResourceObjectRelationships,
 } from '@klerick/json-api-nestjs-shared';
-import { AxiosStatic, AxiosResponse, Method } from 'axios';
+import { AxiosStatic, AxiosResponse, Method, AxiosInstance } from 'axios';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,7 +19,7 @@ import {
 import { ParamObject } from './http-params';
 
 class AxiosHttpClient implements HttpInnerClient {
-  constructor(private axios: AxiosStatic) {}
+  constructor(private axios: AxiosStatic | AxiosInstance) {}
 
   private observify<T, R extends AxiosResponse<T>>(
     makeRequest: () => Promise<R>,
@@ -165,6 +165,6 @@ class AxiosHttpClient implements HttpInnerClient {
   }
 }
 
-export function adapterForAxios(axios: AxiosStatic): HttpInnerClient {
+export function adapterForAxios(axios: AxiosStatic | AxiosInstance): HttpInnerClient {
   return new AxiosHttpClient(axios);
 }
