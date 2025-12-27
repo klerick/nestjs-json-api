@@ -1,3 +1,13 @@
+## 10.0.0-beta.7 (2025-12-27)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** update TS config and peerDependencies for compatibility improvements ([a0cd057](https://github.com/klerick/nestjs-json-api/commit/a0cd057))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.6 (2025-12-27)
 
 ### 🚀 Features
