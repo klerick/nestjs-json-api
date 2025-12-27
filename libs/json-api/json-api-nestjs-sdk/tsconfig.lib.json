@@ -2,9 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "declaration": false,
     "types": ["node"],
-    "target": "es2021"
+    "target": "es2021",
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "noCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
