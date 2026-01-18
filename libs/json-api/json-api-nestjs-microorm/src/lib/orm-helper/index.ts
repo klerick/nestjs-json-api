@@ -1,10 +1,6 @@
-import { EntityKey, EntityMetadata } from '@mikro-orm/core';
+import { EntityKey, EntityMetadata, NamingStrategy } from '@mikro-orm/core';
 import { Logger } from '@nestjs/common';
-import {
-  EntityParam,
-  TypeField,
-  PrepareParams,
-} from '@klerick/json-api-nestjs';
+import { EntityParam, PrepareParams, TypeField } from '@klerick/json-api-nestjs';
 import { MicroOrmParam } from '../type';
 import { DEFAULT_ARRAY_TYPE } from '../constants';
 
@@ -17,23 +13,29 @@ export const getRelation = <E extends object>(
   ) as unknown as EntityParam<E>['relations'];
 
 export const getProps = <E extends object>(
-  entityMetadata: EntityMetadata<E>
+  entityMetadata: EntityMetadata<E>,
+  namingStrategy: NamingStrategy
 ): EntityParam<E>['props'] => {
   const relations = getRelation(entityMetadata) as any;
+  const fkField = Object.values(getRelationFkField(entityMetadata, namingStrategy));
 
-  return entityMetadata.props
-    .map((i) => i.name)
-    .filter(
-      (i) => !relations.includes(i)
-    ) as unknown as EntityParam<E>['props'];
+  return (
+    entityMetadata.props
+      .filter((i) => !fkField.includes(i.name))
+      .map((i) => i.name)
+      .filter(
+        (i) => !relations.includes(i)
+      ) as unknown as EntityParam<E>['props']
+  );
 };
 
 export const getPropsType = <E extends object>(
   entityMetadata: EntityMetadata<E>,
+  namingStrategy: NamingStrategy,
   config: PrepareParams<MicroOrmParam>['options']['arrayType'] = DEFAULT_ARRAY_TYPE
 ): EntityParam<E>['propsType'] => {
   const logger = new Logger('JSON-API:MkroORM: init');
-  const field = getProps(entityMetadata);
+  const field = getProps(entityMetadata, namingStrategy);
 
   const result = {} as any;
   for (const item of field) {
@@ -73,11 +75,12 @@ export const getPropsType = <E extends object>(
 };
 
 export const getPropsNullable = <E extends object>(
-  entityMetadata: EntityMetadata<E>
+  entityMetadata: EntityMetadata<E>,
+  namingStrategy: NamingStrategy
 ): EntityParam<E>['propsNullable'] => {
-  return getProps(entityMetadata)
+  return getProps(entityMetadata, namingStrategy)
     .map((i) => {
-      // @ts-ignore
+      // @ts-expect-error dynamic property assignment
       const props = entityMetadata.properties[i];
       return props.nullable ||
         props.default !== undefined ||
@@ -105,6 +108,45 @@ export const getPrimaryColumnType = <E extends object>(
   ) as EntityParam<E>['primaryColumnType'];
 };
 
+export const getRelationFkField = <E extends object>(
+  entityMetadata: EntityMetadata<E>,
+  namingStrategy: NamingStrategy
+): EntityParam<E>['relationFkField'] => {
+
+  return entityMetadata.relations
+    .filter((rel) => {
+      if (rel.kind !== 'm:1' && !(rel.kind === '1:1' && !rel.mappedBy)) {
+        return false;
+      }
+
+      return !!rel.fieldNames?.[0];
+    })
+    .reduce((acum, rel) => {
+      if (!rel.targetMeta) {
+        return acum;
+      }
+      const primaryKey = rel.referencedColumnNames[0];
+      const joinsColumnName = namingStrategy.joinKeyColumnName(
+        rel.name,
+        rel.targetMeta.properties[primaryKey].fieldNames[0]
+      );
+      const joinPropertyName =
+        namingStrategy.columnNameToProperty(joinsColumnName);
+      const hasJoinProperty = entityMetadata.props.find(
+        (p) => p.name === joinPropertyName
+      );
+
+      if (!hasJoinProperty) {
+        return acum;
+      }
+      // @ts-expect-error dynamic property assignment
+      acum[rel.name] = hasJoinProperty.name;
+
+      return acum;
+    }, {} as EntityParam<E>['relationFkField']);
+
+};
+
 export const getRelationProperty = <E extends object>(
   entityMetadata: EntityMetadata<E>
 ): EntityParam<E>['relationProperty'] => {
@@ -125,9 +167,10 @@ export const getRelationProperty = <E extends object>(
 
 export const getArrayType = <E extends object>(
   repository: EntityMetadata<E>,
+  namingStrategy: NamingStrategy,
   config: PrepareParams<MicroOrmParam>['options']['arrayType'] = DEFAULT_ARRAY_TYPE
 ): EntityParam<E>['propsArrayType'] => {
-  return Object.entries(getPropsType(repository, config))
+  return Object.entries(getPropsType(repository, namingStrategy, config))
     .filter(([name, type]) => type === TypeField.array)
     .reduce((acum, [name]) => {
       const fieldType = Reflect.get(repository.properties, name)

@@ -55,3 +55,41 @@ export const config: Options = {
 })
 export class MicroOrmDatabaseModule {}
 ```
+
+## Resource Linkage for To-One Relations
+
+To enable automatic resource linkage (`data` field in relationships) for to-one relations, add a virtual FK field with `persist: false`.
+
+**Important:** The FK field name must follow the pattern: `{relationName}` + `Id` (e.g., relation `createdBy` → FK field `createdById`).
+
+**Example:**
+```typescript
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  Ref,
+  Opt,
+} from '@mikro-orm/core';
+
+@Entity({ tableName: 'comments' })
+export class Comments {
+  @PrimaryKey()
+  public id!: number;
+
+  @ManyToOne(() => Users)
+  public user!: Ref<Users>;
+
+  // Virtual FK field for resource linkage
+  // Must have persist: false and name pattern: {relation}Id
+  @Property({ persist: false })
+  public userId!: number & Opt;
+}
+```
+
+The library automatically detects FK fields based on:
+1. The naming convention (`{relationName}Id`)
+2. The `persist: false` option (marks it as a virtual/computed field)
+
+This FK value will be used to populate `relationships.{relation}.data` in API responses.

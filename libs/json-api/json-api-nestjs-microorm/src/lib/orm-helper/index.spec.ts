@@ -30,6 +30,7 @@ import {
   getRelation,
   getRelationProperty,
   getArrayType,
+  getRelationFkField,
 } from './index';
 
 describe('microorm-orm-helper-for-map', () => {
@@ -58,7 +59,8 @@ describe('microorm-orm-helper-for-map', () => {
   });
 
   it('getProps', () => {
-    const result = getProps(entityMetadataToken.get(Users));
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+    const result = getProps(entityMetadataToken.get(Users), namingStrategy);
     expect(result.includes('id')).toBe(true);
     expect(result.includes('lastName')).toBe(true);
     expect(result.includes('createdAt')).toBe(true);
@@ -78,8 +80,21 @@ describe('microorm-orm-helper-for-map', () => {
     expect(result.includes('addresses' as any)).toBe(false);
   });
 
+  it('getProps - without RelationFkField', () => {
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+    const result = getProps(entityMetadataToken.get(Notes), namingStrategy);
+    expect(result.includes('id')).toBe(true);
+    expect(result.includes('text')).toBe(true);
+    expect(result.includes('createdAt')).toBe(true);
+    expect(result.includes('updatedAt')).toBe(true);
+
+    expect(result.includes('createdBy' as any)).toBe(false);
+    expect(result.includes('createdById' as any)).toBe(false);
+  });
+
   it('getPropsType', () => {
-    const result = getPropsType(entityMetadataToken.get(Users), config);
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+    const result = getPropsType(entityMetadataToken.get(Users), namingStrategy, config);
 
     expect(result).toEqual({
       createdAt: 'date',
@@ -96,7 +111,8 @@ describe('microorm-orm-helper-for-map', () => {
   });
 
   it('getPropsNullable', () => {
-    const result = getPropsNullable(entityMetadataToken.get(Users));
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+    const result = getPropsNullable(entityMetadataToken.get(Users), namingStrategy);
     expect(result).toEqual([
       'firstName',
       'testReal',
@@ -120,7 +136,8 @@ describe('microorm-orm-helper-for-map', () => {
   });
 
   it('getArrayType', () => {
-    const result = getArrayType(entityMetadataToken.get(Users));
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+    const result = getArrayType(entityMetadataToken.get(Users), namingStrategy);
     expect(result).toEqual({
       testReal: TypeField.number,
       testArrayNull: TypeField.number,
@@ -182,5 +199,25 @@ describe('microorm-orm-helper-for-map', () => {
         nullable: true,
       },
     });
+  });
+
+  it('getRelationFkField', () => {
+
+    const namingStrategy = mikroORM.config.getNamingStrategy();
+
+    const notesResult = getRelationFkField(
+      entityMetadataToken.get(Notes),
+      namingStrategy
+    );
+
+    expect(notesResult).toEqual({
+      createdBy: 'createdById',
+    });
+
+    const usersResult = getRelationFkField(
+      entityMetadataToken.get(Users),
+      namingStrategy
+    );
+    expect(usersResult).toEqual({});
   });
 });

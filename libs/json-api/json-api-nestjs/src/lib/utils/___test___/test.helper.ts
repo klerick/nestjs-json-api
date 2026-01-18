@@ -73,6 +73,7 @@ const entityParamUsers: EntityParam<Users, 'id'> = {
       nullable: false,
     },
   },
+  relationFkField: {},
 };
 
 const entityParamRoles: EntityParam<Roles, 'id'> = {
@@ -93,6 +94,7 @@ const entityParamRoles: EntityParam<Roles, 'id'> = {
   propsNullable: [],
   typeName: 'roles',
   relationProperty: {},
+  relationFkField: {},
 };
 
 const entityParamAddresses: EntityParam<Addresses, 'id'> = {
@@ -124,11 +126,12 @@ const entityParamAddresses: EntityParam<Addresses, 'id'> = {
   propsNullable: [],
   typeName: 'addresses',
   relationProperty: {},
+  relationFkField: {},
 };
 
 const entityParamComments: EntityParam<Comments, 'id'> = {
-  relations: [],
-  props: ['id', 'createdAt', 'updatedAt', 'kind'],
+  relations: ['user'],
+  props: ['id', 'createdAt', 'updatedAt', 'kind', 'userId'],
   propsArrayType: {},
   className: 'Comments',
   primaryColumnName: 'id',
@@ -137,9 +140,10 @@ const entityParamComments: EntityParam<Comments, 'id'> = {
     kind: TypeField.string,
     createdAt: TypeField.date,
     updatedAt: TypeField.date,
+    userId: TypeField.number,
   },
   primaryColumnType: TypeField.number,
-  propsNullable: [],
+  propsNullable: ['userId'],
   typeName: 'comments',
   relationProperty: {
     user: {
@@ -147,6 +151,9 @@ const entityParamComments: EntityParam<Comments, 'id'> = {
       nullable: false,
       isArray: false,
     },
+  },
+  relationFkField: {
+    user: 'userId',
   },
 };
 
@@ -164,6 +171,7 @@ const entityParamUserGroups: EntityParam<UserGroups, 'id'> = {
   propsNullable: [],
   typeName: kebabCase('UserGroups'),
   relationProperty: {},
+  relationFkField: {},
 };
 
 export const mapMock = new Map<Constructor<any>, EntityParam<any, any>>([

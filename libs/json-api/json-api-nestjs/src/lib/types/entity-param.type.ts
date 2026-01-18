@@ -92,6 +92,7 @@ export type EntityParam<E extends object, IdKey extends string = 'id'> = {
   className: string;
   relations: UnionToTuple<RelationKeys<E, IdKey>>;
   relationProperty: RelationProperty<E>;
+  relationFkField: Partial<Record<RelationKeys<E, IdKey>, string>>;
 };
 
 type RelationType<

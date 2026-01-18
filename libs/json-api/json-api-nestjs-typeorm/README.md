@@ -30,3 +30,34 @@ export type TypeOrmParam = {
   ) => ReturnType<Func> // You can use cutom function for wrapping transaction in atomic operation, example: runInTransaction from https://github.com/Aliheym/typeorm-transactional
 };
 ```
+
+## Resource Linkage for To-One Relations
+
+To enable automatic resource linkage (`data` field in relationships) for to-one relations, use the `@RelationId` decorator from TypeORM.
+
+**Example:**
+```typescript
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  RelationId,
+} from 'typeorm';
+
+@Entity('comments')
+export class Comments {
+  @PrimaryGeneratedColumn()
+  public id!: number;
+
+  @ManyToOne(() => Users)
+  @JoinColumn({ name: 'user_id' })
+  public user!: Users;
+
+  // This field will be used for resource linkage
+  @RelationId((comment: Comments) => comment.user)
+  public userId!: number;
+}
+```
+
+The `@RelationId` decorator creates a virtual field that contains the FK value. The library automatically detects these fields and uses them to populate `relationships.{relation}.data` in API responses.
