@@ -1,4 +1,11 @@
-import { PrimaryKey, Property, Entity, ManyToOne } from '@mikro-orm/core';
+import {
+  PrimaryKey,
+  Property,
+  Entity,
+  ManyToOne,
+  Ref,
+  Opt,
+} from '@mikro-orm/core';
 
 import { Users, IUsers } from './index';
 
@@ -37,8 +44,9 @@ export class Notes {
   })
   updatedAt: Date = new Date();
 
-  @ManyToOne(() => Users, {
-    fieldName: 'created_by',
-  })
-  public createdBy!: IUsers;
+  @ManyToOne(() => Users)
+  public createdBy!: Ref<Users>;
+
+  @Property({ persist: false })
+  public createdById!: number & Opt;
 }

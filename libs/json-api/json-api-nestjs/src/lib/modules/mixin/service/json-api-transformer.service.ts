@@ -203,6 +203,32 @@ export class JsonApiTransformerService<
         },
       };
 
+      // Если relation НЕ в include, но есть FK поле — используем его для resource linkage
+      if (!includeMap.has(i as any) && !mapProps.relationProperty[i].isArray) {
+        const fkFieldName = (mapProps.relationFkField as Record<string, string>)[
+          i as string
+        ];
+        if (fkFieldName) {
+          const fkValue = (item as any)[fkFieldName];
+          if (fkValue != null) {
+            const relationMapPops = this.entityParamMapService.getParamMap(
+              mapProps.relationProperty[i].entityClass as EntityClass<object>
+            );
+            if (relationMapPops) {
+              // @ts-expect-error incorrect parse
+              acum[i as keyof Relationships<T>]['data'] = {
+                id: String(fkValue),
+                type: relationMapPops.typeName,
+              };
+            }
+          } else {
+            // FK поле null → data: null
+            // @ts-expect-error incorrect parse
+            acum[i as keyof Relationships<T>]['data'] = null;
+          }
+        }
+      }
+
       if (includeMap.has(i as any)) {
         const relationMapPops = this.entityParamMapService.getParamMap(
           mapProps.relationProperty[i].entityClass as EntityClass<object>

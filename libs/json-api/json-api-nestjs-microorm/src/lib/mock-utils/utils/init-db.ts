@@ -1,4 +1,3 @@
-import { Knex as TypeKnex } from '@mikro-orm/knex';
 import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';

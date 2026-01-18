@@ -21,6 +21,7 @@ import {
   getPrimaryColumnType,
   getRelationProperty,
   getArrayType,
+  getRelationFkField,
 } from './';
 
 import { TypeormUtilsService } from '../service';
@@ -28,9 +29,10 @@ import { TypeormUtilsService } from '../service';
 describe('typeorm-orm-helper-for-map', () => {
   const dbName = dbRandomName();
   let userRepository: Repository<Users>;
+  let notesRepository: Repository<Notes>;
   beforeAll(async () => {
     const module = await getModuleForPgLite(Users, dbName, TypeormUtilsService);
-    ({ userRepository } = getRepository(module));
+    ({ userRepository, notesRepository } = getRepository(module));
   });
 
   it('getProps', () => {
@@ -157,6 +159,18 @@ describe('typeorm-orm-helper-for-map', () => {
         isArray: false,
         nullable: true,
       },
+    });
+  });
+
+  it('getRelationFkField', () => {
+    // Users has no @RelationId decorators
+    const usersResult = getRelationFkField(userRepository);
+    expect(usersResult).toEqual({});
+
+    // Notes has @RelationId for createdBy relation
+    const notesResult = getRelationFkField(notesRepository);
+    expect(notesResult).toEqual({
+      createdBy: 'createdById',
     });
   });
 });

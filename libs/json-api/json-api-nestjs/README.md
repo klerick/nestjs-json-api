@@ -445,3 +445,38 @@ export class AtomicInterceptor<T> implements NestInterceptor {
 }
 ```
 **isAtomic** - is array of params of method
+
+## Resource Linkage for To-One Relations
+
+According to the [JSON:API specification](https://jsonapi.org/format/#document-resource-object-linkage), relationships should include a `data` member containing resource linkage (the `id` and `type` of the related resource).
+
+For **to-one relations** (ManyToOne, OneToOne), if your entity has an FK field (foreign key), the library will automatically include `relationships.{relation}.data` in responses **even without using `include`**.
+
+**Example response:**
+```json
+{
+  "data": {
+    "id": "1",
+    "type": "comments",
+    "attributes": { "text": "Hello" },
+    "relationships": {
+      "user": {
+        "links": { "self": "/api/comments/1/relationships/user" },
+        "data": { "id": "5", "type": "users" }
+      }
+    }
+  }
+}
+```
+
+If the FK field is `null`, then `data` will also be `null`:
+```json
+"relationships": {
+  "user": {
+    "links": { "self": "/api/comments/1/relationships/user" },
+    "data": null
+  }
+}
+```
+
+**Note:** TypeORM and MikroORM implement FK field detection differently. See the respective adapter documentation for details on how to define FK fields in your entities.

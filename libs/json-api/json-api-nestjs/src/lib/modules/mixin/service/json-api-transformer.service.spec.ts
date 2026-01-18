@@ -235,6 +235,64 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
       expect(result).toEqual({});
     });
+
+    it('should use relationFkField to populate data when FK is not null', () => {
+      const userId = faker.number.int();
+      const commentObject = {
+        id: faker.number.int(),
+        kind: 'COMMENT',
+        userId: userId,
+        user: null as any,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Comments;
+
+      const query = { include: [] } as any;
+      const mapPropsComments = mapPropsService.getParamMap(Comments);
+
+      const result = service.transformRelationships(
+        commentObject,
+        mapPropsComments,
+        query
+      );
+
+      expect(result.user).toEqual({
+        links: {
+          self: `/${urlPrefix}/v${version}/${mapPropsComments.typeName}/${commentObject.id}/relationships/user`,
+        },
+        data: {
+          id: userId.toString(),
+          type: mapPropsService.getParamMap(Users)?.typeName,
+        },
+      });
+    });
+
+    it('should set data to null when FK field is null', () => {
+      const commentObject = {
+        id: faker.number.int(),
+        kind: 'COMMENT',
+        userId: null,
+        user: null as any,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Comments;
+
+      const query = { include: [] } as any;
+      const mapPropsComments = mapPropsService.getParamMap(Comments);
+
+      const result = service.transformRelationships(
+        commentObject,
+        mapPropsComments,
+        query
+      );
+
+      expect(result.user).toEqual({
+        links: {
+          self: `/${urlPrefix}/v${version}/${mapPropsComments.typeName}/${commentObject.id}/relationships/user`,
+        },
+        data: null,
+      });
+    });
   });
   describe('extractIncluded', () => {
     const roleFake = {} as Roles;
@@ -404,6 +462,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
         },
         relationships: {
           user: {
+            data: null,
             links: {
               self: `/api/v1/${
                 mapPropsService.getParamMap(Comments)?.typeName

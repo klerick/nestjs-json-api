@@ -33,6 +33,7 @@ import {
   getPrimaryColumnType,
   getRelationProperty,
   getArrayType,
+  getRelationFkField,
 } from '../orm-helper';
 
 import {
@@ -41,9 +42,8 @@ import {
   CURRENT_ENTITY_MANAGER_TOKEN,
   CURRENT_ENTITY_REPOSITORY,
 } from '../constants';
-import { MicroOrmService } from '../service';
+import { MicroOrmService, MicroOrmUtilService } from '../service';
 import { MicroOrmParam } from '../type';
-import { MicroOrmUtilService } from '../service/micro-orm-util.service';
 
 export function CurrentMicroOrmProvider(
   connectionName?: string
@@ -99,27 +99,30 @@ export function CheckRelationNameFactory<
 export function EntityPropsMap<E extends object>(entities: EntityClass<E>[]) {
   return {
     provide: ENTITY_PARAM_MAP,
-    inject: [ENTITY_METADATA_TOKEN, MODULE_OPTIONS_TOKEN],
+    inject: [ENTITY_METADATA_TOKEN, MODULE_OPTIONS_TOKEN, CURRENT_DATA_SOURCE_TOKEN],
     useFactory: (
       metadataStorage: MetadataStorage,
-      config: PrepareParams<MicroOrmParam>
+      config: PrepareParams<MicroOrmParam>,
+      mikroORM: MikroORM
     ) => {
       const mapProperty = new Map<EntityClass<E>, EntityParam<E>>();
       const arrayConfig = config.options.arrayType;
+      const namingStrategy = mikroORM.config.getNamingStrategy();
       for (const item of entities) {
         const metadata = metadataStorage.get<E>(item);
         const className = getEntityName(item);
         mapProperty.set(item, {
-          props: getProps(metadata),
-          propsType: getPropsType(metadata, arrayConfig),
-          propsNullable: getPropsNullable(metadata),
+          props: getProps(metadata, namingStrategy),
+          propsType: getPropsType(metadata, namingStrategy, arrayConfig),
+          propsNullable: getPropsNullable(metadata, namingStrategy),
           primaryColumnName: getPrimaryColumnName(metadata),
           primaryColumnType: getPrimaryColumnType(metadata),
-          propsArrayType: getArrayType(metadata),
+          propsArrayType: getArrayType(metadata, namingStrategy),
           typeName: kebabCase(className),
           className: className,
           relations: getRelation(metadata),
           relationProperty: getRelationProperty(metadata),
+          relationFkField: getRelationFkField(metadata, namingStrategy),
         });
       }
       return mapProperty;

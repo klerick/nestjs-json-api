@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  UpdateDateColumn,
+  UpdateDateColumn, RelationId,
 } from 'typeorm';
 
 import { Users, IUsers } from './index';
@@ -38,7 +38,10 @@ export class Notes {
 
   @ManyToOne(() => Users, (item) => item.notes)
   @JoinColumn({
-    name: 'created_by',
+    name: 'created_by_id',
   })
   public createdBy!: IUsers;
+
+  @RelationId((note: Notes) => note.createdBy, 'created_by')
+  public createdById!: string[];
 }

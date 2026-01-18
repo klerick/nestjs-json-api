@@ -18,6 +18,17 @@ export const getProps = <E extends object>(
     .map((r) => r.propertyName) as unknown as EntityParam<E>['props'];
 };
 
+export const getRelationFkField = <E extends object>(
+  repository: Repository<E>
+): EntityParam<E>['relationFkField'] => {
+
+  return repository.metadata.relationIds.reduce((acum, relationId) => {
+    // @ts-expect-error dynamic property assignment
+    acum[relationId.relation.propertyName] = relationId.propertyName;
+    return acum;
+  }, {} as EntityParam<E>['relationFkField']);
+};
+
 export const getPropsType = <E extends object>(
   repository: Repository<E>
 ): EntityParam<E>['propsType'] => {

@@ -46,8 +46,11 @@ type IComments = Comments;
 export class Comments {
   public id!: number;
   public kind!: CommentKind;
+  public userId!: number | null;
   createdAt: Date = new Date();
   updatedAt: Date = new Date();
+
+  public user!: IUsers;
 }
 export enum CommentKind {
   Comment = 'COMMENT',

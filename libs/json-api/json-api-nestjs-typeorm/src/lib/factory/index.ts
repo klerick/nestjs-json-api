@@ -37,6 +37,7 @@ import {
   getPrimaryColumnType,
   getRelationProperty,
   getArrayType,
+  getRelationFkField,
 } from '../orm-helper';
 import { EntityClass } from '@mikro-orm/core';
 
@@ -91,6 +92,7 @@ export function EntityPropsMap<E extends object>(entities: EntityClass<E>[]) {
           className: className,
           relations: getRelation(entityRepo),
           relationProperty: getRelationProperty(entityRepo),
+          relationFkField: getRelationFkField(entityRepo),
         });
       }
       return mapProperty;
