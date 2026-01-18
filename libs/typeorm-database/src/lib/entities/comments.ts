@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   UpdateDateColumn,
+  RelationId,
 } from 'typeorm';
 
 export enum CommentKind {
@@ -56,4 +57,7 @@ export class Comments {
     name: 'created_by',
   })
   public createdBy!: IUsers;
+
+  @RelationId((item: Comments) => item.createdBy, 'created_by')
+  public createdById!: string[];
 }

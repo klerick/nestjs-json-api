@@ -47,8 +47,10 @@ export class Comments {
   updatedAt: Date = new Date();
 
   @ManyToOne(() => Users, {
-    fieldName: 'created_by',
     nullable: true,
   })
   createdBy!: IUsers;
+
+  @Property({ persist: false })
+  public createdById!: number;
 }
