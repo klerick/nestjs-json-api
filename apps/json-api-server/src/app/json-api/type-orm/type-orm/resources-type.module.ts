@@ -20,6 +20,7 @@ import {
 
 import { ExtendBookListController } from './controllers/extend-book-list/extend-book-list.controller';
 import { ExtendUserController } from './controllers/extend-user/extend-user.controller';
+import { CommentsController } from './controllers/comments/comments.controller'
 import { ExampleService } from './service/example.service';
 import { wrapperJsonApiController } from '@klerick/acl-json-api-nestjs';
 
@@ -42,7 +43,11 @@ import { wrapperJsonApiController } from '@klerick/acl-json-api-nestjs';
         UserProfileAcl,
         ContextTestAcl,
       ],
-      controllers: [ExtendBookListController, ExtendUserController],
+      controllers: [
+        ExtendBookListController,
+        ExtendUserController,
+        CommentsController,
+      ],
       providers: [ExampleService],
       options: {
         debug: true,

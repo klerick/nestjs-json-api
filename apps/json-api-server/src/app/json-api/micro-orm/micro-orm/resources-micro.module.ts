@@ -45,12 +45,17 @@ import { ExtendUserController } from './controllers/extend-user/extend-user.cont
 import { ExampleService } from './service/example.service';
 
 import { wrapperJsonApiController } from '@klerick/acl-json-api-nestjs';
+import { CommentsController } from './controllers/comments/comments.controller';
 
 @Module({
   imports: [
     JsonApiModule.forRoot(MicroOrmJsonApiModule, {
       entities: [...GeneraleResource, ...AclResource] as any,
-      controllers: [ExtendBookListController, ExtendUserController],
+      controllers: [
+        ExtendBookListController,
+        ExtendUserController,
+        CommentsController,
+      ],
       providers: [ExampleService],
       options: {
         debug: true,
