@@ -21,9 +21,7 @@
     },
     "build": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build-common"
-      ],
+      "dependsOn": ["build-common"],
       "options": {
         "outputPath": "dist/{projectRoot}",
         "commands": [
@@ -64,6 +62,11 @@
         "cwd": "./",
         "parallel": false,
         "outputPath": "{workspaceRoot}/{projectRoot}"
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
       }
     }
   },
