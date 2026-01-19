@@ -81,7 +81,7 @@ const checkEntityRelationProps = {
     'updatedAt',
   ],
   roles: ['id', 'createdAt', 'updatedAt', 'name', 'key', 'isDefault'],
-  comments: ['id', 'createdAt', 'updatedAt', 'kind'],
+  comments: ['id', 'createdAt', 'updatedAt', 'kind', 'userId'],
   addresses: [
     'id',
     'createdAt',

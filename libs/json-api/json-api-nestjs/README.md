@@ -480,3 +480,108 @@ If the FK field is `null`, then `data` will also be `null`:
 ```
 
 **Note:** TypeORM and MikroORM implement FK field detection differently. See the respective adapter documentation for details on how to define FK fields in your entities.
+
+## Field Access Control Decorators
+
+The library provides two decorators to control field accessibility in POST and PATCH operations:
+
+### @JsonApiReadOnly()
+
+Fields marked with `@JsonApiReadOnly()` are completely excluded from input validation schemas. They cannot be set via POST or PATCH requests and are not shown in Swagger documentation for input.
+
+**Use case:** Server-managed fields like `createdAt`, `updatedAt`, computed fields.
+
+```typescript
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { JsonApiReadOnly } from '@klerick/json-api-nestjs';
+
+@Entity()
+export class Users {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  login: string;
+
+  @JsonApiReadOnly()
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @JsonApiReadOnly()
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+With this configuration:
+- **POST /users** - `createdAt` and `updatedAt` fields are not accepted
+- **PATCH /users/:id** - `createdAt` and `updatedAt` fields are not accepted
+
+### @JsonApiImmutable()
+
+Fields marked with `@JsonApiImmutable()` can be optionally set during creation (POST) but cannot be modified after (PATCH).
+
+**Use case:** Fields that should be set once and never changed, like `externalId`, `slug`, or `username`.
+
+```typescript
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { JsonApiImmutable } from '@klerick/json-api-nestjs';
+
+@Entity()
+export class Users {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @JsonApiImmutable()
+  @Column({ unique: true })
+  login: string;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+}
+```
+
+With this configuration:
+- **POST /users** - `login` is optional, can be provided or omitted
+- **PATCH /users/:id** - `login` is not accepted (cannot be changed)
+
+### Combining Decorators
+
+You can use both decorators in the same entity:
+
+```typescript
+@Entity()
+export class Article {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @JsonApiImmutable()
+  @Column({ unique: true })
+  slug: string;
+
+  @Column()
+  title: string;
+
+  @Column()
+  content: string;
+
+  @JsonApiReadOnly()
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @JsonApiReadOnly()
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+| Field | POST | PATCH |
+|-------|------|-------|
+| `slug` | Optional | Not accepted |
+| `title` | Required | Optional |
+| `content` | Required | Optional |
+| `createdAt` | Not accepted | Not accepted |
+| `updatedAt` | Not accepted | Not accepted |

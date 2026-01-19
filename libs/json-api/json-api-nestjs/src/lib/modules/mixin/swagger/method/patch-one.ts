@@ -7,7 +7,11 @@ import {
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { TypeField } from '../../../../types';
+import {
+  ExtractJsonApiImmutableKeys,
+  ExtractJsonApiReadOnlyKeys,
+  TypeField,
+} from '../../../../types';
 
 import {
   errorSchema,
@@ -16,6 +20,10 @@ import {
 } from '../utils';
 import { zodPatch } from '../../zod';
 import { EntityParamMapService } from '../../service';
+import {
+  getJsonApiImmutableFields,
+  getJsonApiReadOnlyFields,
+} from '../../decorators';
 
 export function patchOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -27,6 +35,12 @@ export function patchOne<E extends object, IdKey extends string = 'id'>(
   const entityName = entity.name;
 
   const primaryColumnType = mapEntity.entityParaMap.primaryColumnType;
+  const readOnlyProps = getJsonApiReadOnlyFields(
+    entity
+  ) as ExtractJsonApiReadOnlyKeys<E>[];
+  const immutableProps = getJsonApiImmutableFields(
+    entity
+  ) as ExtractJsonApiImmutableKeys<E>[];
 
   ApiOperation({
     summary: `Update item of resource "${entityName}"`,
@@ -42,9 +56,10 @@ export function patchOne<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: z.toJSONSchema(zodPatch(mapEntity), zodToJSONSchemaParams) as
-      | SchemaObject
-      | ReferenceObject,
+    schema: z.toJSONSchema(
+      zodPatch(mapEntity, readOnlyProps, immutableProps),
+      zodToJSONSchemaParams
+    ) as SchemaObject | ReferenceObject,
     required: true,
   })(controller, methodName, descriptor);
 
