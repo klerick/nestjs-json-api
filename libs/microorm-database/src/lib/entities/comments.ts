@@ -1,4 +1,11 @@
-import { Entity, PrimaryKey, Property, Enum, ManyToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  Enum,
+  ManyToOne,
+  Opt,
+} from '@mikro-orm/core';
 
 export enum CommentKind {
   Comment = 'COMMENT',
@@ -7,6 +14,7 @@ export enum CommentKind {
 }
 
 import { Users, IUsers } from '.';
+import { JsonApiReadOnly, JsonApiReadOnlyField } from '@klerick/json-api-nestjs';
 
 export type IComments = Comments;
 
@@ -34,7 +42,8 @@ export class Comments {
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
     columnType: 'timestamp(0) without time zone',
   })
-  createdAt: Date = new Date();
+  @JsonApiReadOnly()
+  createdAt: Date & Opt & JsonApiReadOnlyField = new Date();
 
   @Property({
     length: 0,
@@ -44,7 +53,8 @@ export class Comments {
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  @JsonApiReadOnly()
+  updatedAt: Date & Opt & JsonApiReadOnlyField = new Date();
 
   @ManyToOne(() => Users, {
     nullable: true,
