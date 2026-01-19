@@ -1,3 +1,14 @@
+## 10.0.0-beta.8 (2026-01-19)
+
+### 🚀 Features
+
+- **json-api-nestjs:** add read-only and immutable field decorators with validation schema updates and inheritance support ([fccf757](https://github.com/klerick/nestjs-json-api/commit/fccf757))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-typeorm:** add support for automatic resource linkage in to-one relations, update FK field detection and handling ([0dd670d](https://github.com/klerick/nestjs-json-api/commit/0dd670d))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.7 (2025-12-26)
 
 This was a version bump only for json-api-nestjs to align it with other projects, there were no code changes.
