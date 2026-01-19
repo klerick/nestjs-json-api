@@ -1,3 +1,6 @@
+import { EntityClass } from '@klerick/json-api-nestjs-shared';
+
+import { ExtractJsonApiReadOnlyKeys, ExtractJsonApiImmutableKeys } from '../../../types';
 import {
   zodInputQuery,
   ZodInputQuery,
@@ -20,9 +23,11 @@ import {
   ZOD_PATCH_SCHEMA,
   ZOD_POST_RELATIONSHIP_SCHEMA,
   ZOD_PATCH_RELATIONSHIP_SCHEMA,
+  CURRENT_ENTITY,
 } from '../../../constants';
 
 import { EntityParamMapService } from '../service';
+import { getJsonApiReadOnlyFields, getJsonApiImmutableFields } from '../decorators';
 import { FactoryProvider, ValueProvider } from '@nestjs/common';
 
 export function ZodInputQuerySchema<
@@ -55,9 +60,14 @@ export function ZodPostSchema<
 >(): FactoryProvider<ZodPost<E, IdKey>> {
   return {
     provide: ZOD_POST_SCHEMA,
-    inject: [EntityParamMapService],
-    useFactory: (entityParamMapService: EntityParamMapService<E, IdKey>) => {
-      return zodPost(entityParamMapService);
+    inject: [EntityParamMapService, CURRENT_ENTITY],
+    useFactory: (
+      entityParamMapService: EntityParamMapService<E, IdKey>,
+      entity: EntityClass<E>
+    ) => {
+      const readOnlyProps = getJsonApiReadOnlyFields(entity) as ExtractJsonApiReadOnlyKeys<E>[];
+      const immutableProps = getJsonApiImmutableFields(entity) as ExtractJsonApiImmutableKeys<E>[];
+      return zodPost(entityParamMapService, readOnlyProps, immutableProps);
     },
   };
 }
@@ -68,9 +78,14 @@ export function ZodPatchSchema<
 >(): FactoryProvider<ZodPatch<E, IdKey>> {
   return {
     provide: ZOD_PATCH_SCHEMA,
-    inject: [EntityParamMapService],
-    useFactory: (entityParamMapService: EntityParamMapService<E, IdKey>) => {
-      return zodPatch(entityParamMapService);
+    inject: [EntityParamMapService, CURRENT_ENTITY],
+    useFactory: (
+      entityParamMapService: EntityParamMapService<E, IdKey>,
+      entity: EntityClass<E>
+    ) => {
+      const readOnlyProps = getJsonApiReadOnlyFields(entity) as ExtractJsonApiReadOnlyKeys<E>[];
+      const immutableProps = getJsonApiImmutableFields(entity) as ExtractJsonApiImmutableKeys<E>[];
+      return zodPatch(entityParamMapService, readOnlyProps, immutableProps);
     },
   };
 }

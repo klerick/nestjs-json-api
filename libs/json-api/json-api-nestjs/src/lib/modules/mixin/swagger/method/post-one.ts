@@ -14,6 +14,8 @@ import {
 } from '../utils';
 import { zodPost } from '../../zod';
 import { EntityParamMapService } from '../../service';
+import { getJsonApiImmutableFields, getJsonApiReadOnlyFields } from '../../decorators';
+import { ExtractJsonApiImmutableKeys, ExtractJsonApiReadOnlyKeys } from '../../../../types';
 
 export function postOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -23,6 +25,14 @@ export function postOne<E extends object, IdKey extends string = 'id'>(
   methodName: string
 ) {
   const entityName = entity.name;
+
+  const readOnlyProps = getJsonApiReadOnlyFields(
+    entity
+  ) as ExtractJsonApiReadOnlyKeys<E>[];
+  const immutableProps = getJsonApiImmutableFields(
+    entity
+  ) as ExtractJsonApiImmutableKeys<E>[];
+
   ApiOperation({
     summary: `Create item of resource "${entityName}"`,
     operationId: `${controller.constructor.name}_${methodName}`,
@@ -30,9 +40,10 @@ export function postOne<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for new "${entityName}" item`,
-    schema: z.toJSONSchema(zodPost(mapEntity), zodToJSONSchemaParams) as
-      | SchemaObject
-      | ReferenceObject,
+    schema: z.toJSONSchema(
+      zodPost(mapEntity, readOnlyProps, immutableProps),
+      zodToJSONSchemaParams
+    ) as SchemaObject | ReferenceObject,
     required: true,
   })(controller, methodName, descriptor);
 

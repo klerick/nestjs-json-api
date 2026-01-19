@@ -1,7 +1,7 @@
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { z, ZodArray, ZodType } from 'zod';
 
-import { EntityParam, TypeField } from '../../../../types';
+import { EntityParam, TypeField, ExtractJsonApiReadOnlyKeys, ExtractJsonApiImmutableKeys } from '../../../../types';
 import { nonEmptyObject, setOptionalOrNot } from '../zod-utils';
 import { ResultSchema } from './type';
 import { EntityParamMapService } from '../../service';
@@ -242,13 +242,28 @@ export function zodAttributes<
   E extends object,
   IdKey extends string,
   S extends true | false = false
->(entityParamMapService: EntityParamMapService<E, IdKey>, isPatch: S) {
+>(
+  entityParamMapService: EntityParamMapService<E, IdKey>,
+  isPatch: S,
+  readOnlyProps: ExtractJsonApiReadOnlyKeys<E>[] = [],
+  immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
+) {
+  type K = keyof Props<E, IdKey>;
   const paramsMap = entityParamMapService.entityParaMap;
+
+  const excludeProps = isPatch
+    ? [...readOnlyProps, ...immutableProps]
+    : readOnlyProps;
 
   const objectShape = ObjectTyped.keys(paramsMap.propsType).reduce(
     (acum, key) => {
-      if (assertOmitKeysProps(paramsMap.primaryColumnName, key)) {
-        acum[key] = buildSchema(paramsMap, key, isPatch);
+      if (
+        assertOmitKeysProps(paramsMap.primaryColumnName, key) &&
+        !excludeProps.includes(key as unknown as ExtractJsonApiReadOnlyKeys<E>)
+      ) {
+        const isImmutable = immutableProps.includes(key as unknown as ExtractJsonApiImmutableKeys<E>);
+        const schema = buildSchema(paramsMap, key, isPatch || isImmutable);
+        acum[key] = schema as ZodRules<E, IdKey, K, IsTypeArray<Props<E, IdKey>[K]>, S>;
       }
 
       return acum;

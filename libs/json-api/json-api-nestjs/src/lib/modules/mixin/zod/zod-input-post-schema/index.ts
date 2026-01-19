@@ -1,6 +1,11 @@
 import { z, ZodObject, ZodOptional } from 'zod';
 
-import { TypeForId } from '../../../../types';
+import {
+  TypeForId,
+  ExtractJsonApiReadOnlyKeys,
+  ExtractJsonApiImmutableKeys,
+  JsonApiReadOnlyField,
+} from '../../../../types';
 import {
   ZodId,
   zodId,
@@ -13,10 +18,11 @@ import {
 } from '../zod-share';
 import { EntityParamMapService } from '../../service';
 
+
 type ZodInputPostShape<E extends object, IdKey extends string> = {
   id: ZodOptional<ZodId>;
   type: ZodType<string>;
-  attributes: ZodAttributes<E, IdKey>;
+  attributes: ZodAttributes<PostEntity<E>, IdKey>;
   relationships: ZodOptional<ZodRelationships<E, IdKey>>;
 };
 
@@ -30,14 +36,21 @@ type ZodInputPostDataShape<E extends object, IdKey extends string> = {
 };
 
 function getShape<E extends object, IdKey extends string>(
-  entityParamMapService: EntityParamMapService<E, IdKey>
+  entityParamMapService: EntityParamMapService<E, IdKey>,
+  readOnlyProps: ExtractJsonApiReadOnlyKeys<E>[] = [],
+  immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
 ): ZodInputPostSchema<E, IdKey> {
   const shape = {
     id: zodId(
       entityParamMapService.entityParaMap.primaryColumnType as TypeForId
     ).optional(),
     type: zodType(entityParamMapService.entityParaMap.typeName),
-    attributes: zodAttributes(entityParamMapService, false),
+    attributes: zodAttributes(
+      entityParamMapService,
+      false,
+      readOnlyProps,
+      immutableProps
+    ) as unknown as ZodAttributes<PostEntity<E>, IdKey>,
     relationships: zodRelationships(entityParamMapService, false).optional(),
   };
 
@@ -45,12 +58,13 @@ function getShape<E extends object, IdKey extends string>(
 }
 
 export function zodPost<E extends object, IdKey extends string>(
-  entityParamMapService: EntityParamMapService<E, IdKey>
+  entityParamMapService: EntityParamMapService<E, IdKey>,
+  readOnlyProps: ExtractJsonApiReadOnlyKeys<E>[] = [],
+  immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
 ): ZodPost<E, IdKey> {
-  return z
-    .strictObject({
-      data: getShape(entityParamMapService),
-    })
+  return z.strictObject({
+    data: getShape(entityParamMapService, readOnlyProps, immutableProps),
+  });
 }
 
 export type ZodPost<E extends object, IdKey extends string> = ZodObject<
@@ -60,7 +74,30 @@ export type ZodPost<E extends object, IdKey extends string> = ZodObject<
 export type Post<E extends object, IdKey extends string> = z.infer<
   ZodPost<E, IdKey>
 >;
+
+type PostEntity<E> =
+  E extends object
+    ? Omit<E, ExtractJsonApiReadOnlyKeys<E> | ExtractJsonApiImmutableKeys<E>> &
+      Partial<Pick<E, ExtractJsonApiImmutableKeys<E>>>
+    : never;
+
 export type PostData<E extends object, IdKey extends string> = Post<
   E,
   IdKey
 >['data'];
+
+class Users {
+  id!: number;
+  login!: string;
+}
+type IUsers = Users;
+
+class Test {
+  id!: number;
+  name!: string;
+  updatedAt: Date & JsonApiReadOnlyField = new Date();
+  createdBy!: IUsers;
+}
+
+type a = Post<PostEntity<Test>, 'id'>['data'];
+type a1 = Post<Test, 'id'>['data'];

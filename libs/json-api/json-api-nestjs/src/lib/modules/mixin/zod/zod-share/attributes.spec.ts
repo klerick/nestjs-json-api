@@ -8,6 +8,7 @@ import {
   Users,
   Addresses,
 } from '../../../../utils/___test___/test-classes.helper';
+import { ExtractJsonApiReadOnlyKeys, ExtractJsonApiImmutableKeys } from '../../../../types';
 
 describe('attributes', () => {
   describe('Attributes for post', () => {
@@ -172,6 +173,150 @@ describe('attributes', () => {
       } catch (e) {
         expect(e).toBeInstanceOf(ZodError);
       }
+    });
+  });
+
+  describe('Attributes with readOnlyProps', () => {
+    it('should exclude read-only fields from schema', () => {
+      const readOnlyProps = ['createdAt', 'updatedAt'] as ExtractJsonApiReadOnlyKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, false, readOnlyProps);
+      const date = new Date();
+
+      // Should pass without read-only fields
+      const validData = {
+        login: 'login',
+        firstName: 'first',
+        lastName: 'last',
+        isActive: null,
+        testReal: [1, 2],
+        testArrayNull: null,
+        testDate: date.toISOString(),
+      };
+
+      const result = schema.parse(validData);
+      expect(result).toBeDefined();
+      expect(result).not.toHaveProperty('createdAt');
+      expect(result).not.toHaveProperty('updatedAt');
+    });
+
+    it('should reject data containing read-only fields (strict mode)', () => {
+      const readOnlyProps = ['createdAt', 'updatedAt'] as ExtractJsonApiReadOnlyKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, false, readOnlyProps);
+      const date = new Date();
+
+      // Should fail with read-only fields
+      const invalidData = {
+        login: 'login',
+        firstName: 'first',
+        lastName: 'last',
+        isActive: null,
+        testReal: [1, 2],
+        testArrayNull: null,
+        testDate: date.toISOString(),
+        createdAt: date.toISOString(), // read-only field
+        updatedAt: date.toISOString(), // read-only field
+      };
+
+      expect(() => schema.parse(invalidData)).toThrow(ZodError);
+    });
+
+    it('should work with patch mode and readOnlyProps', () => {
+      const readOnlyProps = ['createdAt', 'updatedAt'] as ExtractJsonApiReadOnlyKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, true, readOnlyProps);
+      const date = new Date();
+
+      // Should pass with partial data (patch mode)
+      const validData = {
+        login: 'login',
+        firstName: 'first',
+      };
+
+      const result = schema.parse(validData);
+      expect(result).toBeDefined();
+      expect(result).not.toHaveProperty('createdAt');
+      expect(result).not.toHaveProperty('updatedAt');
+    });
+
+    it('should reject patch data containing read-only fields', () => {
+      const readOnlyProps = ['createdAt', 'updatedAt'] as ExtractJsonApiReadOnlyKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, true, readOnlyProps);
+      const date = new Date();
+
+      // Should fail with read-only fields in patch
+      const invalidData = {
+        login: 'login',
+        createdAt: date.toISOString(), // read-only field
+      };
+
+      expect(() => schema.parse(invalidData)).toThrow(ZodError);
+    });
+  });
+
+  describe('Attributes with immutableProps', () => {
+    it('should make immutable fields optional in POST mode', () => {
+      const immutableProps = ['login'] as ExtractJsonApiImmutableKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, false, [], immutableProps);
+      const date = new Date();
+
+      // Should pass without immutable field (login is optional)
+      const validDataWithoutLogin = {
+        firstName: 'first',
+        lastName: 'last',
+        isActive: null,
+        testReal: [1, 2],
+        testArrayNull: null,
+        testDate: date.toISOString(),
+        createdAt: date.toISOString(),
+        updatedAt: date.toISOString(),
+      };
+
+      const result1 = schema.parse(validDataWithoutLogin);
+      expect(result1).toBeDefined();
+      expect(result1).not.toHaveProperty('login');
+
+      // Should also pass with immutable field provided
+      const validDataWithLogin = {
+        ...validDataWithoutLogin,
+        login: 'mylogin',
+      };
+
+      const result2 = schema.parse(validDataWithLogin);
+      expect(result2).toBeDefined();
+      expect(result2).toHaveProperty('login', 'mylogin');
+    });
+
+    it('should exclude immutable fields from PATCH mode', () => {
+      const immutableProps = ['login'] as ExtractJsonApiImmutableKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, true, [], immutableProps);
+
+      // Should pass without immutable field
+      const validData = {
+        firstName: 'first',
+      };
+
+      const result = schema.parse(validData);
+      expect(result).toBeDefined();
+      expect(result).not.toHaveProperty('login');
+
+      // Should reject data with immutable field (strict mode - field not in schema)
+      const dataWithLogin = {
+        firstName: 'first',
+        login: 'mylogin',
+      };
+      expect(() => schema.parse(dataWithLogin)).toThrow(ZodError);
+    });
+
+    it('should reject PATCH data containing immutable fields', () => {
+      const immutableProps = ['login'] as ExtractJsonApiImmutableKeys<Users>[];
+      const schema = zodAttributes(usersEntityParamMapMockData, true, [], immutableProps);
+
+      // Should fail with immutable field in patch
+      const invalidData = {
+        firstName: 'first',
+        login: 'login', // immutable field - not allowed in PATCH
+      };
+
+      expect(() => schema.parse(invalidData)).toThrow(ZodError);
     });
   });
 });
