@@ -1,3 +1,7 @@
+## 0.1.1-beta.2 (2026-01-19)
+
+This was a version bump only for nestjs-acl-permissions to align it with other projects, there were no code changes.
+
 ## 0.1.1-beta.1 (2026-01-19)
 
 ### 🧱 Updated Dependencies
