@@ -15,6 +15,12 @@ export enum CommentKind {
 }
 
 import { Users, IUsers } from '.';
+import {
+  JsonApiReadOnly,
+  JsonApiImmutable,
+  JsonApiReadOnlyField,
+  JsonApiImmutableField,
+} from '@klerick/json-api-nestjs';
 
 export type IComments = Comments;
 
@@ -36,21 +42,23 @@ export class Comments {
   })
   public kind!: CommentKind;
 
+  @JsonApiReadOnly()
   @Column({
     name: 'created_at',
     type: 'timestamp',
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP',
   })
-  public createdAt!: Date;
+  public createdAt!: Date & JsonApiReadOnlyField;
 
+  @JsonApiReadOnly()
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP',
   })
-  public updatedAt!: Date;
+  public updatedAt!: Date & JsonApiReadOnlyField;
 
   @ManyToOne(() => Users, (item) => item.id)
   @JoinColumn({
@@ -59,5 +67,5 @@ export class Comments {
   public createdBy!: IUsers;
 
   @RelationId((item: Comments) => item.createdBy, 'created_by')
-  public createdById!: string[];
+  public createdById!: number;
 }
