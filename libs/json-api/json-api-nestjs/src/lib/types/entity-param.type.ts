@@ -11,6 +11,32 @@ import {
   IsArray,
   CastArrayType,
 } from './utils-type';
+// Extract base primitive/known type from intersection (ignores marker types like Opt, JsonApiReadOnlyField, etc.)
+// Distributive over unions: ExtractBaseType<number | undefined> = number | undefined
+type ExtractBaseType<T> =
+  T extends Date ? Date :
+  T extends boolean ? boolean :
+  T extends number ? number :
+  T extends string ? string :
+  T extends null ? null :
+  T extends undefined ? undefined :
+  T extends (infer U)[] ? U[] :
+  object;
+
+// import {
+//   JsonApiReadOnlyField,
+//   JsonApiImmutableField,
+// } from './json-api-read-only';
+
+// // Remove marker types from value type
+// type CleanMarkerTypes<T> = T extends JsonApiReadOnlyField &
+//   JsonApiImmutableField
+//   ? Omit<T, keyof JsonApiReadOnlyField | keyof JsonApiImmutableField>
+//   : T extends JsonApiReadOnlyField
+//   ? Omit<T, keyof JsonApiReadOnlyField>
+//   : T extends JsonApiImmutableField
+//   ? Omit<T, keyof JsonApiImmutableField>
+//   : T;
 
 export enum TypeField {
   array = 'array',
@@ -35,24 +61,26 @@ type TypeProps<T> = T extends Date
   ? TypeField.number
   : T extends string
   ? TypeField.string
+  : T extends undefined
+  ? never  // Skip undefined in union, e.g. TypeProps<number | undefined> = TypeField.number
   : TypeField.object;
 
 export type PropertyWithType<E extends object, IdKey extends string = 'id'> = {
-  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null> extends never
+  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
     ? TypeField.null
-    : TypeProps<Exclude<E[K], null>>;
+    : TypeProps<ExtractBaseType<Exclude<E[K], null | undefined>>>;
 };
 
 export type ArrayProperty<E extends object, IdKey extends string = 'id'> = {
-  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null> extends never
+  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
     ? never
-    : IsArray<Exclude<E[K], null>> extends 1
+    : IsArray<Exclude<E[K], null | undefined>> extends 1
     ? K
     : never;
 }[PropertyKeys<E, IdKey>];
 
 export type ArrayPropertyType<E extends object, IdKey extends string = 'id'> = {
-  [K in ArrayProperty<E, IdKey>]: TypeProps<CastArrayType<Exclude<E[K], null>>>;
+  [K in ArrayProperty<E, IdKey>]: TypeProps<CastArrayType<Exclude<E[K], null | undefined>>>;
 };
 
 export type NullableProperty<

@@ -8,6 +8,9 @@ import {
   ZodRelationships,
   zodType,
   ZodType,
+  Id,
+  Attributes,
+  Relationships,
 } from '../zod-share';
 
 import { EntityParamMapService } from '../../service';
@@ -33,7 +36,7 @@ function getShape<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>,
   readOnlyProps: ExtractJsonApiReadOnlyKeys<E>[] = [],
   immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
-): ZodInputPatchSchema<E, IdKey> {
+) {
   const shape = {
     id: zodId(
       entityParamMapService.entityParaMap.primaryColumnType as TypeForId
@@ -62,10 +65,25 @@ export type ZodPatch<E extends object, IdKey extends string> = ZodObject<
   ZodInputPatchDataShape<E, IdKey>,
   z.core.$strict
 >;
-
-type PatchEntity<E extends object> =
-  Omit<E, ExtractJsonApiReadOnlyKeys<E> | ExtractJsonApiImmutableKeys<E>>;
-
-export type PatchData<E extends object, IdKey extends string> = z.infer<
-  ZodPatch<PatchEntity<E>, IdKey>
+export type PatchDataRaw<E extends object, IdKey extends string> = z.infer<
+  ZodPatch<E, IdKey>
 >['data'];
+
+// Type for Patch attributes: exclude ReadOnly and Immutable, all fields optional
+type PatchAttributesType<E extends object, IdKey extends string> = Partial<
+  Omit<
+    Attributes<E, IdKey>,
+    ExtractJsonApiReadOnlyKeys<E> | ExtractJsonApiImmutableKeys<E>
+  >
+>;
+
+export type PatchData<E extends object, IdKey extends string> = {
+  id: Id;
+  type: string;
+  attributes?: PatchAttributesType<E, IdKey>;
+  relationships?: Relationships<E, IdKey, true>;
+};
+
+export type Patch<E extends object, IdKey extends string> = {
+  data: PatchData<E, IdKey>;
+};

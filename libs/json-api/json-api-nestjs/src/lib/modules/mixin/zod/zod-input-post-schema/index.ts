@@ -4,7 +4,6 @@ import {
   TypeForId,
   ExtractJsonApiReadOnlyKeys,
   ExtractJsonApiImmutableKeys,
-  JsonApiReadOnlyField,
 } from '../../../../types';
 import {
   ZodId,
@@ -15,6 +14,9 @@ import {
   zodAttributes,
   ZodRelationships,
   zodRelationships,
+  Id,
+  Attributes,
+  Relationships,
 } from '../zod-share';
 import { EntityParamMapService } from '../../service';
 
@@ -22,7 +24,7 @@ import { EntityParamMapService } from '../../service';
 type ZodInputPostShape<E extends object, IdKey extends string> = {
   id: ZodOptional<ZodId>;
   type: ZodType<string>;
-  attributes: ZodAttributes<PostEntity<E>, IdKey>;
+  attributes: ZodAttributes<E, IdKey>;
   relationships: ZodOptional<ZodRelationships<E, IdKey>>;
 };
 
@@ -39,7 +41,7 @@ function getShape<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>,
   readOnlyProps: ExtractJsonApiReadOnlyKeys<E>[] = [],
   immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
-): ZodInputPostSchema<E, IdKey> {
+) {
   const shape = {
     id: zodId(
       entityParamMapService.entityParaMap.primaryColumnType as TypeForId
@@ -50,7 +52,7 @@ function getShape<E extends object, IdKey extends string>(
       false,
       readOnlyProps,
       immutableProps
-    ) as unknown as ZodAttributes<PostEntity<E>, IdKey>,
+    ),
     relationships: zodRelationships(entityParamMapService, false).optional(),
   };
 
@@ -71,33 +73,32 @@ export type ZodPost<E extends object, IdKey extends string> = ZodObject<
   ZodInputPostDataShape<E, IdKey>,
   z.core.$strict
 >;
-export type Post<E extends object, IdKey extends string> = z.infer<
-  ZodPost<E, IdKey>
->;
 
-type PostEntity<E> =
-  E extends object
-    ? Omit<E, ExtractJsonApiReadOnlyKeys<E> | ExtractJsonApiImmutableKeys<E>> &
-      Partial<Pick<E, ExtractJsonApiImmutableKeys<E>>>
-    : never;
-
-export type PostData<E extends object, IdKey extends string> = Post<
+export type PostDataRaw<E extends object, IdKey extends string> = Post<
   E,
   IdKey
 >['data'];
 
-class Users {
-  id!: number;
-  login!: string;
-}
-type IUsers = Users;
+// Type for Post attributes: exclude ReadOnly, make Immutable optional
+type PostAttributesType<E extends object, IdKey extends string> =
+  Omit<
+    Attributes<E, IdKey, false>,
+    ExtractJsonApiReadOnlyKeys<E> | ExtractJsonApiImmutableKeys<E>
+  > &
+  Partial<
+    Pick<
+      Attributes<E, IdKey, false>,
+      Extract<ExtractJsonApiImmutableKeys<E>, keyof Attributes<E, IdKey, false>>
+    >
+  >;
 
-class Test {
-  id!: number;
-  name!: string;
-  updatedAt: Date & JsonApiReadOnlyField = new Date();
-  createdBy!: IUsers;
-}
+export type PostData<E extends object, IdKey extends string> = {
+  id?: Id;
+  type: string;
+  attributes: PostAttributesType<E, IdKey>;
+  relationships?: Relationships<E, IdKey, false>;
+};
 
-type a = Post<PostEntity<Test>, 'id'>['data'];
-type a1 = Post<Test, 'id'>['data'];
+export type Post<E extends object, IdKey extends string> = {
+  data: PostData<E, IdKey>;
+};

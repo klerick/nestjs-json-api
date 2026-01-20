@@ -11,6 +11,13 @@ import { MethodName } from '../types';
 import { Bindings } from '../config/bindings';
 import { Type } from '@nestjs/common/interfaces';
 import { JSON_API_DECORATOR_ENTITY } from '../../../constants';
+import {
+  PostData,
+  PatchData,
+  Attributes,
+  PatchDataRaw,
+  PostDataRaw,
+} from '../zod';
 
 export const nameIt = (
   name: string,
@@ -46,4 +53,20 @@ export function excludeMethod(
 
 export function entityForClass<T = any>(type: Type<T>): EntityClass<AnyEntity> {
   return Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, type);
+}
+export function patchInputData<E extends object, IdKey extends string = 'id'>(
+  data: PostData<E, IdKey> | PatchData<E, IdKey>,
+  patch: Partial<Attributes<E, IdKey, true>>
+) {
+  type Input = typeof data;
+
+  return {
+    ...data,
+    attributes: {
+      ...data.attributes,
+      ...patch,
+    },
+  } as Input extends PatchData<E, IdKey>
+    ? PatchDataRaw<E, IdKey>
+    : PostDataRaw<E, IdKey>;
 }

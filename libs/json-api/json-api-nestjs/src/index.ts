@@ -5,6 +5,7 @@ export { JsonApi, InjectService, JsonApiReadOnly, JsonApiImmutable } from './lib
 export {
   entityForClass,
   excludeMethod,
+  patchInputData,
 } from './lib/modules/mixin/helpers/utils';
 export {
   PrepareParams,
