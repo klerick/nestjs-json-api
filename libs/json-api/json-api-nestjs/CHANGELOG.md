@@ -1,3 +1,13 @@
+## 10.0.0-beta.9 (2026-01-20)
+
+### 🚀 Features
+
+- **json-api-nestjs:** enhance Patch and Post schema handling, add utility for merging patch data and refine type definitions for attributes and relationships ([2887603](https://github.com/klerick/nestjs-json-api/commit/2887603))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.8 (2026-01-19)
 
 ### 🚀 Features
