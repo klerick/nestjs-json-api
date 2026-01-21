@@ -173,6 +173,20 @@ type ResultTargetType<E extends object, IdKey extends string> = FilterProps<
   IdKey
 > &
   TargetRelationShape<E, IdKey>;
+const zodRulesForFieldCache = new Map<
+  TypeField,
+  ReturnType<typeof getZodRulesForField>
+>();
+
+function getZodRulesForFieldUsingCache(type: TypeField) {
+  let rules = zodRulesForFieldCache.get(type);
+  if (rules) {
+    return rules;
+  }
+  rules = getZodRulesForField(type);
+  zodRulesForFieldCache.set(type, rules);
+  return rules;
+}
 
 function getFilterPropsShapeForEntity<E extends object, IdKey extends string>(
   entityParam: EntityParam<E, IdKey>
@@ -185,7 +199,7 @@ function getFilterPropsShapeForEntity<E extends object, IdKey extends string>(
     const value =
       propertyType === TypeField.array
         ? zodRuleForArrayField
-        : getZodRulesForField(propertyType);
+        : getZodRulesForFieldUsingCache(propertyType);
 
     Reflect.set(acum, field as PropertyKey, value.optional());
 

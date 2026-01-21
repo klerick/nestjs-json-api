@@ -164,7 +164,7 @@ export function zodInputOperation<E extends object>(
 
   return z
     .object({
-      [KEY_MAIN_INPUT_SCHEMA]: z.array(z.union(array)).nonempty(),
+      [KEY_MAIN_INPUT_SCHEMA]: array.length > 0 ? z.array(z.union(array)).nonempty() : z.never(),
     })
     .strict();
 }

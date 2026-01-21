@@ -2,12 +2,12 @@ import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { z, ZodArray, ZodType } from 'zod';
 
 import { EntityParam, TypeField, ExtractJsonApiReadOnlyKeys, ExtractJsonApiImmutableKeys } from '../../../../types';
-import { nonEmptyObject, setOptionalOrNot } from '../zod-utils';
+import { nonEmptyObject, setOptionalOrNot, memoize } from '../zod-utils';
 import { ResultSchema } from './type';
 import { EntityParamMapService } from '../../service';
 import { transformDateString } from '../map-transform-to-json-shema';
 
-export function getZodRulesForNumber<
+function getZodRulesForNumberFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
@@ -15,33 +15,42 @@ export function getZodRulesForNumber<
   return setOptionalOrNot(schema, isNullable, isPatch);
 }
 
-function getZodRulesForString<
+const getZodRulesForNumber = memoize(getZodRulesForNumberFunc);
+
+function getZodRulesForStringFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
   return setOptionalOrNot(z.string(), isNullable, isPatch);
 }
 
-function getZodRulesForDate<
+const getZodRulesForString = memoize(getZodRulesForStringFunc);
+
+function getZodRulesForDateFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
   return setOptionalOrNot(z.iso.datetime(), isNullable, isPatch).transform(transformDateString<Null, isPatch>);
 }
+const getZodRulesForDate = memoize(getZodRulesForDateFunc);
 
-function getZodRulesForBoolean<
+function getZodRulesForBooleanFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
   return setOptionalOrNot(z.boolean(), isNullable, isPatch);
 }
 
-function getZodSchemaForJson<
+const getZodRulesForBoolean = memoize(getZodRulesForBooleanFunc);
+
+function getZodSchemaForJsonFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
   return setOptionalOrNot(z.json(), isNullable, isPatch);
 }
+
+const getZodSchemaForJson = memoize(getZodSchemaForJsonFunc);
 
 type ZodRulesResultArray<
   T extends TypeField,
@@ -49,7 +58,7 @@ type ZodRulesResultArray<
   isPatch extends true | false
 > = ResultSchema<ZodArray<ZodRulesForType<T, false, false>>, Null, isPatch>;
 
-function getZodRulesForArray<
+function getZodRulesForArrayFunc<
   T extends TypeField,
   Null extends true | false,
   isPatch extends true | false
@@ -79,6 +88,8 @@ function getZodRulesForArray<
     isPatch
   >;
 }
+
+const getZodRulesForArray = memoize(getZodRulesForArrayFunc);
 
 type ZodRulesForArray<
   T extends TypeField,

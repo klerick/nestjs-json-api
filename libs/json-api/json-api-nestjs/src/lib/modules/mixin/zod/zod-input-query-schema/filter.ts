@@ -71,7 +71,7 @@ function getZodRulesForFilterOperator() {
 
   return z.union([filterConditional, conditional]).optional();
 }
-
+const zodRulesForFilterOperator = getZodRulesForFilterOperator();
 export type ZodRulesForFilterOperator = ReturnType<
   typeof getZodRulesForFilterOperator
 >;
@@ -96,7 +96,7 @@ function getZodRulesForRelation() {
     ])
     .optional();
 }
-
+const zodRulesForRelation = getZodRulesForRelation();
 type ZodRulesForRelation = ReturnType<typeof getZodRulesForRelation>;
 type CastPropertyKey<T> = T extends PropertyKey ? T : never;
 
@@ -153,14 +153,14 @@ export function zodFilterInputQuery<E extends object, IdKey extends string>(
     ZodRulesForFilterOperator,
     IdKey,
     EntityParam<E, IdKey>['props']
-  >(entityParamMapService.entityParaMap.props, getZodRulesForFilterOperator());
+  >(entityParamMapService.entityParaMap.props, zodRulesForFilterOperator);
 
   const relations = shapeForArray<
     E,
     ZodRulesForRelation,
     IdKey,
     EntityParam<E, IdKey>['relations']
-  >(entityParamMapService.entityParaMap.relations, getZodRulesForRelation());
+  >(entityParamMapService.entityParaMap.relations, zodRulesForRelation);
 
   const relationList = getRelationProps(entityParamMapService);
 
@@ -169,10 +169,7 @@ export function zodFilterInputQuery<E extends object, IdKey extends string>(
     ZodRulesForFilterOperator,
     IdKey,
     ConcatRelationField<E, IdKey>
-  >(
-    getTupleConcatRelationFields(relationList),
-    getZodRulesForFilterOperator()
-  );
+  >(getTupleConcatRelationFields(relationList), zodRulesForFilterOperator);
   return z.object({
     ...target,
     ...relations,
