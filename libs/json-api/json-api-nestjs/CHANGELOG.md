@@ -1,3 +1,13 @@
+## 10.0.0-beta.10 (2026-01-21)
+
+### 🚀 Features
+
+- **json-api-nestjs:** optimize and memoize Zod schema generation ([611da19](https://github.com/klerick/nestjs-json-api/commit/611da19))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.9 (2026-01-20)
 
 ### 🚀 Features
