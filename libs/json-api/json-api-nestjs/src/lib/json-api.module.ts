@@ -33,7 +33,11 @@ export class JsonApiModule {
         `The module ${module.name} should be provide ${ENTITY_PARAM_MAP.description}`
       );
 
-    const entitiesModules = prepareOptions.entities.map((entityItem) =>
+    const entitiesForControllers = prepareOptions.entities.filter(
+      (entity) => !prepareOptions.excludeControllers.includes(entity)
+    );
+
+    const entitiesModules = entitiesForControllers.map((entityItem) =>
       MixinModule.forRoot({
         entity: entityItem,
         imports: [commonOrmModule, ...prepareOptions.imports],
@@ -46,7 +50,6 @@ export class JsonApiModule {
     const atomicOperation = prepareOptions.options.operationUrl
       ? AtomicOperationModule.forRoot(
           prepareOptions.options.operationUrl,
-          prepareOptions.entities,
           entitiesModules,
           commonOrmModule
         )

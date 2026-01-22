@@ -23,6 +23,7 @@ export function prepareConfig<OrmParams>(
     providers: moduleParams['providers'] || [],
     controllers: moduleParams['controllers'] || [],
     entities: moduleParams['entities'],
+    excludeControllers: moduleParams['excludeControllers'] || [],
     options: {
       ...options,
       operationUrl: options['operationUrl'] || undefined,

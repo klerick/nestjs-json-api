@@ -7,7 +7,6 @@ import {
   NestModule,
 } from '@nestjs/common';
 import { DiscoveryModule, RouterModule } from '@nestjs/core';
-import { AnyEntity, EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { OperationController } from './controllers';
 import { ExplorerService, ExecuteService, SwaggerService } from './service';
@@ -25,13 +24,11 @@ import { ErrorFormatService } from '../../modules/mixin/service';
 export class AtomicOperationModule implements NestModule {
   static forRoot(
     operationUrl: string,
-    entities: EntityClass<AnyEntity>[],
     entityModules: DynamicModule[],
     commonModule: DynamicModule
   ): DynamicModule[] {
     return [
       AtomicOperationModule.factoryModule(
-        entities,
         entityModules,
         commonModule
       ),
@@ -45,7 +42,6 @@ export class AtomicOperationModule implements NestModule {
   }
 
   private static factoryModule(
-    entities: EntityClass<AnyEntity>[],
     entityModules: DynamicModule[],
     commonModule: DynamicModule
   ): DynamicModule {
@@ -54,6 +50,7 @@ export class AtomicOperationModule implements NestModule {
     if (!errorFormat) {
       throw new Error('ErrorFormatService not found, should be provide in common orm module')
     }
+    const mapControllerEntityProvider = MapControllerEntity(entityModules);
     return {
       module: AtomicOperationModule,
       controllers: [OperationController],
@@ -63,8 +60,8 @@ export class AtomicOperationModule implements NestModule {
         ExecuteService,
         SwaggerService,
         AsyncIterate,
-        MapControllerEntity(entities, entityModules),
-        MapEntityNameToEntity(entities),
+        mapControllerEntityProvider,
+        MapEntityNameToEntity([...mapControllerEntityProvider.useValue.keys()]),
         ZodInputOperation(),
         {
           provide: MAP_CONTROLLER_INTERCEPTORS,

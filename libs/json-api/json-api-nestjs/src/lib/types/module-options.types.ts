@@ -11,6 +11,7 @@ import { ExtractNestType, IfEquals } from './utils-type';
 
 type ModuleCommonParams = {
   entities: NonEmptyArray<EntityClass<AnyEntity>>;
+  excludeControllers?: EntityClass<AnyEntity>[];
   connectionName?: string;
   controllers?: NestController;
   providers?: NestProvider;

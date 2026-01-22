@@ -79,8 +79,9 @@ The following interface is using for the configuration:
 ```typescript
 export interface ModuleOptions {
   entities: Entity[]; // List of typeOrm Entity
+  excludeControllers?: Entity[]; // List of entities to exclude from automatic controller generation
   controllers?: NestController[];  // List of controller, if you need extend default present
-  connectionName?: string; // Type orm connection name: "default" is default name  
+  connectionName?: string; // Type orm connection name: "default" is default name
   providers?: NestProvider[]; // List of addition provider for useing in custom controller
   imports?: NestImport[]; // List of addition module for useing in custom controller
   options?: {
@@ -88,10 +89,36 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
-    // You can add params for MicroOrm or TypeOrm adapter  
+    // You can add params for MicroOrm or TypeOrm adapter
   } ;
 }
 ```
+
+### Excluding Controllers
+
+If you need to register entities for relationships but don't want automatic controller generation for some of them, use `excludeControllers`:
+
+```typescript
+import {Module} from '@nestjs/common';
+import {JsonApiModule} from '@klerick/json-api-nestjs';
+import {TypeOrmJsonApiModule} from '@klerick/json-api-nestjs-typeorm';
+import {Users, Roles, AuditLog} from 'database';
+
+@Module({
+  imports: [
+    JsonApiModule.forRoot(TypeOrmJsonApiModule, {
+      entities: [Users, Roles, AuditLog],
+      excludeControllers: [AuditLog], // AuditLog entity will not have auto-generated controller
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+This is useful when:
+- You want to manage certain entities only through relationships
+- You need custom controller implementation without the auto-generated one
+- Some entities should be internal and not exposed via REST API
 
 You can extend the default controller:
 

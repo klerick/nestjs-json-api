@@ -78,6 +78,7 @@ describe('module-helper', () => {
         imports: [],
         providers: [],
         controllers: [],
+        excludeControllers: [],
         entities: [],
         hooks: {
           afterCreateController: result.hooks.afterCreateController,
