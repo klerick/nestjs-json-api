@@ -1,3 +1,13 @@
+## 10.0.0-beta.11 (2026-01-22)
+
+### 🚀 Features
+
+- **json-api-nestjs:** add support for excluding controllers during module initialization ([5e2de06](https://github.com/klerick/nestjs-json-api/commit/5e2de06))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.10 (2026-01-21)
 
 ### 🚀 Features
