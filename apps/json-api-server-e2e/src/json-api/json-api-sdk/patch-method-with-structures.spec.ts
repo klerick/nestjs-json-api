@@ -23,7 +23,7 @@ import { JsonSdkPromise, nullRef } from '@klerick/json-api-nestjs-sdk';
 
 import { creatSdk } from '../utils/run-application';
 
-describe('Updating Resources (PATCH Operations)', () => {
+describe('Updating Resources (PATCH Operations) with entity() and plain structures', () => {
   let jsonSdk: JsonSdkPromise;
   let address: Addresses;
   let addressAfterSave: Addresses;
@@ -43,13 +43,13 @@ describe('Updating Resources (PATCH Operations)', () => {
     address.state = faker.string.alpha(50);
     address.country = faker.string.alpha(50);
 
-    addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
+    addressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
 
     comments = new Comments();
     comments.text = faker.string.alpha(50);
     comments.kind = CommentKind.Comment;
 
-    commentsAfterSave = await jsonSdk.jonApiSdkService.postOne(comments);
+    commentsAfterSave = await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, comments)).postOne();
 
     user = new Users();
     user.firstName = faker.string.alpha(50);
@@ -59,26 +59,24 @@ describe('Updating Resources (PATCH Operations)', () => {
     user.addresses = addressAfterSave;
     user.comments = [commentsAfterSave];
 
-    userAfterSave = await jsonSdk.jonApiSdkService.postOne(user);
+    userAfterSave = await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, user)).postOne();
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(commentsAfterSave);
+    await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, commentsAfterSave)).deleteOne();
     if (newCommentsAfterSave){
-      await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
+      await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, newCommentsAfterSave)).deleteOne();
     }
-    await jsonSdk.jonApiSdkService.deleteOne(userAfterSave);
-    await jsonSdk.jonApiSdkService.deleteOne(addressAfterSave);
+    await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, userAfterSave)).deleteOne();
+    await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, addressAfterSave)).deleteOne();
     if (newAddressAfterSave) {
-      jsonSdk.jonApiSdkService.deleteOne(newAddressAfterSave);
+      jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, newAddressAfterSave)).deleteOne();
     }
   });
 
   it('should update resource attributes and automatically update the updatedAt timestamp', async () => {
     addressAfterSave.city = faker.location.city();
-    const addressAfterUpdate = await jsonSdk.jonApiSdkService.patchOne(
-      addressAfterSave
-    );
+    const addressAfterUpdate = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, addressAfterSave)).patchOne();
     addressAfterUpdate.updatedAt = addressAfterSave.updatedAt;
     expect(addressAfterSave).toEqual(addressAfterUpdate);
   });
@@ -93,16 +91,14 @@ describe('Updating Resources (PATCH Operations)', () => {
     newComments.text = faker.string.alpha();
     newComments.kind = CommentKind.Comment;
 
-    newAddressAfterSave = await jsonSdk.jonApiSdkService.postOne(
-      newAddress
-    );
+    newAddressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, newAddress)).postOne();
 
 
-    newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(newComments);
+    newCommentsAfterSave = await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, newComments)).postOne();
 
     userAfterSave.addresses = newAddressAfterSave;
     userAfterSave.comments = [newCommentsAfterSave];
-    await jsonSdk.jonApiSdkService.patchOne(userAfterSave);
+    await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, userAfterSave)).patchOne();
     const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
       Users,
       userAfterSave.id,
@@ -123,13 +119,9 @@ describe('Updating Resources (PATCH Operations)', () => {
     newComments.text = faker.string.alpha();
     newComments.kind = CommentKind.Comment;
 
-    newAddressAfterSave = await jsonSdk.jonApiSdkService.postOne(
-      newAddress
-    );
+    newAddressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, newAddress)).postOne();
 
-    newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(
-      newComments
-    );
+    newCommentsAfterSave = await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, newComments)).postOne();
 
     userAfterSave.addresses = newAddressAfterSave;
     userAfterSave.comments = [newCommentsAfterSave];
@@ -140,7 +132,7 @@ describe('Updating Resources (PATCH Operations)', () => {
     userWithEmptyAttr.comments = [newCommentsAfterSave];
     userWithEmptyAttr.lastName = null as any;
 
-    await jsonSdk.jonApiSdkService.patchOne(userWithEmptyAttr);
+    await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, userWithEmptyAttr)).patchOne();
     const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
       Users,
       userWithEmptyAttr.id,
@@ -157,7 +149,7 @@ describe('Updating Resources (PATCH Operations)', () => {
     const commentsWithEmptyAttr = new Comments();
     commentsWithEmptyAttr.id = commentsAfterSave.id;
     commentsWithEmptyAttr.createdBy = nullRef();
-    await jsonSdk.jonApiSdkService.patchOne(commentsWithEmptyAttr);
+    await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, commentsWithEmptyAttr)).patchOne();
 
     const commentsAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
       Comments,
