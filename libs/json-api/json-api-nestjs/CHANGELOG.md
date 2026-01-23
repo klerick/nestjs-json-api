@@ -1,3 +1,17 @@
+## 10.0.0-beta.14 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs-shared,json-api-nestjs:** im did mistake in commit msg ([56c483a](https://github.com/klerick/nestjs-json-api/commit/56c483a))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.6
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.13 (2026-01-23)
 
 This was a version bump only for json-api-nestjs to align it with other projects, there were no code changes.

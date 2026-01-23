@@ -1,3 +1,13 @@
+## 1.0.0-beta.6 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs-shared,json-api-nestjs:** im did mistake in commit msg ([56c483a](https://github.com/klerick/nestjs-json-api/commit/56c483a))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 1.0.0-beta.5 (2026-01-23)
 
 ### 🚀 Features

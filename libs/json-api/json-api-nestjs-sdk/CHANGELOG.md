@@ -1,3 +1,17 @@
+## 10.0.0-beta.10 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** remove unused `OutputEntity` generics for simplified and consistent typings ([69ce098](https://github.com/klerick/nestjs-json-api/commit/69ce098))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.6
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.9 (2026-01-23)
 
 ### 🚀 Features
