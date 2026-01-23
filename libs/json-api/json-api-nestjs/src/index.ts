@@ -1,7 +1,7 @@
 export { JsonApiModule } from './lib/json-api.module';
 
 export { JsonBaseController } from './lib/modules/mixin/controllers/json-base.controller';
-export { JsonApi, InjectService, JsonApiReadOnly, JsonApiImmutable } from './lib/modules/mixin/decorators';
+export { JsonApi, InjectService, JsonApiReadOnly, JsonApiImmutable, JsonApiResponseFrom } from './lib/modules/mixin/decorators';
 export {
   entityForClass,
   excludeMethod,
