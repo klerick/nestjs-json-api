@@ -1,4 +1,9 @@
-import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
 import {
   ObjectTyped,
@@ -8,11 +13,11 @@ import {
 
 import {
   assertIsKeysOfObject,
-  errorSchema,
   jsonSchemaResponse,
 } from '../utils';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
 import { EntityParamMapService } from '../../service';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function getAll<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -264,7 +269,7 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 400,
     description: 'Wrong query parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({

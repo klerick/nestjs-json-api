@@ -4,7 +4,13 @@ import {
   ReferenceObject,
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import {
@@ -14,7 +20,6 @@ import {
 } from '../../../../types';
 
 import {
-  errorSchema,
   jsonSchemaResponse,
   zodToJSONSchemaParams,
 } from '../utils';
@@ -24,6 +29,7 @@ import {
   getJsonApiImmutableFields,
   getJsonApiReadOnlyFields,
 } from '../../decorators';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function patchOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -72,12 +78,12 @@ export function patchOne<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 400,
     description: 'Wrong body parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
     status: 422,
     description: 'Unprocessable data',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 }

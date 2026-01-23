@@ -32,45 +32,6 @@ export function assertIsKeyOfObject<E extends object>(
   if (false) throw new Error(element + 'not exist in ' + object.name);
 }
 
-export const errorSchema = {
-  type: 'object',
-  properties: {
-    statusCode: {
-      type: 'number',
-    },
-    error: {
-      type: 'string',
-    },
-    message: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          code: {
-            type: 'string',
-          },
-          message: {
-            type: 'string',
-          },
-          path: {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-          },
-          keys: {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-          },
-        },
-        required: ['code', 'message', 'path'],
-      },
-    },
-  },
-};
-
 export function jsonSchemaResponse<
   E extends object,
   IdKey extends string = 'id'
@@ -135,7 +96,7 @@ export function jsonSchemaResponse<
       relationships: {
         type: 'object',
         properties: ObjectTyped.keys(
-          relationProperty as RelationProperty<Record<string, unknown>>
+          relationProperty
         ).reduce((acum, name) => {
           const dataItem = {
             type: 'object',

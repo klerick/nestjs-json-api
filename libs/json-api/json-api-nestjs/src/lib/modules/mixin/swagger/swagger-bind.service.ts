@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { DECORATORS } from '@nestjs/swagger/dist/constants';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DiscoveryService } from '@nestjs/core';
 import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { PARAMTYPES_METADATA } from '@nestjs/common/constants';
@@ -20,6 +20,11 @@ import { Bindings } from '../config/bindings';
 
 import { swaggerMethod } from './method';
 import { EntityParamMapService } from '../service';
+import { JsonApiErrorResponseModel } from './error-response-model';
+import {
+  JSON_API_RESPONSE_FROM,
+  JsonApiResponseFromMeta,
+} from '../decorators';
 
 @Injectable()
 export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
@@ -71,7 +76,9 @@ export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
     ApiTags(this.entity.name)(controller);
 
     ApiExtraModels(FilterOperand)(controller);
+    ApiExtraModels(JsonApiErrorResponseModel)(controller);
     ApiExtraModels(createApiModels(this.entity, mapProps))(controller);
+
 
     const { allowMethod = ObjectTyped.keys(Bindings) } = this.config;
     for (const method of ObjectTyped.keys(Bindings)) {
@@ -102,6 +109,55 @@ export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
         controller.prototype,
         method
       );
+    }
+
+    // Process JsonApiResponseFrom decorators on custom methods
+    this.processJsonApiResponseFrom(controller);
+  }
+
+  private processJsonApiResponseFrom(controller: any) {
+    const responseMeta: JsonApiResponseFromMeta | undefined =
+      Reflect.getMetadata(JSON_API_RESPONSE_FROM, controller);
+
+    if (!responseMeta) return;
+
+    const prototype = controller.prototype;
+
+    for (const [targetMethod, sourceMapping] of Object.entries(responseMeta)) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(prototype, targetMethod);
+      if (!descriptor) continue;
+      const targetResponses = Reflect.getMetadata(
+        DECORATORS.API_RESPONSE,
+        descriptor.value
+      );
+      if (!targetResponses) continue;
+
+      for (const [sourceMethod, mappings] of Object.entries(sourceMapping)) {
+        const sourceDescriptor = Reflect.getOwnPropertyDescriptor(
+          prototype,
+          sourceMethod
+        );
+        if (!sourceDescriptor) continue;
+        const sourceResponses = Reflect.getMetadata(
+          DECORATORS.API_RESPONSE,
+          sourceDescriptor.value
+        );
+
+        if (!sourceResponses || !mappings) continue;
+
+        for (const { fromStatus, toStatus } of [...mappings]) {
+          const sourceResponse = sourceResponses[fromStatus];
+          if (!sourceResponse?.schema) continue;
+
+          const existingTarget = targetResponses[toStatus] || {};
+          ApiResponse({
+            status: toStatus,
+            ...existingTarget,
+            schema: sourceResponse.schema,
+          })(prototype, targetMethod, descriptor);
+        }
+      }
+
     }
   }
 }

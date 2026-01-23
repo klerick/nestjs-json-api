@@ -1,4 +1,10 @@
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import {
   ReferenceObject,
   SchemaObject,
@@ -8,9 +14,10 @@ import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
-import { errorSchema, schemaTypeForRelation } from '../utils';
+import { schemaTypeForRelation } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { EntityParamMapService } from '../../service';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function patchRelationship<
   E extends object,
@@ -63,18 +70,18 @@ export function patchRelationship<
   ApiResponse({
     status: 400,
     description: 'Wrong url parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller.prototype, methodName, descriptor);
 
   ApiResponse({
     status: 422,
     description: 'Incorrect type for relation',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller.prototype, methodName, descriptor);
 
   ApiResponse({
     status: 404,
     description: 'Resource not found ',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller.prototype, methodName, descriptor);
 }

@@ -1,10 +1,10 @@
 import { Type } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
-import { errorSchema } from '../utils';
 import { EntityParamMapService } from '../../service';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function deleteOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -32,7 +32,7 @@ export function deleteOne<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 404,
     description: `Item of resource "${entityName}" not found`,
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
@@ -43,6 +43,6 @@ export function deleteOne<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 400,
     description: 'Wrong query parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 }

@@ -1,17 +1,23 @@
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { z } from 'zod';
 import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
 import { zodPatchRelationship } from '../../zod';
-import { errorSchema } from '../utils';
 
 import {
   ReferenceObject,
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { EntityParamMapService } from '../../service';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function deleteRelationship<
   E extends object,
@@ -58,19 +64,19 @@ export function deleteRelationship<
   ApiResponse({
     status: 400,
     description: 'Wrong url parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
     status: 422,
     description: 'Incorrect type for relation',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
     status: 404,
     description: 'Resource not found ',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({

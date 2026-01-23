@@ -1,4 +1,9 @@
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { z } from 'zod';
 import {
   ReferenceObject,
@@ -8,7 +13,6 @@ import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import {
-  errorSchema,
   jsonSchemaResponse,
   zodToJSONSchemaParams,
 } from '../utils';
@@ -16,6 +20,7 @@ import { zodPost } from '../../zod';
 import { EntityParamMapService } from '../../service';
 import { getJsonApiImmutableFields, getJsonApiReadOnlyFields } from '../../decorators';
 import { ExtractJsonApiImmutableKeys, ExtractJsonApiReadOnlyKeys } from '../../../../types';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function postOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -56,12 +61,12 @@ export function postOne<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 400,
     description: 'Wrong body parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
     status: 422,
     description: 'Unprocessable data',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 }

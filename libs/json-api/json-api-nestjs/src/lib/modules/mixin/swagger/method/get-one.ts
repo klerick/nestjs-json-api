@@ -1,10 +1,17 @@
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { Type } from '@nestjs/common';
 
-import { errorSchema, jsonSchemaResponse } from '../utils';
+import { jsonSchemaResponse } from '../utils';
 import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
+import { JsonApiErrorResponseModel } from '../error-response-model';
 
 export function getOne<E extends object, IdKey extends string = 'id'>(
   controller: Type<any>,
@@ -102,13 +109,13 @@ export function getOne<E extends object, IdKey extends string = 'id'>(
   ApiResponse({
     status: 404,
     description: `Item of resource "${entityName}" not found`,
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
     status: 400,
     description: 'Wrong query parameters',
-    schema: errorSchema,
+    schema: { $ref: getSchemaPath(JsonApiErrorResponseModel) },
   })(controller, methodName, descriptor);
 
   ApiResponse({
