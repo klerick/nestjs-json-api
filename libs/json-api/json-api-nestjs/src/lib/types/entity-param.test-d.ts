@@ -69,7 +69,6 @@ expectNotAssignable<RelationProperty<Users>>(incorrectRelationProps);
 
 const checkEntityRelationProps = {
   manager: [
-    'id',
     'testArrayNull',
     'lastName',
     'isActive',
@@ -80,10 +79,9 @@ const checkEntityRelationProps = {
     'createdAt',
     'updatedAt',
   ],
-  roles: ['id', 'createdAt', 'updatedAt', 'name', 'key', 'isDefault'],
-  comments: ['id', 'createdAt', 'updatedAt', 'kind', 'userId'],
+  roles: ['createdAt', 'updatedAt', 'name', 'key', 'isDefault'],
+  comments: [ 'createdAt', 'updatedAt', 'kind', 'userId'],
   addresses: [
-    'id',
     'createdAt',
     'updatedAt',
     'city',
@@ -91,7 +89,7 @@ const checkEntityRelationProps = {
     'country',
     'arrayField',
   ],
-  userGroup: ['id', 'label'],
+  userGroup: ['label'],
 } satisfies EntityRelationProps<Users, 'id'>;
 
 expectAssignable<EntityRelationProps<Users, 'id'>>(checkEntityRelationProps);
