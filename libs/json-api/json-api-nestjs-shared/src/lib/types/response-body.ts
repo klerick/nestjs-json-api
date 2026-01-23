@@ -1,5 +1,5 @@
 import {
-  PropertyKeys,
+  AttrKeys,
   RelationKeys,
   IsIterator,
   CastIteratorType,
@@ -48,7 +48,7 @@ export type BaseLinks = {
 };
 
 export type Attributes<Entity extends object, IdKey extends string = 'id'> = {
-  [P in Exclude<PropertyKeys<Entity>, IdKey>]?: Entity[P];
+  [P in Exclude<AttrKeys<Entity>, IdKey>]?: Entity[P];
 };
 
 export type BaseAttribute<

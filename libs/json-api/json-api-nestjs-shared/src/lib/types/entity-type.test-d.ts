@@ -3,7 +3,7 @@ import { Any } from 'ts-toolbelt';
 
 import { Users } from '../utils/___test___/test-classes.helper';
 
-import { RelationKeys, PropertyKeys, IsIterator } from './entity-type';
+import { RelationKeys, AttrKeys, IsIterator } from './entity-type';
 import type { Collection } from '@mikro-orm/core';
 
 type RelationId = 'addresses' | 'manager' | 'roles' | 'comments' | 'userGroup';
@@ -44,12 +44,12 @@ type IsNoEqualsRelationName = Any.Equals<
   'comments'
 >;
 
-type IsEqualsPropertyId = Any.Equals<PropertyKeys<Users>, PropertyId>;
+type IsEqualsPropertyId = Any.Equals<AttrKeys<Users>, PropertyId>;
 type IsEqualsPropertyName = Any.Equals<
-  PropertyKeys<Users, 'name'>,
+  AttrKeys<Users, 'name'>,
   PropertyName
 >;
-type IsNoEqualsPropertyName = Any.Equals<PropertyKeys<Users, 'name'>, 'roles'>;
+type IsNoEqualsPropertyName = Any.Equals<AttrKeys<Users, 'name'>, 'roles'>;
 
 expectType<IsEqualsRelationId>(1);
 expectType<IsEqualsRelationName>(1);

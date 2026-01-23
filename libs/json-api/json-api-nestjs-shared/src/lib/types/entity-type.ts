@@ -35,7 +35,12 @@ export type RelationKeys<E, IdKey extends string = 'id'> = {
 
 export type PropertyKeys<E, IdKey extends string = 'id'> = Exclude<
   StringKeys<E>,
-  RelationKeys<E, IdKey> | FunctionKeys<E> | IdKey
+  RelationKeys<E, IdKey> | FunctionKeys<E>
+>;
+
+export type AttrKeys<E, IdKey extends string = 'id'> = Exclude<
+  PropertyKeys<E, IdKey>,
+  IdKey
 >;
 
 export type IsIterator<T> = T extends {
