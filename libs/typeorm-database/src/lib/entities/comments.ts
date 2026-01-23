@@ -64,7 +64,7 @@ export class Comments {
   @JoinColumn({
     name: 'created_by',
   })
-  public createdBy!: IUsers;
+  public createdBy!: IUsers | null;
 
   @RelationId((item: Comments) => item.createdBy, 'created_by')
   public createdById!: number;
