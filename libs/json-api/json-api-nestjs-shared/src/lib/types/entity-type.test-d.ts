@@ -9,7 +9,6 @@ import type { Collection } from '@mikro-orm/core';
 type RelationId = 'addresses' | 'manager' | 'roles' | 'comments' | 'userGroup';
 type RelationName = 'roles';
 type PropertyId =
-  | 'id'
   | 'login'
   | 'firstName'
   | 'testReal'

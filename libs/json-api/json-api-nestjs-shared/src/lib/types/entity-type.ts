@@ -1,14 +1,17 @@
-import { Any } from 'ts-toolbelt';
+export type HasId<T, IdKey extends string> = IdKey extends keyof T ? 1 : 0;
 
-export type HasId<T, IdKey extends string> = Any.At<T, IdKey> extends undefined
-  ? 0
-  : 1;
+// Unwrap MikroORM Ref/Reference - cheap check first, then inference
+type UnwrapReference<T> = T extends { unwrap: Function }
+  ? T extends { unwrap(): infer U }
+    ? U & {} // & {} prevents deep evaluation
+    : T
+  : T;
 
 export type CastIteratorType<T> = T extends {
   [Symbol.iterator](): Iterator<infer U>;
 }
   ? U
-  : T;
+  : UnwrapReference<T>;
 
 type RelationCheck<T, IdKey extends string> = T extends never
   ? 0
@@ -16,17 +19,23 @@ type RelationCheck<T, IdKey extends string> = T extends never
   ? RelationCheck<U, IdKey>
   : HasId<Exclude<CastIteratorType<T>, undefined>, IdKey>;
 
+type StringKeys<E> = Extract<keyof E, string>;
+
+type FunctionKeys<E> = {
+  [K in StringKeys<E>]: E[K] extends Function ? K : never;
+}[StringKeys<E>];
+
 export type RelationKeys<E, IdKey extends string = 'id'> = {
-  [K in keyof E]: Exclude<E[K], null> extends never
+  [K in StringKeys<E>]: Exclude<E[K], null> extends never
     ? never
     : RelationCheck<Exclude<E[K], null>, IdKey> extends 1
     ? K
     : never;
-}[keyof E];
+}[StringKeys<E>];
 
-export type PropertyKeys<E, IdKey extends string = 'id'> = keyof Omit<
-  E,
-  RelationKeys<E, IdKey>
+export type PropertyKeys<E, IdKey extends string = 'id'> = Exclude<
+  StringKeys<E>,
+  RelationKeys<E, IdKey> | FunctionKeys<E> | IdKey
 >;
 
 export type IsIterator<T> = T extends {
