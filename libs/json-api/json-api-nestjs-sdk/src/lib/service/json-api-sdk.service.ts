@@ -53,30 +53,18 @@ export class JsonApiSdkService {
     }) as unknown as EntityChain<E, OutputE>;
   }
 
-  public getList<
-    Entity extends object,
-    OutputEntity extends Entity = Entity,
-    IdKey extends string = 'id'
-  >(
+  public getList<Entity extends object, IdKey extends string = 'id'>(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>
-  ): Observable<EntityArray<OutputEntity>>;
-  public getList<
-    Entity extends object,
-    OutputEntity extends Entity = Entity,
-    IdKey extends string = 'id'
-  >(
+  ): Observable<EntityArray<Entity>>;
+  public getList<Entity extends object, IdKey extends string = 'id'>(
     typeName: string,
     params?: QueryParams<Entity>
-  ): Observable<EntityArray<OutputEntity>>;
-  public getList<
-    Entity extends object,
-    OutputEntity extends Entity = Entity,
-    IdKey extends string = 'id'
-  >(
+  ): Observable<EntityArray<Entity>>;
+  public getList<Entity extends object, IdKey extends string = 'id'>(
     entityOrTypeName: EntityClass<Entity> | string,
     params?: QueryParams<Entity>
-  ): Observable<EntityArray<OutputEntity>> {
+  ): Observable<EntityArray<Entity>> {
     const name =
       typeof entityOrTypeName === 'string'
         ? entityOrTypeName
@@ -91,53 +79,49 @@ export class JsonApiSdkService {
         }
       )
       .pipe(
-        map<
-          ResourceObject<Entity, 'array', null, IdKey>,
-          EntityArray<OutputEntity>
-        >((result) => {
-          const resource = params
-            ? this.jsonApiUtilsService.convertResponseData(
-                result,
-                params.include
-              )
-            : this.jsonApiUtilsService.convertResponseData(result);
-          const { totalItems, pageSize, pageNumber } = Object.assign(
-            {
-              totalItems: 0,
-              pageNumber: 0,
-              pageSize: 0,
-            },
-            result.meta
-          );
+        map<ResourceObject<Entity, 'array', null, IdKey>, EntityArray<Entity>>(
+          (result) => {
+            const resource = params
+              ? this.jsonApiUtilsService.convertResponseData(
+                  result,
+                  params.include
+                )
+              : this.jsonApiUtilsService.convertResponseData(result);
+            const { totalItems, pageSize, pageNumber } = Object.assign(
+              {
+                totalItems: 0,
+                pageNumber: 0,
+                pageSize: 0,
+              },
+              result.meta
+            );
 
-          return new EntityArray<OutputEntity>(resource as OutputEntity[], {
-            totalItems,
-            pageNumber,
-            pageSize,
-          });
-        })
+            return new EntityArray<Entity>(resource, {
+              totalItems,
+              pageNumber,
+              pageSize,
+            });
+          }
+        )
       );
   }
 
-  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+  getAll<Entity extends object>(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>,
     push?: boolean
-  ): Observable<EntityArray<OutputEntity>>;
-  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Observable<EntityArray<Entity>>;
+  getAll<Entity extends object>(
     typeName: string,
     params?: QueryParams<Entity>,
     push?: boolean
-  ): Observable<EntityArray<OutputEntity>>;
-  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Observable<EntityArray<Entity>>;
+  getAll<Entity extends object>(
     entityOrTypeName: EntityClass<Entity> | string,
     params?: QueryParams<Entity>,
     push = true
-  ): Observable<EntityArray<OutputEntity>> {
-    const request = this.getList<Entity, OutputEntity>(
-      entityOrTypeName as any,
-      params
-    ).pipe(
+  ): Observable<EntityArray<Entity>> {
+    const request = this.getList<Entity>(entityOrTypeName as any, params).pipe(
       expand((r) => {
         if (r.pageNumber * r.pageSize >= r.totalItems) {
           return EMPTY;
@@ -151,16 +135,13 @@ export class JsonApiSdkService {
             },
           },
         };
-        return this.getList<Entity, OutputEntity>(
-          entityOrTypeName as any,
-          newParams
-        );
+        return this.getList<Entity>(entityOrTypeName as any, newParams);
       })
     );
 
     if (!push) {
       return request.pipe(
-        reduce<OutputEntity[]>((acum, item) => {
+        reduce<Entity[]>((acum, item) => {
           if (!acum && !Array.isArray(acum)) {
             acum = [];
           }
@@ -169,7 +150,7 @@ export class JsonApiSdkService {
         }),
         map(
           (r) =>
-            new EntityArray<OutputEntity>(r, {
+            new EntityArray<Entity>(r, {
               pageSize: r.length,
               pageNumber: 1,
               totalItems: r.length,
@@ -181,21 +162,21 @@ export class JsonApiSdkService {
     return request;
   }
 
-  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+  getOne<Entity extends object>(
     entity: EntityClass<Entity>,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Observable<OutputEntity>;
-  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Observable<Entity>;
+  getOne<Entity extends object>(
     typeName: string,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Observable<OutputEntity>;
-  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Observable<Entity>;
+  getOne<Entity extends object>(
     entityOrTypeName: EntityClass<Entity> | string,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Observable<OutputEntity> {
+  ): Observable<Entity> {
     if (!id) {
       return throwError(() => new Error('Id for resource is required'));
     }
@@ -214,12 +195,8 @@ export class JsonApiSdkService {
         }
       )
       .pipe(
-        map(
-          (result) =>
-            this.jsonApiUtilsService.convertResponseData(
-              result,
-              params?.include
-            ) as OutputEntity
+        map((result) =>
+          this.jsonApiUtilsService.convertResponseData(result, params?.include)
         )
       );
   }

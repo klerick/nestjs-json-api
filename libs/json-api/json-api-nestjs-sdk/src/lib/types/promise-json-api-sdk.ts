@@ -7,40 +7,40 @@ import { PromiseEntityChain } from './entity-chain';
 
 /**
  * JsonApiSdkService with Promise return types
- * Methods support separate Input and Output types via generics.
+ * POST/PATCH methods support separate Input and Output types via generics.
  * If OutputEntity is not specified, it defaults to the same as Entity.
  */
 export interface PromiseJsonApiSdkService {
-  getList<Entity extends object, OutputEntity extends Entity = Entity>(
+  getList<Entity extends object>(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>
-  ): Promise<EntityArray<OutputEntity>>;
-  getList<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Promise<EntityArray<Entity>>;
+  getList<Entity extends object>(
     typeName: string,
     params?: QueryParams<Entity>
-  ): Promise<EntityArray<OutputEntity>>;
+  ): Promise<EntityArray<Entity>>;
 
-  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+  getAll<Entity extends object>(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>,
     push?: boolean
-  ): Promise<EntityArray<OutputEntity>>;
-  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Promise<EntityArray<Entity>>;
+  getAll<Entity extends object>(
     typeName: string,
     params?: QueryParams<Entity>,
     push?: boolean
-  ): Promise<EntityArray<OutputEntity>>;
+  ): Promise<EntityArray<Entity>>;
 
-  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+  getOne<Entity extends object>(
     entity: EntityClass<Entity>,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Promise<OutputEntity>;
-  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+  ): Promise<Entity>;
+  getOne<Entity extends object>(
     typeName: string,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Promise<OutputEntity>;
+  ): Promise<Entity>;
 
   postOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
