@@ -34,6 +34,10 @@ Type-safe TypeScript/JavaScript client for consuming [JSON:API](https://jsonapi.
   - [Updating Resources](#updating-resources)
   - [Deleting Resources](#deleting-resources)
   - [Relationship Operations](#relationship-operations)
+- [Working with Plain Objects](#-working-with-plain-objects)
+  - [Using entity() Method](#using-entity-method)
+  - [Using String Type Names](#using-string-type-names)
+- [Nullifying Relationships](#-nullifying-relationships)
 - [Query Options](#-query-options)
   - [Filtering](#filtering)
   - [Sorting](#sorting)
@@ -379,6 +383,148 @@ await jsonSdk.jonApiSdkService.deleteRelationships(user, 'manager');
 
 // Remove all comments from user
 await jsonSdk.jonApiSdkService.deleteRelationships(user, 'comments');
+```
+
+---
+
+## 🏗️ Working with Plain Objects
+
+In monorepo environments or when sharing types between frontend and backend, you may want to use plain TypeScript types/interfaces instead of classes. The SDK provides tools to work with plain objects while maintaining full type safety.
+
+### Using entity() Method
+
+The `entity()` method creates a properly typed entity instance from a plain object. This is essential when:
+- You share types (not classes) between frontend and backend
+- The SDK needs to identify the resource type at runtime (via `constructor.name`)
+
+```typescript
+import { JsonApiJs } from '@klerick/json-api-nestjs-sdk';
+
+// Shared type (not a class)
+interface User {
+  id?: number;
+  firstName: string;
+  lastName: string;
+  login: string;
+  manager?: User | null;
+}
+
+const jsonSdk = JsonApiJs({ apiHost: 'http://localhost:3000', apiPrefix: 'api' }, true);
+
+// Create entity from plain object - chainable API
+const createdUser = await jsonSdk.jonApiSdkService
+  .entity<User>('Users', {
+    firstName: 'John',
+    lastName: 'Doe',
+    login: 'johndoe'
+  })
+  .postOne();
+
+// Update entity - chainable API
+const updatedUser = await jsonSdk.jonApiSdkService
+  .entity<User>('Users', {
+    id: 1,
+    firstName: 'Jane'
+  })
+  .patchOne();
+
+// Delete entity - chainable API
+await jsonSdk.jonApiSdkService
+  .entity<User>('Users', { id: 1 })
+  .deleteOne();
+
+// Work with relationships
+const userRelations = await jsonSdk.jonApiSdkService
+  .entity<User>('Users', { id: 1 })
+  .getRelationships('manager');
+```
+
+**Raw mode** - get the entity instance without chaining:
+
+```typescript
+// Get raw entity instance (third argument = true)
+const userEntity = jsonSdk.jonApiSdkService.entity<User>('Users', {
+  firstName: 'John',
+  lastName: 'Doe',
+  login: 'johndoe'
+}, true);
+
+// Now use it with standard SDK methods
+const created = await jsonSdk.jonApiSdkService.postOne(userEntity);
+```
+
+### Using String Type Names
+
+GET methods also accept string type names instead of classes:
+
+```typescript
+// Using string type name
+const users = await jsonSdk.jonApiSdkService.getAll<User>('Users', {
+  include: ['manager']
+});
+
+const user = await jsonSdk.jonApiSdkService.getOne<User>('Users', '1', {
+  include: ['manager']
+});
+
+const userList = await jsonSdk.jonApiSdkService.getList<User>('Users', {
+  page: { number: 1, size: 10 }
+});
+```
+
+---
+
+## 🔗 Nullifying Relationships
+
+To clear a relationship (set it to `null`), use the `nullRef()` function. This is necessary because the SDK distinguishes between:
+- **Missing relationship** - not included in the request (no change)
+- **Null relationship** - explicitly set to `null` (clear the relationship)
+
+```typescript
+import { JsonApiJs, nullRef } from '@klerick/json-api-nestjs-sdk';
+
+interface User {
+  id?: number;
+  firstName: string;
+  manager?: User | null;
+}
+
+const jsonSdk = JsonApiJs({ apiHost: 'http://localhost:3000', apiPrefix: 'api' }, true);
+
+// Clear the manager relationship
+const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+  id: 1,
+  firstName: 'John',
+  manager: nullRef()  // This will send { data: null } for the relationship
+}, true);
+
+const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+// Result: user.manager is now null
+```
+
+**How it works:**
+- `nullRef()` returns a special marker object that TypeScript sees as `null`
+- At runtime, the SDK detects this marker and generates `{ data: null }` in the JSON:API request body
+- The server then clears the relationship
+
+**Without nullRef:**
+```typescript
+// This won't clear the relationship - it will be ignored
+const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+  id: 1,
+  firstName: 'John',
+  // manager is undefined - not included in request
+}, true);
+```
+
+**With nullRef:**
+```typescript
+// This explicitly clears the relationship
+const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+  id: 1,
+  firstName: 'John',
+  manager: nullRef()  // Generates: relationships: { manager: { data: null } }
+}, true);
 ```
 
 ---

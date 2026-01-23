@@ -104,16 +104,16 @@ export class AtomicOperationsService<T extends unknown[]>
     );
   }
 
-  public patchOne<Entity extends object>(
+  public patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperations<[...T, Entity]> {
-    return this.setToBody('patchOne', entity);
+  ): AtomicOperations<[...T, OutputEntity]> {
+    return this.setToBody<Entity, OutputEntity>('patchOne', entity);
   }
 
-  public postOne<Entity extends object>(
+  public postOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperations<[...T, Entity]> {
-    return this.setToBody('postOne', entity);
+  ): AtomicOperations<[...T, OutputEntity]> {
+    return this.setToBody<Entity, OutputEntity>('postOne', entity);
   }
 
   public deleteRelationships<
@@ -152,10 +152,13 @@ export class AtomicOperationsService<T extends unknown[]>
     entity: Entity,
     skipEmpty: boolean
   ): AtomicOperations<[...T, 'EMPTY']>;
-  private setToBody<Entity extends object>(
+  private setToBody<
+    Entity extends object,
+    OutputEntity extends Entity = Entity
+  >(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteOne'>,
     entity: Entity
-  ): AtomicOperations<[...T, Entity]>;
+  ): AtomicOperations<[...T, OutputEntity]>;
   private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: Extract<keyof AtomicVoidOperation, 'deleteRelationships'>,
     entity: Entity,
@@ -166,15 +169,21 @@ export class AtomicOperationsService<T extends unknown[]>
     entity: Entity,
     relationType: Rel
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>;
-  private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
+  private setToBody<
+    Entity extends object,
+    OutputEntityOrRel extends Entity | RelationKeys<Entity> = Entity
+  >(
     operationType: keyof AtomicVoidOperation,
     entity: Entity,
-    relationType?: Rel | boolean
+    relationType?: OutputEntityOrRel | boolean
   ):
     | AtomicOperations<[...T, Entity]>
-    | AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>
+    | AtomicOperations<
+        [...T, ReturnIfArray<Entity[OutputEntityOrRel & RelationKeys<Entity>], string>]
+      >
     | AtomicOperations<[...T]>
     | AtomicOperations<[...T, 'EMPTY']> {
+    type Rel = OutputEntityOrRel & RelationKeys<Entity>;
     const atomicBody = new GenerateAtomicBody<Entity, Rel>(
       this.jsonApiUtilsService,
       this.jsonApiSdkConfig
@@ -189,7 +198,8 @@ export class AtomicOperationsService<T extends unknown[]>
         case 'postRelationships':
         case 'patchRelationships':
         case 'deleteRelationships':
-          if (relationType) atomicBody[operationType](entity, relationType);
+          if (relationType)
+            atomicBody[operationType](entity, relationType as Rel);
           break;
         default:
           atomicBody[operationType](entity, true);

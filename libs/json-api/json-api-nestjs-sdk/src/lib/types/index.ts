@@ -7,3 +7,4 @@ export * from './config';
 export * from './query-params';
 export * from './promise-json-api-sdk';
 export * from './filter-operand';
+export * from './entity-chain';

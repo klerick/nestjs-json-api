@@ -12,12 +12,12 @@ export interface AtomicRunPromise<T extends unknown[]> {
 }
 
 export interface AtomicMainOperations<T extends unknown[]> {
-  postOne<Entity extends object>(
+  postOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperations<[...T, Entity]>;
-  patchOne<Entity extends object>(
+  ): AtomicOperations<[...T, OutputEntity]>;
+  patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperations<[...T, Entity]>;
+  ): AtomicOperations<[...T, OutputEntity]>;
 
   deleteOne<Entity extends object>(entity: Entity): AtomicOperations<[...T]>;
   deleteOne<Entity extends object>(
@@ -44,12 +44,12 @@ export interface AtomicMainOperations<T extends unknown[]> {
 }
 
 export interface AtomicMainOperationsPromise<T extends unknown[]> {
-  postOne<Entity extends object>(
+  postOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperationsPromise<[...T, Entity]>;
-  patchOne<Entity extends object>(
+  ): AtomicOperationsPromise<[...T, OutputEntity]>;
+  patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
-  ): AtomicOperationsPromise<[...T, Entity]>;
+  ): AtomicOperationsPromise<[...T, OutputEntity]>;
   deleteOne<Entity extends object>(
     entity: Entity
   ): AtomicOperationsPromise<[...T]>;

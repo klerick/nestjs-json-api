@@ -17,7 +17,7 @@ import {
   ReturnIfArray,
 } from '../types';
 
-import { getTypeForReq, HttpParams, isRelation } from '../utils';
+import { getTypeForReq, HttpParams, isRelation, isNullRef } from '../utils';
 import { ID_KEY } from '../constants';
 
 type Attributes<E extends object> = BaseAttribute<E>['attributes'];
@@ -322,7 +322,9 @@ export class JsonApiUtilsService {
       })
       .reduce((acum, [key, val]) => {
         let data;
-        if (Array.isArray(val)) {
+        if (isNullRef(val)) {
+          data = null;
+        } else if (Array.isArray(val)) {
           data = val.map((i: any) => ({
             type: getTypeForReq(i.constructor.name),
             id: i[ID_KEY].toString(),

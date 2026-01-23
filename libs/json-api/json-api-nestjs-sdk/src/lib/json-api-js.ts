@@ -64,8 +64,30 @@ export function JsonApiJs<P extends true | boolean>(
         R extends FunctionPropertyNames<PromiseJsonApiSdkService>,
         K extends FunctionProperty<T, R>
       >(target: T, p: R): PromiseJsonApiSdkService[R] {
+        // Special handling for entity() method - it returns EntityChain, not Observable
+        if (p === 'entity') {
+          return ((...args: any): any => {
+            const result = (target as any).entity(...args);
+            // If raw mode (third arg is true), return entity as-is
+            if (args[2] === true) {
+              return result;
+            }
+            // Chain mode - wrap chain methods to return Promise instead of Observable
+            return new Proxy(result, {
+              get(chainTarget: any, chainMethod: string) {
+                const fn = chainTarget[chainMethod];
+                if (typeof fn === 'function') {
+                  return (...chainArgs: any) =>
+                    lastValueFrom(fn.call(chainTarget, ...chainArgs));
+                }
+                return fn;
+              },
+            });
+          }) as any;
+        }
+
         return (...arg: any): any =>
-          lastValueFrom((target[p] as K).apply(target, arg));
+          lastValueFrom((target[p] as any).apply(target, arg));
       },
     });
 

@@ -15,6 +15,7 @@ import {
   QueryParamsForOneItem,
   RelationBodyData,
   ReturnIfArray,
+  EntityChain,
 } from '../types';
 import { EntityArray, getTypeForReq } from '../utils';
 import { JsonApiUtilsService } from './json-api-utils.service';
@@ -26,53 +27,117 @@ export class JsonApiSdkService {
     private jsonApiSdkConfig: JsonApiSdkConfig
   ) {}
 
-  public getList<Entity extends object, IdKey extends string = 'id'>(
+  public entity<E extends object, OutputE extends E = E>(
+    typeName: string,
+    data: E
+  ): EntityChain<E, OutputE>;
+  public entity<E extends object>(typeName: string, data: E, raw: true): E;
+  public entity<E extends object, OutputE extends E = E>(
+    typeName: string,
+    data: E,
+    raw?: boolean
+  ): EntityChain<E, OutputE> | E {
+    const instance = this.jsonApiUtilsService.createEntityInstance<E>(typeName);
+    const entityObj = Object.assign(instance, data);
+
+    if (raw) return entityObj;
+
+    return new Proxy(this, {
+      get: (target, method: string) => {
+        const fn = (target as any)[method];
+        if (typeof fn === 'function') {
+          return (...args: unknown[]) => fn.call(target, entityObj, ...args);
+        }
+        return fn;
+      },
+    }) as unknown as EntityChain<E, OutputE>;
+  }
+
+  public getList<
+    Entity extends object,
+    OutputEntity extends Entity = Entity,
+    IdKey extends string = 'id'
+  >(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>
-  ): Observable<EntityArray<Entity>> {
+  ): Observable<EntityArray<OutputEntity>>;
+  public getList<
+    Entity extends object,
+    OutputEntity extends Entity = Entity,
+    IdKey extends string = 'id'
+  >(
+    typeName: string,
+    params?: QueryParams<Entity>
+  ): Observable<EntityArray<OutputEntity>>;
+  public getList<
+    Entity extends object,
+    OutputEntity extends Entity = Entity,
+    IdKey extends string = 'id'
+  >(
+    entityOrTypeName: EntityClass<Entity> | string,
+    params?: QueryParams<Entity>
+  ): Observable<EntityArray<OutputEntity>> {
+    const name =
+      typeof entityOrTypeName === 'string'
+        ? entityOrTypeName
+        : entityOrTypeName.name;
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
 
     return this.http
       .get<Entity, 'array', IdKey>(
-        this.jsonApiUtilsService.getUrlForResource(entity.name),
+        this.jsonApiUtilsService.getUrlForResource(name),
         {
           params: query.toObject(),
         }
       )
       .pipe(
-        map<ResourceObject<Entity, 'array', null, IdKey>, EntityArray<Entity>>(
-          (result) => {
-            const resource = params
-              ? this.jsonApiUtilsService.convertResponseData(
-                  result,
-                  params.include
-                )
-              : this.jsonApiUtilsService.convertResponseData(result);
-            const { totalItems, pageSize, pageNumber } = Object.assign(
-              {
-                totalItems: 0,
-                pageNumber: 0,
-                pageSize: 0,
-              },
-              result.meta
-            );
+        map<
+          ResourceObject<Entity, 'array', null, IdKey>,
+          EntityArray<OutputEntity>
+        >((result) => {
+          const resource = params
+            ? this.jsonApiUtilsService.convertResponseData(
+                result,
+                params.include
+              )
+            : this.jsonApiUtilsService.convertResponseData(result);
+          const { totalItems, pageSize, pageNumber } = Object.assign(
+            {
+              totalItems: 0,
+              pageNumber: 0,
+              pageSize: 0,
+            },
+            result.meta
+          );
 
-            return new EntityArray<Entity>(resource, {
-              totalItems,
-              pageNumber,
-              pageSize,
-            });
-          }
-        )
+          return new EntityArray<OutputEntity>(resource as OutputEntity[], {
+            totalItems,
+            pageNumber,
+            pageSize,
+          });
+        })
       );
   }
 
-  getAll<Entity extends object>(
+  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: EntityClass<Entity>,
     params?: QueryParams<Entity>,
+    push?: boolean
+  ): Observable<EntityArray<OutputEntity>>;
+  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+    typeName: string,
+    params?: QueryParams<Entity>,
+    push?: boolean
+  ): Observable<EntityArray<OutputEntity>>;
+  getAll<Entity extends object, OutputEntity extends Entity = Entity>(
+    entityOrTypeName: EntityClass<Entity> | string,
+    params?: QueryParams<Entity>,
     push = true
-  ): Observable<EntityArray<Entity>> {
-    const request = this.getList(entity, params).pipe(
+  ): Observable<EntityArray<OutputEntity>> {
+    const request = this.getList<Entity, OutputEntity>(
+      entityOrTypeName as any,
+      params
+    ).pipe(
       expand((r) => {
         if (r.pageNumber * r.pageSize >= r.totalItems) {
           return EMPTY;
@@ -86,13 +151,16 @@ export class JsonApiSdkService {
             },
           },
         };
-        return this.getList(entity, newParams);
+        return this.getList<Entity, OutputEntity>(
+          entityOrTypeName as any,
+          newParams
+        );
       })
     );
 
     if (!push) {
       return request.pipe(
-        reduce<Entity[]>((acum, item) => {
+        reduce<OutputEntity[]>((acum, item) => {
           if (!acum && !Array.isArray(acum)) {
             acum = [];
           }
@@ -101,7 +169,7 @@ export class JsonApiSdkService {
         }),
         map(
           (r) =>
-            new EntityArray<Entity>(r, {
+            new EntityArray<OutputEntity>(r, {
               pageSize: r.length,
               pageNumber: 1,
               totalItems: r.length,
@@ -113,32 +181,52 @@ export class JsonApiSdkService {
     return request;
   }
 
-  getOne<Entity extends object>(
+  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: EntityClass<Entity>,
     id: string | number,
     params?: QueryParamsForOneItem<Entity>
-  ): Observable<Entity> {
+  ): Observable<OutputEntity>;
+  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+    typeName: string,
+    id: string | number,
+    params?: QueryParamsForOneItem<Entity>
+  ): Observable<OutputEntity>;
+  getOne<Entity extends object, OutputEntity extends Entity = Entity>(
+    entityOrTypeName: EntityClass<Entity> | string,
+    id: string | number,
+    params?: QueryParamsForOneItem<Entity>
+  ): Observable<OutputEntity> {
     if (!id) {
       return throwError(() => new Error('Id for resource is required'));
     }
 
+    const name =
+      typeof entityOrTypeName === 'string'
+        ? entityOrTypeName
+        : entityOrTypeName.name;
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
 
     return this.http
       .get<Entity>(
-        `${this.jsonApiUtilsService.getUrlForResource(entity.name)}/${id}`,
+        `${this.jsonApiUtilsService.getUrlForResource(name)}/${id}`,
         {
           params: query.toObject(),
         }
       )
       .pipe(
-        map((result) =>
-          this.jsonApiUtilsService.convertResponseData(result, params?.include)
+        map(
+          (result) =>
+            this.jsonApiUtilsService.convertResponseData(
+              result,
+              params?.include
+            ) as OutputEntity
         )
       );
   }
 
-  public postOne<Entity extends object>(entity: Entity): Observable<Entity> {
+  public postOne<Entity extends object, OutputEntity extends Entity = Entity>(
+    entity: Entity
+  ): Observable<OutputEntity> {
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
     const body = {
@@ -154,10 +242,14 @@ export class JsonApiSdkService {
         this.jsonApiUtilsService.getUrlForResource(entity.constructor.name),
         body
       )
-      .pipe(map((r) => this.jsonApiUtilsService.convertResponseData(r)));
+      .pipe(
+        map((r) => this.jsonApiUtilsService.convertResponseData(r) as OutputEntity)
+      );
   }
 
-  public patchOne<Entity extends object>(entity: Entity): Observable<Entity> {
+  public patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
+    entity: Entity
+  ): Observable<OutputEntity> {
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (!id) {
       return throwError(
@@ -193,7 +285,9 @@ export class JsonApiSdkService {
         )}/${id}`,
         body
       )
-      .pipe(map((r) => this.jsonApiUtilsService.convertResponseData(r)));
+      .pipe(
+        map((r) => this.jsonApiUtilsService.convertResponseData(r) as OutputEntity)
+      );
   }
 
   public deleteOne<Entity extends object>(entity: Entity): Observable<void> {
