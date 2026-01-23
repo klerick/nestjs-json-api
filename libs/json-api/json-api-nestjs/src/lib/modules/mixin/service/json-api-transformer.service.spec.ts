@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApplicationConfig } from '@nestjs/core';
 import { faker } from '@faker-js/faker';
-import { PropertyKeys } from '@klerick/json-api-nestjs-shared';
+import { AttrKeys } from '@klerick/json-api-nestjs-shared';
 import { JsonApiTransformerService } from './json-api-transformer.service';
 import { EntityParamMapService } from './entity-param-map.service';
 import { usersEntityParamMapMockData } from '../../../utils/___test___/test.helper';
@@ -67,7 +67,7 @@ describe('JsonApiTransformerService - extractAttributes', () => {
 
   describe('extractAttributes', () => {
     it('should extract specified fields from an object', () => {
-      const fields: PropertyKeys<Users, 'id'>[] = [
+      const fields: AttrKeys<Users, 'id'>[] = [
         'firstName',
         'lastName',
         'login',

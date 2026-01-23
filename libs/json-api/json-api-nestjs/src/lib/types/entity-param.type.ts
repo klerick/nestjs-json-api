@@ -1,6 +1,6 @@
 import { Union, Object } from 'ts-toolbelt';
 import {
-  PropertyKeys,
+  AttrKeys,
   RelationKeys,
   IsIterator,
   Constructor,
@@ -66,18 +66,18 @@ type TypeProps<T> = T extends Date
   : TypeField.object;
 
 export type PropertyWithType<E extends object, IdKey extends string = 'id'> = {
-  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
+  [K in AttrKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
     ? TypeField.null
     : TypeProps<ExtractBaseType<Exclude<E[K], null | undefined>>>;
 };
 
 export type ArrayProperty<E extends object, IdKey extends string = 'id'> = {
-  [K in PropertyKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
+  [K in AttrKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends never
     ? never
     : IsArray<Exclude<E[K], null | undefined>> extends 1
     ? K
     : never;
-}[PropertyKeys<E, IdKey>];
+}[AttrKeys<E, IdKey>];
 
 export type ArrayPropertyType<E extends object, IdKey extends string = 'id'> = {
   [K in ArrayProperty<E, IdKey>]: TypeProps<CastArrayType<Exclude<E[K], null | undefined>>>;
@@ -86,7 +86,7 @@ export type ArrayPropertyType<E extends object, IdKey extends string = 'id'> = {
 export type NullableProperty<
   E extends object,
   IdKey extends string = 'id'
-> = Union.Intersect<Object.NullableKeys<E>, PropertyKeys<E, IdKey>>;
+> = Union.Intersect<Object.NullableKeys<E>, AttrKeys<E, IdKey>>;
 
 export type RelationProperty<E extends object, IdKey extends string = 'id'> = {
   [K in RelationKeys<E, IdKey>]: {
@@ -110,7 +110,7 @@ type PrimaryType<
   : TypeField.string;
 
 export type EntityParam<E extends object, IdKey extends string = 'id'> = {
-  props: UnionToTuple<PropertyKeys<E, IdKey>>;
+  props: UnionToTuple<AttrKeys<E, IdKey>>;
   propsType: PropertyWithType<E, IdKey>;
   propsArrayType: ArrayPropertyType<E, IdKey>;
   propsNullable: UnionToTuple<NullableProperty<E, IdKey>>;
@@ -139,6 +139,6 @@ export type EntityRelationProps<
   IdKey extends string = 'id'
 > = {
   [K in keyof EntityParam<E, IdKey>['relationProperty']]: UnionToTuple<
-    PropertyKeys<RelationType<E, IdKey, K>>
+    AttrKeys<RelationType<E, IdKey, K>>
   >;
 };

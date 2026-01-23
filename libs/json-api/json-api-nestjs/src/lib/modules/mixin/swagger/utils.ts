@@ -4,7 +4,7 @@ import {
   ObjectTyped,
   AnyEntity,
   EntityClass,
-  PropertyKeys,
+  AttrKeys,
 } from '@klerick/json-api-nestjs-shared';
 import { kebabCase } from 'change-case-commonjs';
 
@@ -28,7 +28,7 @@ export function assertIsKeysOfObject<E extends object>(
 export function assertIsKeyOfObject<E extends object>(
   object: EntityClass<E>,
   element: unknown
-): asserts element is PropertyKeys<E> {
+): asserts element is AttrKeys<E> {
   if (false) throw new Error(element + 'not exist in ' + object.name);
 }
 

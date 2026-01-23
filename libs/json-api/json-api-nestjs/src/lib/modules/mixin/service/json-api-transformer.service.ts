@@ -4,7 +4,7 @@ import {
   Attributes,
   Include,
   ObjectTyped,
-  PropertyKeys,
+  AttrKeys,
   Relationships,
   ResourceData,
   ResourceObject,
@@ -275,7 +275,7 @@ export class JsonApiTransformerService<
 
   public extractAttributes<T extends object = E, TIdKey extends string = IdKey>(
     item: T,
-    fields: PropertyKeys<T, TIdKey>[]
+    fields: AttrKeys<T, TIdKey>[]
   ): Attributes<T, TIdKey> {
     const mapFields = fields.reduce((acum, field) => {
       acum[field.toString()] = true;
