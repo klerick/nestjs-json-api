@@ -17,6 +17,7 @@ import {
   QueryOne,
   PatchRelationshipData,
   PostData,
+  JsonApiResponseFrom,
 } from '@klerick/json-api-nestjs';
 import {
   ResourceObjectRelationships,
@@ -35,6 +36,7 @@ import { GuardService, EntityName } from '../../service/guard.service';
 
 import { Users } from '@nestjs-json-api/microorm-database';
 import { AtomicInterceptor } from '../../service/atomic.interceptor';
+import { ApiResponse } from '@nestjs/swagger';
 
 @UseGuards(GuardService)
 @UseFilters(new HttpExceptionFilter())
@@ -75,6 +77,12 @@ export class ExtendUserController extends JsonBaseController<Users, 'id'> {
   }
 
   @Get(':id/example')
+  @ApiResponse({
+    status: 200,
+    description: 'User testOne test swagger copy response',
+  })
+  @JsonApiResponseFrom('getOne', 200, 200)
+  @JsonApiResponseFrom('getOne', 400)
   testOne(@Param('id') id: string): string {
     return this.exampleService.testMethode(id);
   }
