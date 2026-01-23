@@ -1,3 +1,7 @@
+## 10.0.0-beta.13 (2026-01-23)
+
+This was a version bump only for json-api-nestjs to align it with other projects, there were no code changes.
+
 ## 10.0.0-beta.12 (2026-01-23)
 
 ### 🚀 Features

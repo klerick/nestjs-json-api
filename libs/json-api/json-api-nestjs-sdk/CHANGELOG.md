@@ -1,3 +1,13 @@
+## 10.0.0-beta.9 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** add support for plain object entities, null relationship handling, and type-safe chaining ([97865ef](https://github.com/klerick/nestjs-json-api/commit/97865ef))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.8 (2026-01-23)
 
 ### 🧱 Updated Dependencies
