@@ -1,3 +1,13 @@
+## 1.0.0-beta.5 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs-shared:** enhance type utilities with `UnwrapReference`, `FunctionKeys`, and refine `PropertyKeys` logic ([d864270](https://github.com/klerick/nestjs-json-api/commit/d864270))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 1.0.0-beta.4 (2025-11-13)
 
 ### 🚀 Features

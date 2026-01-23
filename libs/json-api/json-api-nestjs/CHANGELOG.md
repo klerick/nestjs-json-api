@@ -1,3 +1,19 @@
+## 10.0.0-beta.12 (2026-01-23)
+
+### 🚀 Features
+
+- **json-api-nestjs:** enhance ZodIncludeQuery with improved type definitions and utility functions ([c4a5856](https://github.com/klerick/nestjs-json-api/commit/c4a5856))
+- **json-api-nestjs:** add JsonApiResponseFrom decorator for reusing response schemas across methods ([f1f49c1](https://github.com/klerick/nestjs-json-api/commit/f1f49c1))
+- **json-api-nestjs:** replace `errorSchema` with `JsonApiErrorResponseModel`, update response schema handling across Swagger methods ([4e7f481](https://github.com/klerick/nestjs-json-api/commit/4e7f481))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.5
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.11 (2026-01-22)
 
 ### 🚀 Features
