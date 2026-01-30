@@ -18,10 +18,10 @@ export const getProps = <E extends object>(
 ): EntityParam<E>['props'] => {
   const relations = getRelation(entityMetadata) as any;
   const fkField = Object.values(getRelationFkField(entityMetadata, namingStrategy));
-
+  const primaryName = getPrimaryColumnName(entityMetadata);
   return (
     entityMetadata.props
-      .filter((i) => !fkField.includes(i.name))
+      .filter((i) => !fkField.includes(i.name) && i.name !== primaryName)
       .map((i) => i.name)
       .filter(
         (i) => !relations.includes(i)
