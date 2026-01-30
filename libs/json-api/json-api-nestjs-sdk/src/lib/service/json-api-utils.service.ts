@@ -184,19 +184,23 @@ export class JsonApiUtilsService {
   ): E;
   convertResponseData<E extends object, IdKey extends string>(
     body: ResourceObject<E, 'array', null, IdKey>,
-    includeEntity?: QueryParams<E>['include']
+    includeEntity?: QueryParams<E>['include'],
+    asPlain?: boolean
   ): E[];
   convertResponseData<E extends object, IdKey extends string>(
     body: ResourceObject<E, 'object', null, IdKey>,
-    includeEntity?: QueryParams<E>['include']
+    includeEntity?: QueryParams<E>['include'],
+    asPlain?: boolean
   ): E;
   convertResponseData<E extends object, IdKey extends string>(
     body: ResourceObject<E, 'array', null, IdKey>,
-    includeEntity?: QueryParams<E>['include']
+    includeEntity?: QueryParams<E>['include'],
+    asPlain?: boolean
   ): E[];
   convertResponseData<E extends object>(
     body: ResourceObject<E, 'array'> | ResourceObject<E>,
-    includeEntity?: QueryParams<E>['include']
+    includeEntity?: QueryParams<E>['include'],
+    asPlain = false
   ): E[] | E {
     const { data, included = [] } = body;
 
@@ -219,35 +223,69 @@ export class JsonApiUtilsService {
           {} as Record<string, unknown>
         ),
       };
-      const itemEntity = Object.assign(
-        this.createEntityInstance<E>(dataItem.type) as object,
-        entityObject
+      const itemEntity = (
+        asPlain
+          ? entityObject
+          : Object.assign(
+              this.createEntityInstance<E>(dataItem.type) as object,
+              entityObject
+            )
       ) as E;
 
-      if (!includeEntity || includeEntity.length === 0) {
-        result.push(itemEntity);
-        continue;
-      }
-      for (const itemInclude of includeEntity) {
-        if (!(dataItem.relationships && dataItem.relationships[itemInclude])) {
-          continue;
-        }
-        const relationship = dataItem.relationships[itemInclude];
-        if (!relationship || !('data' in relationship) || !relationship.data) {
-          continue;
-        }
+      // Process all relationships from response
+      if (dataItem.relationships) {
+        for (const [relKey, relationship] of Object.entries(dataItem.relationships)) {
+          if (!relationship || typeof relationship !== 'object' || !('data' in relationship)) {
+            continue;
+          }
 
-        const relationshipData = relationship.data;
+          const relationshipData = relationship.data as MainData | MainData[] | null;
 
-        if (Array.isArray(relationshipData)) {
-          itemEntity[itemInclude] = relationshipData.reduce((acum, item) => {
-            const result = this.findIncludeEntity(item, included);
-            if (result) acum.push(result);
-            return acum;
-          }, [] as E[RelationKeys<E>][]) as E[RelationKeys<E>];
-        } else {
-          const relation = this.findIncludeEntity(relationshipData, included);
-          if (relation) itemEntity[itemInclude] = relation;
+          // Skip if no data (null relationship)
+          if (relationshipData === null || relationshipData === undefined) {
+            continue;
+          }
+
+          const isIncluded = includeEntity?.includes(relKey as any);
+
+          if (Array.isArray(relationshipData)) {
+            itemEntity[relKey as keyof E] = relationshipData.reduce((acum, item: MainData) => {
+              // Try to find in included first
+              const result = isIncluded
+                ? this.findIncludeEntity(item, included, asPlain)
+                : null;
+
+              if (result) {
+                acum.push(result);
+              } else {
+                // Create minimal entity with just id
+                const minimalEntity = this.createMinimalEntityFromRelationship(
+                  item,
+                  asPlain
+                );
+                if (minimalEntity) acum.push(minimalEntity);
+              }
+              return acum;
+            }, [] as E[RelationKeys<E>][]) as E[keyof E];
+          } else {
+            // Try to find in included first
+            const relation = isIncluded
+              ? this.findIncludeEntity(relationshipData as MainData, included, asPlain)
+              : null;
+
+            if (relation) {
+              itemEntity[relKey as keyof E] = relation as E[keyof E];
+            } else {
+              // Create minimal entity with just id
+              const minimalEntity = this.createMinimalEntityFromRelationship(
+                relationshipData as MainData,
+                asPlain
+              );
+              if (minimalEntity) {
+                itemEntity[relKey as keyof E] = minimalEntity as E[keyof E];
+              }
+            }
+          }
         }
       }
       result.push(itemEntity);
@@ -263,9 +301,32 @@ export class JsonApiUtilsService {
     return createEntityInstance<E>(name);
   }
 
+  private createMinimalEntityFromRelationship<E, R extends MainData>(
+    item: R,
+    asPlain = false
+  ): E[RelationKeys<E>] | undefined {
+    if (!item || !item.id) return;
+
+    const entityObject = {
+      [this.jsonApiSdkConfig.idKey]: this.jsonApiSdkConfig.idIsNumber
+        ? parseInt(item.id, 10)
+        : item.id,
+    };
+
+    if (asPlain) {
+      return entityObject as E[RelationKeys<E>];
+    }
+
+    return Object.assign(
+      this.createEntityInstance<E[RelationKeys<E>]>(item.type.toString()) as object,
+      entityObject
+    ) as E[RelationKeys<E>];
+  }
+
   private findIncludeEntity<E, R extends MainData>(
     item: R,
-    included: Include<E>[]
+    included: Include<E>[],
+    asPlain = false
   ): E[RelationKeys<E>] | undefined {
     const relatedIncluded = included.find(
       (includedItem) =>
@@ -289,6 +350,10 @@ export class JsonApiUtilsService {
         {} as Record<string, unknown>
       ),
     };
+
+    if (asPlain) {
+      return entityObject as E[RelationKeys<E>];
+    }
 
     return Object.assign(
       this.createEntityInstance<E[RelationKeys<E>]>(

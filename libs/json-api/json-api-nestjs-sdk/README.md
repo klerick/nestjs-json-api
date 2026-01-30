@@ -132,6 +132,8 @@ import { Component, inject } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 
 // 1. Configure in your main.ts or app.config.ts
+
+// Option A: Direct configuration object
 const angularConfig = {
   apiHost: 'http://localhost:3000',
   idKey: 'id',
@@ -144,6 +146,23 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withFetch()),
     provideJsonApi(angularConfig)
+  ],
+}).catch((err) => console.error(err));
+
+// Option B: Factory function (useful for dynamic configuration)
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideHttpClient(withFetch()),
+    provideJsonApi(() => {
+      const env = inject(EnvironmentService);
+      return {
+        apiHost: env.apiUrl,
+        idKey: 'id',
+        apiPrefix: 'api',
+        operationUrl: 'operation',
+        dateFields: ['createdAt', 'updatedAt']
+      };
+    })
   ],
 }).catch((err) => console.error(err));
 
@@ -190,6 +209,10 @@ type JsonSdkConfig = {
 type JsonConfig = JsonSdkConfig & {
   adapter?: HttpInnerClient; // HTTP client adapter (default: fetch)
 }
+
+// Angular: provideJsonApi accepts config or factory function
+type JsonSdkConfigFactory = () => JsonSdkConfig;
+type JsonSdkConfigOrFactory = JsonSdkConfig | JsonSdkConfigFactory;
 ```
 
 ### HTTP Adapters

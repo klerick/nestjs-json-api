@@ -392,7 +392,7 @@ describe('JsonApiUtilsService', () => {
       included: [],
     });
 
-    it('should handle data without relationships', () => {
+    it('should handle data without include but preserve relationship id', () => {
       const response = service['convertResponseData'](
         someData() as any,
         []
@@ -401,7 +401,12 @@ describe('JsonApiUtilsService', () => {
       expect(response[0][mockJsonApiSdkConfig.idKey]).toBe(1);
       expect(response[0]).toHaveProperty('attr1');
       expect(response[0]).toHaveProperty('attr2');
-      expect(response[0]).not.toHaveProperty('relationship1');
+      // Relationship is now preserved with just id (even without include)
+      expect(response[0]).toHaveProperty('relationship1');
+      expect(response[0]['relationship1'][mockJsonApiSdkConfig.idKey]).toBe(2);
+      expect(response[0]['relationship1'].constructor.name).toBe('Type2');
+      // But no attributes since it wasn't in included
+      expect(response[0]['relationship1']).not.toHaveProperty('attr1');
     });
     it('should handle data with existing relationships', () => {
       const data = {
@@ -426,6 +431,65 @@ describe('JsonApiUtilsService', () => {
       expect(response[0]).toHaveProperty('attr2');
       expect(response[0]).toHaveProperty('relationship1');
       expect(response[0]['relationship1'][mockJsonApiSdkConfig.idKey]).toBe(2);
+    });
+
+    it('should handle array relationships without include', () => {
+      const data = {
+        data: [
+          {
+            type: 'users',
+            id: '1',
+            attributes: { name: 'John' },
+            relationships: {
+              roles: {
+                data: [
+                  { type: 'roles', id: '10' },
+                  { type: 'roles', id: '20' },
+                ],
+              },
+            },
+          },
+        ],
+        included: [],
+      } as any;
+      const response = service['convertResponseData'](data, []) as any;
+      expect(response[0]).toHaveProperty('roles');
+      expect(response[0]['roles']).toHaveLength(2);
+      expect(response[0]['roles'][0][mockJsonApiSdkConfig.idKey]).toBe(10);
+      expect(response[0]['roles'][1][mockJsonApiSdkConfig.idKey]).toBe(20);
+      expect(response[0]['roles'][0].constructor.name).toBe('Roles');
+    });
+
+    it('should skip null relationship data', () => {
+      const data = {
+        data: [
+          {
+            type: 'comments',
+            id: '1',
+            attributes: { text: 'hello' },
+            relationships: {
+              createdBy: {
+                data: null,
+              },
+            },
+          },
+        ],
+        included: [],
+      } as any;
+      const response = service['convertResponseData'](data, []) as any;
+      expect(response[0]).not.toHaveProperty('createdBy');
+    });
+
+    it('should return plain objects when asPlain is true', () => {
+      const response = service['convertResponseData'](
+        someData() as any,
+        [],
+        true
+      ) as any;
+      expect(response[0].constructor.name).toBe('Object');
+      expect(response[0][mockJsonApiSdkConfig.idKey]).toBe(1);
+      expect(response[0]).toHaveProperty('relationship1');
+      expect(response[0]['relationship1'].constructor.name).toBe('Object');
     });
   });
 
