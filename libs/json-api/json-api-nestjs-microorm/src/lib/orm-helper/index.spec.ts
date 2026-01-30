@@ -61,7 +61,7 @@ describe('microorm-orm-helper-for-map', () => {
   it('getProps', () => {
     const namingStrategy = mikroORM.config.getNamingStrategy();
     const result = getProps(entityMetadataToken.get(Users), namingStrategy);
-    expect(result.includes('id')).toBe(true);
+    expect(result.includes('id' as any)).toBe(false);
     expect(result.includes('lastName')).toBe(true);
     expect(result.includes('createdAt')).toBe(true);
     expect(result.includes('updatedAt')).toBe(true);
@@ -83,7 +83,7 @@ describe('microorm-orm-helper-for-map', () => {
   it('getProps - without RelationFkField', () => {
     const namingStrategy = mikroORM.config.getNamingStrategy();
     const result = getProps(entityMetadataToken.get(Notes), namingStrategy);
-    expect(result.includes('id')).toBe(true);
+    expect(result.includes('id' as any)).toBe(false);
     expect(result.includes('text')).toBe(true);
     expect(result.includes('createdAt')).toBe(true);
     expect(result.includes('updatedAt')).toBe(true);
