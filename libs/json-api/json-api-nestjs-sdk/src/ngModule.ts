@@ -5,6 +5,8 @@ export {
   provideJsonApi,
   JSON_API_SDK_CONFIG,
   getProviders,
+  JsonSdkConfigFactory,
+  JsonSdkConfigOrFactory,
 } from './lib/json-api-angular';
 export { JsonApiUtilsService, JsonApiSdkService } from './lib/service';
 export { AtomicOperations, JsonSdkConfig } from './lib/types';

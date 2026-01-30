@@ -9,10 +9,19 @@ import {
   AtomicOperationsService,
 } from './service';
 
-export const getProviders = (config: JsonSdkConfig) => [
+export type JsonSdkConfigFactory = () => JsonSdkConfig;
+export type JsonSdkConfigOrFactory = JsonSdkConfig | JsonSdkConfigFactory;
+
+const isFactory = (config: JsonSdkConfigOrFactory): config is JsonSdkConfigFactory =>
+  typeof config === 'function';
+
+export const getProviders = (configOrFactory: JsonSdkConfigOrFactory) => [
   {
     provide: JSON_API_SDK_CONFIG,
-    useValue: resultConfig(config),
+    useFactory: () => {
+      const config = isFactory(configOrFactory) ? configOrFactory() : configOrFactory;
+      return resultConfig(config);
+    },
   },
   {
     provide: JsonApiUtilsService,
@@ -45,7 +54,7 @@ export const getProviders = (config: JsonSdkConfig) => [
   },
 ];
 
-export const provideJsonApi = (config: JsonSdkConfig) =>
-  makeEnvironmentProviders(getProviders(config));
+export const provideJsonApi = (configOrFactory: JsonSdkConfigOrFactory) =>
+  makeEnvironmentProviders(getProviders(configOrFactory));
 
 export { AtomicFactory, JSON_API_SDK_CONFIG } from './token';

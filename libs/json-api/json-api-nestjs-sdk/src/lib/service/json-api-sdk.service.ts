@@ -20,6 +20,8 @@ import {
 import { EntityArray, getTypeForReq } from '../utils';
 import { JsonApiUtilsService } from './json-api-utils.service';
 
+const AS_PLAIN_RESULT = Symbol('asPlainResult');
+
 export class JsonApiSdkService {
   constructor(
     private http: HttpInnerClient,
@@ -41,6 +43,9 @@ export class JsonApiSdkService {
     const entityObj = Object.assign(instance, data);
 
     if (raw) return entityObj;
+
+    // Mark for plain result when used via chain
+    Reflect.set(entityObj, AS_PLAIN_RESULT, true);
 
     return new Proxy(this, {
       get: (target, method: string) => {
@@ -65,10 +70,8 @@ export class JsonApiSdkService {
     entityOrTypeName: EntityClass<Entity> | string,
     params?: QueryParams<Entity>
   ): Observable<EntityArray<Entity>> {
-    const name =
-      typeof entityOrTypeName === 'string'
-        ? entityOrTypeName
-        : entityOrTypeName.name;
+    const asPlain = typeof entityOrTypeName === 'string';
+    const name = asPlain ? entityOrTypeName : entityOrTypeName.name;
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
 
     return this.http
@@ -84,9 +87,14 @@ export class JsonApiSdkService {
             const resource = params
               ? this.jsonApiUtilsService.convertResponseData(
                   result,
-                  params.include
+                  params.include,
+                  asPlain
                 )
-              : this.jsonApiUtilsService.convertResponseData(result);
+              : this.jsonApiUtilsService.convertResponseData(
+                  result,
+                  undefined,
+                  asPlain
+                );
             const { totalItems, pageSize, pageNumber } = Object.assign(
               {
                 totalItems: 0,
@@ -181,10 +189,8 @@ export class JsonApiSdkService {
       return throwError(() => new Error('Id for resource is required'));
     }
 
-    const name =
-      typeof entityOrTypeName === 'string'
-        ? entityOrTypeName
-        : entityOrTypeName.name;
+    const asPlain = typeof entityOrTypeName === 'string';
+    const name = asPlain ? entityOrTypeName : entityOrTypeName.name;
     const query = this.jsonApiUtilsService.getQueryStringParams(params);
 
     return this.http
@@ -196,7 +202,11 @@ export class JsonApiSdkService {
       )
       .pipe(
         map((result) =>
-          this.jsonApiUtilsService.convertResponseData(result, params?.include)
+          this.jsonApiUtilsService.convertResponseData(
+            result,
+            params?.include,
+            asPlain
+          )
         )
       );
   }
@@ -204,6 +214,7 @@ export class JsonApiSdkService {
   public postOne<Entity extends object, OutputEntity extends Entity = Entity>(
     entity: Entity
   ): Observable<OutputEntity> {
+    const asPlain = Reflect.has(entity, AS_PLAIN_RESULT);
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
     const body = {
@@ -220,7 +231,14 @@ export class JsonApiSdkService {
         body
       )
       .pipe(
-        map((r) => this.jsonApiUtilsService.convertResponseData(r) as OutputEntity)
+        map(
+          (r) =>
+            this.jsonApiUtilsService.convertResponseData(
+              r,
+              undefined,
+              asPlain
+            ) as OutputEntity
+        )
       );
   }
 
@@ -237,6 +255,7 @@ export class JsonApiSdkService {
       );
     }
 
+    const asPlain = Reflect.has(entity, AS_PLAIN_RESULT);
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
 
@@ -263,7 +282,14 @@ export class JsonApiSdkService {
         body
       )
       .pipe(
-        map((r) => this.jsonApiUtilsService.convertResponseData(r) as OutputEntity)
+        map(
+          (r) =>
+            this.jsonApiUtilsService.convertResponseData(
+              r,
+              undefined,
+              asPlain
+            ) as OutputEntity
+        )
       );
   }
 
