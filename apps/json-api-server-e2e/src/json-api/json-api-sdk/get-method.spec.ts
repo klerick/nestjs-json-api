@@ -41,7 +41,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       address.city = faker.string.alpha(50);
       address.state = faker.string.alpha(50);
       address.country = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(address);
+      return jsonSdk.jsonApiSdkService.postOne(address);
     });
     addressArray = await Promise.all(addressesPromise);
 
@@ -49,7 +49,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       const roles = new Roles();
       roles.name = faker.string.alpha(50);
       roles.key = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(roles);
+      return jsonSdk.jsonApiSdkService.postOne(roles);
     });
 
     rolesArray = await Promise.all(rolesPromise);
@@ -57,7 +57,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       const comments = new Comments();
       comments.text = faker.string.alpha(50);
       comments.kind = CommentKind.Comment;
-      return jsonSdk.jonApiSdkService.postOne(comments);
+      return jsonSdk.jsonApiSdkService.postOne(comments);
     });
 
     commentsArray = await Promise.all(commentsPromise);
@@ -66,7 +66,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       const user = getUser();
       user.isActive = !!addressIndex;
       user.addresses = addressArray[index];
-      return jsonSdk.jonApiSdkService.postOne(user);
+      return jsonSdk.jsonApiSdkService.postOne(user);
     });
     usersArray = await Promise.all(usersPromise);
     usersArray[0].manager = usersArray[2];
@@ -80,8 +80,8 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
     usersArray[1].roles = [rolesArray[3], rolesArray[4]];
     usersArray[1].comments = [commentsArray[3], commentsArray[4]];
 
-    await jsonSdk.jonApiSdkService.patchOne(usersArray[0]);
-    await jsonSdk.jonApiSdkService.patchOne(usersArray[1]);
+    await jsonSdk.jsonApiSdkService.patchOne(usersArray[0]);
+    await jsonSdk.jsonApiSdkService.patchOne(usersArray[1]);
   });
 
   afterAll(async () => {
@@ -89,13 +89,13 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       usersArray.map((i) => {
         const tmp = [];
         if (i.comments) {
-          tmp.push(jsonSdk.jonApiSdkService.deleteRelationships(i, 'comments'));
+          tmp.push(jsonSdk.jsonApiSdkService.deleteRelationships(i, 'comments'));
         }
         if (i.manager) {
-          tmp.push(jsonSdk.jonApiSdkService.deleteRelationships(i, 'manager'));
+          tmp.push(jsonSdk.jsonApiSdkService.deleteRelationships(i, 'manager'));
         }
         if (i.roles) {
-          tmp.push(jsonSdk.jonApiSdkService.deleteRelationships(i, 'roles'));
+          tmp.push(jsonSdk.jsonApiSdkService.deleteRelationships(i, 'roles'));
         }
         return Promise.all(tmp);
       })
@@ -103,21 +103,24 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
 
     await Promise.all(
       [...usersArray, ...commentsArray, ...rolesArray, ...addressArray].map(
-        (i) => jsonSdk.jonApiSdkService.deleteOne(i)
+        (i) => jsonSdk.jsonApiSdkService.deleteOne(i)
       )
     );
   });
 
   describe('Filtering Resources', () => {
-    it('should fetch all users without filters', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users);
+    it('should fetch all users without filters and return class instances', async () => {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users);
       expect(users).toBeDefined();
       expect(users).toBeInstanceOf(Array);
       expect(users.length).toBeGreaterThan(0);
+      // When using class, result should have constructor name (not plain Object)
+      expect(users[0].constructor.name).toBe('Users');
+      expect(users[0].constructor.name).not.toBe('Object');
     });
 
     it('should filter users by target attributes using eq, ne, in, and like operators', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             isActive: {
@@ -138,7 +141,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
         expect(user.isActive).toBe(true);
       });
 
-      const users2 = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users2 = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             isActive: {
@@ -156,7 +159,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
         expect(user.isActive).toBe(false);
       });
 
-      const resultFindLike = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const resultFindLike = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             login: { [FilterOperand.like]: users2.at(0)?.login.slice(5, -5) },
@@ -168,7 +171,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
     });
 
     it('should filter users by relationship existence (null/not null check)', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             manager: {
@@ -186,7 +189,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
         expect(user.manager).toBeUndefined();
       });
 
-      const users1 = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users1 = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             manager: {
@@ -206,7 +209,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
     });
 
     it('should filter users by related resource attributes (roles.name)', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             id: {
@@ -231,7 +234,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
 
   describe('Pagination and Sorting', () => {
     it('should return first page with page size limit', async () => {
-      const users = await jsonSdk.jonApiSdkService.getList(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getList(Users, {
         filter: {
           target: {
             id: {
@@ -255,7 +258,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       expect(users[0].id).toBe(usersArray.sort((a, b) => a.id - b.id)[0].id);
     });
     it('should return second page when page number is 2', async () => {
-      const users = await jsonSdk.jonApiSdkService.getList(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getList(Users, {
         filter: {
           target: {
             id: {
@@ -281,7 +284,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
 
   describe('Sparse Fieldsets (Field Selection)', () => {
     it('should return only specified target fields (id, isActive)', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             id: {
@@ -303,7 +306,7 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
       });
     });
     it('should return specified fields for both target and related resources', async () => {
-      const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+      const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             id: {
@@ -346,29 +349,35 @@ describe('JSON API: GET Operations - Fetching and Filtering Resources', () => {
     it('should return relationship identifier for to-one relationship (addresses)', async () => {
       const userItem = usersArray[0];
 
-      const result = await jsonSdk.jonApiSdkService.getRelationships(
+      const result = await jsonSdk.jsonApiSdkService.getRelationships(
         userItem,
         'addresses'
       );
 
-      const resultGetOne = await jsonSdk.jonApiSdkService.getOne(
+      const resultGetOne = await jsonSdk.jsonApiSdkService.getOne(
         Users,
         userItem.id,
         { include: ['addresses'] }
       );
 
       expect(result).toBe(`${resultGetOne.addresses.id}`);
+      // getOne with class returns object with constructor name (not plain Object)
+      expect(resultGetOne.constructor.name).toBe('Users');
+      expect(resultGetOne.constructor.name).not.toBe('Object');
+      // Included relation should also have constructor name
+      expect(resultGetOne.addresses.constructor.name).toBe('Addresses');
+      expect(resultGetOne.addresses.constructor.name).not.toBe('Object');
     });
 
     it('should return relationship identifiers for to-many relationship (roles)', async () => {
       const userItem = usersArray.filter((i) => i.roles)[0];
 
-      const result = await jsonSdk.jonApiSdkService.getRelationships(
+      const result = await jsonSdk.jsonApiSdkService.getRelationships(
         userItem,
         'roles'
       );
 
-      const resultGetOne = await jsonSdk.jonApiSdkService.getOne(
+      const resultGetOne = await jsonSdk.jsonApiSdkService.getOne(
         Users,
         userItem.id,
         { include: ['roles'] }

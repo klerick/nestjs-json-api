@@ -53,14 +53,14 @@ describe('Creating Resources (POST Operations)', () => {
 
   afterEach(async () => {
     if (commentsAfterSave)
-      await jsonSdk.jonApiSdkService.deleteOne(commentsAfterSave);
-    if (userAfterSave) await jsonSdk.jonApiSdkService.deleteOne(userAfterSave);
+      await jsonSdk.jsonApiSdkService.deleteOne(commentsAfterSave);
+    if (userAfterSave) await jsonSdk.jsonApiSdkService.deleteOne(userAfterSave);
 
-    await jsonSdk.jonApiSdkService.deleteOne(addressAfterSave);
+    await jsonSdk.jsonApiSdkService.deleteOne(addressAfterSave);
   });
 
   it('should create a new resource and automatically generate id and timestamps', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
+    addressAfterSave = await jsonSdk.jsonApiSdkService.postOne(address);
     const {
       id: addressId,
       createdAt,
@@ -72,22 +72,34 @@ describe('Creating Resources (POST Operations)', () => {
     expect(newAddress).toEqual(address);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // postOne with class instance returns object with same constructor name
+    expect(addressAfterSave.constructor.name).toBe('Addresses');
+    expect(addressAfterSave.constructor.name).not.toBe('Object');
   });
 
   it('should create a resource with a one-to-one relationship and verify the relationship is properly linked', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
+    addressAfterSave = await jsonSdk.jsonApiSdkService.postOne(address);
     user.addresses = addressAfterSave;
 
-    userAfterSave = await jsonSdk.jonApiSdkService.postOne(user);
-    const { id, createdAt, updatedAt, ...newUser } = userAfterSave;
+    userAfterSave = await jsonSdk.jsonApiSdkService.postOne(user);
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      addresses: savedAddresses,
+      ...newUser
+    } = userAfterSave;
     const { addresses, ...userWithoutAddress } = user;
 
     expect(id).toBeDefined();
     expect(newUser).toEqual(userWithoutAddress);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // Verify relationship is returned in response
+    expect(savedAddresses).toBeDefined();
+    expect(savedAddresses.id).toBe(addressAfterSave.id);
 
-    const usersFromSerer = await jsonSdk.jonApiSdkService.getOne(Users, id, {
+    const usersFromSerer = await jsonSdk.jsonApiSdkService.getOne(Users, id, {
       include: ['addresses'],
     });
     const {
@@ -105,17 +117,23 @@ describe('Creating Resources (POST Operations)', () => {
   });
 
   it('should create a resource with both one-to-one and one-to-many relationships', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
-    commentsAfterSave = await jsonSdk.jonApiSdkService.postOne(comments);
+    addressAfterSave = await jsonSdk.jsonApiSdkService.postOne(address);
+    commentsAfterSave = await jsonSdk.jsonApiSdkService.postOne(comments);
     user.addresses = addressAfterSave;
     user.comments = [commentsAfterSave];
+    userAfterSave = await jsonSdk.jsonApiSdkService.postOne(user);
 
-    userAfterSave = await jsonSdk.jonApiSdkService.postOne(user);
-
-    const { id, createdAt, updatedAt, ...newUser } = userAfterSave;
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      addresses: savedAddresses,
+      comments: savedComments,
+      ...newUser
+    } = userAfterSave;
     const {
       addresses,
-      comments: comentsFromuser,
+      comments: commentsFromUser,
       ...userWithoutAddress
     } = user;
 
@@ -123,8 +141,14 @@ describe('Creating Resources (POST Operations)', () => {
     expect(newUser).toEqual(userWithoutAddress);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // Verify relationships are returned in response
+    expect(savedAddresses).toBeDefined();
+    expect(savedAddresses.id).toBe(addressAfterSave.id);
+    expect(savedComments).toBeDefined();
+    expect(savedComments).toHaveLength(1);
+    expect(savedComments[0].id).toBe(commentsAfterSave.id);
 
-    const usersFromSerer = await jsonSdk.jonApiSdkService.getOne(Users, id, {
+    const usersFromSerer = await jsonSdk.jsonApiSdkService.getOne(Users, id, {
       include: ['addresses', 'comments'],
     });
     const {
@@ -140,6 +164,6 @@ describe('Creating Resources (POST Operations)', () => {
     expect(fromCreatedAt).toBeInstanceOf(Date);
     expect(fromUpdatedAt).toBeInstanceOf(Date);
     expect(addresses).toEqual(fromUser.addresses);
-    expect(comentsFromuser).toEqual(fromUser.comments);
+    expect(commentsFromUser).toEqual(fromUser.comments);
   });
 });

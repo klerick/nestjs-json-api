@@ -43,8 +43,8 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
   let notPublicUser: UsersAcl;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
     });
     publicUser = usersAcl.find((i) => i.profile.isPublic) as UsersAcl;
@@ -54,7 +54,7 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Admin Role: Full Access Without Restrictions', () => {
@@ -66,15 +66,15 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch any user by ID with all fields (no ACL restrictions)', async () => {
-      await jsonSdk.jonApiSdkService.getOne(UsersAcl, usersAcl[0].id);
+      await jsonSdk.jsonApiSdkService.getOne(UsersAcl, usersAcl[0].id);
     });
 
     it('should fetch any user by ID with included profile with all fields', async () => {
-      await jsonSdk.jonApiSdkService.getOne(UsersAcl, usersAcl[0].id, {
+      await jsonSdk.jsonApiSdkService.getOne(UsersAcl, usersAcl[0].id, {
         include: ['profile'],
       });
     });
@@ -89,11 +89,11 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch any profile by ID but exclude sensitive fields (role, salary)', async () => {
-      const item = await jsonSdk.jonApiSdkService.getOne(
+      const item = await jsonSdk.jsonApiSdkService.getOne(
         UserProfileAcl,
         usersAcl[0].id
       );
@@ -109,7 +109,7 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
     });
 
     it('should fetch any user by ID with profile but exclude salary from nested profile', async () => {
-      const item = await jsonSdk.jonApiSdkService.getOne(
+      const item = await jsonSdk.jsonApiSdkService.getOne(
         UsersAcl,
         usersAcl[0].id,
         {
@@ -132,11 +132,11 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.user).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch own profile with phone visible and sensitive fields excluded', async () => {
-      const item = await jsonSdk.jonApiSdkService.getOne(
+      const item = await jsonSdk.jsonApiSdkService.getOne(
         UserProfileAcl,
         bobUser.profile.id
       );
@@ -153,7 +153,7 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
     });
 
     it('should fetch public profile with phone hidden and sensitive fields excluded', async () => {
-      const item = await jsonSdk.jonApiSdkService.getOne(
+      const item = await jsonSdk.jsonApiSdkService.getOne(
         UserProfileAcl,
         publicUser.profile.id
       );
@@ -170,7 +170,7 @@ describe('ACL: GET One Resource (Single Resource Fetching)', () => {
     });
     it('should return 404 Not Found when attempting to fetch private profile of another user', async () => {
       try {
-        await jsonSdk.jonApiSdkService.getOne(
+        await jsonSdk.jsonApiSdkService.getOne(
           UserProfileAcl,
           notPublicUser.profile.id
         );

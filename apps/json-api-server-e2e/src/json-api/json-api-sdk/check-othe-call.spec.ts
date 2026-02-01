@@ -99,7 +99,7 @@ describe('Advanced Configuration and Custom Routes', () => {
     it('should trigger custom query validation pipe and return validation error', async () => {
       expect.assertions(2);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               id: {

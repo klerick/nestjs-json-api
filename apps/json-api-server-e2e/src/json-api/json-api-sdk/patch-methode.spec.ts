@@ -43,13 +43,13 @@ describe('Updating Resources (PATCH Operations)', () => {
     address.state = faker.string.alpha(50);
     address.country = faker.string.alpha(50);
 
-    addressAfterSave = await jsonSdk.jonApiSdkService.postOne(address);
+    addressAfterSave = await jsonSdk.jsonApiSdkService.postOne(address);
 
     comments = new Comments();
     comments.text = faker.string.alpha(50);
     comments.kind = CommentKind.Comment;
 
-    commentsAfterSave = await jsonSdk.jonApiSdkService.postOne(comments);
+    commentsAfterSave = await jsonSdk.jsonApiSdkService.postOne(comments);
 
     user = new Users();
     user.firstName = faker.string.alpha(50);
@@ -59,24 +59,24 @@ describe('Updating Resources (PATCH Operations)', () => {
     user.addresses = addressAfterSave;
     user.comments = [commentsAfterSave];
 
-    userAfterSave = await jsonSdk.jonApiSdkService.postOne(user);
+    userAfterSave = await jsonSdk.jsonApiSdkService.postOne(user);
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(commentsAfterSave);
+    await jsonSdk.jsonApiSdkService.deleteOne(commentsAfterSave);
     if (newCommentsAfterSave){
-      await jsonSdk.jonApiSdkService.deleteOne(newCommentsAfterSave);
+      await jsonSdk.jsonApiSdkService.deleteOne(newCommentsAfterSave);
     }
-    await jsonSdk.jonApiSdkService.deleteOne(userAfterSave);
-    await jsonSdk.jonApiSdkService.deleteOne(addressAfterSave);
+    await jsonSdk.jsonApiSdkService.deleteOne(userAfterSave);
+    await jsonSdk.jsonApiSdkService.deleteOne(addressAfterSave);
     if (newAddressAfterSave) {
-      jsonSdk.jonApiSdkService.deleteOne(newAddressAfterSave);
+      jsonSdk.jsonApiSdkService.deleteOne(newAddressAfterSave);
     }
   });
 
   it('should update resource attributes and automatically update the updatedAt timestamp', async () => {
     addressAfterSave.city = faker.location.city();
-    const addressAfterUpdate = await jsonSdk.jonApiSdkService.patchOne(
+    const addressAfterUpdate = await jsonSdk.jsonApiSdkService.patchOne(
       addressAfterSave
     );
     addressAfterUpdate.updatedAt = addressAfterSave.updatedAt;
@@ -93,17 +93,17 @@ describe('Updating Resources (PATCH Operations)', () => {
     newComments.text = faker.string.alpha();
     newComments.kind = CommentKind.Comment;
 
-    newAddressAfterSave = await jsonSdk.jonApiSdkService.postOne(
+    newAddressAfterSave = await jsonSdk.jsonApiSdkService.postOne(
       newAddress
     );
 
 
-    newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(newComments);
+    newCommentsAfterSave = await jsonSdk.jsonApiSdkService.postOne(newComments);
 
     userAfterSave.addresses = newAddressAfterSave;
     userAfterSave.comments = [newCommentsAfterSave];
-    await jsonSdk.jonApiSdkService.patchOne(userAfterSave);
-    const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
+    await jsonSdk.jsonApiSdkService.patchOne(userAfterSave);
+    const userAfterUpdate = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       userAfterSave.id,
       { include: ['addresses', 'comments'] }
@@ -123,11 +123,11 @@ describe('Updating Resources (PATCH Operations)', () => {
     newComments.text = faker.string.alpha();
     newComments.kind = CommentKind.Comment;
 
-    newAddressAfterSave = await jsonSdk.jonApiSdkService.postOne(
+    newAddressAfterSave = await jsonSdk.jsonApiSdkService.postOne(
       newAddress
     );
 
-    newCommentsAfterSave = await jsonSdk.jonApiSdkService.postOne(
+    newCommentsAfterSave = await jsonSdk.jsonApiSdkService.postOne(
       newComments
     );
 
@@ -140,8 +140,8 @@ describe('Updating Resources (PATCH Operations)', () => {
     userWithEmptyAttr.comments = [newCommentsAfterSave];
     userWithEmptyAttr.lastName = null as any;
 
-    await jsonSdk.jonApiSdkService.patchOne(userWithEmptyAttr);
-    const userAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
+    await jsonSdk.jsonApiSdkService.patchOne(userWithEmptyAttr);
+    const userAfterUpdate = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       userWithEmptyAttr.id,
       { include: ['addresses', 'comments'] }
@@ -157,9 +157,9 @@ describe('Updating Resources (PATCH Operations)', () => {
     const commentsWithEmptyAttr = new Comments();
     commentsWithEmptyAttr.id = commentsAfterSave.id;
     commentsWithEmptyAttr.createdBy = nullRef();
-    await jsonSdk.jonApiSdkService.patchOne(commentsWithEmptyAttr);
+    await jsonSdk.jsonApiSdkService.patchOne(commentsWithEmptyAttr);
 
-    const commentsAfterUpdate = await jsonSdk.jonApiSdkService.getOne(
+    const commentsAfterUpdate = await jsonSdk.jsonApiSdkService.getOne(
       Comments,
       commentsWithEmptyAttr.id,
       { include: ['createdBy'] }

@@ -39,14 +39,14 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
     });
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Admin Role: Full Access Without Restrictions', () => {
@@ -56,15 +56,15 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
       contextTestAcl.context = { currentUser: adminUser };
 
       contextTestAcl.aclRules.rules = new AbilityBuilder(CheckFieldAndInclude).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch all profiles with all fields (no ACL restrictions)', async () => {
-      await jsonSdk.jonApiSdkService.getAll(UserProfileAcl)
+      await jsonSdk.jsonApiSdkService.getAll(UserProfileAcl)
     })
 
     it('should fetch all users with included profiles with all fields', async () => {
-      await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+      await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
         include: ['profile'],
       });
     });
@@ -77,11 +77,11 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
       contextTestAcl.context = { currentUser: moderatorUser };
 
       contextTestAcl.aclRules.rules = new AbilityBuilder(CheckFieldAndInclude).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch all profiles but exclude sensitive fields (role, salary)', async () => {
-      const result = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl)
+      const result = await jsonSdk.jsonApiSdkService.getAll(UserProfileAcl)
 
       for (const item of result) {
         expect(item.role).toBeUndefined()
@@ -97,7 +97,7 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
     })
 
     it('should fetch all users with profiles but exclude salary from nested profile', async () => {
-      const result = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+      const result = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
         include: ['profile'],
       });
       for (const item of result) {
@@ -111,7 +111,7 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
   describe('User Role: Conditional Row-Level Access with Field Restrictions', () => {
     let countPublicProfile: UserProfileAcl[];
     beforeEach(async () => {
-      countPublicProfile = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl, {
+      countPublicProfile = await jsonSdk.jsonApiSdkService.getAll(UserProfileAcl, {
         filter: {
           target: {
             isPublic: {eq: 'true'}
@@ -124,12 +124,12 @@ describe('ACL: GET All Resources (Collection Fetching)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.user).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should fetch only public profiles and own profile, with field restrictions and conditional phone visibility', async () => {
 
-      const result = await jsonSdk.jonApiSdkService.getAll(UserProfileAcl);
+      const result = await jsonSdk.jsonApiSdkService.getAll(UserProfileAcl);
       expect(result.length).toBe(countPublicProfile.length + 1)
       for (const item of result) {
         expect(item.salary).toBeUndefined()
