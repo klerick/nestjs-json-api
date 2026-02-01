@@ -6,6 +6,7 @@ import {
   ArrayType,
 } from '@mikro-orm/core';
 import { UsersAcl, IUsersAcl } from './user.entity';
+import { truncateToSeconds } from '../../utils/date';
 
 export type IDocumentAcl = DocumentAcl;
 
@@ -102,15 +103,15 @@ export class DocumentAcl {
     columnType: 'timestamp(0) without time zone',
     type: 'timestamp',
   })
-  uploadedAt: Date = new Date();
+  uploadedAt: Date = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: false,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  updatedAt: Date = truncateToSeconds();
 }

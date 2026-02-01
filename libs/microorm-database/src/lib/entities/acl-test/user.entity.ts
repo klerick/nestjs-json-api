@@ -14,6 +14,7 @@ import { CommentAcl, ICommentAcl } from './comment.entity';
 import { TagAcl, ITagAcl } from './tag.entity';
 import { ArticleAcl, IArticleAcl } from './article.entity';
 import { DocumentAcl, IDocumentAcl } from './document.entity';
+import { truncateToSeconds } from '../../utils/date';
 
 export type IUsersAcl = UsersAcl;
 
@@ -68,17 +69,17 @@ export class UsersAcl {
     columnType: 'timestamp(0) without time zone',
     type: 'timestamp',
   })
-  createdAt: Date = new Date();
+  createdAt: Date = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: true,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  updatedAt: Date = truncateToSeconds();
 
   // ========================================
   // ACL Test Entities Relationships

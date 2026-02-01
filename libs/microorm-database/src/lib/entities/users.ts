@@ -9,6 +9,7 @@ import {
 } from '@mikro-orm/core';
 
 import { Roles, Addresses, IAddresses, Comments, BookList } from './';
+import { truncateToSeconds } from '../utils/date';
 
 export type IUsers = Users;
 
@@ -63,17 +64,17 @@ export class Users {
     columnType: 'timestamp(0) without time zone',
     type: 'timestamp',
   })
-  createdAt: Date = new Date();
+  createdAt: Date = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: true,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  updatedAt: Date = truncateToSeconds();
 
   @ManyToMany(() => Roles, (role) => role.users, {
     owner: true,
