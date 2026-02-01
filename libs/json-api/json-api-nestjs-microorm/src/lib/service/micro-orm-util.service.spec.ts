@@ -568,4 +568,265 @@ describe('MicroOrmUtilService', () => {
       });
     });
   });
+
+  describe('updateEntity', () => {
+    let dbNameForUpdate: string;
+    let moduleForUpdate: TestingModule;
+    let mikroORMForUpdate: MikroORM;
+    let microOrmUtilServiceForUpdate: MicroOrmUtilService<Users>;
+
+    beforeAll(async () => {
+      dbNameForUpdate = dbRandomName();
+      moduleForUpdate = await getModuleForPgLite(Users, dbNameForUpdate);
+      microOrmUtilServiceForUpdate =
+        moduleForUpdate.get<MicroOrmUtilService<Users>>(MicroOrmUtilService);
+      mikroORMForUpdate = moduleForUpdate.get(MikroORM);
+    });
+
+    afterAll(async () => {
+      await mikroORMForUpdate.close(true);
+    });
+
+    const createTestUser = (
+      em: MicroOrmUtilService<Users>['entityManager'],
+      login: string
+    ) => {
+      return em.create(
+        Users,
+        {
+          login,
+          firstName: 'Test',
+          lastName: 'User',
+          isActive: true,
+          testDate: new Date(),
+          testReal: [],
+        },
+        { partial: true }
+      );
+    };
+
+    const createTestRole = (
+      em: MicroOrmUtilService<Users>['entityManager'],
+      key: string,
+      name: string
+    ) => {
+      return em.create(
+        Roles,
+        { key, name, isDefault: false },
+        { partial: true }
+      );
+    };
+
+    it('should only remove roles not in new list and add only new roles (diff-based update)', async () => {
+      const em = microOrmUtilServiceForUpdate.entityManager;
+
+      // Create user with initial roles
+      const user = createTestUser(em, 'test-user-update');
+
+      const role1 = createTestRole(em, 'role-1', 'Role 1');
+      const role2 = createTestRole(em, 'role-2', 'Role 2');
+      const role3 = createTestRole(em, 'role-3', 'Role 3');
+      const role4 = createTestRole(em, 'role-4', 'Role 4');
+
+      user.roles.add(role1, role2, role3);
+
+      await em.persistAndFlush([user, role1, role2, role3, role4]);
+      em.clear();
+
+      // Load user with roles
+      const loadedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      // Verify initial state: roles 1, 2, 3
+      const initialRoleIds = loadedUser.roles
+        .getItems()
+        .map((r) => r.id)
+        .sort();
+      expect(initialRoleIds).toEqual([role1.id, role2.id, role3.id].sort());
+
+      // Update: keep role2, role3, add role4, remove role1
+      // New roles: [role2, role3, role4]
+      const newRolesData = await em.find(Roles, {
+        id: { $in: [role2.id, role3.id, role4.id] },
+      });
+
+      await microOrmUtilServiceForUpdate.updateEntity(loadedUser, {
+        roles: {
+          data: newRolesData.map((r) => ({ type: 'roles', id: String(r.id) })),
+        },
+      } as Parameters<typeof microOrmUtilServiceForUpdate.updateEntity>[1]);
+
+      em.clear();
+
+      // Verify final state
+      const updatedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      const finalRoleIds = updatedUser.roles
+        .getItems()
+        .map((r) => r.id)
+        .sort();
+      expect(finalRoleIds).toEqual([role2.id, role3.id, role4.id].sort());
+
+      // Verify role1 still exists in DB (not deleted, just unlinked)
+      const role1StillExists = await em.findOne(Roles, { id: role1.id });
+      expect(role1StillExists).not.toBeNull();
+    });
+
+    it('should not touch existing relationships when same data is sent', async () => {
+      const em = microOrmUtilServiceForUpdate.entityManager;
+
+      // Create user with roles
+      const user = createTestUser(em, 'test-user-same-data');
+
+      const roleA = createTestRole(em, 'role-a', 'Role A');
+      const roleB = createTestRole(em, 'role-b', 'Role B');
+
+      user.roles.add(roleA, roleB);
+
+      await em.persistAndFlush([user, roleA, roleB]);
+      em.clear();
+
+      // Load user with roles
+      const loadedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      // Send the same roles again
+      const sameRolesData = await em.find(Roles, {
+        id: { $in: [roleA.id, roleB.id] },
+      });
+
+      // Spy on collection methods to verify no unnecessary operations
+      const removeSpy = vi.spyOn(loadedUser.roles, 'remove');
+      const addSpy = vi.spyOn(loadedUser.roles, 'add');
+
+      await microOrmUtilServiceForUpdate.updateEntity(loadedUser, {
+        roles: {
+          data: sameRolesData.map((r) => ({ type: 'roles', id: String(r.id) })),
+        },
+      } as Parameters<typeof microOrmUtilServiceForUpdate.updateEntity>[1]);
+
+      // Neither remove nor add should be called since data is the same
+      expect(removeSpy).not.toHaveBeenCalled();
+      expect(addSpy).not.toHaveBeenCalled();
+
+      em.clear();
+
+      // Verify state unchanged
+      const unchangedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      const roleIds = unchangedUser.roles
+        .getItems()
+        .map((r) => r.id)
+        .sort();
+      expect(roleIds).toEqual([roleA.id, roleB.id].sort());
+    });
+
+    it('should handle empty new relationships (remove all)', async () => {
+      const em = microOrmUtilServiceForUpdate.entityManager;
+
+      // Create user with roles
+      const user = createTestUser(em, 'test-user-empty');
+
+      const roleX = createTestRole(em, 'role-x', 'Role X');
+      const roleY = createTestRole(em, 'role-y', 'Role Y');
+
+      user.roles.add(roleX, roleY);
+
+      await em.persistAndFlush([user, roleX, roleY]);
+      em.clear();
+
+      // Load user with roles
+      const loadedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      // Send empty array - should remove all roles
+      await microOrmUtilServiceForUpdate.updateEntity(loadedUser, {
+        roles: {
+          data: [] as { id: string; type: string }[],
+        },
+      } as Parameters<typeof microOrmUtilServiceForUpdate.updateEntity>[1]);
+
+      em.clear();
+
+      // Verify all roles removed
+      const userWithNoRoles = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      expect(userWithNoRoles.roles.getItems()).toHaveLength(0);
+
+      // Verify roles still exist in DB
+      const rolesStillExist = await em.find(Roles, {
+        id: { $in: [roleX.id, roleY.id] },
+      });
+      expect(rolesStillExist).toHaveLength(2);
+    });
+
+    it('should handle adding to empty collection', async () => {
+      const em = microOrmUtilServiceForUpdate.entityManager;
+
+      // Create user without roles
+      const user = createTestUser(em, 'test-user-no-roles');
+
+      const roleNew1 = createTestRole(em, 'role-new-1', 'Role New 1');
+      const roleNew2 = createTestRole(em, 'role-new-2', 'Role New 2');
+
+      await em.persistAndFlush([user, roleNew1, roleNew2]);
+      em.clear();
+
+      // Load user (no roles)
+      const loadedUser = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      expect(loadedUser.roles.getItems()).toHaveLength(0);
+
+      // Add roles to empty collection
+      const newRoles = await em.find(Roles, {
+        id: { $in: [roleNew1.id, roleNew2.id] },
+      });
+
+      await microOrmUtilServiceForUpdate.updateEntity(loadedUser, {
+        roles: {
+          data: newRoles.map((r) => ({ type: 'roles', id: String(r.id) })),
+        },
+      } as Parameters<typeof microOrmUtilServiceForUpdate.updateEntity>[1]);
+
+      em.clear();
+
+      // Verify roles added
+      const userWithRoles = await em.findOneOrFail(
+        Users,
+        { id: user.id },
+        { populate: ['roles'] }
+      );
+
+      const roleIds = userWithRoles.roles
+        .getItems()
+        .map((r) => r.id)
+        .sort();
+      expect(roleIds).toEqual([roleNew1.id, roleNew2.id].sort());
+    });
+  });
 });

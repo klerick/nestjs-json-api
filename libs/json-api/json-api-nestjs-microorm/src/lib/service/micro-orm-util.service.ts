@@ -588,31 +588,20 @@ export class MicroOrmUtilService<
         continue;
       }
 
-      const condition = isArray
-        ? {
-            $in: data.map((i) => (i || {}).id),
-          }
-        : {
-            $eq: data['id'],
-          };
-
       const relationProps = this.metadata.properties[propsKey];
       const relationEntity = relationProps.entity() as EntityClass<any>;
       const metadata = this.entityManager.getMetadata().get(relationEntity);
       const primaryName = metadata.getPrimaryProp().name;
 
-      const queryBuilder = this.queryBuilder(
-        relationEntity,
-        this.getAliasForEntity(relationEntity)
-      )
-        .select([primaryName])
-        .where({
-          [primaryName]: condition,
-        });
       let result: typeof relationEntity | (typeof relationEntity)[];
       let error: BadRequestException | undefined = undefined;
+
+      // Use em.find/findOne instead of QueryBuilder to leverage Identity Map
       if (isArray) {
-        const tmpResult = await queryBuilder.getResult();
+        const ids = data.map((i) => (i || {}).id);
+        const tmpResult = await this.entityManager.find(relationEntity, {
+          [primaryName]: { $in: ids },
+        } as any);
 
         if (tmpResult.length === 0 || data.length !== tmpResult.length) {
           const msg = `Resource '${metadata.className}' with ids '${data
@@ -623,7 +612,9 @@ export class MicroOrmUtilService<
         }
         result = tmpResult;
       } else {
-        const tmpResult = await queryBuilder.getSingleResult();
+        const tmpResult = await this.entityManager.findOne(relationEntity, {
+          [primaryName]: data['id'],
+        } as any);
         if (!tmpResult)
           error = new BadRequestException([
             getErrorObject(
@@ -658,10 +649,88 @@ export class MicroOrmUtilService<
         }
       }
     }
+    await this.entityManager.persistAndFlush(targetInstance);
+
+    return targetInstance;
+  }
+
+  /**
+   * Updates entity with diff-based relationship handling.
+   * Only removes relationships that are not in the new list,
+   * only adds relationships that are not already present.
+   * Existing relationships are not touched.
+   *
+   * @param targetInstance - Entity loaded with current relationships
+   * @param relationships - New relationships data
+   */
+  async updateEntity(
+    targetInstance: E,
+    relationships?: Relationships<E, IdKey>
+  ): Promise<E> {
+    if (relationships) {
+      for await (const item of this.asyncIterateFindRelationships(
+        relationships
+      )) {
+        const itemProps = ObjectTyped.entries(item).at(0);
+        if (!itemProps) continue;
+        const [nameProps, data] = itemProps;
+
+        if (isCollectionField(targetInstance[nameProps])) {
+          this.updateCollection(
+            targetInstance[nameProps],
+            data as any[],
+            nameProps as EntityKey<E, false>
+          );
+        } else {
+          Object.assign(targetInstance, item);
+        }
+      }
+    }
 
     await this.entityManager.persistAndFlush(targetInstance);
 
     return targetInstance;
+  }
+
+  private updateCollection<T extends object>(
+    collection: Collection<T>,
+    newItems: T[],
+    relationName: EntityKey<E, false>
+  ): void {
+    const relationProps = this.getRelation(relationName);
+    const relationEntity = relationProps.entity() as EntityClass<T>;
+    const primaryName = this.entityManager
+      .getMetadata()
+      .get(relationEntity)
+      .getPrimaryProp().name as keyof T;
+
+    const currentItems = collection.getItems();
+
+    // Build set of new IDs for quick lookup
+    const newIds = new Set(
+      newItems.map((item) => String(item[primaryName]))
+    );
+
+    // Build map of current IDs to items
+    const currentMap = new Map(
+      currentItems.map((item) => [String(item[primaryName]), item])
+    );
+
+    // Remove items that are not in the new list
+    for (const item of currentItems) {
+      const itemId = String(item[primaryName]);
+      if (!newIds.has(itemId)) {
+        collection.remove(item);
+      }
+    }
+
+    // Add only new items that don't exist in current collection
+    for (const item of newItems) {
+      const itemId = String(item[primaryName]);
+      if (!currentMap.has(itemId)) {
+        collection.add(item);
+      }
+    }
   }
 
   async validateRelationInputData<
