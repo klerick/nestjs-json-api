@@ -76,6 +76,10 @@
             "forwardAllArgs": false
           },
           {
+            "command": "echo '{\"type\": \"module\"}' > dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
             "command": "rm -f dist/{projectRoot}/cjs/package.json",
             "forwardAllArgs": false
           },

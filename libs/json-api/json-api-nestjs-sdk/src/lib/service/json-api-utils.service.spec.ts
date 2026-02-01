@@ -476,6 +476,103 @@ describe('JsonApiUtilsService', () => {
         ],
         included: [],
       } as any;
+
+      const tmp = {
+        meta: {
+          time: 27.92083299998194,
+        },
+        data: {
+          id: '019c0ecd-3a59-725a-bb19-06c8c810551e',
+          type: 'users',
+          attributes: {
+            createdAt: '2026-01-30T12:07:37.000Z',
+            updatedAt: '2026-01-30T18:08:53.004Z',
+            deletedAt: null,
+            email: 'klerick666@gmail.com',
+            verifiedEmail: false,
+            username: 'klerick',
+            firstName: 'Alex',
+            lastName: 'H',
+            displayName: 'Alex H',
+          },
+          links: {
+            self: '/api/users/019c0ecd-3a59-725a-bb19-06c8c810551e',
+          },
+          relationships: {
+            role: {
+              links: {
+                self: '/api/users/019c0ecd-3a59-725a-bb19-06c8c810551e/relationships/role',
+              },
+              data: {
+                id: 'free_user',
+                type: 'roles',
+              },
+            },
+            providers: {
+              links: {
+                self: '/api/users/019c0ecd-3a59-725a-bb19-06c8c810551e/relationships/providers',
+              },
+              data: [
+                {
+                  id: '019c100a-5aff-7124-9b8c-5cc521263ba2',
+                  type: 'user-providers',
+                },
+                {
+                  id: '019c100a-7e76-7028-af09-0a8322ba4275',
+                  type: 'user-providers',
+                },
+              ],
+            },
+          },
+        },
+        included: [
+          {
+            id: '019c100a-5aff-7124-9b8c-5cc521263ba2',
+            type: 'user-providers',
+            attributes: {
+              createdAt: '2026-01-30T17:54:00.000Z',
+              provider: 'github',
+              profileId: '1661581',
+              email: 'klerick666@gmail.com',
+              displayName: null,
+            },
+            links: {
+              self: '/api/user-providers/019c100a-5aff-7124-9b8c-5cc521263ba2',
+            },
+            relationships: {
+              user: {
+                links: {
+                  self: '/api/user-providers/019c100a-5aff-7124-9b8c-5cc521263ba2/relationships/user',
+                },
+              },
+            },
+          },
+          {
+            id: '019c100a-7e76-7028-af09-0a8322ba4275',
+            type: 'user-providers',
+            attributes: {
+              createdAt: '2026-01-30T17:54:09.000Z',
+              provider: 'google',
+              profileId: '118084993756780491993',
+              email: 'klerick666@gmail.com',
+              displayName: null,
+            },
+            links: {
+              self: '/api/user-providers/019c100a-7e76-7028-af09-0a8322ba4275',
+            },
+            relationships: {
+              user: {
+                links: {
+                  self: '/api/user-providers/019c100a-7e76-7028-af09-0a8322ba4275/relationships/user',
+                },
+              },
+            },
+          },
+        ],
+      };
+
+      console.log(service['convertResponseData'](tmp as any, ['providers'] as any, true));
+
       const response = service['convertResponseData'](data, []) as any;
       expect(response[0]).not.toHaveProperty('createdBy');
     });
@@ -586,5 +683,55 @@ describe('JsonApiUtilsService', () => {
         type: 'test-entity',
       },
     ]);
+  });
+
+  describe('generateBody with nullRef and emptyArrayRef', () => {
+    it('should handle nullRef for single relationship', async () => {
+      const { nullRef } = await import('../utils');
+
+      class TestEntity {
+        id = '1';
+        name = 'Test';
+        manager: null = nullRef();
+      }
+
+      const testEntity = new TestEntity();
+      const result = service.generateBody(testEntity);
+
+      expect(result).toEqual({
+        attributes: {
+          name: 'Test',
+        },
+        relationships: {
+          manager: {
+            data: null,
+          },
+        },
+      });
+    });
+
+    it('should handle emptyArrayRef for to-many relationship', async () => {
+      const { emptyArrayRef } = await import('../utils');
+
+      class TestEntity {
+        id = '1';
+        name = 'Test';
+        roles: unknown[] = emptyArrayRef();
+      }
+
+      const testEntity = new TestEntity();
+      const result = service.generateBody(testEntity);
+
+      expect(result).toEqual({
+        attributes: {
+          name: 'Test',
+        },
+        relationships: {
+          roles: {
+            data: [],
+          },
+        },
+      });
+    });
   });
 });

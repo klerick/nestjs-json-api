@@ -17,7 +17,7 @@ import {
   ReturnIfArray,
 } from '../types';
 
-import { getTypeForReq, HttpParams, isRelation, isNullRef } from '../utils';
+import { getTypeForReq, HttpParams, isRelation, isNullRef, isEmptyArrayRef } from '../utils';
 import { ID_KEY } from '../constants';
 
 type Attributes<E extends object> = BaseAttribute<E>['attributes'];
@@ -208,10 +208,14 @@ export class JsonApiUtilsService {
     const arrayData = isArray ? data : [data];
     const result: E[] = [];
     for (const dataItem of arrayData) {
+      let id = (dataItem as any)[this.jsonApiSdkConfig.idKey];
+      if (this.jsonApiSdkConfig.idIsNumber) {
+        const idNumber = parseInt(id, 10);
+        id = isNaN(idNumber) ? id : idNumber;
+      }
+
       const entityObject = {
-        [this.jsonApiSdkConfig.idKey]: this.jsonApiSdkConfig.idIsNumber
-          ? parseInt((dataItem as any)[this.jsonApiSdkConfig.idKey], 10)
-          : (dataItem as any)[this.jsonApiSdkConfig.idKey],
+        [this.jsonApiSdkConfig.idKey]: id,
         ...Object.entries(dataItem.attributes || []).reduce(
           (acum, [key, val]) => {
             acum[key] = this.jsonApiSdkConfig.dateFields.includes(key)
@@ -305,12 +309,16 @@ export class JsonApiUtilsService {
     item: R,
     asPlain = false
   ): E[RelationKeys<E>] | undefined {
-    if (!item || !item.id) return;
+    if (!item || !item['id']) return;
+
+    let id: string | number = item['id'];
+    if (this.jsonApiSdkConfig.idIsNumber) {
+      const idNumber = parseInt(id, 10);
+      id = isNaN(idNumber) ? id : idNumber;
+    }
 
     const entityObject = {
-      [this.jsonApiSdkConfig.idKey]: this.jsonApiSdkConfig.idIsNumber
-        ? parseInt(item.id, 10)
-        : item.id,
+      [this.jsonApiSdkConfig.idKey]: id,
     };
 
     if (asPlain) {
@@ -389,6 +397,8 @@ export class JsonApiUtilsService {
         let data;
         if (isNullRef(val)) {
           data = null;
+        } else if (isEmptyArrayRef(val)) {
+          data = [];
         } else if (Array.isArray(val)) {
           data = val.map((i: any) => ({
             type: getTypeForReq(i.constructor.name),

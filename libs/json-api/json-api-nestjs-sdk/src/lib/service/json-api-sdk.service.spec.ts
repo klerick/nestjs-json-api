@@ -77,7 +77,11 @@ describe('JsonApiSdkService', () => {
     expect(spyGetQueryStringParams).toHaveBeenCalled();
     expect(spyGetUrlForResource).toHaveBeenCalledWith(TestKlass.name);
     expect(spyHttpGet).toHaveBeenCalled();
-    expect(spyConvertResponseData).toHaveBeenCalledWith(mockResult);
+    expect(spyConvertResponseData).toHaveBeenCalledWith(
+      mockResult,
+      undefined,
+      false,
+    );
   });
 
   it('should call getAll and return result', async () => {
