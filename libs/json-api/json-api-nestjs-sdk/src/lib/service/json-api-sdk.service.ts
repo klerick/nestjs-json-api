@@ -235,7 +235,7 @@ export class JsonApiSdkService {
           (r) =>
             this.jsonApiUtilsService.convertResponseData(
               r,
-              undefined,
+              (Object.keys(relationships).length > 0 ? Object.keys(relationships) : undefined) as any,
               asPlain
             ) as OutputEntity
         )
@@ -286,7 +286,7 @@ export class JsonApiSdkService {
           (r) =>
             this.jsonApiUtilsService.convertResponseData(
               r,
-              undefined,
+              (Object.keys(relationships).length > 0 ? Object.keys(relationships) : undefined) as any,
               asPlain
             ) as OutputEntity
         )

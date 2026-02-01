@@ -4,6 +4,7 @@ import { ID_KEY } from '../constants';
 import { JsonApiSdkConfig, JsonSdkConfig } from '../types';
 
 const NULL_REF = Symbol('null-ref');
+const EMPTY_ARRAY_REF = Symbol('empty-array-ref');
 
 /**
  * Marker for null relationship.
@@ -20,9 +21,27 @@ export function isNullRef(val: unknown): boolean {
   return val !== null && typeof val === 'object' && NULL_REF in val;
 }
 
+/**
+ * Marker for empty array relationship.
+ * Returns empty array for TypeScript but object with Symbol marker for runtime.
+ * Use this to explicitly clear all items from a to-many relationship.
+ */
+export function emptyArrayRef<T = unknown>(): T[] {
+  return { [EMPTY_ARRAY_REF]: true } as unknown as T[];
+}
+
+/**
+ * Checks if value is an emptyArrayRef marker
+ */
+export function isEmptyArrayRef(val: unknown): boolean {
+  return val !== null && typeof val === 'object' && EMPTY_ARRAY_REF in val;
+}
+
 export function isRelation(val: any): boolean {
   // nullRef is a special case - it's a relationship that should be null
   if (isNullRef(val)) return true;
+  // emptyArrayRef is a special case - it's a to-many relationship that should be empty
+  if (isEmptyArrayRef(val)) return true;
 
   const result = !(
     val === null ||

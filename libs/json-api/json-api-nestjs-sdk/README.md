@@ -38,6 +38,7 @@ Type-safe TypeScript/JavaScript client for consuming [JSON:API](https://jsonapi.
   - [Using entity() Method](#using-entity-method)
   - [Using String Type Names](#using-string-type-names)
 - [Nullifying Relationships](#-nullifying-relationships)
+- [Clearing To-Many Relationships](#-clearing-to-many-relationships)
 - [Query Options](#-query-options)
   - [Filtering](#filtering)
   - [Sorting](#sorting)
@@ -82,10 +83,10 @@ const jsonSdk = JsonApiJs(
 
 // 3. Use SDK
 // Fetch all users
-const users = await jsonSdk.jonApiSdkService.getAll(Users);
+const users = await jsonSdk.jsonApiSdkService.getAll(Users);
 
 // Fetch with filtering and relationships
-const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+const activeUsers = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       isActive: { [FilterOperand.eq]: 'true' }
@@ -95,7 +96,7 @@ const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // Get one user
-const user = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+const user = await jsonSdk.jsonApiSdkService.getOne(Users, '1', {
   include: ['addresses', 'comments', 'roles', 'manager']
 });
 
@@ -106,14 +107,14 @@ newUser.lastName = 'Doe';
 newUser.login = 'johndoe';
 newUser.isActive = true;
 
-const createdUser = await jsonSdk.jonApiSdkService.postOne(newUser);
+const createdUser = await jsonSdk.jsonApiSdkService.postOne(newUser);
 
 // Update a user
 createdUser.firstName = 'Jane';
-const updatedUser = await jsonSdk.jonApiSdkService.patchOne(createdUser);
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(createdUser);
 
 // Delete a user
-await jsonSdk.jonApiSdkService.deleteOne(createdUser);
+await jsonSdk.jsonApiSdkService.deleteOne(createdUser);
 ```
 
 ### Angular Setup
@@ -252,10 +253,10 @@ Fetch all resources with optional filtering, sorting, and relationships.
 import { FilterOperand } from '@klerick/json-api-nestjs-sdk';
 
 // Fetch all users
-const users = await jsonSdk.jonApiSdkService.getAll(Users);
+const users = await jsonSdk.jsonApiSdkService.getAll(Users);
 
 // With filtering
-const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+const activeUsers = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       isActive: { [FilterOperand.eq]: 'true' },
@@ -266,7 +267,7 @@ const activeUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // Filter by relationship
-const usersWithRoles = await jsonSdk.jonApiSdkService.getAll(Users, {
+const usersWithRoles = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       id: { [FilterOperand.in]: ['1', '2'] }
@@ -284,7 +285,7 @@ const usersWithRoles = await jsonSdk.jonApiSdkService.getAll(Users, {
 Fetch resources with pagination (returns paginated results).
 
 ```typescript
-const firstPage = await jsonSdk.jonApiSdkService.getList(Users, {
+const firstPage = await jsonSdk.jsonApiSdkService.getList(Users, {
   page: {
     number: 1,
     size: 10
@@ -296,7 +297,7 @@ const firstPage = await jsonSdk.jonApiSdkService.getList(Users, {
   }
 });
 
-const secondPage = await jsonSdk.jonApiSdkService.getList(Users, {
+const secondPage = await jsonSdk.jsonApiSdkService.getList(Users, {
   page: {
     number: 2,
     size: 10
@@ -315,15 +316,15 @@ Fetch a single resource by ID.
 
 ```typescript
 // Simple fetch
-const user = await jsonSdk.jonApiSdkService.getOne(Users, '1');
+const user = await jsonSdk.jsonApiSdkService.getOne(Users, '1');
 
 // With relationships
-const userWithRelations = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+const userWithRelations = await jsonSdk.jsonApiSdkService.getOne(Users, '1', {
   include: ['addresses', 'comments', 'roles', 'manager']
 });
 
 // With sparse fieldsets
-const userPartial = await jsonSdk.jonApiSdkService.getOne(Users, '1', {
+const userPartial = await jsonSdk.jsonApiSdkService.getOne(Users, '1', {
   fields: {
     users: ['firstName', 'lastName', 'email']
   }
@@ -344,7 +345,7 @@ newUser.lastName = 'Doe';
 newUser.login = 'johndoe';
 newUser.isActive = true;
 
-const createdUser = await jsonSdk.jonApiSdkService.postOne(newUser);
+const createdUser = await jsonSdk.jsonApiSdkService.postOne(newUser);
 
 // Create with relationships
 const newAddress = new Addresses();
@@ -352,7 +353,7 @@ newAddress.city = 'New York';
 newAddress.state = 'NY';
 newAddress.country = 'USA';
 
-const savedAddress = await jsonSdk.jonApiSdkService.postOne(newAddress);
+const savedAddress = await jsonSdk.jsonApiSdkService.postOne(newAddress);
 
 const user = new Users();
 user.firstName = 'Jane';
@@ -360,7 +361,7 @@ user.lastName = 'Doe';
 user.login = 'janedoe';
 user.addresses = savedAddress; // Set relationship
 
-const createdUser = await jsonSdk.jonApiSdkService.postOne(user);
+const createdUser = await jsonSdk.jsonApiSdkService.postOne(user);
 ```
 
 ### Updating Resources
@@ -372,13 +373,13 @@ Update an existing resource.
 ```typescript
 // Update attributes
 user.firstName = 'Updated Name';
-const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(user);
 
 // Update relationships
-const newAddress = await jsonSdk.jonApiSdkService.postOne(addressEntity);
+const newAddress = await jsonSdk.jsonApiSdkService.postOne(addressEntity);
 user.addresses = newAddress;
 
-const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(user);
 ```
 
 ### Deleting Resources
@@ -388,7 +389,7 @@ const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
 Delete a resource.
 
 ```typescript
-await jsonSdk.jonApiSdkService.deleteOne(user);
+await jsonSdk.jsonApiSdkService.deleteOne(user);
 ```
 
 ### Relationship Operations
@@ -399,13 +400,13 @@ Remove relationships without deleting the related resources.
 
 ```typescript
 // Remove all roles from user
-await jsonSdk.jonApiSdkService.deleteRelationships(user, 'roles');
+await jsonSdk.jsonApiSdkService.deleteRelationships(user, 'roles');
 
 // Remove manager from user
-await jsonSdk.jonApiSdkService.deleteRelationships(user, 'manager');
+await jsonSdk.jsonApiSdkService.deleteRelationships(user, 'manager');
 
 // Remove all comments from user
-await jsonSdk.jonApiSdkService.deleteRelationships(user, 'comments');
+await jsonSdk.jsonApiSdkService.deleteRelationships(user, 'comments');
 ```
 
 ---
@@ -435,7 +436,7 @@ interface User {
 const jsonSdk = JsonApiJs({ apiHost: 'http://localhost:3000', apiPrefix: 'api' }, true);
 
 // Create entity from plain object - chainable API
-const createdUser = await jsonSdk.jonApiSdkService
+const createdUser = await jsonSdk.jsonApiSdkService
   .entity<User>('Users', {
     firstName: 'John',
     lastName: 'Doe',
@@ -444,7 +445,7 @@ const createdUser = await jsonSdk.jonApiSdkService
   .postOne();
 
 // Update entity - chainable API
-const updatedUser = await jsonSdk.jonApiSdkService
+const updatedUser = await jsonSdk.jsonApiSdkService
   .entity<User>('Users', {
     id: 1,
     firstName: 'Jane'
@@ -452,12 +453,12 @@ const updatedUser = await jsonSdk.jonApiSdkService
   .patchOne();
 
 // Delete entity - chainable API
-await jsonSdk.jonApiSdkService
+await jsonSdk.jsonApiSdkService
   .entity<User>('Users', { id: 1 })
   .deleteOne();
 
 // Work with relationships
-const userRelations = await jsonSdk.jonApiSdkService
+const userRelations = await jsonSdk.jsonApiSdkService
   .entity<User>('Users', { id: 1 })
   .getRelationships('manager');
 ```
@@ -466,14 +467,14 @@ const userRelations = await jsonSdk.jonApiSdkService
 
 ```typescript
 // Get raw entity instance (third argument = true)
-const userEntity = jsonSdk.jonApiSdkService.entity<User>('Users', {
+const userEntity = jsonSdk.jsonApiSdkService.entity<User>('Users', {
   firstName: 'John',
   lastName: 'Doe',
   login: 'johndoe'
 }, true);
 
 // Now use it with standard SDK methods
-const created = await jsonSdk.jonApiSdkService.postOne(userEntity);
+const created = await jsonSdk.jsonApiSdkService.postOne(userEntity);
 ```
 
 ### Using String Type Names
@@ -482,15 +483,15 @@ GET methods also accept string type names instead of classes:
 
 ```typescript
 // Using string type name
-const users = await jsonSdk.jonApiSdkService.getAll<User>('Users', {
+const users = await jsonSdk.jsonApiSdkService.getAll<User>('Users', {
   include: ['manager']
 });
 
-const user = await jsonSdk.jonApiSdkService.getOne<User>('Users', '1', {
+const user = await jsonSdk.jsonApiSdkService.getOne<User>('Users', '1', {
   include: ['manager']
 });
 
-const userList = await jsonSdk.jonApiSdkService.getList<User>('Users', {
+const userList = await jsonSdk.jsonApiSdkService.getList<User>('Users', {
   page: { number: 1, size: 10 }
 });
 ```
@@ -515,13 +516,13 @@ interface User {
 const jsonSdk = JsonApiJs({ apiHost: 'http://localhost:3000', apiPrefix: 'api' }, true);
 
 // Clear the manager relationship
-const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+const user = jsonSdk.jsonApiSdkService.entity<User>('Users', {
   id: 1,
   firstName: 'John',
   manager: nullRef()  // This will send { data: null } for the relationship
 }, true);
 
-const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(user);
 // Result: user.manager is now null
 ```
 
@@ -533,7 +534,7 @@ const updatedUser = await jsonSdk.jonApiSdkService.patchOne(user);
 **Without nullRef:**
 ```typescript
 // This won't clear the relationship - it will be ignored
-const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+const user = jsonSdk.jsonApiSdkService.entity<User>('Users', {
   id: 1,
   firstName: 'John',
   // manager is undefined - not included in request
@@ -543,11 +544,52 @@ const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
 **With nullRef:**
 ```typescript
 // This explicitly clears the relationship
-const user = jsonSdk.jonApiSdkService.entity<User>('Users', {
+const user = jsonSdk.jsonApiSdkService.entity<User>('Users', {
   id: 1,
   firstName: 'John',
   manager: nullRef()  // Generates: relationships: { manager: { data: null } }
 }, true);
+```
+
+## 🔗 Clearing To-Many Relationships
+
+To clear all items from a to-many relationship (ManyToMany, OneToMany), use the `emptyArrayRef()` function:
+
+```typescript
+import { JsonApiJs, emptyArrayRef } from '@klerick/json-api-nestjs-sdk';
+
+interface User {
+  id?: number;
+  firstName: string;
+  roles?: Role[];
+}
+
+const jsonSdk = JsonApiJs({ apiHost: 'http://localhost:3000', apiPrefix: 'api' }, true);
+
+// Clear all roles from user
+const user = jsonSdk.jsonApiSdkService.entity<User>('Users', {
+  id: 1,
+  firstName: 'John',
+  roles: emptyArrayRef()  // This will send { data: [] } for the relationship
+}, true);
+
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(user);
+// Result: user.roles is now an empty array
+```
+
+**Why emptyArrayRef is needed:**
+- An empty array `[]` would be treated as an attribute (not a relationship)
+- `emptyArrayRef()` marks it as a relationship that should be cleared
+- At runtime, the SDK generates `{ data: [] }` in the JSON:API request body
+
+**Comparison:**
+```typescript
+// ❌ This won't work - empty array treated as attribute
+const user = { id: 1, roles: [] };
+
+// ✅ This works - explicitly clears the relationship
+const user = { id: 1, roles: emptyArrayRef() };
+// Generates: relationships: { roles: { data: [] } }
 ```
 
 ---
@@ -577,7 +619,7 @@ enum FilterOperand {
 
 ```typescript
 // Equal
-const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       isActive: { [FilterOperand.eq]: 'true' }
@@ -586,7 +628,7 @@ const users = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // Not equal
-const inactiveUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+const inactiveUsers = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       isActive: { [FilterOperand.ne]: 'true' }
@@ -595,7 +637,7 @@ const inactiveUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // In array
-const specificUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+const specificUsers = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       id: { [FilterOperand.in]: ['1', '2', '3'] }
@@ -604,7 +646,7 @@ const specificUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // LIKE search
-const searchUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
+const searchUsers = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       login: { [FilterOperand.like]: 'john' }
@@ -613,7 +655,7 @@ const searchUsers = await jsonSdk.jonApiSdkService.getAll(Users, {
 });
 
 // Check null/not null
-const usersWithManager = await jsonSdk.jonApiSdkService.getAll(Users, {
+const usersWithManager = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       manager: { [FilterOperand.ne]: null }
@@ -621,7 +663,7 @@ const usersWithManager = await jsonSdk.jonApiSdkService.getAll(Users, {
   }
 });
 
-const usersWithoutManager = await jsonSdk.jonApiSdkService.getAll(Users, {
+const usersWithoutManager = await jsonSdk.jsonApiSdkService.getAll(Users, {
   filter: {
     target: {
       manager: { [FilterOperand.eq]: null }
@@ -634,7 +676,7 @@ const usersWithoutManager = await jsonSdk.jonApiSdkService.getAll(Users, {
 
 ```typescript
 // Sort by single field
-const users = await jsonSdk.jonApiSdkService.getList(Users, {
+const users = await jsonSdk.jsonApiSdkService.getList(Users, {
   sort: {
     target: {
       id: 'ASC'
@@ -643,7 +685,7 @@ const users = await jsonSdk.jonApiSdkService.getList(Users, {
 });
 
 // Sort by multiple fields
-const sortedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
+const sortedUsers = await jsonSdk.jsonApiSdkService.getList(Users, {
   sort: {
     target: {
       createdAt: 'DESC',
@@ -656,7 +698,7 @@ const sortedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
 ### Pagination
 
 ```typescript
-const paginatedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
+const paginatedUsers = await jsonSdk.jsonApiSdkService.getList(Users, {
   page: {
     number: 1,  // Page number (1-indexed)
     size: 20    // Items per page
@@ -668,17 +710,17 @@ const paginatedUsers = await jsonSdk.jonApiSdkService.getList(Users, {
 
 ```typescript
 // Include single relationship
-const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
   include: ['addresses']
 });
 
 // Include multiple relationships
-const usersWithAll = await jsonSdk.jonApiSdkService.getAll(Users, {
+const usersWithAll = await jsonSdk.jsonApiSdkService.getAll(Users, {
   include: ['addresses', 'roles', 'comments', 'manager']
 });
 
 // Include nested relationships
-const usersWithNested = await jsonSdk.jonApiSdkService.getAll(Users, {
+const usersWithNested = await jsonSdk.jsonApiSdkService.getAll(Users, {
   include: ['addresses', 'manager.addresses', 'roles']
 });
 ```
@@ -688,7 +730,7 @@ const usersWithNested = await jsonSdk.jonApiSdkService.getAll(Users, {
 Request only specific fields to reduce payload size.
 
 ```typescript
-const users = await jsonSdk.jonApiSdkService.getAll(Users, {
+const users = await jsonSdk.jsonApiSdkService.getAll(Users, {
   fields: {
     users: ['firstName', 'lastName', 'email'],
     addresses: ['city', 'country']

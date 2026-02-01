@@ -17,13 +17,13 @@ import { lastValueFrom } from 'rxjs';
 
 export type JsonSdkPromise = {
   jsonApiUtilsService: JsonApiUtilsService;
-  jonApiSdkService: PromiseJsonApiSdkService;
+  jsonApiSdkService: PromiseJsonApiSdkService;
   atomicFactory: AtomicFactoryPromise;
 };
 
 export type JsonSdkGeneral = {
   jsonApiUtilsService: JsonApiUtilsService;
-  jonApiSdkService: JsonApiSdkService;
+  jsonApiSdkService: JsonApiSdkService;
   atomicFactory: AtomicFactory;
 };
 
@@ -43,13 +43,13 @@ export function JsonApiJs<P extends true | boolean>(
 
   const jsonApiUtilsService = new JsonApiUtilsService(resultJsonConfig);
   const httpInnerClient = adapter ? adapter : new FetchInnerClient();
-  const jonApiSdkService = new JsonApiSdkService(
+  const jsonApiSdkService = new JsonApiSdkService(
     httpInnerClient,
     jsonApiUtilsService,
     resultJsonConfig
   );
   jsonSdk['jsonApiUtilsService'] = jsonApiUtilsService;
-  jsonSdk['jonApiSdkService'] = jonApiSdkService;
+  jsonSdk['jsonApiSdkService'] = jsonApiSdkService;
   jsonSdk['atomicFactory'] = () =>
     new AtomicOperationsService(
       jsonApiUtilsService,
@@ -58,7 +58,7 @@ export function JsonApiJs<P extends true | boolean>(
     );
 
   if (returnPromise) {
-    jsonSdk['jonApiSdkService'] = new Proxy(jonApiSdkService, {
+    jsonSdk['jsonApiSdkService'] = new Proxy(jsonApiSdkService, {
       get<
         T extends JsonApiSdkService,
         R extends FunctionPropertyNames<PromiseJsonApiSdkService>,
