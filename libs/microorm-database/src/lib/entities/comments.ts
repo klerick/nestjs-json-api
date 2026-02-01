@@ -15,6 +15,7 @@ export enum CommentKind {
 
 import { Users, IUsers } from '.';
 import { JsonApiReadOnly, JsonApiReadOnlyField } from '@klerick/json-api-nestjs';
+import { truncateToSeconds } from '../utils/date';
 
 export type IComments = Comments;
 
@@ -43,18 +44,18 @@ export class Comments {
     columnType: 'timestamp(0) without time zone',
   })
   @JsonApiReadOnly()
-  createdAt: Date & Opt & JsonApiReadOnlyField = new Date();
+  createdAt: Date & Opt & JsonApiReadOnlyField = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: true,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
   @JsonApiReadOnly()
-  updatedAt: Date & Opt & JsonApiReadOnlyField = new Date();
+  updatedAt: Date & Opt & JsonApiReadOnlyField = truncateToSeconds();
 
   @ManyToOne(() => Users, {
     nullable: true,

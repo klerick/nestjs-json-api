@@ -7,6 +7,7 @@ import {
   ArrayType,
 } from '@mikro-orm/core';
 import { UsersAcl, IUsersAcl } from './user.entity';
+import { truncateToSeconds } from '../../utils/date';
 
 export enum ArticleStatus {
   DRAFT = 'draft',
@@ -159,15 +160,15 @@ export class ArticleAcl {
     columnType: 'timestamp(0) without time zone',
     type: 'timestamp',
   })
-  createdAt: Date = new Date();
+  createdAt: Date = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: false,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  updatedAt: Date = truncateToSeconds();
 }

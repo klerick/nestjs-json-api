@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, OneToOne } from '@mikro-orm/core';
 
 import { Users, IUsers } from '.';
+import { truncateToSeconds } from '../utils/date';
 
 export type IAddresses = Addresses;
 
@@ -41,17 +42,17 @@ export class Addresses {
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
     columnType: 'timestamp(0) without time zone',
   })
-  createdAt: Date = new Date();
+  createdAt: Date = truncateToSeconds();
 
   @Property({
     length: 0,
-    onUpdate: () => new Date(),
+    onUpdate: () => truncateToSeconds(),
     name: 'updated_at',
     nullable: true,
     columnType: 'timestamp(0) without time zone',
     defaultRaw: 'CURRENT_TIMESTAMP(0)',
   })
-  updatedAt: Date = new Date();
+  updatedAt: Date = truncateToSeconds();
 
   @OneToOne(() => Users, (item) => item.addresses)
   public user!: IUsers;

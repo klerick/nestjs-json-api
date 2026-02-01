@@ -11,5 +11,6 @@ export const config = {
   loggerFactory: (options: LoggerOptions) => new DatabaseLoggerService(options),
   context: () => ClsServiceManager.getClsService().get<EntityManager>(CONTEXT_STORE_NAME),
   // @ts-ignore
-  registerRequestContext: false
+  registerRequestContext: false,
+  forceUtcTimezone: true,
 };
