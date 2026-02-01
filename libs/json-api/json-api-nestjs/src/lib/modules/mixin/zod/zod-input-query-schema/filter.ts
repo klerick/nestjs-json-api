@@ -7,6 +7,7 @@ import { z, ZodType } from 'zod';
 
 import { EntityParamMapService } from '../../service';
 import { getRelationPrimaryName, getRelationProps, oneOf, stringLongerThan } from '../zod-utils';
+import { transformFilterValueToString, transformToNull } from '../map-transform-to-json-shema';
 import {
   EntityParam,
   EntityRelationProps,
@@ -52,7 +53,7 @@ function convertToFilterObject(
 function getZodRulesForFilterOperator() {
   const filterConditional = z
     .union([z.string().refine(stringLongerThan()), z.null(), z.number()])
-    .transform((r) => `${r}`);
+    .transform(transformFilterValueToString);
 
   const conditional = z
     .object(
@@ -81,14 +82,14 @@ function getZodRulesForRelation() {
         .object({
           [FilterOperand.eq]: z
             .union([z.literal('null'), z.null()])
-            .transform(() => null),
+            .transform(transformToNull),
         })
         .strict(),
       z
         .object({
           [FilterOperand.ne]: z
             .union([z.literal('null'), z.null()])
-            .transform(() => null),
+            .transform(transformToNull),
         })
         .strict(),
     ])
@@ -146,7 +147,7 @@ export function shapeForArray<
   );
 }
 
-export function zodFilterInputQuery<E extends object, IdKey extends string>(
+export function zodFilterInputQuerySwagger<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
   const target = {
@@ -172,7 +173,6 @@ export function zodFilterInputQuery<E extends object, IdKey extends string>(
   const relationList = getRelationProps(entityParamMapService);
   const relationPrimaryName = getRelationPrimaryName(entityParamMapService);
 
-
   for (const [key, val] of ObjectTyped.entries(relationPrimaryName)) {
     if (relationList[key].includes(val as never)) continue;
     relationList[key].push(val as never);
@@ -183,13 +183,20 @@ export function zodFilterInputQuery<E extends object, IdKey extends string>(
     IdKey,
     ConcatRelationField<E, IdKey>
   >(getTupleConcatRelationFields(relationList), zodRulesForFilterOperator);
+
   return z
     .object({
       ...target,
       ...relations,
       ...relationFields,
     })
-    .optional()
+    .optional();
+}
+
+export function zodFilterInputQuery<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+) {
+  return zodFilterInputQuerySwagger(entityParamMapService)
     .transform((data) => {
       if (!data) {
         return {

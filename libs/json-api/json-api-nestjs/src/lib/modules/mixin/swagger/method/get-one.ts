@@ -5,10 +5,16 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import {
+  ReferenceObject,
+  SchemaObject,
+} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ObjectTyped, EntityClass } from '@klerick/json-api-nestjs-shared';
 import { Type } from '@nestjs/common';
+import { z } from 'zod';
 
-import { jsonSchemaResponse } from '../utils';
+import { jsonSchemaResponse, zodToJSONSchemaParams } from '../utils';
+import { zodFieldsInputQuerySwagger } from '../../zod';
 import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
@@ -55,9 +61,10 @@ export function getOne<E extends object, IdKey extends string = 'id'>(
     name: 'fields',
     required: false,
     style: 'deepObject',
-    schema: {
-      type: 'object',
-    },
+    schema: z.toJSONSchema(
+      zodFieldsInputQuerySwagger(mapEntity),
+      zodToJSONSchemaParams
+    ) as SchemaObject | ReferenceObject,
     examples: {
       allField: {
         summary: 'Select all field',
