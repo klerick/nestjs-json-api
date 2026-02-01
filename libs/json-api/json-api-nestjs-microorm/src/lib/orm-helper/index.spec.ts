@@ -99,7 +99,6 @@ describe('microorm-orm-helper-for-map', () => {
     expect(result).toEqual({
       createdAt: 'date',
       firstName: 'string',
-      id: 'number',
       isActive: 'boolean',
       lastName: 'string',
       login: 'string',
