@@ -5,6 +5,8 @@ import {
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { PatchData, ValidateQueryError } from '@klerick/json-api-nestjs';
 import { MicroOrmService } from '../../service';
+import { FilterQuery } from '@mikro-orm/core';
+import { Populate } from '@mikro-orm/core/typings';
 
 export async function patchOne<E extends object, IdKey extends string>(
   this: MicroOrmService<E, IdKey>,
@@ -23,12 +25,14 @@ export async function patchOne<E extends object, IdKey extends string>(
     throw new UnprocessableEntityException([error]);
   }
 
-  const existEntity = await this.microOrmUtilService
-    .queryBuilder()
-    .where({
+  const relationshipsPropsArray = Object.keys(relationships || {}) as unknown as Populate<E, string>;
+  const existEntity = await this.microOrmUtilService.entityManager.findOne(
+    this.microOrmUtilService.entity,
+    {
       [this.microOrmUtilService.currentPrimaryColumn]: id,
-    })
-    .getSingleResult();
+    } as FilterQuery<NoInfer<E>>,
+    { populate: relationshipsPropsArray }
+  );
 
   if (!existEntity) {
     const error: ValidateQueryError = {
@@ -47,5 +51,5 @@ export async function patchOne<E extends object, IdKey extends string>(
       Reflect.set(existEntity, props, val);
     }
   }
-  return this.microOrmUtilService.saveEntity(existEntity, relationships as any);
+  return this.microOrmUtilService.updateEntity(existEntity, relationships as any);
 }

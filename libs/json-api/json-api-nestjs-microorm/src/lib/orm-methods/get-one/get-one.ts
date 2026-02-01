@@ -9,22 +9,41 @@ export async function getOne<E extends object, IdKey extends string>(
   query: QueryOne<E, IdKey>,
   additionalQueryParams?: Record<string, unknown>
 ): Promise<E> {
-  const queryBuilder = this.microOrmUtilService.queryBuilder().where({
-    [this.microOrmUtilService.currentPrimaryColumn]: id,
-  });
+  const { include, fields } = query;
+  const primaryColumn = this.microOrmUtilService.currentPrimaryColumn;
 
-  const resultQueryBuilder = this.microOrmUtilService.prePareQueryBuilder(
-    queryBuilder,
-    query as any
-  );
+  // Simple query: no fields selection, no additional params
+  // Use em.findOne() which leverages Identity Map and loads only missing relations
+  const canUseFindOne = !fields && !additionalQueryParams;
 
-  if (additionalQueryParams) {
-    resultQueryBuilder.andWhere(additionalQueryParams);
+  let resultItem: E | null;
+  if (canUseFindOne) {
+    const em = this.microOrmUtilService.entityManager;
+
+    resultItem = await em.findOne(
+      this.microOrmUtilService.entity,
+      { [primaryColumn]: id } as any,
+      { populate: (include || []) as any }
+    );
+  } else {
+    const queryBuilder = this.microOrmUtilService.queryBuilder().where({
+      [primaryColumn]: id,
+    });
+
+    const resultQueryBuilder = this.microOrmUtilService.prePareQueryBuilder(
+      queryBuilder,
+      query as any
+    );
+
+    if (additionalQueryParams) {
+      resultQueryBuilder.andWhere(additionalQueryParams);
+    }
+
+    await resultQueryBuilder.applyFilters();
+
+    resultItem = await resultQueryBuilder.getSingleResult();
   }
 
-  await resultQueryBuilder.applyFilters();
-
-  const resultItem = await resultQueryBuilder.getSingleResult();
   if (!resultItem) {
     const error: ValidateQueryError = {
       code: 'invalid_arguments',

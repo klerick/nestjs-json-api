@@ -5,6 +5,7 @@ import {
   EntityRepository,
   MetadataStorage,
   EntityClass,
+  FilterQuery,
 } from '@mikro-orm/core';
 import { kebabCase } from 'change-case-commonjs';
 import { getMikroORMToken } from '@mikro-orm/nestjs';
@@ -154,13 +155,13 @@ export function FindOneRowEntityFactory<
   return {
     provide: FIND_ONE_ROW_ENTITY,
     inject: [MicroOrmUtilService],
-    useFactory(microOrmUtilService: MicroOrmUtilService<E, IdKey>) {
+    useFactory(
+      microOrmUtilService: MicroOrmUtilService<E, IdKey>,
+    ) {
       return async (entity, value) => {
-        const qb = microOrmUtilService.queryBuilder(entity).where({
+        return await microOrmUtilService.entityManager.findOne<E>(entity, {
           [microOrmUtilService.currentPrimaryColumn]: value,
-        });
-        await qb.applyFilters();
-        return qb.getSingleResult();
+        } as FilterQuery<NoInfer<E>>);
       };
     },
   };
