@@ -65,6 +65,10 @@
             "forwardAllArgs": false
           },
           {
+            "command": "echo '{\"type\": \"module\"}' > dist/{projectRoot}/mjs/package.json",
+            "forwardAllArgs": false
+          },
+          {
             "command": "node tools/scripts/prepare-package-json.mjs json-api-nestjs-shared"
           },
           {
