@@ -161,7 +161,9 @@ export type FilterProps<E extends object, IdKey extends string> = {
       ? ZodOptional<ZodRuleForArrayField>
       : ZodOptional<ZodRulesForField>
     : never;
-};
+} & { [
+  id in EntityParam<E, IdKey>['primaryColumnName']
+  ]?: ZodOptional<ZodRulesForField> };
 
 type TargetRelationShape<E extends object, IdKey extends string> = {
   [Props in EntityParam<E, IdKey>['relations'][number] &
@@ -204,7 +206,9 @@ function getFilterPropsShapeForEntity<E extends object, IdKey extends string>(
     Reflect.set(acum, field as PropertyKey, value.optional());
 
     return acum;
-  }, {} as FilterProps<E, IdKey>);
+  }, {
+    [entityParam.primaryColumnName]: getZodRulesForFieldUsingCache(entityParam.primaryColumnType).optional()
+  } as FilterProps<E, IdKey>);
 }
 
 export function zodFilterQuery<E extends object, IdKey extends string>(

@@ -1,7 +1,12 @@
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { z, ZodObject } from 'zod';
 
-import { getRelationProps, nonEmptyObject, uniqueArray } from '../zod-utils';
+import {
+  getRelationPrimaryName,
+  getRelationProps,
+  nonEmptyObject,
+  uniqueArray,
+} from '../zod-utils';
 import {
   EntityParam,
   EntityRelationProps,
@@ -13,8 +18,8 @@ function getZodFieldRule<
   E extends object,
   IdKey extends string,
   PropsList extends ShapeArrayInput<E, IdKey>
->(fields: PropsList) {
-  const fieldsProps: NonEmptyStringTuple<PropsList> = fields as any;
+>(fields: PropsList, id: IdKey) {
+  const fieldsProps: NonEmptyStringTuple<PropsList> = [...fields, id] as any;
 
   return z
     .enum(fieldsProps)
@@ -50,15 +55,16 @@ function getShapeFields<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ): ZodObject<ZodFieldsShape<E, IdKey>, z.core.$strict> {
   const relationList = getRelationProps(entityParamMapService);
-
+  const relationListPrimaryName = getRelationPrimaryName(entityParamMapService);
   const fieldShape = ObjectTyped.entries(relationList).reduce(
     (acum, [key, val]) => ({
       ...acum,
-      [key as PropertyKey]: getZodFieldRule<E, IdKey, typeof val>(val),
+      [key as PropertyKey]: getZodFieldRule<E, IdKey, typeof val>(val, relationListPrimaryName[key] as IdKey),
     }),
     {
       target: getZodFieldRule<E, IdKey, EntityParam<E, IdKey>['props']>(
-        entityParamMapService.entityParaMap.props
+        entityParamMapService.entityParaMap.props,
+        entityParamMapService.entityParaMap.primaryColumnName
       ),
     } as ZodFieldsShape<E, IdKey>
   );

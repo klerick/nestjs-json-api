@@ -3,7 +3,11 @@ import { z, ZodObject } from 'zod';
 
 import { EntityParam, EntityRelationProps } from '../../../../types';
 import { SORT_TYPE } from '../../../../constants';
-import { getRelationProps, nonEmptyObject } from '../zod-utils';
+import {
+  getRelationPrimaryName,
+  getRelationProps,
+  nonEmptyObject,
+} from '../zod-utils';
 import { EntityParamMapService } from '../../service';
 
 function getZodSortRule() {
@@ -14,13 +18,13 @@ function getZodFieldRule<
   E extends object,
   IdKey extends string,
   PropsList extends ShapeArrayInput<E, IdKey>
->(fields: PropsList, zodSchema: ZodSortRule) {
+>(fields: PropsList, zodSchema: ZodSortRule, idKey: IdKey) {
   const targetShape = fields.reduce(
     (acum, item) => ({
       ...acum,
       [item as PropertyKey]: zodSchema,
     }),
-    {} as { [K in PropsList[number] & PropertyKey]: ZodSortRule }
+    {[idKey]: zodSchema} as { [K in (PropsList[number] | IdKey) & PropertyKey]: ZodSortRule }
   );
 
   return z.object(targetShape).strict().refine(nonEmptyObject()).optional();
@@ -59,19 +63,22 @@ function zodSortObject<E extends object, IdKey extends string>(
 ): ZodObject<ZodSortShape<E, IdKey>, z.core.$strict> {
   const zodSortRule = getZodSortRule();
   const relationList = getRelationProps(entityParamMapService);
+  const relationListPrimaryName = getRelationPrimaryName(entityParamMapService);
 
   const sortShape = ObjectTyped.entries(relationList).reduce(
     (acum, [key, val]) => ({
       ...acum,
       [key as PropertyKey]: getZodFieldRule<E, IdKey, typeof val>(
         val,
-        zodSortRule
+        zodSortRule,
+        relationListPrimaryName[key]
       ),
     }),
     {
       target: getZodFieldRule<E, IdKey, EntityParam<E, IdKey>['props']>(
         entityParamMapService.entityParaMap.props,
-        zodSortRule
+        zodSortRule,
+        entityParamMapService.entityParaMap.primaryColumnName
       ),
     } as ZodSortShape<E, IdKey>
   );
