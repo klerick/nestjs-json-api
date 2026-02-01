@@ -1,3 +1,18 @@
+## 10.0.0-beta.11 (2026-02-01)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** add emptyArrayRef for clearing to-many relationships and update SDK to handle id parsing and relationship markers ([58b2309](https://github.com/klerick/nestjs-json-api/commit/58b2309))
+- **json-api-nestjs-sdk:** add support for plain objects, dynamic factory config, and relationship id preservation ([295de3c](https://github.com/klerick/nestjs-json-api/commit/295de3c))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.7
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.10 (2026-01-23)
 
 ### 🚀 Features

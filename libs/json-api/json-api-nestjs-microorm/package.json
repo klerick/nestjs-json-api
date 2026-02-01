@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-microorm",
-  "version": "0.1.0-beta.16",
+  "version": "0.1.0-beta.17",
   "type": "commonjs",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -15,7 +15,7 @@
     "CRUD"
   ],
   "peerDependencies": {
-    "@klerick/json-api-nestjs": "10.0.0-beta.14",
+    "@klerick/json-api-nestjs": "10.0.0-beta.15",
     "@mikro-orm/nestjs": "^6.1.0"
   }
 }

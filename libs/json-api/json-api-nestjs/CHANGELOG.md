@@ -1,3 +1,18 @@
+## 10.0.0-beta.15 (2026-02-01)
+
+### 🚀 Features
+
+- **json-api-nestjs:** refactor query parameter schemas with Zod, improve Swagger definitions, and add reusable transformers ([70e955f](https://github.com/klerick/nestjs-json-api/commit/70e955f))
+- **json-api-nestjs:** add primary key handling for relations and improve query schema generation ([7caea1a](https://github.com/klerick/nestjs-json-api/commit/7caea1a))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.7
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.14 (2026-01-23)
 
 ### 🚀 Features

@@ -1,3 +1,13 @@
+## 1.0.0-beta.7 (2026-02-01)
+
+### 🚀 Features
+
+- **json-api-nestjs-shared:** add command to generate mjs package.json for ESM support in dist folder ([2b3083d](https://github.com/klerick/nestjs-json-api/commit/2b3083d))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 1.0.0-beta.6 (2026-01-23)
 
 ### 🚀 Features

@@ -1,3 +1,23 @@
+## 0.1.0-beta.17 (2026-02-01)
+
+### 🚀 Features
+
+- **json-api-nestjs-microorm:** optimize entity operations with `entityManager` over `queryBuilder` and implement diff-based relationship handling ([406ead6](https://github.com/klerick/nestjs-json-api/commit/406ead6))
+- **json-api-nestjs-microorm:** exclude primary key from props and update related tests ([c4cf0bb](https://github.com/klerick/nestjs-json-api/commit/c4cf0bb))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm:** update test to exclude primary key validation in properties ([8cfdf1d](https://github.com/klerick/nestjs-json-api/commit/8cfdf1d))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.7
+- Updated json-api-nestjs to 10.0.0-beta.15
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 0.1.0-beta.16 (2026-01-23)
 
 ### 🧱 Updated Dependencies
