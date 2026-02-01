@@ -1,8 +1,8 @@
-import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
+import { ObjectTyped, RelationKeys } from '@klerick/json-api-nestjs-shared';
 
 import { ZodType } from 'zod';
 
-import { EntityRelationProps, TypeField } from '../../../types';
+import { EntityParam, EntityRelationProps, RelationProperty, TypeField } from '../../../types';
 import { EntityParamMapService } from '../service';
 import { ResultSchema } from './zod-share';
 
@@ -84,6 +84,26 @@ export function getRelationProps<E extends object, IdKey extends string>(
     Reflect.set(acum, name, relMap.props);
     return acum;
   }, {} as EntityRelationProps<E, IdKey>);
+}
+
+export function getRelationPrimaryName<E extends object, IdKey extends string>(
+  entityParamMapService: EntityParamMapService<E, IdKey>
+) {
+
+  return ObjectTyped.entries(
+    entityParamMapService.entityParaMap.relationProperty
+  ).reduce(
+    (acum, [name, value]) => {
+      const relMap = entityParamMapService.getParamMap(
+        value.entityClass as any
+      );
+      Reflect.set(acum, name, relMap.primaryColumnName);
+      return acum;
+    },
+    {} as {
+      [K in keyof EntityRelationProps<E, IdKey>]: IdKey;
+    }
+  );
 }
 
 export function setOptionalOrNot<

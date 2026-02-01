@@ -6,7 +6,7 @@ import {
 import { z, ZodType } from 'zod';
 
 import { EntityParamMapService } from '../../service';
-import { getRelationProps, oneOf, stringLongerThan } from '../zod-utils';
+import { getRelationPrimaryName, getRelationProps, oneOf, stringLongerThan } from '../zod-utils';
 import {
   EntityParam,
   EntityRelationProps,
@@ -64,9 +64,7 @@ function getZodRulesForFilterOperator() {
     .strict()
     .partial()
     .refine(oneOf(Object.values(FilterOperand)), {
-      error: `Must have one of: "${Object.values(FilterOperand).join(
-        '","'
-      )}"`,
+      error: `Must have one of: "${Object.values(FilterOperand).join('","')}"`,
     });
 
   return z.union([filterConditional, conditional]).optional();
@@ -106,7 +104,7 @@ export type ConcatRelationField<
 > = UnionToTuple<
   {
     [K in keyof EntityRelationProps<E, IdKey>]: `${K &
-    string}.${EntityRelationProps<E, IdKey>[K][number] & string}`;
+      string}.${EntityRelationProps<E, IdKey>[K][number] & string}`;
   }[keyof EntityRelationProps<E, IdKey>]
 >;
 
@@ -135,7 +133,10 @@ export function shapeForArray<
   Z extends ZodType,
   IdKey extends string,
   PropsList extends ShapeArrayInput<E, IdKey>
->(fields: PropsList, zodSchema: Z): Record<CastPropertyKey<PropsList[number]>, Z> {
+>(
+  fields: PropsList,
+  zodSchema: Z
+): Record<CastPropertyKey<PropsList[number]>, Z> {
   return fields.reduce(
     (acum, item) => ({
       ...acum,
@@ -148,12 +149,18 @@ export function shapeForArray<
 export function zodFilterInputQuery<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
 ) {
-  const target = shapeForArray<
-    E,
-    ZodRulesForFilterOperator,
-    IdKey,
-    EntityParam<E, IdKey>['props']
-  >(entityParamMapService.entityParaMap.props, zodRulesForFilterOperator);
+  const target = {
+    ...{
+      [entityParamMapService.entityParaMap.primaryColumnName]:
+        zodRulesForFilterOperator,
+    } as {[Id in IdKey]: ZodRulesForFilterOperator},
+    ...shapeForArray<
+      E,
+      ZodRulesForFilterOperator,
+      IdKey,
+      EntityParam<E, IdKey>['props']
+    >(entityParamMapService.entityParaMap.props, zodRulesForFilterOperator),
+  };
 
   const relations = shapeForArray<
     E,
@@ -163,18 +170,25 @@ export function zodFilterInputQuery<E extends object, IdKey extends string>(
   >(entityParamMapService.entityParaMap.relations, zodRulesForRelation);
 
   const relationList = getRelationProps(entityParamMapService);
+  const relationPrimaryName = getRelationPrimaryName(entityParamMapService);
 
+
+  for (const [key, val] of ObjectTyped.entries(relationPrimaryName)) {
+    if (relationList[key].includes(val as never)) continue;
+    relationList[key].push(val as never);
+  }
   const relationFields = shapeForArray<
     E,
     ZodRulesForFilterOperator,
     IdKey,
     ConcatRelationField<E, IdKey>
   >(getTupleConcatRelationFields(relationList), zodRulesForFilterOperator);
-  return z.object({
-    ...target,
-    ...relations,
-    ...relationFields
-  })
+  return z
+    .object({
+      ...target,
+      ...relations,
+      ...relationFields,
+    })
     .optional()
     .transform((data) => {
       if (!data) {
