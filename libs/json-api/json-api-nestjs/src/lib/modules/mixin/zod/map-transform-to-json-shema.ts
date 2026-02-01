@@ -24,6 +24,14 @@ export function transformStringToArray(input: string | undefined) {
   return input ? input.split(',') : undefined;
 }
 
+export function transformFilterValueToString(r: string | null | number) {
+  return `${r}`;
+}
+
+export function transformToNull() {
+  return null;
+}
+
 const mapTransformFunctionToJsonShema = new Map<string, JSONSchema.JSONSchema>([
   [
     transformDateString.name,
@@ -34,6 +42,8 @@ const mapTransformFunctionToJsonShema = new Map<string, JSONSchema.JSONSchema>([
     },
   ],
   [transformStringToArray.name, { type: 'array', items: { type: 'string' } }],
+  [transformFilterValueToString.name, { type: 'string' }],
+  [transformToNull.name, { type: 'null' }],
 ]);
 
 export { mapTransformFunctionToJsonShema };

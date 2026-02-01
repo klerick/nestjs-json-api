@@ -4,17 +4,23 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import {
+  ReferenceObject,
+  SchemaObject,
+} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from '@nestjs/common';
 import {
   ObjectTyped,
   EntityClass,
-  FilterOperand,
 } from '@klerick/json-api-nestjs-shared';
+import { z } from 'zod';
 
 import {
   assertIsKeysOfObject,
   jsonSchemaResponse,
+  zodToJSONSchemaParams,
 } from '../utils';
+import { zodFieldsInputQuerySwagger, zodFilterInputQuerySwagger } from '../../zod';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
@@ -53,9 +59,10 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     name: 'fields',
     required: false,
     style: 'deepObject',
-    schema: {
-      type: 'object',
-    },
+    schema: z.toJSONSchema(
+      zodFieldsInputQuerySwagger(mapEntity),
+      zodToJSONSchemaParams
+    ) as SchemaObject | ReferenceObject,
     examples: {
       allField: {
         summary: 'Select all field',
@@ -86,40 +93,10 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     name: 'filter',
     required: false,
     style: 'deepObject',
-    schema: {
-      type: 'object',
-      properties: {
-        ...props.reduce((acum, i) => {
-          Reflect.set(acum, String(i), {
-            type: 'object',
-            properties: Object.keys(FilterOperand).reduce((acum, name) => {
-              Reflect.set(acum, String(name), {
-                type: 'string',
-              });
-              return acum;
-            }, {}),
-            minProperties: 1,
-            additionalProperties: false,
-          });
-          return acum;
-        }, {}),
-        ...relationTree.reduce((acum, i) => {
-          Reflect.set(acum, String(i), {
-            type: 'object',
-            properties: Object.keys(FilterOperand).reduce((acum, name) => {
-              Reflect.set(acum, String(name), {
-                type: 'string',
-              });
-              return acum;
-            }, {}),
-            minProperties: 1,
-            additionalProperties: false,
-          });
-          return acum;
-        }, {}),
-      },
-      additionalProperties: false,
-    },
+    schema: z.toJSONSchema(
+      zodFilterInputQuerySwagger(mapEntity),
+      zodToJSONSchemaParams
+    ) as SchemaObject | ReferenceObject,
     examples: {
       simpleExample: {
         summary: 'Several conditional',

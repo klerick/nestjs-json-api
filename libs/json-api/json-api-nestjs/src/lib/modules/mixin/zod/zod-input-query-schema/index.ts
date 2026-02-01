@@ -2,13 +2,13 @@ import { QueryField } from '@klerick/json-api-nestjs-shared';
 import { z } from 'zod';
 
 import { EntityParamMapService } from '../../service';
-import { zodFieldsInputQuery } from './fields';
-import { zodFilterInputQuery } from './filter';
+import { zodFieldsInputQuery, zodFieldsInputQuerySwagger } from './fields';
+import { zodFilterInputQuery, zodFilterInputQuerySwagger } from './filter';
 import { zodIncludeInputQuery } from './include';
 import { zodSortInputQuery } from './sort';
 import { zodPageInputQuery } from '../zod-share';
 
-export {zodFieldsInputQuery}
+export { zodFieldsInputQuery, zodFieldsInputQuerySwagger, zodFilterInputQuerySwagger };
 
 export function zodInputQuery<E extends object, IdKey extends string>(
   entityParamMapService: EntityParamMapService<E, IdKey>
