@@ -30,7 +30,7 @@ describe('NestJS Common Decorators Integration', () => {
     it('should trigger controller-level interceptor and return validation error', async () => {
       expect.assertions(3);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {
@@ -53,7 +53,7 @@ describe('NestJS Common Decorators Integration', () => {
     it('should trigger method-level interceptor and return validation error', async () => {
       expect.assertions(3);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {
@@ -78,7 +78,7 @@ describe('NestJS Common Decorators Integration', () => {
     it('should trigger controller-level exception filter and return custom HTTP status code', async () => {
       expect.assertions(4);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {
@@ -98,7 +98,7 @@ describe('NestJS Common Decorators Integration', () => {
     });
     it('should trigger method-level exception filter and return custom HTTP status code', async () => {
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {
@@ -123,7 +123,7 @@ describe('NestJS Common Decorators Integration', () => {
     it('should trigger controller-level guard and deny access with 403 Forbidden', async () => {
       expect.assertions(3);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {
@@ -143,7 +143,7 @@ describe('NestJS Common Decorators Integration', () => {
     it('should trigger method-level guard and deny access with 403 Forbidden', async () => {
       expect.assertions(3);
       try {
-        await jsonSdk.jonApiSdkService.getAll(Users, {
+        await jsonSdk.jsonApiSdkService.getAll(Users, {
           filter: {
             target: {
               firstName: {

@@ -56,16 +56,16 @@ describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
     });
-    articleAcl = await jsonSdk.jonApiSdkService.getAll(ArticleAcl, {
+    articleAcl = await jsonSdk.jsonApiSdkService.getAll(ArticleAcl, {
       include: ['author', 'editor'],
     });
   });
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Admin Role: Full Atomic Operation Access', () => {
@@ -83,7 +83,7 @@ describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should execute atomic operation with POST, PATCH, and DELETE all succeeding', async () => {
@@ -118,7 +118,7 @@ describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should return 403 Forbidden for entire atomic request when DELETE operation violates ACL (POST and PATCH allowed but DELETE forbidden)', async () => {
@@ -131,6 +131,9 @@ describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
       try {
         const [articleForUpdate] = await jsonSdk.atomicFactory().postOne(articleForCreate).run();
         articleForUpdate.status = ArticleStatus.REVIEW;
+        // Remove author relationship to avoid ACL field-level check on patchOne
+        // (postOne now returns relationships in response, and moderator cannot write to author field)
+        delete (articleForUpdate as any).author;
         await jsonSdk.atomicFactory().patchOne(articleForUpdate).deleteOne(articleForUpdate).run();
       } catch (e) {
         expect(e).toBeInstanceOf(AxiosError);

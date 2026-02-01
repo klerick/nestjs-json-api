@@ -23,16 +23,16 @@ describe('ACL patchRelationship:', () => {
 
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile', 'posts', 'aclComments'],
     });
-    allPosts = await jsonSdk.jonApiSdkService.getAll(PostAcl);
-    allComments = await jsonSdk.jonApiSdkService.getAll(CommentAcl);
+    allPosts = await jsonSdk.jsonApiSdkService.getAll(PostAcl);
+    allComments = await jsonSdk.jsonApiSdkService.getAll(CommentAcl);
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Without conditional: admin', () => {
@@ -49,7 +49,7 @@ describe('ACL patchRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('patch rel aclComments for user (replace with different comments)', async () => {
@@ -60,7 +60,7 @@ describe('ACL patchRelationship:', () => {
       //   throw new Error('Not enough comments available');
       // }
       // userForPatch.aclComments = newComments as any;
-      // await jsonSdk.jonApiSdkService.patchRelationships(
+      // await jsonSdk.jsonApiSdkService.patchRelationships(
       //   userForPatch,
       //   'aclComments'
       // );
@@ -74,7 +74,7 @@ describe('ACL patchRelationship:', () => {
       //   throw new Error('Not enough posts available');
       // }
       // userForPatch.posts = newPosts as any;
-      // await jsonSdk.jonApiSdkService.patchRelationships(userForPatch, 'posts');
+      // await jsonSdk.jsonApiSdkService.patchRelationships(userForPatch, 'posts');
     });
   });
 
@@ -92,7 +92,7 @@ describe('ACL patchRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('patch rel aclComments for user, should be error', async () => {
@@ -104,7 +104,7 @@ describe('ACL patchRelationship:', () => {
       //     throw new Error('Not enough comments available');
       //   }
       //   userForPatch.aclComments = newComments as any;
-      //   await jsonSdk.jonApiSdkService.patchRelationships(
+      //   await jsonSdk.jsonApiSdkService.patchRelationships(
       //     userForPatch,
       //     'aclComments'
       //   );
@@ -123,7 +123,7 @@ describe('ACL patchRelationship:', () => {
       //   throw new Error('Not enough posts available');
       // }
       // userForPatch.posts = newPosts as any;
-      // await jsonSdk.jonApiSdkService.patchRelationships(userForPatch, 'posts');
+      // await jsonSdk.jsonApiSdkService.patchRelationships(userForPatch, 'posts');
     });
   });
 
@@ -143,7 +143,7 @@ describe('ACL patchRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.user).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('patch rel aclComments for bob user (replace with different comments)', async () => {
@@ -154,7 +154,7 @@ describe('ACL patchRelationship:', () => {
       //   throw new Error('Not enough comments available');
       // }
       // bobUser.aclComments = newComments as any;
-      // await jsonSdk.jonApiSdkService.patchRelationships(
+      // await jsonSdk.jsonApiSdkService.patchRelationships(
       //   bobUser,
       //   'aclComments'
       // );
@@ -169,7 +169,7 @@ describe('ACL patchRelationship:', () => {
       //     throw new Error('Not enough posts available');
       //   }
       //   bobUser.posts = newPosts as any;
-      //   await jsonSdk.jonApiSdkService.patchRelationships(bobUser, 'posts');
+      //   await jsonSdk.jsonApiSdkService.patchRelationships(bobUser, 'posts');
       //   assert.fail('should be error');
       // } catch (e) {
       //   expect(e).toBeInstanceOf(AxiosError);
@@ -186,7 +186,7 @@ describe('ACL patchRelationship:', () => {
       //     throw new Error('Not enough comments available');
       //   }
       //   aliceUser.aclComments = newComments as any;
-      //   await jsonSdk.jonApiSdkService.patchRelationships(
+      //   await jsonSdk.jsonApiSdkService.patchRelationships(
       //     aliceUser,
       //     'aclComments'
       //   );
@@ -206,7 +206,7 @@ describe('ACL patchRelationship:', () => {
       //     throw new Error('Not enough posts available');
       //   }
       //   aliceUser.posts = newPosts as any;
-      //   await jsonSdk.jonApiSdkService.patchRelationships(aliceUser, 'posts');
+      //   await jsonSdk.jsonApiSdkService.patchRelationships(aliceUser, 'posts');
       //   assert.fail('should be error');
       // } catch (e) {
       //   expect(e).toBeInstanceOf(AxiosError);

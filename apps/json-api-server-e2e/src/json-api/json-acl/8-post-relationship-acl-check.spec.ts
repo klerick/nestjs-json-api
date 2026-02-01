@@ -24,16 +24,16 @@ describe('ACL postRelationship:', () => {
 
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile', 'posts', 'aclComments'],
     });
-    allPosts = await jsonSdk.jonApiSdkService.getAll(PostAcl);
-    allComments = await jsonSdk.jonApiSdkService.getAll(CommentAcl);
+    allPosts = await jsonSdk.jsonApiSdkService.getAll(PostAcl);
+    allComments = await jsonSdk.jsonApiSdkService.getAll(CommentAcl);
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Without conditional: admin', () => {
@@ -50,7 +50,7 @@ describe('ACL postRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('add rel aclComments for user', async () => {
@@ -61,7 +61,7 @@ describe('ACL postRelationship:', () => {
       //   throw new Error('No available comment to add');
       // }
       // userForAdd.aclComments = [commentToAdd] as any;
-      // await jsonSdk.jonApiSdkService.postRelationships(
+      // await jsonSdk.jsonApiSdkService.postRelationships(
       //   userForAdd,
       //   'aclComments'
       // );
@@ -75,7 +75,7 @@ describe('ACL postRelationship:', () => {
       //   throw new Error('No available post to add');
       // }
       // userForAdd.posts = [postToAdd] as any;
-      // await jsonSdk.jonApiSdkService.postRelationships(userForAdd, 'posts');
+      // await jsonSdk.jsonApiSdkService.postRelationships(userForAdd, 'posts');
     });
   });
 
@@ -93,7 +93,7 @@ describe('ACL postRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('add rel aclComments for user, should be error', async () => {
@@ -105,7 +105,7 @@ describe('ACL postRelationship:', () => {
       //     throw new Error('No available comment to add');
       //   }
       //   userForAdd.aclComments = [commentToAdd] as any;
-      //   await jsonSdk.jonApiSdkService.postRelationships(
+      //   await jsonSdk.jsonApiSdkService.postRelationships(
       //     userForAdd,
       //     'aclComments'
       //   );
@@ -124,7 +124,7 @@ describe('ACL postRelationship:', () => {
       //   throw new Error('No available post to add');
       // }
       // userForAdd.posts = [postToAdd] as any;
-      // await jsonSdk.jonApiSdkService.postRelationships(userForAdd, 'posts');
+      // await jsonSdk.jsonApiSdkService.postRelationships(userForAdd, 'posts');
     });
   });
 
@@ -144,7 +144,7 @@ describe('ACL postRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.user).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('add rel aclComments for bob user', async () => {
@@ -155,7 +155,7 @@ describe('ACL postRelationship:', () => {
       //   throw new Error('No available comment to add');
       // }
       // bobUser.aclComments = [commentToAdd] as any;
-      // await jsonSdk.jonApiSdkService.postRelationships(
+      // await jsonSdk.jsonApiSdkService.postRelationships(
       //   bobUser,
       //   'aclComments'
       // );
@@ -170,7 +170,7 @@ describe('ACL postRelationship:', () => {
       //     throw new Error('No available post to add');
       //   }
       //   bobUser.posts = [postToAdd] as any;
-      //   await jsonSdk.jonApiSdkService.postRelationships(bobUser, 'posts');
+      //   await jsonSdk.jsonApiSdkService.postRelationships(bobUser, 'posts');
       //   assert.fail('should be error');
       // } catch (e) {
       //   expect(e).toBeInstanceOf(AxiosError);
@@ -187,7 +187,7 @@ describe('ACL postRelationship:', () => {
       //     throw new Error('No available comment to add');
       //   }
       //   aliceUser.aclComments = [commentToAdd] as any;
-      //   await jsonSdk.jonApiSdkService.postRelationships(
+      //   await jsonSdk.jsonApiSdkService.postRelationships(
       //     aliceUser,
       //     'aclComments'
       //   );
@@ -207,7 +207,7 @@ describe('ACL postRelationship:', () => {
       //     throw new Error('No available post to add');
       //   }
       //   aliceUser.posts = [postToAdd] as any;
-      //   await jsonSdk.jonApiSdkService.postRelationships(aliceUser, 'posts');
+      //   await jsonSdk.jsonApiSdkService.postRelationships(aliceUser, 'posts');
       //   assert.fail('should be error');
       // } catch (e) {
       //   expect(e).toBeInstanceOf(AxiosError);

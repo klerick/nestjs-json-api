@@ -39,14 +39,14 @@ describe('Atomic Operations (Batch Requests)', () => {
       address.city = faker.string.alpha(50);
       address.state = faker.string.alpha(50);
       address.country = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(address);
+      return jsonSdk.jsonApiSdkService.postOne(address);
     });
     addressArray = await Promise.all(addressesPromise);
     const rolesPromise = Array.from(new Array(6)).map(() => {
       const roles = new Roles();
       roles.name = faker.string.alpha(50);
       roles.key = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(roles);
+      return jsonSdk.jsonApiSdkService.postOne(roles);
     });
 
     rolesArray = await Promise.all(rolesPromise);
@@ -54,7 +54,7 @@ describe('Atomic Operations (Batch Requests)', () => {
       const comments = new Comments();
       comments.text = faker.string.alpha(50);
       comments.kind = CommentKind.Comment;
-      return jsonSdk.jonApiSdkService.postOne(comments);
+      return jsonSdk.jsonApiSdkService.postOne(comments);
     });
 
     commentsArray = await Promise.all(commentsPromise);
@@ -64,7 +64,7 @@ describe('Atomic Operations (Batch Requests)', () => {
   afterEach(async () => {
     let usersArray: Users[] = [];
     if (usersId.length > 0) {
-      usersArray = await jsonSdk.jonApiSdkService.getAll(Users, {
+      usersArray = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             id: { [FilterOperand.in]: usersId.map((i) => `${i}`) },
@@ -78,16 +78,16 @@ describe('Atomic Operations (Batch Requests)', () => {
           const tmp = [];
           if (i.comments && i.comments.length > 0) {
             tmp.push(
-              jsonSdk.jonApiSdkService.deleteRelationships(i, 'comments')
+              jsonSdk.jsonApiSdkService.deleteRelationships(i, 'comments')
             );
           }
           if (i.manager) {
             tmp.push(
-              jsonSdk.jonApiSdkService.deleteRelationships(i, 'manager')
+              jsonSdk.jsonApiSdkService.deleteRelationships(i, 'manager')
             );
           }
           if (i.roles && i.roles.length > 0) {
-            tmp.push(jsonSdk.jonApiSdkService.deleteRelationships(i, 'roles'));
+            tmp.push(jsonSdk.jsonApiSdkService.deleteRelationships(i, 'roles'));
           }
 
           acum.push(...tmp);
@@ -102,7 +102,7 @@ describe('Atomic Operations (Batch Requests)', () => {
       ...commentsArray,
       ...rolesArray,
     ]) {
-      await jsonSdk.jonApiSdkService.deleteOne(item);
+      await jsonSdk.jsonApiSdkService.deleteOne(item);
     }
   });
 
@@ -152,7 +152,7 @@ describe('Atomic Operations (Batch Requests)', () => {
         .map((i) => `${i}`)
     );
 
-    const resultUser = await jsonSdk.jonApiSdkService.getAll(Users, {
+    const resultUser = await jsonSdk.jsonApiSdkService.getAll(Users, {
       filter: {
         target: {
           id: {
@@ -214,12 +214,12 @@ describe('Atomic Operations (Batch Requests)', () => {
       .postOne(user)
       .run();
 
-    const selectManager = await jsonSdk.jonApiSdkService.getOne(
+    const selectManager = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       managerPost.id,
       { include: ['addresses'] }
     );
-    const selectUser = await jsonSdk.jonApiSdkService.getOne(
+    const selectUser = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       userPost.id,
       {

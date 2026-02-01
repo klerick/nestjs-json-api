@@ -46,16 +46,16 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
     });
-    articleAcl = await jsonSdk.jonApiSdkService.getAll(ArticleAcl, {
+    articleAcl = await jsonSdk.jsonApiSdkService.getAll(ArticleAcl, {
       include: ['author', 'editor'],
     });
   });
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Admin Role: Full Update Access Without Restrictions', () => {
@@ -75,12 +75,12 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should update any article with any field values (no ACL restrictions)', async () => {
       articleForUpdate.title = 'new title';
-      await jsonSdk.jonApiSdkService.patchOne(articleForUpdate);
+      await jsonSdk.jsonApiSdkService.patchOne(articleForUpdate);
     });
   });
 
@@ -108,12 +108,12 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should return 403 Forbidden when attempting to update published article', async () => {
       try {
-        await jsonSdk.jonApiSdkService.patchOne(articlePublishForUpdate);
+        await jsonSdk.jsonApiSdkService.patchOne(articlePublishForUpdate);
         assert.fail('should be error');
       } catch (e) {
         expect(e).toBeInstanceOf(AxiosError);
@@ -125,7 +125,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
       const oldTitle = articleNoPublishForUpdate.title;
       try {
         articleNoPublishForUpdate.title = 'new title';
-        await jsonSdk.jonApiSdkService.patchOne(articleNoPublishForUpdate);
+        await jsonSdk.jsonApiSdkService.patchOne(articleNoPublishForUpdate);
         assert.fail('should be error');
       } catch (e) {
         expect(e).toBeInstanceOf(AxiosError);
@@ -137,7 +137,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
     it('should return 403 Forbidden when attempting to set status to forbidden value (published)', async () => {
       try {
         articleNoPublishForUpdate.status = ArticleStatus.PUBLISHED;
-        await jsonSdk.jonApiSdkService.patchOne(articleNoPublishForUpdate);
+        await jsonSdk.jsonApiSdkService.patchOne(articleNoPublishForUpdate);
         assert.fail('should be error');
       } catch (e) {
         expect(e).toBeInstanceOf(AxiosError);
@@ -149,7 +149,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
       articleNoPublishForUpdate.status = ArticleStatus.REVIEW;
       // @ts-ignore
       delete articleNoPublishForUpdate.author;
-      await jsonSdk.jonApiSdkService.patchOne(articleNoPublishForUpdate);
+      await jsonSdk.jsonApiSdkService.patchOne(articleNoPublishForUpdate);
     });
   });
 
@@ -167,7 +167,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
       if (!posibleBobUser) throw new Error('Bob user not found');
       bobUser = posibleBobUser;
 
-      const listAliceArticleForUpdate = await jsonSdk.jonApiSdkService.getAll(
+      const listAliceArticleForUpdate = await jsonSdk.jsonApiSdkService.getAll(
         ArticleAcl,
         {
           filter: {
@@ -187,9 +187,9 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
         contextTestAcl.aclRules.rules = new AbilityBuilder(
           CheckFieldAndInclude
         ).permissionsFor(UserRole.user).rules as any;
-        await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+        await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
 
-        const listArticleForUpdate = await jsonSdk.jonApiSdkService.getAll(
+        const listArticleForUpdate = await jsonSdk.jsonApiSdkService.getAll(
           ArticleAcl,
           {
             filter: {
@@ -211,7 +211,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
           articleForUpdate.coAuthorIds = [...articleForUpdate.coAuthorIds, 6];
           // @ts-ignore
           delete articleForUpdate.author;
-          await jsonSdk.jonApiSdkService.patchOne(articleForUpdate);
+          await jsonSdk.jsonApiSdkService.patchOne(articleForUpdate);
           assert.fail('should be error');
         } catch (e) {
           expect(e).toBeInstanceOf(AxiosError);
@@ -228,7 +228,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
           ];
           // @ts-ignore
           delete articleForUpdate.author;
-          await jsonSdk.jonApiSdkService.patchOne(articleForUpdate);
+          await jsonSdk.jsonApiSdkService.patchOne(articleForUpdate);
           assert.fail('should be error');
         } catch (e) {
           expect(e).toBeInstanceOf(AxiosError);
@@ -243,7 +243,7 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
         );
         // @ts-ignore
         delete articleForUpdate.author;
-        await jsonSdk.jonApiSdkService.patchOne(articleForUpdate);
+        await jsonSdk.jsonApiSdkService.patchOne(articleForUpdate);
       });
     });
 
@@ -253,11 +253,11 @@ describe('ACL: PATCH One Resource (Update Operations)', () => {
         contextTestAcl.aclRules.rules = new AbilityBuilder(
           CheckFieldAndInclude
         ).permissionsFor(UserRole.user).rules as any;
-        await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+        await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
       });
       it('should update own article (alice updating alice article)', async () => {
         articleForUpdateAlice.title = 'new Title';
-        await jsonSdk.jonApiSdkService.patchOne(articleForUpdateAlice);
+        await jsonSdk.jsonApiSdkService.patchOne(articleForUpdateAlice);
       });
     });
   });

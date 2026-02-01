@@ -53,14 +53,14 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
 
   afterEach(async () => {
     if (commentsAfterSave)
-      await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, commentsAfterSave)).deleteOne();
-    if (userAfterSave) await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, userAfterSave)).deleteOne();
+      await jsonSdk.jsonApiSdkService.entity('Comments', Object.assign({}, commentsAfterSave)).deleteOne();
+    if (userAfterSave) await jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, userAfterSave)).deleteOne();
 
-    await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, addressAfterSave)).deleteOne();
+    await jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, addressAfterSave)).deleteOne();
   });
 
   it('should create a new resource and automatically generate id and timestamps', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
+    addressAfterSave = await jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
     const {
       id: addressId,
       createdAt,
@@ -72,22 +72,36 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     expect(newAddress).toEqual(address);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // entity().postOne() returns plain object
+    expect(addressAfterSave.constructor.name).toBe('Object');
   });
 
   it('should create a resource with a one-to-one relationship and verify the relationship is properly linked', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
-    user.addresses = addressAfterSave;
+    addressAfterSave = await jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
+    // For relationships, we need objects with proper constructor.name
+    // Use entity(..., true) to get raw instance with correct type
+    const addressRaw = jsonSdk.jsonApiSdkService.entity('Addresses', addressAfterSave, true);
+    user.addresses = addressRaw;
 
-    userAfterSave = await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, user)).postOne();
-    const { id, createdAt, updatedAt, ...newUser } = userAfterSave;
+    userAfterSave = await jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, user)).postOne();
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      addresses: savedAddresses,
+      ...newUser
+    } = userAfterSave;
     const { addresses, ...userWithoutAddress } = user;
 
     expect(id).toBeDefined();
     expect(newUser).toEqual(userWithoutAddress);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // Verify relationship is returned in response
+    expect(savedAddresses).toBeDefined();
+    expect(savedAddresses.id).toBe(addressAfterSave.id);
 
-    const usersFromSerer = await jsonSdk.jonApiSdkService.getOne(Users, id, {
+    const usersFromSerer = await jsonSdk.jsonApiSdkService.getOne(Users, id, {
       include: ['addresses'],
     });
     const {
@@ -105,17 +119,27 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
   });
 
   it('should create a resource with both one-to-one and one-to-many relationships', async () => {
-    addressAfterSave = await jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
-    commentsAfterSave = await jsonSdk.jonApiSdkService.entity('Comments', Object.assign({}, comments)).postOne();
-    user.addresses = addressAfterSave;
-    user.comments = [commentsAfterSave];
+    addressAfterSave = await jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
+    commentsAfterSave = await jsonSdk.jsonApiSdkService.entity('Comments', Object.assign({}, comments)).postOne();
+    // For relationships, we need objects with proper constructor.name
+    const addressRaw = jsonSdk.jsonApiSdkService.entity('Addresses', addressAfterSave, true);
+    const commentsRaw = jsonSdk.jsonApiSdkService.entity('Comments', commentsAfterSave, true);
+    user.addresses = addressRaw;
+    user.comments = [commentsRaw];
 
-    userAfterSave = await jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, user)).postOne();
+    userAfterSave = await jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, user)).postOne();
 
-    const { id, createdAt, updatedAt, ...newUser } = userAfterSave;
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      addresses: savedAddresses,
+      comments: savedComments,
+      ...newUser
+    } = userAfterSave;
     const {
       addresses,
-      comments: comentsFromuser,
+      comments: commentsFromUser,
       ...userWithoutAddress
     } = user;
 
@@ -123,8 +147,14 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     expect(newUser).toEqual(userWithoutAddress);
     expect(createdAt).toBeInstanceOf(Date);
     expect(updatedAt).toBeInstanceOf(Date);
+    // Verify relationships are returned in response
+    expect(savedAddresses).toBeDefined();
+    expect(savedAddresses.id).toBe(addressAfterSave.id);
+    expect(savedComments).toBeDefined();
+    expect(savedComments).toHaveLength(1);
+    expect(savedComments[0].id).toBe(commentsAfterSave.id);
 
-    const usersFromSerer = await jsonSdk.jonApiSdkService.getOne(Users, id, {
+    const usersFromSerer = await jsonSdk.jsonApiSdkService.getOne(Users, id, {
       include: ['addresses', 'comments'],
     });
     const {
@@ -140,6 +170,6 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     expect(fromCreatedAt).toBeInstanceOf(Date);
     expect(fromUpdatedAt).toBeInstanceOf(Date);
     expect(addresses).toEqual(fromUser.addresses);
-    expect(comentsFromuser).toEqual(fromUser.comments);
+    expect(commentsFromUser).toEqual(fromUser.comments);
   });
 });

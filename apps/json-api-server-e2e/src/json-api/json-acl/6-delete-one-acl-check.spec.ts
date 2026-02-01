@@ -41,17 +41,17 @@ describe('ACL: DELETE One Resource (Delete Operations)', () => {
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
     });
-    articleAcl = await jsonSdk.jonApiSdkService.getAll(ArticleAcl, {
+    articleAcl = await jsonSdk.jsonApiSdkService.getAll(ArticleAcl, {
       include: ['author', 'editor'],
     });
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Admin Role: Full Delete Access Without Restrictions', () => {
@@ -71,11 +71,11 @@ describe('ACL: DELETE One Resource (Delete Operations)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should delete any article regardless of status or author (no ACL restrictions)', async () => {
-      await jsonSdk.jonApiSdkService.deleteOne(articleForDelete);
+      await jsonSdk.jsonApiSdkService.deleteOne(articleForDelete);
     });
   });
 
@@ -96,11 +96,11 @@ describe('ACL: DELETE One Resource (Delete Operations)', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('should delete published article (moderator deleting alice published article)', async () => {
-      await jsonSdk.jonApiSdkService.deleteOne(articleForDelete);
+      await jsonSdk.jsonApiSdkService.deleteOne(articleForDelete);
     });
   });
 
@@ -126,12 +126,12 @@ describe('ACL: DELETE One Resource (Delete Operations)', () => {
         contextTestAcl.aclRules.rules = new AbilityBuilder(
           CheckFieldAndInclude
         ).permissionsFor(UserRole.user).rules as any;
-        await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+        await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
       });
 
       it('should return 403 Forbidden when author attempts to delete own published article', async () => {
         try {
-          await jsonSdk.jonApiSdkService.deleteOne(articleAclAlice);
+          await jsonSdk.jsonApiSdkService.deleteOne(articleAclAlice);
           assert.fail('should be error');
         } catch (e) {
           expect(e).toBeInstanceOf(AxiosError);
@@ -158,11 +158,11 @@ describe('ACL: DELETE One Resource (Delete Operations)', () => {
         contextTestAcl.aclRules.rules = new AbilityBuilder(
           CheckFieldAndInclude
         ).permissionsFor(UserRole.user).rules as any;
-        await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+        await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
       });
 
       it('should delete own non-published article (bob deleting bob draft article)', async () => {
-        await jsonSdk.jonApiSdkService.deleteOne(articleAclBobe);
+        await jsonSdk.jsonApiSdkService.deleteOne(articleAclBobe);
       });
     });
   });

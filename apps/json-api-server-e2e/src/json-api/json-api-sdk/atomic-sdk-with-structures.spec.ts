@@ -39,14 +39,14 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
       address.city = faker.string.alpha(50);
       address.state = faker.string.alpha(50);
       address.country = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(address);
+      return jsonSdk.jsonApiSdkService.postOne(address);
     });
     addressArray = await Promise.all(addressesPromise);
     const rolesPromise = Array.from(new Array(6)).map(() => {
       const roles = new Roles();
       roles.name = faker.string.alpha(50);
       roles.key = faker.string.alpha(50);
-      return jsonSdk.jonApiSdkService.postOne(roles);
+      return jsonSdk.jsonApiSdkService.postOne(roles);
     });
 
     rolesArray = await Promise.all(rolesPromise);
@@ -54,7 +54,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
       const comments = new Comments();
       comments.text = faker.string.alpha(50);
       comments.kind = CommentKind.Comment;
-      return jsonSdk.jonApiSdkService.postOne(comments);
+      return jsonSdk.jsonApiSdkService.postOne(comments);
     });
 
     commentsArray = await Promise.all(commentsPromise);
@@ -64,7 +64,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
   afterEach(async () => {
     let usersArray: Users[] = [];
     if (usersId.length > 0) {
-      usersArray = await jsonSdk.jonApiSdkService.getAll(Users, {
+      usersArray = await jsonSdk.jsonApiSdkService.getAll(Users, {
         filter: {
           target: {
             id: { [FilterOperand.in]: usersId.map((i) => `${i}`) },
@@ -78,16 +78,16 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
           const tmp = [];
           if (i.comments && i.comments.length > 0) {
             tmp.push(
-              jsonSdk.jonApiSdkService.deleteRelationships(i, 'comments')
+              jsonSdk.jsonApiSdkService.deleteRelationships(i, 'comments')
             );
           }
           if (i.manager) {
             tmp.push(
-              jsonSdk.jonApiSdkService.deleteRelationships(i, 'manager')
+              jsonSdk.jsonApiSdkService.deleteRelationships(i, 'manager')
             );
           }
           if (i.roles && i.roles.length > 0) {
-            tmp.push(jsonSdk.jonApiSdkService.deleteRelationships(i, 'roles'));
+            tmp.push(jsonSdk.jsonApiSdkService.deleteRelationships(i, 'roles'));
           }
 
           acum.push(...tmp);
@@ -102,7 +102,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
       ...commentsArray,
       ...rolesArray,
     ]) {
-      await jsonSdk.jonApiSdkService.deleteOne(item);
+      await jsonSdk.jsonApiSdkService.deleteOne(item);
     }
   });
 
@@ -110,7 +110,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
     const newUser = getUser();
     newUser.addresses = addressArray[0];
     // Convert to structure and back to class via entity()
-    const newUserEntity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, newUser), true);
+    const newUserEntity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, newUser), true);
     try {
       const result = await jsonSdk.atomicFactory().postOne(newUserEntity).run();
       usersId.push(result[0].id);
@@ -123,7 +123,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
     const newUser = getUser();
     newUser.addresses = addressArray[0];
     // Convert to structure and back to class via entity()
-    const newUserEntity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, newUser), true);
+    const newUserEntity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, newUser), true);
     const resultCreate = await jsonSdk.atomicFactory().postOne(newUserEntity).run();
 
     const patchUser = Object.assign(new Users(), resultCreate[0]);
@@ -140,9 +140,9 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
     patchUser3.comments = [commentsArray[1]];
 
     // Convert to structures and back to classes via entity()
-    const patchUserEntity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, patchUser), true);
-    const patchUser2Entity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, patchUser2), true);
-    const patchUser3Entity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, patchUser3), true);
+    const patchUserEntity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, patchUser), true);
+    const patchUser2Entity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, patchUser2), true);
+    const patchUser3Entity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, patchUser3), true);
 
     const result = await jsonSdk
       .atomicFactory()
@@ -161,7 +161,7 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
         .map((i) => `${i}`)
     );
 
-    const resultUser = await jsonSdk.jonApiSdkService.getAll(Users, {
+    const resultUser = await jsonSdk.jsonApiSdkService.getAll(Users, {
       filter: {
         target: {
           id: {
@@ -215,11 +215,11 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
     user.roles = [roles];
 
     // Convert to structures and back to classes via entity()
-    const addressEntity = jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, address), true);
-    const userAddressEntity = jsonSdk.jonApiSdkService.entity('Addresses', Object.assign({}, userAddress), true);
-    const managerEntity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, manager), true);
-    const rolesEntity = jsonSdk.jonApiSdkService.entity('Roles', Object.assign({}, roles), true);
-    const userEntity = jsonSdk.jonApiSdkService.entity('Users', Object.assign({}, user), true);
+    const addressEntity = jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, address), true);
+    const userAddressEntity = jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, userAddress), true);
+    const managerEntity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, manager), true);
+    const rolesEntity = jsonSdk.jsonApiSdkService.entity('Roles', Object.assign({}, roles), true);
+    const userEntity = jsonSdk.jsonApiSdkService.entity('Users', Object.assign({}, user), true);
 
     const [addressPost, userAddressPost, managerPost, rolesPost, userPost] = await jsonSdk
       .atomicFactory()
@@ -230,12 +230,12 @@ describe('Atomic Operations (Batch Requests) with entity() and plain structures'
       .postOne(userEntity)
       .run();
 
-    const selectManager = await jsonSdk.jonApiSdkService.getOne(
+    const selectManager = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       managerPost.id,
       { include: ['addresses'] }
     );
-    const selectUser = await jsonSdk.jonApiSdkService.getOne(
+    const selectUser = await jsonSdk.jsonApiSdkService.getOne(
       Users,
       userPost.id,
       {

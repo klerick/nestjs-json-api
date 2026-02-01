@@ -18,14 +18,14 @@ describe('ACL deleteRelationship:', () => {
 
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = await jsonSdk.jonApiSdkService.postOne(contextTestAcl);
-    usersAcl = await jsonSdk.jonApiSdkService.getAll(UsersAcl, {
+    contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
+    usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile', 'posts', 'aclComments'],
     });
   });
 
   afterEach(async () => {
-    await jsonSdk.jonApiSdkService.deleteOne(contextTestAcl);
+    await jsonSdk.jsonApiSdkService.deleteOne(contextTestAcl);
   });
 
   describe('Without conditional: admin', () => {
@@ -45,7 +45,7 @@ describe('ACL deleteRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.admin).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('delete rel aclComments for user', async () => {
@@ -54,7 +54,7 @@ describe('ACL deleteRelationship:', () => {
       //   throw new Error('User has no cpmment');
       // }
       // userForDelete.aclComments = [commentToDelete] as any
-      // await jsonSdk.jonApiSdkService.deleteRelationships(
+      // await jsonSdk.jsonApiSdkService.deleteRelationships(
       //   userForDelete,
       //   'aclComments'
       // );
@@ -66,7 +66,7 @@ describe('ACL deleteRelationship:', () => {
       //   throw new Error('User has no posts');
       // }
       // userForDelete.posts = [postToDelete] as any
-      // await jsonSdk.jonApiSdkService.deleteRelationships(
+      // await jsonSdk.jsonApiSdkService.deleteRelationships(
       //   userForDelete,
       //   'posts'
       // );
@@ -89,13 +89,13 @@ describe('ACL deleteRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.moderator).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('delete rel aclComments for user, should be error', async () => {
       // try {
       //   const commentToDelete = userForDelete.aclComments![0];
-      //   await jsonSdk.jonApiSdkService.deleteRelationships(
+      //   await jsonSdk.jsonApiSdkService.deleteRelationships(
       //     userForDelete,
       //     'aclComments',
       //     commentToDelete
@@ -109,7 +109,7 @@ describe('ACL deleteRelationship:', () => {
 
     it('delete rel posts for user', async () => {
       // const postToDelete = userForDelete.posts![0];
-      // await jsonSdk.jonApiSdkService.deleteRelationships(
+      // await jsonSdk.jsonApiSdkService.deleteRelationships(
       //   userForDelete,
       //   'posts',
       //   postToDelete
@@ -133,7 +133,7 @@ describe('ACL deleteRelationship:', () => {
       contextTestAcl.aclRules.rules = new AbilityBuilder(
         CheckFieldAndInclude
       ).permissionsFor(UserRole.user).rules as any;
-      await jsonSdk.jonApiSdkService.patchOne(contextTestAcl);
+      await jsonSdk.jsonApiSdkService.patchOne(contextTestAcl);
     });
 
     it('delete rel aclComments for bob user', async () => {
@@ -141,7 +141,7 @@ describe('ACL deleteRelationship:', () => {
       //   throw new Error('Bob has no comments');
       // }
       // const commentToDelete = bobUser.aclComments[0];
-      // await jsonSdk.jonApiSdkService.deleteRelationships(
+      // await jsonSdk.jsonApiSdkService.deleteRelationships(
       //   bobUser,
       //   'aclComments',
       //   commentToDelete
@@ -154,7 +154,7 @@ describe('ACL deleteRelationship:', () => {
       //     throw new Error('Bob has no posts');
       //   }
       //   const postToDelete = bobUser.posts[0];
-      //   await jsonSdk.jonApiSdkService.deleteRelationships(
+      //   await jsonSdk.jsonApiSdkService.deleteRelationships(
       //     bobUser,
       //     'posts',
       //     postToDelete
@@ -172,7 +172,7 @@ describe('ACL deleteRelationship:', () => {
       //     throw new Error('Alice has no comments');
       //   }
       //   const commentToDelete = aliceUser.aclComments[0];
-      //   await jsonSdk.jonApiSdkService.deleteRelationships(
+      //   await jsonSdk.jsonApiSdkService.deleteRelationships(
       //     aliceUser,
       //     'aclComments',
       //     commentToDelete
@@ -190,7 +190,7 @@ describe('ACL deleteRelationship:', () => {
       //     throw new Error('Alice has no posts');
       //   }
       //   const postToDelete = aliceUser.posts[0];
-      //   await jsonSdk.jonApiSdkService.deleteRelationships(
+      //   await jsonSdk.jsonApiSdkService.deleteRelationships(
       //     aliceUser,
       //     'posts',
       //     postToDelete
