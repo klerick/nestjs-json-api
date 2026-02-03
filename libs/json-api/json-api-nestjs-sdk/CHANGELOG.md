@@ -1,3 +1,13 @@
+## 10.0.0-beta.12 (2026-02-03)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** handle invalid date parsing in attribute processing ([cd8943f](https://github.com/klerick/nestjs-json-api/commit/cd8943f))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.11 (2026-02-01)
 
 ### 🚀 Features
