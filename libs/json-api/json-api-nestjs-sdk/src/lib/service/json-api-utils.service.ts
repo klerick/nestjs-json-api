@@ -218,9 +218,12 @@ export class JsonApiUtilsService {
         [this.jsonApiSdkConfig.idKey]: id,
         ...Object.entries(dataItem.attributes || []).reduce(
           (acum, [key, val]) => {
-            acum[key] = this.jsonApiSdkConfig.dateFields.includes(key)
-              ? new Date(String(val))
-              : val;
+            if (this.jsonApiSdkConfig.dateFields.includes(key)) {
+              const date = new Date(String(val));
+              acum[key] = isNaN(date.getTime()) ? val : date;
+            } else {
+              acum[key] = val;
+            }
 
             return acum;
           },
@@ -349,9 +352,12 @@ export class JsonApiUtilsService {
         : (relatedIncluded as any)[this.jsonApiSdkConfig.idKey],
       ...Object.entries(relatedIncluded.attributes || []).reduce(
         (acum, [key, val]) => {
-          acum[key] = this.jsonApiSdkConfig.dateFields.includes(key)
-            ? new Date(String(val))
-            : val;
+          if (this.jsonApiSdkConfig.dateFields.includes(key)) {
+            const date = new Date(String(val));
+            acum[key] = isNaN(date.getTime()) ? val : date;
+          } else {
+            acum[key] = val;
+          }
 
           return acum;
         },
