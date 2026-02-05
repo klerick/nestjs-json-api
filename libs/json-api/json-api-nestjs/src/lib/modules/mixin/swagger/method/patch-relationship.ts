@@ -9,7 +9,7 @@ import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
-import { schemaTypeForRelation, zodToOpenApiSchema } from '../utils';
+import { schemaTypeForRelationRef, zodToOpenApiSchema } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
@@ -56,7 +56,7 @@ export function patchRelationship<
 
   ApiResponse({
     status: 200,
-    schema: schemaTypeForRelation,
+    schema: schemaTypeForRelationRef,
     description: `Item/s of relation for "${entityName}" has been updated`,
   })(controller.prototype, methodName, descriptor);
 

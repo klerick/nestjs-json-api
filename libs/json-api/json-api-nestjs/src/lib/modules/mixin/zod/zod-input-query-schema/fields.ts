@@ -6,14 +6,13 @@ import { nonEmptyObject, getValidationErrorForStrict } from '../zod-utils';
 import { EntityParamMapService } from '../../service';
 import { transformStringToArray } from '../map-transform-to-json-shema';
 
-function getZodRules() {
-  return z
-    .string()
-    .optional()
-    .transform(transformStringToArray);
-}
+export const zodFieldSelectRule = z
+  .string()
+  .optional()
+  .transform(transformStringToArray)
+  .meta({ id: 'FieldSelectRule' });
 
-type ZodRule = ReturnType<typeof getZodRules>;
+export type ZodRule = z.infer<typeof zodFieldSelectRule>;
 type CastPropertyKey<T> = T extends PropertyKey ? T : never;
 type ZorRelationType<E extends object, IdKey extends string> = Record<CastPropertyKey<EntityParam<E, IdKey>['relations'][number]>, ZodRule>;
 
@@ -25,7 +24,7 @@ export function zodFieldsInputQuerySwagger<E extends object, IdKey extends strin
   const relation = relations.reduce(
     (acum, item) => ({
       ...acum,
-      [item as PropertyKey]: getZodRules(),
+      [item as PropertyKey]: zodFieldSelectRule,
     }),
     {} as ZorRelationType<E, IdKey>
   );
@@ -33,19 +32,20 @@ export function zodFieldsInputQuerySwagger<E extends object, IdKey extends strin
   return z
     .strictObject(
       {
-        target: getZodRules(),
+        target: zodFieldSelectRule,
         ...relation,
       },
       {
         error: (err) =>
           err.code === 'unrecognized_keys'
             ? getValidationErrorForStrict(
-              [
-                'target',
-                ...(entityParamMapService.entityParaMap.relations as string[]),
-              ],
-              'Fields'
-            )
+                [
+                  'target',
+                  ...(entityParamMapService.entityParaMap
+                    .relations as string[]),
+                ],
+                'Fields'
+              )
             : err.message,
       }
     )
@@ -64,7 +64,10 @@ export function zodFieldsInputQuery<E extends object, IdKey extends string>(
 
       const result = ObjectTyped.entries(input).reduce(
         (acum, entries) => {
-          const [key, value] = entries as unknown as [key: keyof typeof input, z.infer<ZodRule>];
+          const [key, value] = entries as unknown as [
+            key: keyof typeof input,
+            ZodRule
+          ];
 
           if (!value || value.length === 0) return acum;
 

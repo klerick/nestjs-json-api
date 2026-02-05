@@ -70,10 +70,9 @@ function getZodRulesForFilterOperator() {
 
   return z.union([filterConditional, conditional]).optional();
 }
-const zodRulesForFilterOperator = getZodRulesForFilterOperator();
-export type ZodRulesForFilterOperator = ReturnType<
-  typeof getZodRulesForFilterOperator
->;
+export const zodRulesForFilterOperator = getZodRulesForFilterOperator()
+  .meta({ id: 'FilterOperatorRule' });
+export type ZodRulesForFilterOperator = typeof zodRulesForFilterOperator;
 
 function getZodRulesForRelation() {
   return z
@@ -95,8 +94,9 @@ function getZodRulesForRelation() {
     ])
     .optional();
 }
-const zodRulesForRelation = getZodRulesForRelation();
-type ZodRulesForRelation = ReturnType<typeof getZodRulesForRelation>;
+export const zodRulesForRelation = getZodRulesForRelation()
+  .meta({ id: 'FilterRelationRule' });
+type ZodRulesForRelation = typeof zodRulesForRelation;
 type CastPropertyKey<T> = T extends PropertyKey ? T : never;
 
 export type ConcatRelationField<

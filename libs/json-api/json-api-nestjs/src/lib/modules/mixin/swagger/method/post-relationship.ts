@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { schemaTypeForRelation, zodToOpenApiSchema } from '../utils';
+import { schemaTypeForRelationRef, zodToOpenApiSchema } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
@@ -53,7 +53,7 @@ export function postRelationship<E extends object, IdKey extends string = 'id'>(
 
   ApiResponse({
     status: 200,
-    schema: schemaTypeForRelation,
+    schema: schemaTypeForRelationRef,
     description: `Item/s of relation for "${entityName}" has been created`,
   })(controller, methodName, descriptor);
 

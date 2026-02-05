@@ -2,19 +2,26 @@ import { ApiProperty } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import {
   ObjectTyped,
-  AnyEntity,
   EntityClass,
   AttrKeys,
 } from '@klerick/json-api-nestjs-shared';
 import { kebabCase } from 'change-case-commonjs';
 
-import { EntityParam, RelationProperty, TypeField } from '../../../types';
+import { EntityParam, TypeField } from '../../../types';
 
-import { EntityParamMap } from '../types';
 import { EntityParamMapService } from '../service';
 import { toJSONSchema, ZodType } from 'zod';
 import { mapTransformFunctionToJsonShema } from '../zod';
 import { ReferenceObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import {
+  zodFieldSelectRule,
+} from '../zod/zod-input-query-schema/fields';
+import {
+  zodRulesForFilterOperator,
+  zodRulesForRelation,
+} from '../zod/zod-input-query-schema/filter';
+import { zodPatchRelationship, zodRelationshipData } from '../zod';
+import { zodGeneralData } from '../../atomic-operation/utils';
 
 export function assertIsKeysOfObject<E extends object>(
   object: EntityClass<E>,
@@ -33,19 +40,25 @@ export function assertIsKeyOfObject<E extends object>(
   if (false) throw new Error(element + 'not exist in ' + object.name);
 }
 
-export function jsonSchemaResponse<
-  E extends object,
-  IdKey extends string = 'id'
->(
+const jsonApiLinksRef = { $ref: '#/components/schemas/ZodSchemaRef/properties/JsonApiLinks' };
+
+function getOrCreateEntityDataItem<E extends object, IdKey extends string>(
   entity: EntityClass<E>,
-  mapEntity: EntityParamMapService<E, IdKey>,
-  array = false
-) {
+  mapEntity: EntityParamMapService<E, IdKey>
+): { $ref: string } {
+  const schemaName = `${entity.name}DataItem`;
+  const refPath = `#/components/schemas/ZodSchemaRef/properties/${schemaName}`;
+
+  if (schemaName in ZodSchemaRef.prototype) {
+    return { $ref: refPath };
+  }
+
   const { propsType, relations, relationProperty, primaryColumnName } =
     mapEntity.getParamMap(entity);
 
   assertIsKeysOfObject(entity, relations);
-  const dataType = {
+
+  const dataTypeSchema = {
     type: 'object',
     properties: {
       type: {
@@ -99,7 +112,7 @@ export function jsonSchemaResponse<
         properties: ObjectTyped.keys(
           relationProperty
         ).reduce((acum, name) => {
-          const dataItem = {
+          const relDataItem = {
             type: 'object',
             properties: {
               type: {
@@ -114,99 +127,54 @@ export function jsonSchemaResponse<
             },
             required: ['type', 'id'],
           };
-          const dataArray = {
+          const relDataArray = {
             type: 'array',
-            items: dataItem,
+            items: relDataItem,
           };
           acum[name] = {
             type: 'object',
             properties: {
-              links: {
-                type: 'object',
-                properties: {
-                  self: {
-                    type: 'string',
-                  },
-                },
-                required: ['self'],
-              },
+              links: jsonApiLinksRef,
               data: Reflect.get(relationProperty, name).isArray
-                ? dataArray
-                : dataItem,
+                ? relDataArray
+                : relDataItem,
             },
             required: ['links'],
           };
           return acum;
         }, {} as Record<string, SchemaObject>),
       },
-      links: {
-        type: 'object',
-        properties: {
-          self: {
-            type: 'string',
-          },
-        },
-        required: ['self'],
-      },
+      links: jsonApiLinksRef,
     },
   };
-  const dataTypeArra = {
-    type: 'array',
-    items: dataType,
-  };
+
+  ApiProperty(dataTypeSchema as any)(ZodSchemaRef.prototype, schemaName);
+
+  return { $ref: refPath };
+}
+
+export function jsonSchemaResponse<
+  E extends object,
+  IdKey extends string = 'id'
+>(
+  entity: EntityClass<E>,
+  mapEntity: EntityParamMapService<E, IdKey>,
+  array = false
+) {
+  const dataItemRef = getOrCreateEntityDataItem(entity, mapEntity);
+
+  const dataSchema = array
+    ? { type: 'array', items: dataItemRef }
+    : dataItemRef;
+
   return {
     type: 'object',
     properties: {
       meta: {
         type: 'object',
       },
-      data: array ? dataTypeArra : dataType,
-      includes: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            type: {
-              type: 'string',
-            },
-            id: {
-              type: 'string',
-            },
-            attributes: {
-              type: 'object',
-            },
-            relationships: {
-              type: 'object',
-              properties: {
-                relationName: {
-                  properties: {
-                    links: {
-                      type: 'object',
-                      properties: {
-                        self: {
-                          type: 'string',
-                        },
-                      },
-                      required: ['self'],
-                    },
-                  },
-                  required: ['links'],
-                },
-              },
-            },
-            links: {
-              type: 'object',
-              properties: {
-                self: {
-                  type: 'string',
-                },
-              },
-              required: ['self'],
-            },
-          },
-          required: ['type', 'id', 'attributes'],
-        },
-      },
+      data: dataSchema,
+      includes: jsonApiIncludesRef,
     },
     required: ['meta', 'data'],
   };
@@ -297,16 +265,6 @@ export const schemaTypeForRelation = {
   },
 };
 
-export function getEntityMapProps<E extends object>(
-  mapEntity: EntityParamMap<EntityClass<AnyEntity>>,
-  entity: EntityClass<E>
-) {
-  const entityMap = mapEntity.get(entity);
-  if (!entityMap) throw new Error('Entity not found in map');
-  return entityMap;
-}
-
-
 export const zodToJSONSchemaParams: Parameters<typeof toJSONSchema>[1] = {
   target: 'draft-2020-12',
   unrepresentable: 'any',
@@ -325,7 +283,7 @@ export const zodToJSONSchemaParams: Parameters<typeof toJSONSchema>[1] = {
 
 function resolveDefsInSchema(
   schema: Record<string, unknown>,
-  defs: Record<string, unknown>,
+  defs?: Record<string, unknown>,
   resolving = new Set<string>()
 ): Record<string, unknown> {
   if (typeof schema !== 'object' || schema === null) {
@@ -338,6 +296,8 @@ function resolveDefsInSchema(
     ) as unknown as Record<string, unknown>;
   }
 
+  const effectiveDefs = defs ?? (schema['$defs'] as Record<string, unknown> | undefined);
+
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(schema)) {
@@ -347,15 +307,20 @@ function resolveDefsInSchema(
 
     if (key === '$ref' && typeof value === 'string' && value.startsWith('#/$defs/')) {
       const defName = value.replace('#/$defs/', '');
+
+      if (!defName.startsWith('__')) {
+        return { $ref: `#/components/schemas/ZodSchemaRef/properties/${defName}` };
+      }
+
       if (resolving.has(defName)) {
         return {};
       }
-      const defSchema = defs[defName];
+      const defSchema = effectiveDefs?.[defName];
       if (defSchema && typeof defSchema === 'object') {
         resolving.add(defName);
         const resolved = resolveDefsInSchema(
           defSchema as Record<string, unknown>,
-          defs,
+          effectiveDefs,
           resolving
         );
         resolving.delete(defName);
@@ -367,7 +332,7 @@ function resolveDefsInSchema(
     if (typeof value === 'object' && value !== null) {
       result[key] = resolveDefsInSchema(
         value as Record<string, unknown>,
-        defs,
+        effectiveDefs,
         resolving
       );
     } else {
@@ -378,14 +343,111 @@ function resolveDefsInSchema(
   return result;
 }
 
+const jsonApiLinksSchema = {
+  type: 'object',
+  properties: {
+    self: { type: 'string' },
+  },
+  required: ['self'],
+};
+
+const jsonApiIncludesSchema = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      type: { type: 'string' },
+      id: { type: 'string' },
+      attributes: { type: 'object' },
+      relationships: {
+        type: 'object',
+        properties: {
+          relationName: {
+            properties: {
+              links: { $ref: '#/components/schemas/ZodSchemaRef/properties/JsonApiLinks' },
+            },
+            required: ['links'],
+          },
+        },
+      },
+      links: { $ref: '#/components/schemas/ZodSchemaRef/properties/JsonApiLinks' },
+    },
+    required: ['type', 'id', 'attributes'],
+  },
+};
+const jsonApiIncludesRef = { $ref: '#/components/schemas/ZodSchemaRef/properties/JsonApiIncludes' };
+
+function registerZodSchemas(target: { prototype: object }, schemas: ZodType[]): void {
+  for (const schema of schemas) {
+    const metaId = schema.meta()?.id;
+    if (!metaId) continue;
+
+    if (metaId in target.prototype) continue;
+
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { $schema: _, ...rest } = toJSONSchema(schema, {
+      ...zodToJSONSchemaParams,
+      reused: 'ref',
+    }) as Record<string, unknown>;
+
+    const jsonSchema = resolveDefsInSchema(rest);
+    Object.defineProperty(target.prototype, metaId, {
+      value: undefined,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
+    Reflect.defineMetadata('design:type', Object, target.prototype, metaId);
+    ApiProperty(jsonSchema as any)(target.prototype, metaId);
+  }
+}
+
+export class ZodSchemaRef {
+  @ApiProperty(jsonApiLinksSchema as any)
+  JsonApiLinks!: unknown;
+
+  @ApiProperty(jsonApiIncludesSchema as any)
+  JsonApiIncludes!: unknown;
+
+  @ApiProperty(schemaTypeForRelation as any)
+  RelationshipResponse!: unknown;
+}
+
+export const schemaTypeForRelationRef = { $ref: '#/components/schemas/ZodSchemaRef/properties/RelationshipResponse' };
+
+let zodSchemasRegistered = false;
+
+export function ensureZodSchemasRegistered(): void {
+  if (zodSchemasRegistered) return;
+  zodSchemasRegistered = true;
+
+  registerZodSchemas(ZodSchemaRef, [
+    zodFieldSelectRule,
+    zodRulesForFilterOperator,
+    zodRulesForRelation,
+    zodPatchRelationship,
+    zodRelationshipData,
+    zodGeneralData,
+  ]);
+}
+
 export function zodToOpenApiSchema<T extends ZodType>(
   schema: T,
   params: Parameters<typeof toJSONSchema>[1] = zodToJSONSchemaParams
 ): SchemaObject | ReferenceObject {
-  const { $schema: _, $defs, ...rest } = toJSONSchema(schema, params) as Record<string, unknown>;
+  const metaId = schema.meta()?.id;
+  if (metaId) {
+    return { $ref: `#/components/schemas/ZodSchemaRef/properties/${metaId}` };
+  }
+
+  const refParams = { ...params, reused: 'ref' as const };
+  const { $schema: _, $defs, ...rest } = toJSONSchema(schema, refParams) as Record<string, unknown>;
 
   if ($defs && typeof $defs === 'object') {
-    return resolveDefsInSchema(rest, $defs as Record<string, unknown>) as SchemaObject | ReferenceObject;
+    return resolveDefsInSchema(rest, $defs as Record<string, unknown>) as
+      | SchemaObject
+      | ReferenceObject;
   }
 
   return rest as SchemaObject | ReferenceObject;

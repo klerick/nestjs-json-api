@@ -8,7 +8,7 @@ import {
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
-import { schemaTypeForRelation } from '../utils';
+import { schemaTypeForRelationRef } from '../utils';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
 
@@ -45,7 +45,7 @@ export function getRelationship<E extends object, IdKey extends string = 'id'>(
 
   ApiResponse({
     status: 200,
-    schema: schemaTypeForRelation,
+    schema: schemaTypeForRelationRef,
     description: `Item/s of relation for "${entityName}" has been created`,
   })(controller, methodName, descriptor);
 

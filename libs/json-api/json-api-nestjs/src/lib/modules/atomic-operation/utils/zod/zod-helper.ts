@@ -24,7 +24,7 @@ import { UnionToTuple } from '../../../../types';
 import { EntityParamMap } from '../../../mixin/types';
 
 
-const zodGeneralData = z.json().nullable();
+export const zodGeneralData = z.json().nullable().meta({ id: 'JsonData' });
 type ZodGeneral = typeof zodGeneralData;
 
 export type ZodAdd<T extends string> = ReturnType<typeof zodAdd<T>>;

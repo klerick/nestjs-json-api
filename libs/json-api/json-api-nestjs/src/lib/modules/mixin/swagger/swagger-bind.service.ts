@@ -15,7 +15,7 @@ import { getProviderName, nameIt } from '../helpers';
 import { JsonBaseController } from '../controllers';
 import { DecoratorOptions } from '../types';
 import { FilterOperand } from './filter-operand-model';
-import { createApiModels } from './utils';
+import { createApiModels, ZodSchemaRef, ensureZodSchemasRegistered } from './utils';
 import { Bindings } from '../config/bindings';
 
 import { swaggerMethod } from './method';
@@ -76,6 +76,8 @@ export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
     ApiExtraModels(FilterOperand)(controller);
     ApiExtraModels(JsonApiErrorResponseModel)(controller);
     ApiExtraModels(createApiModels(this.entity, mapProps))(controller);
+    ensureZodSchemasRegistered();
+    ApiExtraModels(ZodSchemaRef)(controller);
 
 
     const { allowMethod = ObjectTyped.keys(Bindings) } = this.config;
