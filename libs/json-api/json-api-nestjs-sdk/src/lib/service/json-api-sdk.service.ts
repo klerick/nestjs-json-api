@@ -217,6 +217,7 @@ export class JsonApiSdkService {
     const asPlain = Reflect.has(entity, AS_PLAIN_RESULT);
     const { attributes, relationships } =
       this.jsonApiUtilsService.generateBody(entity);
+
     const body = {
       data: {
         type: getTypeForReq(entity.constructor.name),
@@ -224,6 +225,10 @@ export class JsonApiSdkService {
         ...(Object.keys(relationships).length > 0 ? { relationships } : {}),
       },
     };
+    const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
+    if (id) {
+      Reflect.set(body.data, 'id', id);
+    }
 
     return this.http
       .post<Entity>(

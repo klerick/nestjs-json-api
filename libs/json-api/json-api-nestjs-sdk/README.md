@@ -347,6 +347,16 @@ newUser.isActive = true;
 
 const createdUser = await jsonSdk.jsonApiSdkService.postOne(newUser);
 
+// Create with client-generated ID
+// Note: Server must have `allowSetId: true` option enabled
+const userWithId = new Users();
+userWithId.id = 'my-custom-uuid';
+userWithId.firstName = 'Jane';
+userWithId.lastName = 'Doe';
+userWithId.login = 'janedoe';
+
+const createdUserWithId = await jsonSdk.jsonApiSdkService.postOne(userWithId);
+
 // Create with relationships
 const newAddress = new Addresses();
 newAddress.city = 'New York';
