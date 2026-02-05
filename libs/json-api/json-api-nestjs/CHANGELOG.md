@@ -1,3 +1,13 @@
+## 10.0.0-beta.16 (2026-02-05)
+
+### 🚀 Features
+
+- **json-api-nestjs:** enhance Zod schema definitions with metadata, refactor Swagger integration, and improve reusability of schema registrations ([9ecb739](https://github.com/klerick/nestjs-json-api/commit/9ecb739))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.15 (2026-02-01)
 
 ### 🚀 Features

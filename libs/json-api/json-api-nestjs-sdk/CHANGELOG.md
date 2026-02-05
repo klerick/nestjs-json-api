@@ -1,3 +1,17 @@
+## 10.0.0-beta.13 (2026-02-05)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** support client-generated IDs in create requests ([60bcb9f](https://github.com/klerick/nestjs-json-api/commit/60bcb9f))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** ensure `id` is always a string in request body ([6d48bad](https://github.com/klerick/nestjs-json-api/commit/6d48bad))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.12 (2026-02-03)
 
 ### 🩹 Fixes
