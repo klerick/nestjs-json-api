@@ -5,17 +5,12 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { z } from 'zod';
 import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
 import { zodPatchRelationship } from '../../zod';
-
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { zodToOpenApiSchema } from '../utils';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
 
@@ -55,9 +50,7 @@ export function deleteRelationship<
 
   ApiBody({
     description: `Json api schema for delete "${entityName}" item`,
-    schema: z.toJSONSchema(zodPatchRelationship) as
-      | SchemaObject
-      | ReferenceObject,
+    schema: zodToOpenApiSchema(zodPatchRelationship),
     required: true,
   })(controller, methodName, descriptor);
 

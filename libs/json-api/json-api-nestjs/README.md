@@ -89,6 +89,7 @@ export interface ModuleOptions {
     debug?: boolean; // Debug info in result object, like error message
     pipeForId?: Type<PipeTransform> // Nestjs pipe for validate id params, by default ParseIntPipe
     operationUrl?: string // Url for atomic operation https://jsonapi.org/ext/atomic/
+    allowSetId?: boolean // Allow client to set id on POST requests, false by default
     // You can add params for MicroOrm or TypeOrm adapter
   } ;
 }
@@ -362,6 +363,42 @@ type FilterOperand
   }
 }
 ```
+
+### Client-Generated IDs
+
+By default, the server generates IDs for new resources. If you need clients to provide their own IDs (e.g., UUIDs), enable the `allowSetId` option:
+
+```typescript
+@Module({
+  imports: [
+    JsonApiModule.forRoot(TypeOrmJsonApiModule, {
+      entities: [Users],
+      options: {
+        allowSetId: true,
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+With this option enabled, clients can include the `id` field in POST requests:
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "users",
+    "attributes": {
+      "login": "johndoe",
+      "firstName": "John",
+      "lastName": "Doe"
+    }
+  }
+}
+```
+
+**Note:** When `allowSetId` is `false` (default), any `id` provided in the POST body will be ignored and the server will generate a new ID.
 ### Update item of Users
   ```
   PATCH /users/:id

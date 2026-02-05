@@ -4,17 +4,12 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { z } from 'zod';
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import {
   jsonSchemaResponse,
-  zodToJSONSchemaParams,
+  zodToOpenApiSchema,
 } from '../utils';
 import { zodPost } from '../../zod';
 import { EntityParamMapService } from '../../service';
@@ -45,10 +40,7 @@ export function postOne<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for new "${entityName}" item`,
-    schema: z.toJSONSchema(
-      zodPost(mapEntity, readOnlyProps, immutableProps),
-      zodToJSONSchemaParams
-    ) as SchemaObject | ReferenceObject,
+    schema: zodToOpenApiSchema(zodPost(mapEntity, readOnlyProps, immutableProps)),
     required: true,
   })(controller, methodName, descriptor);
 

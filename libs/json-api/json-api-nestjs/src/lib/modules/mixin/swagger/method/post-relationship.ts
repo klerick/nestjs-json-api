@@ -1,9 +1,4 @@
 import { Type } from '@nestjs/common';
-import { z } from 'zod';
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import {
   ApiBody,
   ApiOperation,
@@ -13,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
-import { schemaTypeForRelation } from '../utils';
+import { schemaTypeForRelation, zodToOpenApiSchema } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { TypeField } from '../../../../types';
 import { EntityParamMapService } from '../../service';
@@ -47,9 +42,7 @@ export function postRelationship<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: z.toJSONSchema(zodPatchRelationship) as
-      | SchemaObject
-      | ReferenceObject,
+    schema: zodToOpenApiSchema(zodPatchRelationship),
     required: true,
   })(controller, methodName, descriptor);
 

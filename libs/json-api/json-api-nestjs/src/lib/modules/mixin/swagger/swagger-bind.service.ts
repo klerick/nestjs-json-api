@@ -73,8 +73,6 @@ export class SwaggerBindService<E extends object, IdKey extends string = 'id'>
       ApiTags(this.config['overrideRoute'] || this.entity.name)(controller);
     }
 
-    ApiTags(this.entity.name)(controller);
-
     ApiExtraModels(FilterOperand)(controller);
     ApiExtraModels(JsonApiErrorResponseModel)(controller);
     ApiExtraModels(createApiModels(this.entity, mapProps))(controller);

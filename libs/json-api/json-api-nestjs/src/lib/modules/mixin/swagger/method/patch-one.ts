@@ -1,9 +1,4 @@
 import { Type } from '@nestjs/common';
-import { z } from 'zod';
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import {
   ApiBody,
   ApiOperation,
@@ -21,7 +16,7 @@ import {
 
 import {
   jsonSchemaResponse,
-  zodToJSONSchemaParams,
+  zodToOpenApiSchema,
 } from '../utils';
 import { zodPatch } from '../../zod';
 import { EntityParamMapService } from '../../service';
@@ -62,10 +57,7 @@ export function patchOne<E extends object, IdKey extends string = 'id'>(
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: z.toJSONSchema(
-      zodPatch(mapEntity, readOnlyProps, immutableProps),
-      zodToJSONSchemaParams
-    ) as SchemaObject | ReferenceObject,
+    schema: zodToOpenApiSchema(zodPatch(mapEntity, readOnlyProps, immutableProps)),
     required: true,
   })(controller, methodName, descriptor);
 

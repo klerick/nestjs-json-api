@@ -5,16 +5,11 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { z } from 'zod';
 import { Type } from '@nestjs/common';
 import { EntityClass } from '@klerick/json-api-nestjs-shared';
 
 import { TypeField } from '../../../../types';
-import { schemaTypeForRelation } from '../utils';
+import { schemaTypeForRelation, zodToOpenApiSchema } from '../utils';
 import { zodPatchRelationship } from '../../zod';
 import { EntityParamMapService } from '../../service';
 import { JsonApiErrorResponseModel } from '../error-response-model';
@@ -55,9 +50,7 @@ export function patchRelationship<
 
   ApiBody({
     description: `Json api schema for update "${entityName}" item`,
-    schema: z.toJSONSchema(zodPatchRelationship) as
-      | SchemaObject
-      | ReferenceObject,
+    schema: zodToOpenApiSchema(zodPatchRelationship),
     required: true,
   })(controller.prototype, methodName, descriptor);
 

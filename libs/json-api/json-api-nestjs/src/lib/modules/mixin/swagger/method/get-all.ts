@@ -4,21 +4,16 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import {
-  ReferenceObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { Type } from '@nestjs/common';
 import {
   ObjectTyped,
   EntityClass,
 } from '@klerick/json-api-nestjs-shared';
-import { z } from 'zod';
 
 import {
   assertIsKeysOfObject,
   jsonSchemaResponse,
-  zodToJSONSchemaParams,
+  zodToOpenApiSchema,
 } from '../utils';
 import { zodFieldsInputQuerySwagger, zodFilterInputQuerySwagger } from '../../zod';
 import { DEFAULT_PAGE_SIZE, DEFAULT_QUERY_PAGE } from '../../../../constants';
@@ -59,10 +54,7 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     name: 'fields',
     required: false,
     style: 'deepObject',
-    schema: z.toJSONSchema(
-      zodFieldsInputQuerySwagger(mapEntity),
-      zodToJSONSchemaParams
-    ) as SchemaObject | ReferenceObject,
+    schema: zodToOpenApiSchema(zodFieldsInputQuerySwagger(mapEntity)),
     examples: {
       allField: {
         summary: 'Select all field',
@@ -88,15 +80,15 @@ export function getAll<E extends object, IdKey extends string = 'id'>(
     },
     description: `Object of field for select field from "${entity.name}" resource`,
   })(controller, methodName, descriptor);
-  // https://github.com/OAI/OpenAPI-Specification/issues/1706#issuecomment-2704374644 need wait fix deepObject
+  // https://github.com/OAI/OpenAPI-Specification/issues/1706
+  // deepObject style doesn't fully support nested objects in OpenAPI spec,
+  // but works correctly with bracket notation: filter[field][operator]=value
+  // Alternative: use 'content: application/json' but requires JSON-encoded query string
   ApiQuery({
     name: 'filter',
     required: false,
     style: 'deepObject',
-    schema: z.toJSONSchema(
-      zodFilterInputQuerySwagger(mapEntity),
-      zodToJSONSchemaParams
-    ) as SchemaObject | ReferenceObject,
+    schema: zodToOpenApiSchema(zodFilterInputQuerySwagger(mapEntity)),
     examples: {
       simpleExample: {
         summary: 'Several conditional',

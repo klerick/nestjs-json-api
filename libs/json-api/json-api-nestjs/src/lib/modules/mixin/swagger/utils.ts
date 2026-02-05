@@ -12,8 +12,9 @@ import { EntityParam, RelationProperty, TypeField } from '../../../types';
 
 import { EntityParamMap } from '../types';
 import { EntityParamMapService } from '../service';
-import { toJSONSchema } from 'zod';
+import { toJSONSchema, ZodType } from 'zod';
 import { mapTransformFunctionToJsonShema } from '../zod';
+import { ReferenceObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 export function assertIsKeysOfObject<E extends object>(
   object: EntityClass<E>,
@@ -307,15 +308,85 @@ export function getEntityMapProps<E extends object>(
 
 
 export const zodToJSONSchemaParams: Parameters<typeof toJSONSchema>[1] = {
+  target: 'draft-2020-12',
   unrepresentable: 'any',
-  override(ctx){
-    const def = ctx.zodSchema._zod.def
+  reused: 'inline',
+  override(ctx) {
+    const def = ctx.zodSchema._zod.def;
 
-    if (!def || !def?.type) return
-    if (def.type === 'transform'){
-      const shema = mapTransformFunctionToJsonShema.get(def.transform.name)
+    if (!def || !def?.type) return;
+    if (def.type === 'transform') {
+      const shema = mapTransformFunctionToJsonShema.get(def.transform.name);
       if (!shema) return;
-      Object.assign(ctx.jsonSchema, shema)
+      Object.assign(ctx.jsonSchema, shema);
+    }
+  },
+};
+
+function resolveDefsInSchema(
+  schema: Record<string, unknown>,
+  defs: Record<string, unknown>,
+  resolving = new Set<string>()
+): Record<string, unknown> {
+  if (typeof schema !== 'object' || schema === null) {
+    return schema;
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map((item) =>
+      resolveDefsInSchema(item as Record<string, unknown>, defs, resolving)
+    ) as unknown as Record<string, unknown>;
+  }
+
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === '$defs') {
+      continue;
+    }
+
+    if (key === '$ref' && typeof value === 'string' && value.startsWith('#/$defs/')) {
+      const defName = value.replace('#/$defs/', '');
+      if (resolving.has(defName)) {
+        return {};
+      }
+      const defSchema = defs[defName];
+      if (defSchema && typeof defSchema === 'object') {
+        resolving.add(defName);
+        const resolved = resolveDefsInSchema(
+          defSchema as Record<string, unknown>,
+          defs,
+          resolving
+        );
+        resolving.delete(defName);
+        return resolved;
+      }
+      return {};
+    }
+
+    if (typeof value === 'object' && value !== null) {
+      result[key] = resolveDefsInSchema(
+        value as Record<string, unknown>,
+        defs,
+        resolving
+      );
+    } else {
+      result[key] = value;
     }
   }
+
+  return result;
+}
+
+export function zodToOpenApiSchema<T extends ZodType>(
+  schema: T,
+  params: Parameters<typeof toJSONSchema>[1] = zodToJSONSchemaParams
+): SchemaObject | ReferenceObject {
+  const { $schema: _, $defs, ...rest } = toJSONSchema(schema, params) as Record<string, unknown>;
+
+  if ($defs && typeof $defs === 'object') {
+    return resolveDefsInSchema(rest, $defs as Record<string, unknown>) as SchemaObject | ReferenceObject;
+  }
+
+  return rest as SchemaObject | ReferenceObject;
 }
