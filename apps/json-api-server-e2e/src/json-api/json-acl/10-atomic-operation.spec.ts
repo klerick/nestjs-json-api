@@ -48,15 +48,14 @@ const getArticleData = () => ({
 });
 
 describe('ACL: Atomic Operations (Batch Request ACL Enforcement)', () => {
-  let contextTestAcl: ContextTestAcl;
+  let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
   let articleAcl: ArticleAcl[];
+  contextTestAcl.aclRules = { rules: [] };
+  contextTestAcl.context = {};
   let jsonSdk: JsonSdkPromise;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = new ContextTestAcl();
-    contextTestAcl.aclRules = { rules: [] };
-    contextTestAcl.context = {};
     contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
     usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],

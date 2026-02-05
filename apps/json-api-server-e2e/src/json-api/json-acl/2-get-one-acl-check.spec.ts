@@ -34,16 +34,15 @@ import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
 describe('ACL: GET One Resource (Single Resource Fetching)', () => {
-  let contextTestAcl: ContextTestAcl;
+  let contextTestAcl = new ContextTestAcl();
   let usersAcl: UsersAcl[];
+  contextTestAcl.aclRules = { rules: [] };
+  contextTestAcl.context = {};
   let jsonSdk: JsonSdkPromise;
   let publicUser: UsersAcl;
   let notPublicUser: UsersAcl;
   beforeEach(async () => {
     jsonSdk = creatSdk();
-    contextTestAcl = new ContextTestAcl();
-    contextTestAcl.aclRules = { rules: [] };
-    contextTestAcl.context = {};
     contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
     usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile'],
