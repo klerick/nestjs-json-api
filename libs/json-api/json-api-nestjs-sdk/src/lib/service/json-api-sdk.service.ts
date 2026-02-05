@@ -227,7 +227,7 @@ export class JsonApiSdkService {
     };
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (id) {
-      Reflect.set(body.data, 'id', id);
+      Reflect.set(body.data, 'id', String(id));
     }
 
     return this.http
