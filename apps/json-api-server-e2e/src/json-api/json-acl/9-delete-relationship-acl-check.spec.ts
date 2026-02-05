@@ -10,14 +10,15 @@ import { creatSdk } from '../utils/run-application';
 import { AbilityBuilder, CheckFieldAndInclude } from '../utils/acl/acl';
 
 describe('ACL deleteRelationship:', () => {
-  let contextTestAcl = new ContextTestAcl();
+  let contextTestAcl: ContextTestAcl;
   let usersAcl: UsersAcl[];
-  contextTestAcl.aclRules = { rules: [] };
-  contextTestAcl.context = {};
   let jsonSdk: JsonSdkPromise;
 
   beforeEach(async () => {
     jsonSdk = creatSdk();
+    contextTestAcl = new ContextTestAcl();
+    contextTestAcl.aclRules = { rules: [] };
+    contextTestAcl.context = {};
     contextTestAcl = await jsonSdk.jsonApiSdkService.postOne(contextTestAcl);
     usersAcl = await jsonSdk.jsonApiSdkService.getAll(UsersAcl, {
       include: ['profile', 'posts', 'aclComments'],
