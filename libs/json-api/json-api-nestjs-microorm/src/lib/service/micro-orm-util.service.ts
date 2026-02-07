@@ -122,6 +122,7 @@ export class MicroOrmUtilService<
     const relation = relMetaData.relations.map((i) => i.name);
     const newProps = relMetaData.props
       .filter((r) => !relation.includes(r.name))
+      .filter((r) => r.persist !== false)
       .map((r) => r.name);
     this._relationPropsMap.set(entity, newProps);
 
