@@ -91,6 +91,8 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
       addresses: savedAddresses,
       ...newUser
     } = userAfterSave;
+    // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
+    delete (newUser as Record<string, unknown>)['displayName'];
     const { addresses, ...userWithoutAddress } = user;
 
     expect(id).toBeDefined();
@@ -110,6 +112,8 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
       updatedAt: fromUpdatedAt,
       ...fromUser
     } = usersFromSerer;
+    // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
+    delete (fromUser as Record<string, unknown>)['displayName'];
 
     expect(id).toBe(fromId);
     expect(user).toEqual(fromUser);
@@ -137,6 +141,8 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
       comments: savedComments,
       ...newUser
     } = userAfterSave;
+    // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
+    delete (newUser as Record<string, unknown>)['displayName'];
     const {
       addresses,
       comments: commentsFromUser,
@@ -163,6 +169,8 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
       updatedAt: fromUpdatedAt,
       ...fromUser
     } = usersFromSerer;
+    // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
+    delete (fromUser as Record<string, unknown>)['displayName'];
 
     expect(id).toBe(fromId);
     user.comments[0].updatedAt = fromUser.comments[0].updatedAt;
