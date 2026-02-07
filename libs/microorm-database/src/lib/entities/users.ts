@@ -76,6 +76,14 @@ export class Users {
   })
   updatedAt: Date = truncateToSeconds();
 
+  @Property({ persist: false, type: 'string' })
+  get displayName(): string {
+    if (this.firstName || this.lastName) {
+      return [this.firstName, this.lastName].filter(Boolean).join(' ');
+    }
+    return this.login ?? '';
+  }
+
   @ManyToMany(() => Roles, (role) => role.users, {
     owner: true,
     pivotTable: 'users_have_roles',
