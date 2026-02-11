@@ -49,7 +49,7 @@ export class SwaggerService implements OnModuleInit {
                 op: 'update',
                 ref: {
                   type: 'users',
-                  id: '1',
+                  lid: '1',
                 },
                 data: 'EntityPatchOne',
               },
@@ -57,14 +57,14 @@ export class SwaggerService implements OnModuleInit {
                 op: 'remove',
                 ref: {
                   type: 'users',
-                  id: '1',
+                  lid: '1',
                 },
               },
               {
                 op: 'add',
                 ref: {
                   type: 'users',
-                  id: '1',
+                  lid: '1',
                   relationship: 'EntityRelationName',
                 },
                 data: 'UsersPostRelationship',
@@ -73,7 +73,7 @@ export class SwaggerService implements OnModuleInit {
                 op: 'update',
                 ref: {
                   type: 'users',
-                  id: '1',
+                  lid: '1',
                   relationship: 'EntityRelationName',
                 },
                 data: 'UsersDeleteRelationship',
