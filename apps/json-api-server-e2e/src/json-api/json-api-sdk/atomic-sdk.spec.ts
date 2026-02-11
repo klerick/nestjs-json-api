@@ -20,6 +20,7 @@ import {
   Comments,
   Roles,
   Users,
+  BookList
 } from '@nestjs-json-api/typeorm-database';
 import { faker } from '@faker-js/faker';
 import { getUser } from '../utils/data-utils';
@@ -30,6 +31,7 @@ describe('Atomic Operations (Batch Requests)', () => {
   let addressArray: Addresses[];
   let rolesArray: Roles[];
   let commentsArray: Comments[];
+  let bookList: BookList[];
   let usersId: number[];
   beforeEach(async () => {
     jsonSdk = creatSdk();
@@ -59,6 +61,7 @@ describe('Atomic Operations (Batch Requests)', () => {
 
     commentsArray = await Promise.all(commentsPromise);
     usersId = [];
+    bookList =[];
   });
 
   afterEach(async () => {
@@ -97,6 +100,7 @@ describe('Atomic Operations (Batch Requests)', () => {
     }
 
     for (const item of [
+      ...bookList,
       ...usersArray,
       ...addressArray,
       ...commentsArray,
@@ -236,5 +240,57 @@ describe('Atomic Operations (Batch Requests)', () => {
     rolesArray.push(rolesPost);
     usersId.push(managerPost.id);
     usersId.push(userPost.id);
+  });
+
+  it('should handle lid (tmpId) correctly when first operation has temporary ID', async () => {
+
+    const book1 = new BookList();
+    book1.id = '019c4d00-aaaa-0000-0000-000000000001'; // Temporary UUID (lid/tmpId)
+    book1.text = faker.string.alpha(50);
+
+    const book2 = new BookList();
+    book2.id = '019c4d00-bbbb-0000-0000-000000000002'; // Temporary UUID (lid/tmpId)
+    book2.text = faker.string.alpha(50);
+
+    const user = getUser();
+    user.addresses = addressArray[0];
+    user.books = [book1, book2]; // Reference books created in same atomic operation
+
+    const [createdBook1, createdBook2, createdUser] = await jsonSdk
+      .atomicFactory()
+      .postOne(book1)  // First operation - this exposed the bug!
+      .postOne(book2)
+      .postOne(user)
+      .run();
+
+
+    expect(createdBook1).toBeDefined();
+    expect(createdBook1.id).toBeDefined();
+    expect(createdBook1.text).toBe(book1.text);
+
+    expect(createdBook1.id).toBe(book1.id);
+    expect(createdBook2.id).toBe(book2.id);
+
+    expect(createdBook2).toBeDefined();
+    expect(createdBook2.id).toBeDefined();
+    expect(createdBook2.text).toBe(book2.text);
+
+    const fetchedUser = await jsonSdk.jsonApiSdkService.getOne(
+      Users,
+      createdUser.id,
+      { include: ['books'] }
+    );
+
+    bookList.push(
+      ...fetchedUser.books.map((b) =>
+        jsonSdk.jsonApiSdkService.entity('OverrideBookList', b, true)
+      )
+    );
+
+    expect(fetchedUser.books).toHaveLength(2);
+    const bookIds = fetchedUser.books.map(b => b.id).sort();
+    expect(bookIds).toEqual([createdBook1.id, createdBook2.id].sort());
+
+    usersId.push(createdUser.id);
   });
 });
