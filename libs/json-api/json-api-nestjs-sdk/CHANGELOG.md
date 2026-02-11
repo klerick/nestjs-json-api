@@ -1,3 +1,13 @@
+## 10.0.0-beta.14 (2026-02-11)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** replace `tmpId` with `lid` in atomic operation logic and tests for JSON:API spec compliance ([fa7ad1d](https://github.com/klerick/nestjs-json-api/commit/fa7ad1d))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.13 (2026-02-05)
 
 ### 🚀 Features

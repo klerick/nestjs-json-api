@@ -1,3 +1,14 @@
+## 10.0.0-beta.17 (2026-02-11)
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** replace `id` with `lid` in atomic operation references for JSON:API compliance ([579ed01](https://github.com/klerick/nestjs-json-api/commit/579ed01))
+- **json-api-nestjs:** replace `tmpIds` with `lids` for improved clarity in atomic operation logic and related tests ([81e7da9](https://github.com/klerick/nestjs-json-api/commit/81e7da9))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.16 (2026-02-05)
 
 ### 🚀 Features
