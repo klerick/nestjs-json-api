@@ -53,6 +53,7 @@ import { wrapperJsonApiController } from '@klerick/acl-json-api-nestjs';
         debug: true,
         requiredSelectField: false,
         operationUrl: 'operation',
+        allowSetId: true,
       },
       hooks: {
         afterCreateController: (controllerClass: Type<any>) => {

@@ -61,6 +61,7 @@ import { CommentsController } from './controllers/comments/comments.controller';
         debug: true,
         requiredSelectField: false,
         operationUrl: 'operation',
+        allowSetId: true,
       },
       hooks: {
         afterCreateController: (controllerClass: Type<any>) => {
