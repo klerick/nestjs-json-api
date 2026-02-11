@@ -209,7 +209,7 @@ export class JsonApiUtilsService {
     const result: E[] = [];
     for (const dataItem of arrayData) {
       let id = (dataItem as any)[this.jsonApiSdkConfig.idKey];
-      if (this.jsonApiSdkConfig.idIsNumber) {
+      if (this.jsonApiSdkConfig.idIsNumber && /^\d+$/.test(String(id))) {
         const idNumber = parseInt(id, 10);
         id = isNaN(idNumber) ? id : idNumber;
       }
@@ -315,7 +315,7 @@ export class JsonApiUtilsService {
     if (!item || !item['id']) return;
 
     let id: string | number = item['id'];
-    if (this.jsonApiSdkConfig.idIsNumber) {
+    if (this.jsonApiSdkConfig.idIsNumber && /^\d+$/.test(String(id))) {
       const idNumber = parseInt(id, 10);
       id = isNaN(idNumber) ? id : idNumber;
     }
@@ -346,10 +346,11 @@ export class JsonApiUtilsService {
 
     if (!relatedIncluded) return;
 
+    const rawId = (relatedIncluded as any)[this.jsonApiSdkConfig.idKey];
     const entityObject = {
-      [this.jsonApiSdkConfig.idKey]: this.jsonApiSdkConfig.idIsNumber
-        ? parseInt((relatedIncluded as any)[this.jsonApiSdkConfig.idKey], 10)
-        : (relatedIncluded as any)[this.jsonApiSdkConfig.idKey],
+      [this.jsonApiSdkConfig.idKey]: this.jsonApiSdkConfig.idIsNumber && /^\d+$/.test(String(rawId))
+        ? parseInt(rawId, 10)
+        : rawId,
       ...Object.entries(relatedIncluded.attributes || []).reduce(
         (acum, [key, val]) => {
           if (this.jsonApiSdkConfig.dateFields.includes(key)) {
@@ -406,16 +407,31 @@ export class JsonApiUtilsService {
         } else if (isEmptyArrayRef(val)) {
           data = [];
         } else if (Array.isArray(val)) {
-          data = val.map((i: any) => ({
-            type: getTypeForReq(i.constructor.name),
-            id: i[ID_KEY].toString(),
-          }));
+          data = val.map((i: any) => {
+            const relationId = i[ID_KEY];
+            if (relationId === undefined || relationId === null) {
+              throw new Error(
+                `Entity '${i.constructor.name}' used in relationship '${String(key)}' must have an id. ` +
+                `For atomic operations with temporary IDs, set the id property before using the entity in relationships.`
+              );
+            }
+            return {
+              type: getTypeForReq(i.constructor.name),
+              id: relationId.toString(),
+            };
+          });
         } else {
-          if ((val as any)[ID_KEY] !== null) {
+          const relationId = (val as any)[ID_KEY];
+          if (relationId !== undefined && relationId !== null) {
             data = {
               type: getTypeForReq((val as any).constructor.name),
-              id: (val as any)[ID_KEY].toString(),
+              id: relationId.toString(),
             };
+          } else if (relationId === undefined) {
+            throw new Error(
+              `Entity '${(val as any).constructor.name}' used in relationship '${String(key)}' must have an id. ` +
+              `For atomic operations with temporary IDs, set the id property before using the entity in relationships.`
+            );
           } else {
             data = null;
           }
@@ -450,10 +466,19 @@ export class JsonApiUtilsService {
   ): RelationData | RelationData[] {
     const generateRelationObj = (
       relation: RelationshipEntity
-    ): RelationData => ({
-      id: String(Reflect.get(relation, this.jsonApiSdkConfig.idKey)),
-      type: getTypeForReq(relation.constructor.name),
-    });
+    ): RelationData => {
+      const relationId = Reflect.get(relation, this.jsonApiSdkConfig.idKey);
+      if (relationId === undefined || relationId === null) {
+        throw new Error(
+          `Entity '${relation.constructor.name}' used in relationship operation must have an id. ` +
+          `For atomic operations with temporary IDs, set the id property before using the entity.`
+        );
+      }
+      return {
+        id: String(relationId),
+        type: getTypeForReq(relation.constructor.name),
+      };
+    };
 
     return Array.isArray(relationshipEntity)
       ? relationshipEntity.map((item) => generateRelationObj(item))

@@ -571,8 +571,6 @@ describe('JsonApiUtilsService', () => {
         ],
       };
 
-      console.log(service['convertResponseData'](tmp as any, ['providers'] as any, true));
-
       const response = service['convertResponseData'](data, []) as any;
       expect(response[0]).not.toHaveProperty('createdBy');
     });

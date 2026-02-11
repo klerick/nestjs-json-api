@@ -88,18 +88,18 @@ describe('GenerateAtomicBody', () => {
 
       expect(result).toEqual(expectedBodyData);
     });
-    it('should be be add tmpId', () => {
+    it('should add lid (local id) for add operations per JSON:API spec', () => {
       const entity = new BookList();
 
       const user = new Users();
       user.id = 1;
       entity.text = 'text';
-      entity.id = 'tmpId';
+      entity.id = 'test-lid-value';
       entity.users = [user];
 
       const expectedBodyData = {
         op: Operation.add,
-        ref: { type: 'book-list', tmpId: entity.id, id: 'tmpId' },
+        ref: { type: 'book-list', lid: entity.id }, // Only lid, no id per spec
         data: {
           attributes: {
             text: entity.text,
@@ -122,6 +122,58 @@ describe('GenerateAtomicBody', () => {
       const result = generateAtomicBody.getBody();
 
       expect(result).toEqual(expectedBodyData);
+    });
+
+    it('should treat entity without id as attribute, not relationship', () => {
+      const entity = new BookList();
+      entity.text = 'text';
+      entity.id = 'book-lid';
+
+      const userWithoutId = new Users();
+      userWithoutId.firstName = 'John';
+
+      entity.users = [userWithoutId];
+
+      generateAtomicBody.postOne(entity);
+      const result = generateAtomicBody.getBody();
+
+      expect(result.data?.attributes).toHaveProperty('users');
+      expect(result.data?.relationships?.users).toBeUndefined();
+    });
+
+    it('should treat single entity without id as attribute, not relationship', () => {
+      const entity = new Users();
+      entity.firstName = 'John';
+      entity.id = 1;
+
+      const addressWithoutId = new Addresses();
+      addressWithoutId.city = 'New York';
+
+      entity.addresses = addressWithoutId;
+
+      generateAtomicBody.postOne(entity);
+      const result = generateAtomicBody.getBody();
+
+      expect(result.data?.attributes).toHaveProperty('addresses');
+      expect(result.data?.relationships?.addresses).toBeUndefined();
+    });
+
+    it('should throw error when at least one entity in array relationship does not have id', () => {
+      const entity = new BookList();
+      entity.text = 'text';
+      entity.id = 'book-lid';
+
+      const userWithId = new Users();
+      userWithId.id = 1;
+
+      const userWithoutId = new Users();
+      userWithoutId.firstName = 'John';
+
+      entity.users = [userWithId, userWithoutId];
+
+      expect(() => generateAtomicBody.postOne(entity)).toThrowError(
+        /Entity 'Users' used in relationship 'users' must have an id/
+      );
     });
   });
 

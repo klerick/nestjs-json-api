@@ -12,7 +12,7 @@ export type BodyType = {
     type: string;
     id?: string;
     relationship?: string;
-    tmpId?: string;
+    lid?: string;
   };
   data?: any;
 };

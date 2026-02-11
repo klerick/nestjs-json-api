@@ -835,29 +835,69 @@ const result = await jsonSdk
 // result[3] - array of all comment IDs after addition
 ```
 
-### Using Temporary IDs (lid)
+### Using Local Identifiers (lid)
 
-Reference resources created within the same atomic request using temporary IDs.
+Create and reference resources within the same atomic request using local identifiers (`lid`). This allows you to establish relationships between resources being created in a single batch operation.
 
+**How it works:**
+1. Assign a temporary ID to the resource (any unique value - number or string)
+2. Reference this ID in relationships of other resources in the same request
+3. Server automatically replaces temporary IDs with real database IDs
+
+**Example - Numeric lid:**
 ```typescript
 const address = new Addresses();
 address.city = 'Boston';
-address.id = 10000; // Temporary ID
+address.id = 10000; // Temporary ID (lid)
 
 const user = new Users();
 user.firstName = 'Alice';
-user.addresses = address; // Reference by temp ID
+user.addresses = address; // Reference resource by temporary ID
 
 const [createdAddress, createdUser] = await jsonSdk
   .atomicFactory()
-  .postOne(address)
+  .postOne(address)  // First operation: create address with lid=10000
+  .postOne(user)     // Second operation: reference address via lid
+  .run();
+
+// Server assigns real IDs and maintains relationships
+console.log(createdAddress.id); // Real ID (e.g., 42)
+console.log(createdUser.addresses.id); // Same real ID (42)
+```
+
+**Example - UUID lid (for entities with UUID primary keys):**
+```typescript
+const book1 = new BookList();
+book1.id = '550e8400-e29b-41d4-a716-446655440000'; // Temporary UUID (lid)
+book1.title = 'TypeScript Handbook';
+
+const book2 = new BookList();
+book2.id = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // Another temporary UUID (lid)
+book2.title = 'Advanced Node.js';
+
+const user = new Users();
+user.firstName = 'John';
+user.books = [book1, book2]; // Reference both books by their temporary UUIDs
+
+const [createdBook1, createdBook2, createdUser] = await jsonSdk
+  .atomicFactory()
+  .postOne(book1)
+  .postOne(book2)
   .postOne(user)
   .run();
 
-// Server assigns real IDs
-console.log(createdAddress.id); // Real ID (e.g., 1)
-console.log(createdUser.addresses.id); // Same real ID
+// All temporary IDs are used as actual IDs (for UUID fields)
+// or replaced with real IDs (for autoincrement fields)
+console.log(createdBook1.id); // UUID from lid
+console.log(createdBook2.id); // UUID from lid
+console.log(createdUser.books.map(b => b.id)); // Both book UUIDs
 ```
+
+**Important notes:**
+- Local identifiers (lid) are only valid within a single atomic request
+- The SDK automatically handles lid assignment in the request body
+- For numeric IDs: lid is replaced with the actual database-generated ID
+- For UUID IDs: lid can be used as the actual ID (if server has `allowSetId: true`)
 
 ---
 
