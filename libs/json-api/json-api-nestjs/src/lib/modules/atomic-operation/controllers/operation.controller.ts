@@ -87,14 +87,14 @@ export class OperationController {
 
       i++;
     }
-    const tmpIds: (string | number)[] = [];
+    const lids: (string | number)[] = [];
     for (const item of inputOperationData) {
       if (item.op !== 'add') continue;
-      if (!item.ref.tmpId) continue;
-      tmpIds.push(item.ref.tmpId);
+      if (!item.ref.lid) continue;
+      lids.push(item.ref.lid);
     }
 
-    const result = await this.executeService.run(paramForCall, tmpIds);
+    const result = await this.executeService.run(paramForCall, lids);
 
     return {
       [KEY_MAIN_OUTPUT_SCHEMA]: result.map((i) => ({

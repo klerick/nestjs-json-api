@@ -182,6 +182,93 @@ describe('ExecuteService', () => {
       expect(result).toEqual([]);
     });
 
+    it('should correctly assign lids to add operations using separate counter', async () => {
+      const lids = ['lid-book-1', 'lid-book-2'];
+
+      const params: ParamsForExecute[] = [
+        {
+          controller: { name: 'BookController' },
+          methodName: 'postOne', // add operation - должна получить lids[0]
+          module: {}
+        },
+        {
+          controller: { name: 'UserController' },
+          methodName: 'patchOne', // update operation - не должна получить lid
+          module: {}
+        },
+        {
+          controller: { name: 'BookController' },
+          methodName: 'postOne', // add operation - должна получить lids[1]
+          module: {}
+        },
+      ] as unknown as ParamsForExecute[];
+
+      const bookCallback = vi.fn();
+      const userCallback = vi.fn();
+
+      bookCallback.mockReturnValueOnce({
+        data: { id: 'real-book-id-1', attributes: {} }
+      });
+
+      userCallback.mockReturnValueOnce({
+        data: { id: 'user-id', attributes: {} }
+      });
+
+      bookCallback.mockReturnValueOnce({
+        data: { id: 'real-book-id-2', attributes: {} }
+      });
+
+      const bookController = { postOne: bookCallback };
+      const userController = { patchOne: userCallback };
+
+      let controllerCallCount = 0;
+      vi.spyOn(service as any, 'getControllerInstance')
+        .mockImplementation(() => {
+          controllerCallCount++;
+          if (controllerCallCount === 1 || controllerCallCount === 3) {
+            return bookController;
+          } else {
+            return userController;
+          }
+        });
+
+      mapControllerInterceptors.set(bookController, new Map([[bookCallback, []]]));
+      mapControllerInterceptors.set(userController, new Map([[userCallback, []]]));
+
+      let iteratorCallCount = 0;
+      vi.spyOn(asyncIteratorFactory, 'createIterator').mockReturnValue({
+        [Symbol.asyncIterator]: () => ({
+          next: () => {
+            iteratorCallCount++;
+            if (iteratorCallCount <= 3) {
+              // Возвращаем массив параметров для каждой операции
+              return Promise.resolve({
+                value: [{ attributes: {} }],
+                done: false
+              });
+            } else {
+              return Promise.resolve({ value: undefined, done: true });
+            }
+          },
+        } as any),
+      });
+
+      const result = await (service as any).executeOperations(params, lids);
+
+      expect(result).toHaveLength(3);
+      expect(bookCallback).toHaveBeenCalledTimes(2);
+      expect(userCallback).toHaveBeenCalledTimes(1);
+
+      const firstCallArgs = bookCallback.mock.calls[0];
+      expect(firstCallArgs[0]).toHaveProperty('id', 'lid-book-1');
+
+      const secondCallArgs = bookCallback.mock.calls[1];
+      expect(secondCallArgs[0]).toHaveProperty('id', 'lid-book-2');
+
+      expect(result[0].data.id).toBe('real-book-id-1');
+      expect(result[2].data.id).toBe('real-book-id-2');
+    });
+
     it('should call processException if an exception is thrown during execution', async () => {
       const params: ParamsForExecute[] = [
         {
@@ -455,7 +542,7 @@ describe('ExecuteService', () => {
     });
   });
 
-  describe('ExecuteService - replaceTmpIds', () => {
+  describe('ExecuteService - replaceLids', () => {
     let service: ExecuteService;
 
     beforeEach(() => {
@@ -464,48 +551,48 @@ describe('ExecuteService', () => {
 
     it('should be return id first input params of array is undefined', () => {
       const inputParams = [] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
     it('should be return id first input params of array is string', () => {
       const inputParams = ['string'] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
     it('should be return id first input params of array is number', () => {
       const inputParams = [1] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
     it('should be return id first input params of array is array', () => {
       const inputParams = [[]] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
     it('should be return id first input params of array is object', () => {
       const inputParams = [{}] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
     it('should be return id first input params of array is object with undefined of relationships', () => {
       const inputParams = [{ relationships: undefined }] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
@@ -517,9 +604,9 @@ describe('ExecuteService', () => {
           },
         },
       ] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
@@ -536,9 +623,9 @@ describe('ExecuteService', () => {
           },
         },
       ] as any;
-      const tmpIdsMap = {};
+      const lidsMap = {};
 
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(inputParams);
     });
 
@@ -551,7 +638,7 @@ describe('ExecuteService', () => {
         },
       ] as any;
       const newId = '4321';
-      const tmpIdsMap = { '1234': newId };
+      const lidsMap = { '1234': newId };
 
       const checkResult = [
         {
@@ -568,7 +655,7 @@ describe('ExecuteService', () => {
           },
         },
       ];
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(checkResult);
     });
 
@@ -586,7 +673,7 @@ describe('ExecuteService', () => {
         },
       ] as any;
       const newId = '4321';
-      const tmpIdsMap = { '1234': newId };
+      const lidsMap = { '1234': newId };
 
       const checkResult = [
         {
@@ -606,7 +693,7 @@ describe('ExecuteService', () => {
           },
         },
       ];
-      const result = service.replaceTmpIds(inputParams, tmpIdsMap);
+      const result = service.replaceLids(inputParams, lidsMap);
       expect(result).toEqual(checkResult);
     });
   });

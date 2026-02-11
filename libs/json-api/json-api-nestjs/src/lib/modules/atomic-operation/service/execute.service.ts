@@ -108,13 +108,13 @@ export class ExecuteService {
   private interceptorsConsumer = new InterceptorsConsumer();
   private guardsConsumer = new GuardsConsumer();
 
-  async run(params: ParamsForExecute[], tmpIds: (string | number)[]) {
-    return this.runInTransaction(() => this.executeOperations(params, tmpIds));
+  async run(params: ParamsForExecute[], lids: (string | number)[]) {
+    return this.runInTransaction(() => this.executeOperations(params, lids));
   }
 
   protected async executeOperations(
     params: ParamsForExecute[],
-    tmpIds: (string | number)[] = []
+    lids: (string | number)[] = []
   ) {
     const iterateParams = this.asyncIteratorFactory.createIterator(
       params as Parameters<ExecuteService['runOneOperation']>,
@@ -126,7 +126,8 @@ export class ExecuteService {
       | ResourceObjectRelationships<object, string, keyof object>
     > = [];
     let i = 0;
-    const tmpIdsMap: Record<string | number, string | number> = {};
+    let addOperationIndex = 0;
+    const lidsMap: Record<string | number, string | number> = {};
     try {
       for await (const item of iterateParams) {
         const currentParams = params[i];
@@ -136,13 +137,18 @@ export class ExecuteService {
 
         const paramsForExecute = item as unknown as ParamsForExecute['params'];
 
-        const itemReplace = this.replaceTmpIds(paramsForExecute, tmpIdsMap);
+        const itemReplace = this.replaceLids(paramsForExecute, lidsMap);
         const body = itemReplace.at(-1);
-        // First operation doesn't have tmpId'
-        const currentTmpId = i !== 0 ? tmpIds[i] : undefined;
-        if (methodName === 'postOne' && currentTmpId && body) {
+
+        let currentLid: string | number | undefined = undefined;
+        if (methodName === 'postOne') {
+          currentLid = lids[addOperationIndex];
+          addOperationIndex++;
+        }
+
+        if (methodName === 'postOne' && currentLid && body) {
           if (typeof body === 'object' && 'attributes' in body) {
-            body['id'] = `${currentTmpId}`;
+            body['id'] = `${currentLid}`;
             itemReplace[itemReplace.length - 1];
           }
         }
@@ -182,8 +188,8 @@ export class ExecuteService {
             ? await result$
             : await lastValueFrom(result$);
 
-        if (tmpIds[i] && result && !Array.isArray(result.data) && result.data) {
-          tmpIdsMap[tmpIds[i]] = result.data.id;
+        if (currentLid && result && !Array.isArray(result.data) && result.data) {
+          lidsMap[currentLid] = result.data.id;
         }
 
         if (result instanceof Object) {
@@ -258,9 +264,9 @@ export class ExecuteService {
     return resultInterceptors;
   }
 
-  replaceTmpIds<T extends ParamsForExecute['params']>(
+  replaceLids<T extends ParamsForExecute['params']>(
     inputParams: T,
-    tmpIdsMap: Record<string | number, string | number>
+    lidsMap: Record<string | number, string | number>
   ): T {
     const bodyInput = inputParams.at(-1);
     if (!bodyInput) {
@@ -297,7 +303,7 @@ export class ExecuteService {
               if (i === null) return i;
               return {
                 ...i,
-                id: tmpIdsMap[i['id']] ? `${tmpIdsMap[i['id']]}` : i['id'],
+                id: lidsMap[i['id']] ? `${lidsMap[i['id']]}` : i['id'],
               };
             }),
           };
@@ -305,8 +311,8 @@ export class ExecuteService {
           if (!data) {
             acum[name] = val;
           } else {
-            data['id'] = tmpIdsMap[data['id']]
-              ? `${tmpIdsMap[data['id']]}`
+            data['id'] = lidsMap[data['id']]
+              ? `${lidsMap[data['id']]}`
               : data['id'];
             acum[name] = {
               data,

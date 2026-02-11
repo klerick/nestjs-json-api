@@ -35,8 +35,7 @@ export const zodAdd = <T extends string>(type: T) =>
       ref: z
         .object({
           type: z.literal(type),
-          tmpId: z.union([z.number(), z.string()]).optional(),
-          id: z.string().optional(),
+          lid: z.union([z.number(), z.string()]).optional(),
         })
         .strict(),
       data: zodGeneralData,
@@ -107,7 +106,7 @@ export type ZodInputArray = ZodArray<
       type: ZodString;
       id: ZodOptional<ZodString>;
       relationship: ZodOptional<ZodString>;
-      tmpId: ZodOptional<ZodUnion<[ZodNumber, ZodString]>>;
+      lid: ZodOptional<ZodUnion<[ZodNumber, ZodString]>>;
     }>;
     data: ZodOptional<ZodGeneral>;
   }>

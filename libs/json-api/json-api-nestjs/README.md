@@ -435,30 +435,29 @@ With this option enabled, clients can include the `id` field in POST requests:
 
 ```
 
-### Atomic operation
-You can more information find [here](https://jsonapi.org/ext/atomic/)
-But you have additinal feature.
-For example: you will need create new **Roles**, then - create new **Users** and assign new **Roles** to new **Users**.
-If use native json api you need send 3 http request:
-- POST /roles
-- POST /users
+### Atomic Operations
 
-but [Atomic operation](https://jsonapi.org/ext/atomic/) allow for one request.
+The library implements the [JSON:API Atomic Operations Extension](https://jsonapi.org/ext/atomic/), allowing you to execute multiple operations in a single HTTP request with transaction support.
+
+**Use case:** Create multiple related resources in one atomic request instead of multiple sequential HTTP requests.
+
+Example: Create a new **Role**, create a new **User**, and assign the role to the user - all in one request instead of three separate requests.
+
+**Request Example:**
 ```json
-
 {
    "atomic:operations":[
       {
          "op":"add",
          "ref":{
             "type":"roles",
-            "tmpId":10000
+            "lid":10000
          },
          "data":{
             "type":"roles",
             "attributes":{
-               "name":"testRolesAgain",
-               "key":"testRolesAgain"
+               "name":"admin",
+               "key":"admin_role"
             }
          }
       },
@@ -470,27 +469,59 @@ but [Atomic operation](https://jsonapi.org/ext/atomic/) allow for one request.
          "data":{
             "type":"users",
             "attributes":{
-               "login":"newLogin"
+               "login":"johndoe",
+               "firstName":"John",
+               "lastName":"Doe"
             },
             "relationships":{
                "addresses":{
-                  "type":"addresses",
-                  "id":"1"
-               },
-               "roles":[
-                  {
-                     "type":"roles",
-                     "id":"10000"
+                  "data":{
+                     "type":"addresses",
+                     "id":"1"
                   }
-               ]
+               },
+               "roles":{
+                  "data":[
+                     {
+                        "type":"roles",
+                        "id":"10000"
+                     }
+                  ]
+               }
             }
          }
       }
    ]
 }
-
 ```
-**tmpId** - is params for operation **add**, should be unique for all operations.
+
+**Local Identifiers (lid):**
+- The `lid` (local identifier) parameter allows referencing resources created within the same atomic request
+- Must be unique across all operations in the request
+- Used in the `ref.lid` field for the operation creating the resource
+- Referenced in `relationships.{relation}.data.id` to establish relationships
+- Automatically replaced with real database IDs by the server
+
+**Supported Operations:**
+- `add` - Create a new resource (equivalent to POST)
+- `update` - Update an existing resource (equivalent to PATCH)
+- `remove` - Delete a resource (equivalent to DELETE)
+
+**Transaction Guarantees:**
+All operations in an atomic request execute within a single database transaction:
+- If all operations succeed → transaction commits
+- If any operation fails → entire transaction rolls back (no partial changes)
+
+**Configuration:**
+```typescript
+JsonApiModule.forRoot(TypeOrmJsonApiModule, {
+  entities: [Users, Roles],
+  options: {
+    operationUrl: 'operation', // Default endpoint: POST /operation
+    allowSetId: true,          // Allow clients to set IDs (useful for UUIDs)
+  }
+})
+```
 
 If you have Interceptor you can check call it from **AtomicOperation**
 
