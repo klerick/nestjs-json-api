@@ -7,12 +7,6 @@ import { MapController, MapEntity, OperationMethode } from '../types';
 
 import { InputArray } from '../utils';
 import { JsonBaseController } from '../../mixin/controllers/json-base.controller';
-import {
-  PatchData,
-  PatchRelationshipData,
-  PostData,
-  PostRelationshipData,
-} from '../../mixin/zod';
 
 @Injectable()
 export class ExplorerService<E extends object = object> {
@@ -62,32 +56,38 @@ export class ExplorerService<E extends object = object> {
     methodName: OperationMethode<E>,
     data: InputArray[number]
   ): Parameters<JsonBaseController<E>[typeof methodName]> {
-    const { op, ref, ...other } = data;
+    const { ref, data: operationData, meta } = data;
+
+    const requestBody = { data: operationData, meta };
+
     switch (methodName) {
       case 'postOne':
-        return [other as PostData<E, 'id'>];
+        return [requestBody, requestBody] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
       case 'patchOne':
-        return [ref.id as string, other as PatchData<E, 'id'>];
+        return [ref.id as string, requestBody, requestBody] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
       case 'deleteOne':
-        return [ref.id as string];
+        return [ref.id as string] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
       case 'deleteRelationship':
         return [
           ref.id as string,
           ref.relationship as RelationKeys<E>,
-          other as PostRelationshipData,
-        ];
+          requestBody,
+          requestBody,
+        ] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
       case 'patchRelationship':
         return [
           ref.id as string,
           ref.relationship as RelationKeys<E>,
-          other as PatchRelationshipData,
-        ];
+          requestBody,
+          requestBody,
+        ] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
       case 'postRelationship':
         return [
           ref.id as string,
           ref.relationship as RelationKeys<E>,
-          other as PostRelationshipData,
-        ];
+          requestBody,
+          requestBody,
+        ] as unknown as Parameters<JsonBaseController<E>[typeof methodName]>;
     }
   }
 

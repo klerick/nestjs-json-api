@@ -74,6 +74,42 @@ describe('ZodHelperSpec', () => {
         expect(result).toHaveProperty('data');
       }
     });
+
+    it('should be correct with meta', () => {
+      const user = 'user';
+      const schema = zodAdd(user);
+      const check: z.infer<ZodAdd<'user'>> = {
+        op: Operation.add,
+        ref: {
+          type: user,
+        },
+        data: {},
+        meta: { source: 'import', batchId: '123' },
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.add);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('meta');
+      expect(result.meta).toEqual({ source: 'import', batchId: '123' });
+    });
+
+    it('should be correct without meta (backward compatibility)', () => {
+      const user = 'user';
+      const schema = zodAdd(user);
+      const check = {
+        op: Operation.add,
+        ref: {
+          type: user,
+        },
+        data: {},
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.add);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result.meta).toBeUndefined();
+    });
     it('should be not correct', () => {
       const schema = zodAdd('user');
       const check = {
@@ -150,6 +186,44 @@ describe('ZodHelperSpec', () => {
         expect(result.ref.type).toBe(user);
         expect(result).toHaveProperty('data');
       }
+    });
+
+    it('should be correct with meta', () => {
+      const user = 'user';
+      const schema = zodUpdate(user);
+      const check: z.infer<ZodUpdate<'user'>> = {
+        op: Operation.update,
+        ref: {
+          type: 'user',
+          id: '1',
+        },
+        data: {},
+        meta: { reason: 'correction', updatedBy: 'admin' },
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.update);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('meta');
+      expect(result.meta).toEqual({ reason: 'correction', updatedBy: 'admin' });
+    });
+
+    it('should be correct without meta (backward compatibility)', () => {
+      const user = 'user';
+      const schema = zodUpdate(user);
+      const check = {
+        op: Operation.update,
+        ref: {
+          type: 'user',
+          id: '1',
+        },
+        data: {},
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.update);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result.meta).toBeUndefined();
     });
     it('should be not correct', () => {
       const schema = zodUpdate('user');
@@ -247,6 +321,43 @@ describe('ZodHelperSpec', () => {
         expect(result.ref.type).toBe(user);
         expect(result).not.toHaveProperty('data');
       }
+    });
+
+    it('should NOT accept meta (remove operation does not support meta)', () => {
+      const user = 'user';
+      const schema = zodRemove(user);
+      const check = {
+        op: Operation.remove,
+        ref: {
+          type: 'user',
+          id: '1',
+        },
+        meta: { deletedBy: 'admin', reason: 'duplicate' },
+      };
+
+      expect.assertions(1);
+      try {
+        schema.parse(check);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ZodError);
+      }
+    });
+
+    it('should be correct without meta', () => {
+      const user = 'user';
+      const schema = zodRemove(user);
+      const check = {
+        op: Operation.remove,
+        ref: {
+          type: 'user',
+          id: '1',
+        },
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.remove);
+      expect(result.ref.type).toBe(user);
+      expect(result).not.toHaveProperty('data');
+      expect(result).not.toHaveProperty('meta');
     });
 
     it('should be not correct', () => {
@@ -352,6 +463,66 @@ describe('ZodHelperSpec', () => {
         expect(result).toHaveProperty('data');
         expect(result['data']).toEqual(check.data);
       }
+    });
+
+    it('should be correct with meta', () => {
+      const user = 'user';
+      const rel = ['address', 'notes'] as unknown as UnionToTuple<
+        RelationKeys<Users>
+      >;
+      const schema = zodOperationRel<Users, Operation>(
+        user,
+        rel,
+        Operation.add
+      );
+      const check: z.infer<ZodOperationRel<Users, Operation.add>> = {
+        op: Operation.add,
+        ref: {
+          type: 'user',
+          id: '1',
+          relationship: 'notes',
+        },
+        data: {
+          id: 1,
+          type: 'notes',
+        },
+        meta: { addedBy: 'admin', source: 'sync' },
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.add);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('meta');
+      expect(result.meta).toEqual({ addedBy: 'admin', source: 'sync' });
+    });
+
+    it('should be correct without meta (backward compatibility)', () => {
+      const user = 'user';
+      const rel = ['address', 'notes'] as unknown as UnionToTuple<
+        RelationKeys<Users>
+      >;
+      const schema = zodOperationRel<Users, Operation>(
+        user,
+        rel,
+        Operation.update
+      );
+      const check = {
+        op: Operation.update,
+        ref: {
+          type: 'user',
+          id: '1',
+          relationship: 'notes',
+        },
+        data: {
+          id: 1,
+          type: 'notes',
+        },
+      };
+      const result = schema.parse(check);
+      expect(result.op).toBe(Operation.update);
+      expect(result.ref.type).toBe(user);
+      expect(result).toHaveProperty('data');
+      expect(result.meta).toBeUndefined();
     });
     it('should be not correct', () => {
       const user = 'user';

@@ -18,7 +18,7 @@ export class InputOperationPipe
 
   transform(value: JSONValue): InputArray {
     try {
-      return this.zodInputOperation.parse(value)[KEY_MAIN_INPUT_SCHEMA];
+      return this.zodInputOperation.parse(value)[KEY_MAIN_INPUT_SCHEMA] as InputArray;
     } catch (e) {
       if (e instanceof ZodError) {
         throw new BadRequestException(e.issues);

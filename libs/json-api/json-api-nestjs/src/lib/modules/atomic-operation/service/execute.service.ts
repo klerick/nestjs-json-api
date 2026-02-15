@@ -138,7 +138,6 @@ export class ExecuteService {
         const paramsForExecute = item as unknown as ParamsForExecute['params'];
 
         const itemReplace = this.replaceLids(paramsForExecute, lidsMap);
-        const body = itemReplace.at(-1);
 
         let currentLid: string | number | undefined = undefined;
         if (methodName === 'postOne') {
@@ -146,10 +145,17 @@ export class ExecuteService {
           addOperationIndex++;
         }
 
-        if (methodName === 'postOne' && currentLid && body) {
-          if (typeof body === 'object' && 'attributes' in body) {
-            body['id'] = `${currentLid}`;
-            itemReplace[itemReplace.length - 1];
+        if (methodName === 'postOne' && currentLid) {
+          for (const param of itemReplace) {
+            if (
+              param &&
+              typeof param === 'object' &&
+              !Array.isArray(param) &&
+              'attributes' in param
+            ) {
+              param['id'] = `${currentLid}`;
+              break;
+            }
           }
         }
         const guarFunction = this.getCanActivateFn(
@@ -268,22 +274,29 @@ export class ExecuteService {
     inputParams: T,
     lidsMap: Record<string | number, string | number>
   ): T {
-    const bodyInput = inputParams.at(-1);
-    if (!bodyInput) {
-      return inputParams;
-    }
-    if (typeof bodyInput === 'string') {
-      return inputParams;
-    }
-    if (typeof bodyInput === 'number') {
-      return inputParams;
+    // Find the parameter that contains relationships (data object)
+    // For postOne: [data, meta] - index 0
+    // For patchOne: [id, data, meta] - index 1
+    // For relationship methods: [id, relName, data, meta] - index 2
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let bodyInput: any;
+    let bodyIndex = -1;
+
+    for (let i = 0; i < inputParams.length; i++) {
+      const param = inputParams[i];
+      if (
+        param &&
+        typeof param === 'object' &&
+        !Array.isArray(param) &&
+        'relationships' in param
+      ) {
+        bodyInput = param;
+        bodyIndex = i;
+        break;
+      }
     }
 
-    if (Array.isArray(bodyInput)) {
-      return inputParams;
-    }
-
-    if (!(typeof bodyInput === 'object' && 'relationships' in bodyInput)) {
+    if (!bodyInput || bodyIndex === -1) {
       return inputParams;
     }
 
@@ -324,7 +337,7 @@ export class ExecuteService {
       { ...relationships } as any
     );
 
-    inputParams[inputParams.length - 1] = bodyInput;
+    inputParams[bodyIndex] = bodyInput;
     return inputParams;
   }
 
@@ -356,7 +369,7 @@ export class ExecuteService {
           return m;
         });
       }
-      throw new HttpException(response, e.getStatus());
+      throw new HttpException(response, e.getStatus(), {cause: e});
     }
     const formatError = this.errorFormatService.formatError(e);
 
@@ -386,7 +399,7 @@ export class ExecuteService {
       Reflect.getMetadata(ROUTE_ARGS_METADATA, controller, methodName)
     ) as unknown as {
       index: number;
-      pipes: Type<PipeTransform>[];
+      pipes: (Type<PipeTransform> | PipeTransform)[];
     }[];
     const resultParams = new Array(params.length);
     for (const { pipes, index } of pramsPipe) {
@@ -398,7 +411,7 @@ export class ExecuteService {
   private async runPipes(
     initialParams: unknown,
     module: Module,
-    pipes: Type<PipeTransform>[]
+    pipes: (Type<PipeTransform> | PipeTransform)[]
   ) {
     let modifiedParams = initialParams;
     for (const pipe of pipes) {
@@ -412,12 +425,16 @@ export class ExecuteService {
   }
 
   private getPipeInstance(
-    pipe: Type<PipeTransform>,
+    pipe: Type<PipeTransform> | PipeTransform,
     module: Module
   ): PipeTransform {
-    const instanceWrapper = module.getProviderByKey<PipeTransform>(pipe);
+    if (typeof pipe !== 'function' && 'transform' in pipe) {
+      return pipe;
+    }
+
+    const instanceWrapper = module.getProviderByKey<PipeTransform>(pipe as Type<PipeTransform>);
     if (!instanceWrapper) {
-      return this.moduleRef.get(pipe, { strict: false });
+      return this.moduleRef.get(pipe as Type<PipeTransform>, { strict: false });
     }
     return instanceWrapper.instance;
   }

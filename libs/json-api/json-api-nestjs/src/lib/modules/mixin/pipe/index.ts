@@ -13,6 +13,7 @@ import { PatchInputPipe } from './patch-input';
 import { ParseRelationshipNamePipe } from './parse-relationship-name';
 import { PostRelationshipPipe } from './post-relationship';
 import { PatchRelationshipPipe } from './patch-relationship';
+import { MetaExtractorPipe } from './meta-extractor';
 import { nameIt } from '../helpers';
 import { EntityControllerParam } from '../types';
 
@@ -95,4 +96,10 @@ export function parseRelationshipNamePipeMixin(
   entity: ModuleMixinOptions['entity']
 ): PipeMixin {
   return factoryMixin(entity, ParseRelationshipNamePipe);
+}
+
+export function metaExtractorPipeMixin(
+  entity: ModuleMixinOptions['entity']
+): PipeMixin {
+  return factoryMixin(entity, MetaExtractorPipe);
 }

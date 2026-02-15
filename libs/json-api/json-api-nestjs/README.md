@@ -435,6 +435,146 @@ With this option enabled, clients can include the `id` field in POST requests:
 
 ```
 
+### Meta Support
+
+The library supports the `meta` member in JSON:API requests and responses according to the [JSON:API specification](https://jsonapi.org/format/#document-meta). Meta allows passing additional non-standard information that doesn't belong to resource attributes.
+
+**Use cases:**
+- Request tracking (correlation IDs, client versions, timestamps)
+- Business logic metadata (import source, batch IDs, priority levels)
+- Audit information (user context, operation reason)
+
+#### Meta in Regular Operations
+
+Meta is supported in POST, PATCH, and relationship operations:
+
+**POST Request with Meta:**
+```json
+POST /users
+{
+  "data": {
+    "type": "users",
+    "attributes": {
+      "login": "johndoe",
+      "firstName": "John"
+    }
+  },
+  "meta": {
+    "source": "mobile-app",
+    "version": "1.0.2",
+    "correlationId": "abc-123"
+  }
+}
+```
+
+**PATCH Request with Meta:**
+```json
+PATCH /users/1
+{
+  "data": {
+    "id": "1",
+    "type": "users",
+    "attributes": {
+      "firstName": "Jane"
+    }
+  },
+  "meta": {
+    "reason": "name-change-request",
+    "approvedBy": "admin"
+  }
+}
+```
+
+**Relationship Operations with Meta:**
+```json
+POST /users/1/relationships/roles
+{
+  "data": [
+    { "type": "roles", "id": "2" }
+  ],
+  "meta": {
+    "assignedBy": "admin",
+    "expiresAt": "2024-12-31"
+  }
+}
+```
+
+**Note:** DELETE operations do not support meta as per JSON:API specification.
+
+#### Accessing Meta in Controllers
+
+Meta is automatically extracted and passed as a parameter to controller methods:
+
+```typescript
+import { JsonApi, JsonBaseController } from '@klerick/json-api-nestjs';
+import { Body } from '@nestjs/common';
+
+@JsonApi(Users)
+export class UsersController extends JsonBaseController<Users> {
+  override async postOne(
+    @Body() inputData: PostData<Users>,
+    @Body() meta: Record<string, unknown>
+  ) {
+    // Access meta fields
+    console.log('Source:', meta.source);
+    console.log('Correlation ID:', meta.correlationId);
+
+    // Return response with meta
+    const response = await super.postOne(inputData);
+    return {
+      ...response,
+      meta: {
+        ...meta,
+        processedAt: Date.now(),
+        processedBy: 'server'
+      }
+    };
+  }
+}
+```
+
+#### Custom Meta Validation
+
+You can add custom validation for meta using NestJS pipes:
+
+```typescript
+import { PipeTransform, BadRequestException } from '@nestjs/common';
+import { z } from 'zod';
+
+// Define meta schema
+const CustomMetaSchema = z.object({
+  source: z.string(),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  correlationId: z.string().uuid().optional()
+});
+
+type CustomMeta = z.infer<typeof CustomMetaSchema>;
+
+// Custom validation pipe
+export class MetaValidationPipe implements PipeTransform<unknown, CustomMeta> {
+  transform(value: unknown): CustomMeta {
+    try {
+      return CustomMetaSchema.parse(value);
+    } catch (e) {
+      throw new BadRequestException('Invalid meta format');
+    }
+  }
+}
+
+// Use in controller
+@JsonApi(Users)
+export class UsersController extends JsonBaseController<Users> {
+  override async postOne(
+    @Body() inputData: PostData<Users>,
+    @Body(MetaValidationPipe) meta: CustomMeta
+  ) {
+    // meta is now validated and typed
+    console.log(meta.version); // TypeScript knows this exists
+    return super.postOne(inputData);
+  }
+}
+```
+
 ### Atomic Operations
 
 The library implements the [JSON:API Atomic Operations Extension](https://jsonapi.org/ext/atomic/), allowing you to execute multiple operations in a single HTTP request with transaction support.
@@ -501,6 +641,47 @@ Example: Create a new **Role**, create a new **User**, and assign the role to th
 - Used in the `ref.lid` field for the operation creating the resource
 - Referenced in `relationships.{relation}.data.id` to establish relationships
 - Automatically replaced with real database IDs by the server
+
+**Meta Support in Atomic Operations:**
+
+Each operation can include a `meta` object for additional metadata:
+
+```json
+{
+  "atomic:operations": [
+    {
+      "op": "add",
+      "ref": { "type": "users", "lid": 1000 },
+      "data": {
+        "type": "users",
+        "attributes": { "login": "john" }
+      },
+      "meta": {
+        "source": "bulk-import",
+        "batchId": "batch-123",
+        "priority": "high"
+      }
+    },
+    {
+      "op": "update",
+      "ref": { "type": "users", "id": "5" },
+      "data": {
+        "type": "users",
+        "attributes": { "isActive": false }
+      },
+      "meta": {
+        "reason": "account-suspension",
+        "requestedBy": "admin"
+      }
+    }
+  ]
+}
+```
+
+Meta is passed to controller methods just like in regular operations, allowing you to:
+- Track operation context
+- Apply business logic based on metadata
+- Include metadata in response
 
 **Supported Operations:**
 - `add` - Create a new resource (equivalent to POST)

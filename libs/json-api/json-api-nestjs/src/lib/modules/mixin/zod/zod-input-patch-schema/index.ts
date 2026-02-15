@@ -11,6 +11,8 @@ import {
   Id,
   Attributes,
   Relationships,
+  zodMeta,
+  ZodMeta,
 } from '../zod-share';
 
 import { EntityParamMapService } from '../../service';
@@ -30,6 +32,7 @@ type ZodInputPatchSchema<E extends object, IdKey extends string> = ZodObject<
 
 type ZodInputPatchDataShape<E extends object, IdKey extends string> = {
   data: ZodInputPatchSchema<E, IdKey>;
+  meta: ZodMeta;
 };
 
 function getShape<E extends object, IdKey extends string>(
@@ -58,6 +61,7 @@ export function zodPatch<E extends object, IdKey extends string>(
 
   return z.strictObject({
     data: shape,
+    meta: zodMeta,
   });
 }
 
@@ -86,4 +90,5 @@ export type PatchData<E extends object, IdKey extends string> = {
 
 export type Patch<E extends object, IdKey extends string> = {
   data: PatchData<E, IdKey>;
+  meta?: Record<string, unknown>;
 };

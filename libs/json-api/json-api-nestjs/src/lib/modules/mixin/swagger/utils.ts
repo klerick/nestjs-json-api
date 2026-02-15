@@ -20,7 +20,7 @@ import {
   zodRulesForFilterOperator,
   zodRulesForRelation,
 } from '../zod/zod-input-query-schema/filter';
-import { zodPatchRelationship, zodRelationshipData } from '../zod';
+import { zodPatchRelationship, zodRelationshipData, zodMeta } from '../zod';
 import { zodGeneralData } from '../../atomic-operation/utils';
 
 export function assertIsKeysOfObject<E extends object>(
@@ -429,6 +429,7 @@ export function ensureZodSchemasRegistered(): void {
     zodPatchRelationship,
     zodRelationshipData,
     zodGeneralData,
+    zodMeta,
   ]);
 }
 

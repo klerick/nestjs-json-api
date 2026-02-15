@@ -4,3 +4,4 @@ export * from './type';
 export * from './attributes';
 export * from './rel-data';
 export * from './relationships';
+export * from './meta';

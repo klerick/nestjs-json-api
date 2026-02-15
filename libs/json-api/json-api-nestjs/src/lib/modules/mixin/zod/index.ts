@@ -13,4 +13,4 @@ export * from './zod-input-post-relationship-schema';
 export * from './zod-input-patch-relationship-schema';
 export * from './map-transform-to-json-shema'
 
-export { Relationships, Data, Attributes, Id, Type } from './zod-share';
+export { Relationships, Data, Attributes, Id, Type, zodMeta, Meta, ZodMeta, zodMetaExtractor, ZodMetaExtractor } from './zod-share';

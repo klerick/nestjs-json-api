@@ -80,10 +80,76 @@ describe('ExplorerService', () => {
         op: Operation.add,
         data: {},
       };
+      const requestBody = { data: data.data, meta: undefined };
       expect(service.getParamsForMethod('patchRelationship', data)).toEqual([
         data.ref.id,
         data.ref.relationship,
-        { data: data.data },
+        requestBody,
+        requestBody,
+      ]);
+    });
+
+    it('should return the correct parameters with meta', () => {
+      const data = {
+        ref: {
+          id: '1',
+          relationship: 'belongs-to',
+          type: 'TypeA',
+        },
+        op: Operation.add,
+        data: {},
+        meta: { source: 'import', batchId: '123' },
+      };
+      const requestBody = { data: data.data, meta: data.meta };
+      expect(service.getParamsForMethod('patchRelationship', data)).toEqual([
+        data.ref.id,
+        data.ref.relationship,
+        requestBody,
+        requestBody,
+      ]);
+    });
+
+    it('should return correct parameters for postOne without meta', () => {
+      const data = {
+        ref: {
+          type: 'TypeA',
+        },
+        op: Operation.add,
+        data: { attributes: { name: 'test' } },
+      };
+      const requestBody = { data: data.data, meta: undefined };
+      expect(service.getParamsForMethod('postOne', data)).toEqual([
+        requestBody,
+        requestBody,
+      ]);
+    });
+
+    it('should return correct parameters for postOne with meta', () => {
+      const data = {
+        ref: {
+          type: 'TypeA',
+        },
+        op: Operation.add,
+        data: { attributes: { name: 'test' } },
+        meta: { priority: 'high' },
+      };
+      const requestBody = { data: data.data, meta: data.meta };
+      expect(service.getParamsForMethod('postOne', data)).toEqual([
+        requestBody,
+        requestBody,
+      ]);
+    });
+
+    it('should return correct parameters for deleteOne (no meta support)', () => {
+      const data = {
+        ref: {
+          id: '1',
+          type: 'TypeA',
+        },
+        op: Operation.remove,
+      };
+      expect(service.getParamsForMethod('deleteOne', data)).toEqual([
+        data.ref.id,
       ]);
     });
   });

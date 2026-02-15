@@ -22,6 +22,7 @@ import { MapController } from '../../types';
 
 import { UnionToTuple } from '../../../../types';
 import { EntityParamMap } from '../../../mixin/types';
+import { zodMeta, ZodMeta } from '../../../mixin/zod';
 
 
 export const zodGeneralData = z.json().nullable().meta({ id: 'JsonData' });
@@ -39,6 +40,7 @@ export const zodAdd = <T extends string>(type: T) =>
         })
         .strict(),
       data: zodGeneralData,
+      meta: zodMeta,
     })
     .strict();
 
@@ -54,6 +56,7 @@ export const zodUpdate = <T extends string>(type: T) =>
         })
         .strict(),
       data: zodGeneralData,
+      meta: zodMeta,
     })
     .strict();
 export type ZodRemove<T extends string> = ReturnType<typeof zodRemove<T>>;
@@ -66,7 +69,7 @@ export const zodRemove = <T extends string>(type: T) =>
           type: z.literal(type),
           id: z.string(),
         })
-        .strict(),
+        .strict()
     })
     .strict();
 
@@ -96,6 +99,7 @@ export const zodOperationRel = <E extends object, O extends Operation>(
         })
         .strict(),
       data: zodGeneralData,
+      meta: zodMeta,
     })
     .strict();
 };
@@ -109,6 +113,7 @@ export type ZodInputArray = ZodArray<
       lid: ZodOptional<ZodUnion<[ZodNumber, ZodString]>>;
     }>;
     data: ZodOptional<ZodGeneral>;
+    meta: ZodOptional<ZodGeneral>;
   }>
 >;
 

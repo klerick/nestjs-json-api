@@ -77,6 +77,84 @@ describe('zodPatch', () => {
     expect(schema.parse(check2)).toEqual(checkResult2);
     expect(schema.parse(checkResult3)).toEqual(checkResult3);
   });
+
+  it('should accept valid meta object', () => {
+    const date = new Date();
+    const attributes = {
+      login: 'updated-login',
+      testDate: date.toISOString(),
+    };
+
+    const checkWithMeta = {
+      data: {
+        id: '1',
+        type: 'users',
+        attributes,
+      },
+      meta: {
+        updatedBy: 'admin',
+        reason: 'data-correction',
+        timestamp: Date.now(),
+      },
+    };
+
+    const result = schema.parse(checkWithMeta);
+    expect(result.meta).toEqual({
+      updatedBy: 'admin',
+      reason: 'data-correction',
+      timestamp: expect.any(Number),
+    });
+  });
+
+  it('should accept empty meta object', () => {
+    const checkWithEmptyMeta = {
+      data: {
+        id: '1',
+        type: 'users',
+        attributes: {
+          login: 'test',
+        },
+      },
+      meta: {},
+    };
+
+    const result = schema.parse(checkWithEmptyMeta);
+    expect(result.meta).toEqual({});
+  });
+
+  it('should work without meta (backward compatibility)', () => {
+    const checkWithoutMeta = {
+      data: {
+        id: '1',
+        type: 'users',
+        attributes: {
+          login: 'test',
+        },
+      },
+    };
+
+    const result = schema.parse(checkWithoutMeta);
+    expect(result.meta).toBeUndefined();
+  });
+
+  it('should reject invalid meta (not an object)', () => {
+    const invalidMeta = [
+      { data: { id: '1', type: 'users' }, meta: 'string' },
+      { data: { id: '1', type: 'users' }, meta: 123 },
+      { data: { id: '1', type: 'users' }, meta: ['array'] },
+      { data: { id: '1', type: 'users' }, meta: null },
+    ];
+
+    expect.assertions(invalidMeta.length);
+    for (const item of invalidMeta) {
+      try {
+        schema.parse(item);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ZodError);
+      }
+    }
+  });
+
   it('should be not ok', () => {
     const check1 = {};
     const check2 = null;

@@ -41,16 +41,31 @@ export class JsonBaseController<E extends object, IdKey extends string = 'id'>
     return this[ORM_SERVICE_PROPS].deleteOne(id);
   }
 
+  // Method overloads for patchOne
   patchOne(
     id: string | number,
-    inputData: PatchData<E, IdKey>
-  ): Promise<ResourceObject<E, 'object', null, IdKey>> {
+    inputData: PatchData<E, IdKey>,
+    meta?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+  patchOne(
+    id: string | number,
+    inputData: PatchData<E, IdKey>,
+    meta: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>
+  {
     return this[ORM_SERVICE_PROPS].patchOne(id, inputData);
   }
 
+  // Method overloads for postOne
   postOne(
-    inputData: PostData<E, IdKey>
-  ): Promise<ResourceObject<E, 'object', null, IdKey>> {
+    inputData: PostData<E, IdKey>,
+    meta?: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>;
+  postOne(
+    inputData: PostData<E, IdKey>,
+    meta: Record<string, unknown>
+  ): Promise<ResourceObject<E, 'object', null, IdKey>>
+  {
     return this[ORM_SERVICE_PROPS].postOne(inputData);
   }
 
@@ -60,27 +75,55 @@ export class JsonBaseController<E extends object, IdKey extends string = 'id'>
   ): Promise<ResourceObjectRelationships<E, IdKey, Rel>> {
     return this[ORM_SERVICE_PROPS].getRelationship(id, relName);
   }
+
+  // Method overloads for postRelationship
   postRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: string | number,
     relName: Rel,
-    input: PostRelationshipData
-  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>> {
+    input: PostRelationshipData,
+    meta?: Record<string, unknown>
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>;
+  postRelationship<Rel extends RelationKeys<E, IdKey>>(
+    id: string | number,
+    relName: Rel,
+    input: PostRelationshipData,
+    meta: Record<string, unknown>
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>
+  {
     return this[ORM_SERVICE_PROPS].postRelationship(id, relName, input);
   }
 
+  // Method overloads for deleteRelationship
   deleteRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: string | number,
     relName: Rel,
-    input: PostRelationshipData
-  ): Promise<void> {
+    input: PostRelationshipData,
+    meta?: Record<string, unknown>
+  ): Promise<void>;
+  deleteRelationship<Rel extends RelationKeys<E, IdKey>>(
+    id: string | number,
+    relName: Rel,
+    input: PostRelationshipData,
+    meta: Record<string, unknown>
+  ): Promise<void>
+  {
     return this[ORM_SERVICE_PROPS].deleteRelationship(id, relName, input);
   }
 
+  // Method overloads for patchRelationship
   patchRelationship<Rel extends RelationKeys<E, IdKey>>(
     id: string | number,
     relName: Rel,
-    input: PatchRelationshipData
-  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>> {
+    input: PatchRelationshipData,
+    meta?: Record<string, unknown>
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>;
+  patchRelationship<Rel extends RelationKeys<E, IdKey>>(
+    id: string | number,
+    relName: Rel,
+    input: PatchRelationshipData,
+    meta: Record<string, unknown>
+  ): Promise<ResourceObjectRelationships<E, IdKey, Rel>>
+  {
     return this[ORM_SERVICE_PROPS].patchRelationship(id, relName, input);
   }
 }

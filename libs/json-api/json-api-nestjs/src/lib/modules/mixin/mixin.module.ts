@@ -19,6 +19,7 @@ import {
   ZodPatchSchema,
   ZodInputPatchRelationshipSchema,
   ZodInputPostRelationshipSchema,
+  ZodMetaSchema,
 } from './factory';
 
 export class MixinModule {
@@ -66,6 +67,7 @@ export class MixinModule {
         ZodPatchSchema(),
         ZodInputPatchRelationshipSchema,
         ZodInputPostRelationshipSchema,
+        ZodMetaSchema,
         ...ormModule.getUtilProviders(entity),
       ],
       imports: [...imports, DiscoveryModule],

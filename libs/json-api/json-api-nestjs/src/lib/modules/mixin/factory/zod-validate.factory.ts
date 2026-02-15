@@ -14,6 +14,8 @@ import {
   ZodPostRelationship,
   zodPatchRelationship,
   ZodPatchRelationship,
+  zodMetaExtractor,
+  ZodMetaExtractor,
 } from '../zod';
 
 import {
@@ -23,6 +25,7 @@ import {
   ZOD_PATCH_SCHEMA,
   ZOD_POST_RELATIONSHIP_SCHEMA,
   ZOD_PATCH_RELATIONSHIP_SCHEMA,
+  ZOD_META_SCHEMA,
   CURRENT_ENTITY,
 } from '../../../constants';
 
@@ -100,3 +103,8 @@ export const ZodInputPatchRelationshipSchema: ValueProvider<ZodPatchRelationship
     provide: ZOD_PATCH_RELATIONSHIP_SCHEMA,
     useValue: zodPatchRelationship,
   };
+
+export const ZodMetaSchema: ValueProvider<ZodMetaExtractor> = {
+  provide: ZOD_META_SCHEMA,
+  useValue: zodMetaExtractor,
+};

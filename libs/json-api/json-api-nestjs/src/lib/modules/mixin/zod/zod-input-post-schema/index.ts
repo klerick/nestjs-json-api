@@ -17,6 +17,8 @@ import {
   Id,
   Attributes,
   Relationships,
+  zodMeta,
+  ZodMeta,
 } from '../zod-share';
 import { EntityParamMapService } from '../../service';
 
@@ -35,6 +37,7 @@ type ZodInputPostSchema<E extends object, IdKey extends string> = ZodObject<
 
 type ZodInputPostDataShape<E extends object, IdKey extends string> = {
   data: ZodInputPostSchema<E, IdKey>;
+  meta: ZodMeta;
 };
 
 function getShape<E extends object, IdKey extends string>(
@@ -66,6 +69,7 @@ export function zodPost<E extends object, IdKey extends string>(
 ): ZodPost<E, IdKey> {
   return z.strictObject({
     data: getShape(entityParamMapService, readOnlyProps, immutableProps),
+    meta: zodMeta,
   });
 }
 
@@ -101,4 +105,5 @@ export type PostData<E extends object, IdKey extends string> = {
 
 export type Post<E extends object, IdKey extends string> = {
   data: PostData<E, IdKey>;
+  meta?: Record<string, unknown>;
 };

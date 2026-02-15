@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-import { zodData } from '../zod-share';
+import { zodData, zodMeta } from '../zod-share';
 
 export const zodPostRelationship = z
   .strictObject({
     data: z.union([zodData(), zodData().array().nonempty()]),
+    meta: zodMeta,
   });
 
 export type ZodPostRelationship = typeof zodPostRelationship;

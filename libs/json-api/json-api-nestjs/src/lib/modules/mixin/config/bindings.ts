@@ -20,6 +20,7 @@ import {
   parseRelationshipNamePipeMixin,
   postRelationshipPipeMixin,
   patchRelationshipPipeMixin,
+  metaExtractorPipeMixin,
 } from '../pipe';
 
 const Bindings: BindingsConfig = {
@@ -85,6 +86,10 @@ const Bindings: BindingsConfig = {
         decorator: Body,
         mixins: [postInputPipeMixin],
       },
+      {
+        decorator: Body,
+        mixins: [metaExtractorPipeMixin],
+      },
     ],
   },
   [METHOD_NAME.patchOne]: {
@@ -101,6 +106,10 @@ const Bindings: BindingsConfig = {
       {
         decorator: Body,
         mixins: [patchInputPipeMixin],
+      },
+      {
+        decorator: Body,
+        mixins: [metaExtractorPipeMixin],
       },
     ],
   },
@@ -142,6 +151,10 @@ const Bindings: BindingsConfig = {
         decorator: Body,
         mixins: [postRelationshipPipeMixin],
       },
+      {
+        decorator: Body,
+        mixins: [metaExtractorPipeMixin],
+      },
     ],
   },
   [METHOD_NAME.deleteRelationship]: {
@@ -164,6 +177,10 @@ const Bindings: BindingsConfig = {
         decorator: Body,
         mixins: [postRelationshipPipeMixin],
       },
+      {
+        decorator: Body,
+        mixins: [metaExtractorPipeMixin],
+      },
     ],
   },
   [METHOD_NAME.patchRelationship]: {
@@ -185,6 +202,10 @@ const Bindings: BindingsConfig = {
       {
         decorator: Body,
         mixins: [patchRelationshipPipeMixin],
+      },
+      {
+        decorator: Body,
+        mixins: [metaExtractorPipeMixin],
       },
     ],
   },

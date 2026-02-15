@@ -105,6 +105,127 @@ describe('zodPost', () => {
     expect(schema.parse(check2)).toEqual(checkResult2);
     expect(schema.parse(check3)).toEqual(checkResult3);
   });
+
+  it('should accept valid meta object', () => {
+    const real = 123.123;
+    const date = new Date();
+    const attributes = {
+      login: 'login',
+      lastName: 'test',
+      firstName: 'test',
+      isActive: 'null',
+      testDate: date.toISOString(),
+      createdAt: date.toISOString() as any,
+      updatedAt: date.toISOString() as any,
+      testReal: [`${real}`],
+      testArrayNull: null,
+    };
+
+    const checkWithMeta = {
+      data: {
+        type: 'users',
+        attributes,
+      },
+      meta: {
+        source: 'mobile-app',
+        version: '1.0',
+        requestId: 123,
+      },
+    };
+
+    const result = schema.parse(checkWithMeta);
+    expect(result.meta).toEqual({
+      source: 'mobile-app',
+      version: '1.0',
+      requestId: 123,
+    });
+  });
+
+  it('should accept empty meta object', () => {
+    const real = 123.123;
+    const date = new Date();
+    const attributes = {
+      login: 'login',
+      lastName: 'test',
+      firstName: 'test',
+      isActive: 'null',
+      testDate: date.toISOString(),
+      createdAt: date.toISOString() as any,
+      updatedAt: date.toISOString() as any,
+      testReal: [`${real}`],
+      testArrayNull: null,
+    };
+
+    const checkWithEmptyMeta = {
+      data: {
+        type: 'users',
+        attributes,
+      },
+      meta: {},
+    };
+
+    const result = schema.parse(checkWithEmptyMeta);
+    expect(result.meta).toEqual({});
+  });
+
+  it('should work without meta (backward compatibility)', () => {
+    const real = 123.123;
+    const date = new Date();
+    const attributes = {
+      login: 'login',
+      lastName: 'test',
+      firstName: 'test',
+      isActive: 'null',
+      testDate: date.toISOString(),
+      createdAt: date.toISOString() as any,
+      updatedAt: date.toISOString() as any,
+      testReal: [`${real}`],
+      testArrayNull: null,
+    };
+
+    const checkWithoutMeta = {
+      data: {
+        type: 'users',
+        attributes,
+      },
+    };
+
+    const result = schema.parse(checkWithoutMeta);
+    expect(result.meta).toBeUndefined();
+  });
+
+  it('should reject invalid meta (not an object)', () => {
+    const real = 123.123;
+    const date = new Date();
+    const attributes = {
+      login: 'login',
+      lastName: 'test',
+      firstName: 'test',
+      isActive: 'null',
+      testDate: date.toISOString(),
+      createdAt: date.toISOString() as any,
+      updatedAt: date.toISOString() as any,
+      testReal: [`${real}`],
+      testArrayNull: null,
+    };
+
+    const invalidMeta = [
+      { data: { type: 'users', attributes }, meta: 'string' },
+      { data: { type: 'users', attributes }, meta: 123 },
+      { data: { type: 'users', attributes }, meta: ['array'] },
+      { data: { type: 'users', attributes }, meta: null },
+    ];
+
+    expect.assertions(invalidMeta.length);
+    for (const item of invalidMeta) {
+      try {
+        schema.parse(item);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ZodError);
+      }
+    }
+  });
+
   it('should be not ok', () => {
     const check1 = {};
     const check2 = null;

@@ -121,7 +121,10 @@ export function bindController(
         }
 
         const tmp = Object.entries(paramsMetadata)
-          .filter(([k, v]) => k.split(':').at(0) === typeDecorator.toString())
+          .filter(([k, v]) => {
+            const [type, index] = k.split(':');
+            return type === typeDecorator.toString() && index === key;
+          })
           .reduce(
             (acum, [k, v]) => (acum.push(...(v as any).pipes), acum),
             [] as any
