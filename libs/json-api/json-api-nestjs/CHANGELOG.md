@@ -1,3 +1,13 @@
+## 10.0.0-beta.18 (2026-02-16)
+
+### 🚀 Features
+
+- **json-api-nestjs:** add support for `meta` object in various operations ([3c09413](https://github.com/klerick/nestjs-json-api/commit/3c09413))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.17 (2026-02-11)
 
 ### 🩹 Fixes

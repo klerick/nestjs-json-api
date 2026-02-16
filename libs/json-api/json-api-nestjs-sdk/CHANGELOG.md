@@ -1,3 +1,13 @@
+## 10.0.0-beta.15 (2026-02-16)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** add `meta` support to all relevant operations and update tests and documentation for JSON:API compliance ([cd80b93](https://github.com/klerick/nestjs-json-api/commit/cd80b93))
+
+### ❤️ Thank You
+
+- Alex H
+
 ## 10.0.0-beta.14 (2026-02-11)
 
 ### 🩹 Fixes
