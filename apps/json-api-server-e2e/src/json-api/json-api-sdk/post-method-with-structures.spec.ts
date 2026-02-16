@@ -35,6 +35,11 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
   beforeEach(() => {
     jsonSdk = creatSdk();
 
+    // Reset saved entities
+    addressAfterSave = undefined as any;
+    userAfterSave = undefined as any;
+    commentsAfterSave = undefined as any;
+
     address = new Addresses();
     address.city = faker.string.alpha(50);
     address.state = faker.string.alpha(50);
@@ -179,5 +184,38 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     expect(fromUpdatedAt).toBeInstanceOf(Date);
     expect(addresses).toEqual(fromUser.addresses);
     expect(commentsFromUser).toEqual(fromUser.comments);
+  });
+
+  it('should create a user with meta.prefix and apply prefix to firstName', async () => {
+    // Create address first
+    addressAfterSave = await jsonSdk.jsonApiSdkService.entity('Addresses', Object.assign({}, address)).postOne();
+    const addressRaw = jsonSdk.jsonApiSdkService.entity('Addresses', addressAfterSave, true);
+
+    const originalFirstName = faker.person.firstName();
+    const prefix = 'TEST_';
+
+    user.firstName = originalFirstName;
+    user.addresses = addressRaw;
+
+    // Create user with meta.prefix using entity() chain
+    userAfterSave = await jsonSdk.jsonApiSdkService
+      .entity('Users', Object.assign({}, user))
+      .postOne({ prefix });
+
+    const { id, createdAt, updatedAt, addresses: savedAddresses, ...newUser } = userAfterSave;
+    // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
+    delete (newUser as Record<string, unknown>)['displayName'];
+
+    // Verify firstName has prefix applied
+    expect(userAfterSave.firstName).toBe(`${prefix}${originalFirstName}`);
+    expect(id).toBeDefined();
+    expect(createdAt).toBeInstanceOf(Date);
+    expect(updatedAt).toBeInstanceOf(Date);
+    expect(savedAddresses).toBeDefined();
+    expect(savedAddresses.id).toBe(addressAfterSave.id);
+
+    // Verify user is saved with prefixed firstName in database
+    const userFromServer = await jsonSdk.jsonApiSdkService.getOne(Users, id);
+    expect(userFromServer.firstName).toBe(`${prefix}${originalFirstName}`);
   });
 });

@@ -293,4 +293,54 @@ describe('Atomic Operations (Batch Requests)', () => {
 
     usersId.push(createdUser.id);
   });
+
+  it('should create users with meta.prefix in atomic operation and apply prefix to firstName', async () => {
+    // Create separate addresses for each user in atomic operation with lid
+    const address1 = new Addresses();
+    address1.id = 999; // temporary lid
+    address1.city = faker.string.alpha(50);
+    address1.state = faker.string.alpha(50);
+    address1.country = faker.string.alpha(50);
+
+    const address2 = new Addresses();
+    address2.id = 1000; // temporary lid
+    address2.city = faker.string.alpha(50);
+    address2.state = faker.string.alpha(50);
+    address2.country = faker.string.alpha(50);
+
+    const user1 = getUser();
+    const user2 = getUser();
+    const originalFirstName1 = faker.person.firstName();
+    const originalFirstName2 = faker.person.firstName();
+    const prefix = 'ATOMIC_';
+
+    user1.firstName = originalFirstName1;
+    user1.addresses = address1;
+
+    user2.firstName = originalFirstName2;
+    user2.addresses = address2;
+
+    // Execute atomic operations with meta.prefix
+    const [address1Post, address2Post, user1Post, user2Post] = await jsonSdk
+      .atomicFactory()
+      .postOne(address1)
+      .postOne(address2)
+      .postOne(user1, { prefix })
+      .postOne(user2, { prefix })
+      .run();
+
+    // Verify firstName has prefix applied for both users
+    expect(user1Post.firstName).toBe(`${prefix}${originalFirstName1}`);
+    expect(user2Post.firstName).toBe(`${prefix}${originalFirstName2}`);
+
+    // Verify users are saved with prefixed firstName in database
+    const user1FromServer = await jsonSdk.jsonApiSdkService.getOne(Users, user1Post.id);
+    const user2FromServer = await jsonSdk.jsonApiSdkService.getOne(Users, user2Post.id);
+
+    expect(user1FromServer.firstName).toBe(`${prefix}${originalFirstName1}`);
+    expect(user2FromServer.firstName).toBe(`${prefix}${originalFirstName2}`);
+
+    addressArray.push(address1Post, address2Post);
+    usersId.push(user1Post.id, user2Post.id);
+  });
 });
