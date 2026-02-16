@@ -6,6 +6,7 @@ import {
   UseInterceptors,
   UseFilters,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 
 import {
@@ -26,6 +27,7 @@ import {
 } from '@klerick/json-api-nestjs-shared';
 import { ExamplePipe } from '../../service/example.pipe';
 import { ExampleService } from '../../service/example.service';
+import { MetaTransformPipe } from '../../service/meta-transform.pipe';
 import { ControllerInterceptor } from '../../service/controller.interceptor';
 import { MethodInterceptor } from '../../service/method.interceptor';
 import {
@@ -63,8 +65,26 @@ export class ExtendUserController extends JsonBaseController<Users, 'id'> {
   }
 
   // @UseInterceptors(AtomicInterceptor)
-  postOne(inputData: PostData<Users, 'id'>): Promise<ResourceObject<Users>> {
-    return super.postOne(inputData);
+  override async postOne(
+    @Body() inputData: PostData<Users, 'id'>,
+    @Body(new MetaTransformPipe()) meta: Record<string, unknown>
+  ): Promise<ResourceObject<Users, 'object', Record<string, unknown>, 'id'>> {
+    // Apply prefix to firstName if meta.prefix is provided
+    if (meta?.prefix && typeof meta.prefix === 'string' && inputData.attributes) {
+      const firstName = inputData.attributes.firstName;
+      if (firstName) {
+        inputData.attributes.firstName = `${meta.prefix}${firstName}`;
+      }
+    }
+
+    const response = await super.postOne(inputData, meta);
+    return {
+      ...response,
+      meta: {
+        ...response.meta,
+        ...meta,
+      },
+    };
   }
 
   @EntityName('Users')
