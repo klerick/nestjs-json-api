@@ -24,7 +24,12 @@ export class GenerateAtomicBody<
     return this.skipEmpty;
   }
 
-  private setToBody(op: Operation, entity: Entity, relationType?: Rel) {
+  private setToBody(
+    op: Operation,
+    entity: Entity,
+    relationType?: Rel,
+    meta?: Record<string, unknown>
+  ) {
     const type = getTypeForReq(entity.constructor.name);
 
     const { relationships, attributes } =
@@ -47,10 +52,15 @@ export class GenerateAtomicBody<
     const lid =
       op === 'add' && id && !relationType ? { lid: String(id) } : {};
 
+    // IMPORTANT: Do NOT add meta for remove operation without relationship
+    // zodRemove schema doesn't have meta field
+    const shouldIncludeMeta = meta && !(op === 'remove' && !relationType);
+
     this.bodyData = {
       op,
       ref: { type, ...idObj, ...rel, ...lid },
       ...(op === 'remove' && !relationType ? {} : { data }),
+      ...(shouldIncludeMeta ? { meta } : {}),
     };
   }
 
@@ -58,17 +68,17 @@ export class GenerateAtomicBody<
     return this.bodyData;
   }
 
-  postOne(entity: Entity): void {
-    this.setToBody(Operation.add, entity);
+  postOne(entity: Entity, meta?: Record<string, unknown>): void {
+    this.setToBody(Operation.add, entity, undefined, meta);
   }
-  patchOne(entity: Entity): void {
+  patchOne(entity: Entity, meta?: Record<string, unknown>): void {
     if (Reflect.get(entity, this.jsonApiSdkConfig.idKey) === undefined) {
       throw new Error(
         'Resource params should be instance of resource with id params'
       );
     }
 
-    this.setToBody(Operation.update, entity);
+    this.setToBody(Operation.update, entity, undefined, meta);
   }
   deleteOne(entity: Entity, skipEmpty: boolean): void {
     if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
@@ -77,9 +87,13 @@ export class GenerateAtomicBody<
       );
     }
     this.skipEmpty = skipEmpty;
-    this.setToBody(Operation.remove, entity);
+    this.setToBody(Operation.remove, entity, undefined, undefined);
   }
-  patchRelationships(entity: Entity, relationType: Rel): void {
+  patchRelationships(
+    entity: Entity,
+    relationType: Rel,
+    meta?: Record<string, unknown>
+  ): void {
     if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
       throw new Error(
         'Resource params should be instance of resource with id params'
@@ -89,9 +103,13 @@ export class GenerateAtomicBody<
     if (entity[relationType] === undefined) {
       new Error(`${relationType.toString()} should not be undefined in entity`);
     }
-    this.setToBody(Operation.update, entity, relationType);
+    this.setToBody(Operation.update, entity, relationType, meta);
   }
-  postRelationships(entity: Entity, relationType: Rel): void {
+  postRelationships(
+    entity: Entity,
+    relationType: Rel,
+    meta?: Record<string, unknown>
+  ): void {
     if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
       throw new Error(
         'Resource params should be instance of resource with id params'
@@ -103,9 +121,13 @@ export class GenerateAtomicBody<
         `${relationType.toString()} should not be undefined in entity`
       );
     }
-    this.setToBody(Operation.add, entity, relationType);
+    this.setToBody(Operation.add, entity, relationType, meta);
   }
-  deleteRelationships(entity: Entity, relationType: Rel): void {
+  deleteRelationships(
+    entity: Entity,
+    relationType: Rel,
+    meta?: Record<string, unknown>
+  ): void {
     if (!Reflect.get(entity, this.jsonApiSdkConfig.idKey)) {
       throw new Error(
         'Resource params should be instance of resource with id params'
@@ -117,6 +139,6 @@ export class GenerateAtomicBody<
         `${relationType.toString()} should not be undefined in entity`
       );
     }
-    this.setToBody(Operation.remove, entity, relationType);
+    this.setToBody(Operation.remove, entity, relationType, meta);
   }
 }

@@ -178,4 +178,217 @@ describe('JsonApiSdkService', () => {
     });
     expect(service.getList).toHaveBeenCalledTimes(2);
   });
+
+  describe('meta support', () => {
+    class Role{
+      id?: string;
+    }
+    class TestEntity {
+      id?: number;
+      name?: string;
+      roles: Role[] = [];
+    }
+
+    beforeEach(() => {
+      vi.spyOn(jsonApiUtilsService, 'generateBody').mockReturnValue({
+        attributes: { name: 'test' },
+        relationships: {},
+      });
+
+      vi.spyOn(jsonApiUtilsService, 'convertResponseData').mockReturnValue({
+        // @ts-expect-error - Mock return value for test
+        id: 1,
+        name: 'test',
+      });
+      vi.spyOn(jsonApiUtilsService, 'getUrlForResource').mockReturnValue('/test-entity');
+    });
+
+    it('should call postOne with meta and include meta in request body', async () => {
+      const entity = new TestEntity();
+      entity.name = 'test';
+      const meta = { source: 'import', batchId: '123' };
+      const mockResponse = {
+        data: { id: 1, type: 'test-entity', attributes: { name: 'test' } },
+      };
+
+      const spyHttpPost = vi.spyOn(http, 'post').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(service.postOne(entity, meta));
+
+      expect(result).toEqual({ id: 1, name: 'test' });
+      expect(spyHttpPost).toHaveBeenCalledWith(
+        '/test-entity',
+        expect.objectContaining({
+          data: expect.objectContaining({
+            type: 'test-entity',
+            attributes: { name: 'test' },
+          }),
+          meta: { source: 'import', batchId: '123' },
+        })
+      );
+    });
+
+    it('should call postOne without meta (backward compatibility)', async () => {
+      const entity = new TestEntity();
+      entity.name = 'test';
+      const mockResponse = {
+        data: { id: 1, type: 'test-entity', attributes: { name: 'test' } },
+      };
+
+      const spyHttpPost = vi.spyOn(http, 'post').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(service.postOne(entity));
+
+      expect(result).toEqual({ id: 1, name: 'test' });
+      expect(spyHttpPost).toHaveBeenCalledWith(
+        '/test-entity',
+        expect.not.objectContaining({
+          meta: expect.anything(),
+        })
+      );
+    });
+
+    it('should call patchOne with meta and include meta in request body', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+      entity.name = 'updated';
+      const meta = { updatedBy: 'admin', reason: 'correction' };
+      const mockResponse = {
+        data: { id: 1, type: 'test-entity', attributes: { name: 'updated' } },
+      };
+
+      const spyHttpPatch = vi.spyOn(http, 'patch').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(service.patchOne(entity, meta));
+
+      expect(result).toEqual({ id: 1, name: 'test' });
+      expect(spyHttpPatch).toHaveBeenCalledWith(
+        '/test-entity/1',
+        expect.objectContaining({
+          data: expect.objectContaining({
+            id: '1',
+            type: 'test-entity',
+          }),
+          meta: { updatedBy: 'admin', reason: 'correction' },
+        })
+      );
+    });
+
+    it('should call patchOne without meta (backward compatibility)', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+      entity.name = 'updated';
+      const mockResponse = {
+        data: { id: 1, type: 'test-entity', attributes: { name: 'updated' } },
+      };
+
+      const spyHttpPatch = vi.spyOn(http, 'patch').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(service.patchOne(entity));
+
+      expect(result).toEqual({ id: 1, name: 'test' });
+      expect(spyHttpPatch).toHaveBeenCalledWith(
+        '/test-entity/1',
+        expect.not.objectContaining({
+          meta: expect.anything(),
+        })
+      );
+    });
+
+    it('should call patchRelationships with meta', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+      entity.roles = [{ id: '1' }];
+      const meta = { addedBy: 'system' };
+      const mockResponse = { data: [{ type: 'roles', id: '1' }] };
+
+      vi.spyOn(jsonApiUtilsService, 'generateRelationshipsBody').mockReturnValue([
+        { type: 'roles', id: '1' },
+      ] as any);
+      // @ts-expect-error - Mock return value for test
+      vi.spyOn(jsonApiUtilsService, 'getResultForRelation').mockReturnValue(['1']);
+
+      const spyHttpPatch = vi.spyOn(http, 'patch').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(
+        (service as any).patchRelationships(entity, 'roles', meta)
+      );
+
+      expect(result).toEqual(['1']);
+      expect(spyHttpPatch).toHaveBeenCalledWith(
+        '/test-entity/1/relationships/roles',
+        expect.objectContaining({
+          data: [{ type: 'roles', id: '1' }],
+          meta: { addedBy: 'system' },
+        })
+      );
+    });
+
+    it('should call postRelationships with meta', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+      entity.roles = [{ id: '1' }];
+      const meta = { source: 'sync' };
+      const mockResponse = { data: [{ type: 'roles', id: '1' }] };
+
+      vi.spyOn(jsonApiUtilsService, 'generateRelationshipsBody').mockReturnValue([
+        { type: 'roles', id: '1' },
+      ] as any);
+      // @ts-expect-error - Mock return value for test
+      vi.spyOn(jsonApiUtilsService, 'getResultForRelation').mockReturnValue(['1']);
+
+      const spyHttpPost = vi.spyOn(http, 'post').mockReturnValue(of(mockResponse));
+
+      const result = await lastValueFrom(
+        (service as any).postRelationships(entity, 'roles', meta)
+      );
+
+      expect(result).toEqual(['1']);
+      expect(spyHttpPost).toHaveBeenCalledWith(
+        '/test-entity/1/relationships/roles',
+        expect.objectContaining({
+          data: [{ type: 'roles', id: '1' }],
+          meta: { source: 'sync' },
+        })
+      );
+    });
+
+    it('should call deleteRelationships with meta', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+      entity.roles = [{ id: '1' }];
+      const meta = { deletedBy: 'admin' };
+
+      vi.spyOn(jsonApiUtilsService, 'generateRelationshipsBody').mockReturnValue([
+        { type: 'roles', id: '1' },
+      ] as any);
+
+      const spyHttpDelete = vi.spyOn(http, 'delete').mockReturnValue(of(void 0));
+
+      await lastValueFrom((service as any).deleteRelationships(entity, 'roles', meta));
+
+      expect(spyHttpDelete).toHaveBeenCalledWith(
+        '/test-entity/1/relationships/roles',
+        expect.objectContaining({
+          data: [{ type: 'roles', id: '1' }],
+          meta: { deletedBy: 'admin' },
+        })
+      );
+    });
+
+    it('should call deleteOne without meta parameter', async () => {
+      const entity = new TestEntity();
+      entity.id = 1;
+
+      const spyHttpDelete = vi.spyOn(http, 'delete').mockReturnValue(of(void 0));
+
+      await lastValueFrom(service.deleteOne(entity));
+
+      // Verify deleteOne is called with URL only, no body
+      expect(spyHttpDelete).toHaveBeenCalledWith('/test-entity/1');
+      expect(spyHttpDelete).toHaveBeenCalledTimes(1);
+      // Ensure it's not called with a second argument (body)
+      expect(spyHttpDelete.mock.calls[0]).toHaveLength(1);
+    });
+  });
 });

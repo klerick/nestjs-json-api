@@ -43,10 +43,12 @@ export interface PromiseJsonApiSdkService {
   ): Promise<Entity>;
 
   postOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): Promise<OutputEntity>;
   patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): Promise<OutputEntity>;
   deleteOne<Entity extends object>(entity: Entity): Promise<void>;
 
@@ -65,7 +67,8 @@ export interface PromiseJsonApiSdkService {
     Rel extends RelationKeys<Entity, IdKey> = RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Promise<ReturnIfArray<Entity[Rel], string>>;
 
   postRelationships<
@@ -74,7 +77,8 @@ export interface PromiseJsonApiSdkService {
     Rel extends RelationKeys<Entity, IdKey> = RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Promise<ReturnIfArray<Entity[Rel], string>>;
 
   deleteRelationships<
@@ -83,7 +87,8 @@ export interface PromiseJsonApiSdkService {
     Rel extends RelationKeys<Entity, IdKey> = RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Promise<void>;
 
   entity<E extends object, OutputE extends E = E>(

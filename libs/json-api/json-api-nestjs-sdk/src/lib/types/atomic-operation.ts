@@ -13,10 +13,12 @@ export interface AtomicRunPromise<T extends unknown[]> {
 
 export interface AtomicMainOperations<T extends unknown[]> {
   postOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, OutputEntity]>;
   patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, OutputEntity]>;
 
   deleteOne<Entity extends object>(entity: Entity): AtomicOperations<[...T]>;
@@ -31,39 +33,47 @@ export interface AtomicMainOperations<T extends unknown[]> {
 
   patchRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>;
   postRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>;
   deleteRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T]>;
 }
 
 export interface AtomicMainOperationsPromise<T extends unknown[]> {
   postOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperationsPromise<[...T, OutputEntity]>;
   patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperationsPromise<[...T, OutputEntity]>;
   deleteOne<Entity extends object>(
     entity: Entity
   ): AtomicOperationsPromise<[...T]>;
   patchRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperationsPromise<[...T, ReturnIfArray<Entity[Rel], string>]>;
   postRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperationsPromise<[...T, ReturnIfArray<Entity[Rel], string>]>;
   deleteRelationships<Entity extends object, Rel extends RelationKeys<Entity>>(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperationsPromise<[...T]>;
 }
 

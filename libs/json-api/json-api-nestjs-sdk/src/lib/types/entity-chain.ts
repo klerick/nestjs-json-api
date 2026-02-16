@@ -14,20 +14,23 @@ export interface EntityChain<
   OutputE extends E = E,
   IdKey extends string = 'id'
 > {
-  postOne(): Observable<OutputE>;
-  patchOne(): Observable<OutputE>;
+  postOne(meta?: Record<string, unknown>): Observable<OutputE>;
+  patchOne(meta?: Record<string, unknown>): Observable<OutputE>;
   deleteOne(): Observable<void>;
   getRelationships<Rel extends RelationKeys<E, IdKey>>(
     relationType: Rel
   ): Observable<ReturnIfArray<E[Rel], string>>;
   patchRelationships<Rel extends RelationKeys<E, IdKey>>(
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Observable<ReturnIfArray<E[Rel], string>>;
   postRelationships<Rel extends RelationKeys<E, IdKey>>(
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Observable<ReturnIfArray<E[Rel], string>>;
   deleteRelationships<Rel extends RelationKeys<E, IdKey>>(
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Observable<void>;
 }
 

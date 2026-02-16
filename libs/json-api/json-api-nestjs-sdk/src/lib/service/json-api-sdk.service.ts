@@ -212,7 +212,8 @@ export class JsonApiSdkService {
   }
 
   public postOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): Observable<OutputEntity> {
     const asPlain = Reflect.has(entity, AS_PLAIN_RESULT);
     const { attributes, relationships } =
@@ -224,6 +225,7 @@ export class JsonApiSdkService {
         attributes,
         ...(Object.keys(relationships).length > 0 ? { relationships } : {}),
       },
+      ...(meta ? { meta } : {}),
     };
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (id) {
@@ -248,7 +250,8 @@ export class JsonApiSdkService {
   }
 
   public patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): Observable<OutputEntity> {
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (!id) {
@@ -269,6 +272,7 @@ export class JsonApiSdkService {
         id: String(id),
         type: getTypeForReq(entity.constructor.name),
       },
+      ...(meta ? { meta } : {}),
     } satisfies PatchData<Entity>;
 
     if (Object.keys(relationships).length > 0) {
@@ -351,7 +355,8 @@ export class JsonApiSdkService {
     Rel extends RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Observable<ReturnIfArray<Entity[Rel], string>> {
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (!id) {
@@ -376,6 +381,7 @@ export class JsonApiSdkService {
       data: this.jsonApiUtilsService.generateRelationshipsBody(
         entity[relationType] as object
       ),
+      ...(meta ? { meta } : {}),
     };
 
     return this.http
@@ -396,7 +402,8 @@ export class JsonApiSdkService {
     Rel extends RelationKeys<Entity, IdKey>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): Observable<ReturnIfArray<Entity[Rel], string>> {
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (!id) {
@@ -421,6 +428,7 @@ export class JsonApiSdkService {
       data: this.jsonApiUtilsService.generateRelationshipsBody(
         entity[relationType] as object
       ),
+      ...(meta ? { meta } : {}),
     };
 
     return this.http
@@ -439,7 +447,11 @@ export class JsonApiSdkService {
     Entity extends object,
     IdKey extends string,
     Rel extends RelationKeys<Entity, IdKey>
-  >(entity: Entity, relationType: Rel): Observable<void> {
+  >(
+    entity: Entity,
+    relationType: Rel,
+    meta?: Record<string, unknown>
+  ): Observable<void> {
     const id = Reflect.get(entity, this.jsonApiSdkConfig.idKey);
     if (!id) {
       return throwError(
@@ -463,6 +475,7 @@ export class JsonApiSdkService {
       data: this.jsonApiUtilsService.generateRelationshipsBody(
         entity[relationType] as object
       ),
+      ...(meta ? { meta } : {}),
     };
 
     return this.http

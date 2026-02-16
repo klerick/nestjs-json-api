@@ -105,22 +105,28 @@ export class AtomicOperationsService<T extends unknown[]>
   }
 
   public patchOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, OutputEntity]> {
-    return this.setToBody<Entity, OutputEntity>('patchOne', entity);
+    return this.setToBody<Entity, OutputEntity>('patchOne', entity, meta);
   }
 
   public postOne<Entity extends object, OutputEntity extends Entity = Entity>(
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, OutputEntity]> {
-    return this.setToBody<Entity, OutputEntity>('postOne', entity);
+    return this.setToBody<Entity, OutputEntity>('postOne', entity, meta);
   }
 
   public deleteRelationships<
     Entity extends object,
     Rel extends RelationKeys<Entity>
-  >(entity: Entity, relationType: Rel): AtomicOperations<T> {
-    return this.setToBody('deleteRelationships', entity, relationType);
+  >(
+    entity: Entity,
+    relationType: Rel,
+    meta?: Record<string, unknown>
+  ): AtomicOperations<T> {
+    return this.setToBody('deleteRelationships', entity, relationType, meta);
   }
 
   public patchRelationships<
@@ -128,9 +134,10 @@ export class AtomicOperationsService<T extends unknown[]>
     Rel extends RelationKeys<Entity>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]> {
-    return this.setToBody('patchRelationships', entity, relationType);
+    return this.setToBody('patchRelationships', entity, relationType, meta);
   }
 
   public postRelationships<
@@ -138,9 +145,10 @@ export class AtomicOperationsService<T extends unknown[]>
     Rel extends RelationKeys<Entity>
   >(
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]> {
-    return this.setToBody('postRelationships', entity, relationType);
+    return this.setToBody('postRelationships', entity, relationType, meta);
   }
 
   private setToBody<Entity extends object>(
@@ -157,17 +165,20 @@ export class AtomicOperationsService<T extends unknown[]>
     OutputEntity extends Entity = Entity
   >(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteOne'>,
-    entity: Entity
+    entity: Entity,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, OutputEntity]>;
   private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: Extract<keyof AtomicVoidOperation, 'deleteRelationships'>,
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<T>;
   private setToBody<Entity extends object, Rel extends RelationKeys<Entity>>(
     operationType: Exclude<keyof AtomicVoidOperation, 'deleteRelationships'>,
     entity: Entity,
-    relationType: Rel
+    relationType: Rel,
+    meta?: Record<string, unknown>
   ): AtomicOperations<[...T, ReturnIfArray<Entity[Rel], string>]>;
   private setToBody<
     Entity extends object,
@@ -175,7 +186,8 @@ export class AtomicOperationsService<T extends unknown[]>
   >(
     operationType: keyof AtomicVoidOperation,
     entity: Entity,
-    relationType?: OutputEntityOrRel | boolean
+    relationType?: OutputEntityOrRel | boolean,
+    meta?: Record<string, unknown>
   ):
     | AtomicOperations<[...T, Entity]>
     | AtomicOperations<
@@ -199,11 +211,17 @@ export class AtomicOperationsService<T extends unknown[]>
         case 'patchRelationships':
         case 'deleteRelationships':
           if (relationType)
-            atomicBody[operationType](entity, relationType as Rel);
+            atomicBody[operationType](entity, relationType as Rel, meta);
           break;
-        default:
-          atomicBody[operationType](entity, true);
+        case 'postOne':
+        case 'patchOne': {
+          // For postOne/patchOne, relationType parameter contains meta (3rd param)
+          const metaForEntity = typeof relationType === 'object' && relationType !== null && !Array.isArray(relationType)
+            ? relationType as Record<string, unknown>
+            : meta;
+          atomicBody[operationType](entity, metaForEntity);
           break;
+        }
       }
     }
 

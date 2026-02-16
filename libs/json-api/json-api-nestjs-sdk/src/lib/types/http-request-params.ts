@@ -23,12 +23,15 @@ type PostMainData<T = string> = Omit<MainData<T>, 'id'> & {
 
 export type PostData<T extends object, IdKey extends string = 'id'> = {
   data: PostMainData & BaseAttribute<T, IdKey> & BaseRelationships<T, IdKey>;
+  meta?: Record<string, unknown>;
 };
 
 export type PatchData<T extends object, IdKey extends string = 'id'> = {
   data: MainData & BaseAttribute<T, IdKey> & BaseRelationships<T, IdKey>;
+  meta?: Record<string, unknown>;
 };
 
 export type RelationBodyData = {
   data: MainData | MainData[];
+  meta?: Record<string, unknown>;
 };

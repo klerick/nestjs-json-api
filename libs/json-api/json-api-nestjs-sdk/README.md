@@ -16,6 +16,7 @@ Type-safe TypeScript/JavaScript client for consuming [JSON:API](https://jsonapi.
 - 🔍 **Advanced Filtering** - Rich query builder with operators (eq, ne, in, like, gt, lt, etc.)
 - 📦 **Relationship Handling** - Easy include, sparse fieldsets, and relationship management
 - ⚡ **Atomic Operations** - Batch multiple operations in a single request with rollback support
+- 📤 **Meta Support** - Pass additional business logic data with requests (JSON:API spec compliant)
 - 🌐 **Multiple HTTP Clients** - Works with Axios, Fetch API, and Angular HttpClient
 - 📄 **Pagination & Sorting** - Built-in support for pagination and multi-field sorting
 - 🔄 **Observable or Promise** - Choose your async style (RxJS Observable or native Promise)
@@ -46,6 +47,10 @@ Type-safe TypeScript/JavaScript client for consuming [JSON:API](https://jsonapi.
   - [Including Relationships](#including-relationships)
   - [Sparse Fieldsets](#sparse-fieldsets)
 - [Atomic Operations](#-atomic-operations)
+- [Meta Support](#-meta-support)
+  - [Regular Operations with Meta](#regular-operations-with-meta)
+  - [Entity Chain with Meta](#entity-chain-with-meta)
+  - [Atomic Operations with Meta](#atomic-operations-with-meta)
 - [Examples](#-examples)
 
 
@@ -898,6 +903,193 @@ console.log(createdUser.books.map(b => b.id)); // Both book UUIDs
 - The SDK automatically handles lid assignment in the request body
 - For numeric IDs: lid is replaced with the actual database-generated ID
 - For UUID IDs: lid can be used as the actual ID (if server has `allowSetId: true`)
+
+---
+
+## 📤 Meta Support
+
+The SDK supports passing `meta` objects with requests to send additional business logic data that doesn't belong to the entity itself, according to [JSON:API specification](https://jsonapi.org/format/#document-meta).
+
+### Regular Operations with Meta
+
+```typescript
+// POST with meta
+const newUser = new Users();
+newUser.firstName = 'John';
+newUser.lastName = 'Doe';
+newUser.login = 'johndoe';
+
+const createdUser = await jsonSdk.jsonApiSdkService.postOne(newUser, {
+  source: 'import',
+  batchId: '12345'
+});
+
+// Request body:
+{
+  "data": {
+    "type": "users",
+    "attributes": { "firstName": "John", "lastName": "Doe", "login": "johndoe" }
+  },
+  "meta": {
+    "source": "import",
+    "batchId": "12345"
+  }
+}
+
+// PATCH with meta
+user.firstName = 'Jane';
+const updatedUser = await jsonSdk.jsonApiSdkService.patchOne(user, {
+  updatedBy: 'admin',
+  reason: 'name correction'
+});
+
+// Relationship operations with meta
+await jsonSdk.jsonApiSdkService.postRelationships(user, 'roles', {
+  addedBy: 'admin',
+  timestamp: Date.now()
+});
+
+await jsonSdk.jsonApiSdkService.patchRelationships(user, 'roles', {
+  source: 'sync',
+  syncId: 'abc123'
+});
+
+await jsonSdk.jsonApiSdkService.deleteRelationships(user, 'roles', {
+  removedBy: 'admin',
+  reason: 'access revoked'
+});
+```
+
+**Important:** `deleteOne()` does NOT support meta because HTTP DELETE for resources has no body according to JSON:API spec. However, `deleteRelationships()` DOES support meta because relationship deletion endpoints use a request body.
+
+### Entity Chain with Meta
+
+```typescript
+// Chain mode - Observable
+const user = await jsonSdk.jsonApiSdkService
+  .entity('Users', {
+    firstName: 'John',
+    lastName: 'Doe',
+    login: 'johndoe'
+  })
+  .postOne({ source: 'mobile-app', version: '2.0' });
+
+// Update with meta
+await jsonSdk.jsonApiSdkService
+  .entity('Users', { id: 1, firstName: 'Jane' })
+  .patchOne({ updatedBy: 'user-123' });
+
+// Relationship operations with meta
+await jsonSdk.jsonApiSdkService
+  .entity('Users', user)
+  .patchRelationships('roles', { operation: 'bulk-update' });
+```
+
+### Atomic Operations with Meta
+
+Each operation in an atomic request can have its own meta:
+
+```typescript
+const address1 = new Addresses();
+address1.id = 999; // Local identifier (lid)
+address1.city = 'New York';
+
+const address2 = new Addresses();
+address2.id = 1000; // Local identifier (lid)
+address2.city = 'Boston';
+
+const user1 = new Users();
+user1.firstName = 'Alice';
+user1.addresses = address1;
+
+const user2 = new Users();
+user2.firstName = 'Bob';
+user2.addresses = address2;
+
+const [addr1, addr2, createdUser1, createdUser2] = await jsonSdk
+  .atomicFactory()
+  .postOne(address1)
+  .postOne(address2)
+  .postOne(user1, { source: 'import', priority: 'high' })      // User 1 with meta
+  .postOne(user2, { source: 'import', priority: 'normal' })    // User 2 with different meta
+  .run();
+
+// Request body:
+{
+  "atomic:operations": [
+    {
+      "op": "add",
+      "ref": { "type": "addresses", "lid": "999" },
+      "data": { "type": "addresses", "attributes": { "city": "New York" } }
+    },
+    {
+      "op": "add",
+      "ref": { "type": "addresses", "lid": "1000" },
+      "data": { "type": "addresses", "attributes": { "city": "Boston" } }
+    },
+    {
+      "op": "add",
+      "ref": { "type": "users" },
+      "data": {
+        "type": "users",
+        "attributes": { "firstName": "Alice" },
+        "relationships": { "addresses": { "data": { "type": "addresses", "id": "999" } } }
+      },
+      "meta": { "source": "import", "priority": "high" }  // Meta for operation 3
+    },
+    {
+      "op": "add",
+      "ref": { "type": "users" },
+      "data": {
+        "type": "users",
+        "attributes": { "firstName": "Bob" },
+        "relationships": { "addresses": { "data": { "type": "addresses", "id": "1000" } } }
+      },
+      "meta": { "source": "import", "priority": "normal" }  // Meta for operation 4
+    }
+  ]
+}
+```
+
+### Meta with Entity Chain in Atomic Operations
+
+```typescript
+const addressEntity = jsonSdk.jsonApiSdkService.entity('Addresses', {
+  id: 999,
+  city: 'New York'
+}, true);
+
+const userEntity = jsonSdk.jsonApiSdkService.entity('Users', {
+  firstName: 'Alice',
+  addresses: jsonSdk.jsonApiSdkService.entity('Addresses', { id: 999 }, true)
+}, true);
+
+const [createdAddress, createdUser] = await jsonSdk
+  .atomicFactory()
+  .postOne(addressEntity)
+  .postOne(userEntity, { source: 'import', batchId: '12345' })
+  .run();
+```
+
+### Operations WITHOUT Meta Support
+
+The following operations do NOT accept meta parameter:
+
+```typescript
+// ❌ deleteOne - HTTP DELETE has no body
+await jsonSdk.jsonApiSdkService.deleteOne(user);
+// Cannot pass meta here
+
+// ❌ deleteOne in atomic operations
+await jsonSdk.atomicFactory()
+  .deleteOne(user)  // No meta parameter
+  .run();
+
+// ✅ But deleteRelationships DOES support meta (has body)
+await jsonSdk.jsonApiSdkService.deleteRelationships(user, 'roles', {
+  removedBy: 'admin'
+});
+```
 
 ---
 
