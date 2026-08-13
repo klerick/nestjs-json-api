@@ -17,5 +17,8 @@
     "@klerick/json-api-nestjs-shared": [
       "dist/libs/json-api/json-api-nestjs-shared"
     ]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": false
   }
 }

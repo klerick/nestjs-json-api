@@ -12,5 +12,12 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/lib/mock-utils/**/*.ts"]
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/lib/mock-utils/**/*.ts"
+  ],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }

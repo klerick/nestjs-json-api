@@ -1,16 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "module": "es2015",
     "target": "ES2022",
     "removeComments": false,
     "declaration": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }
