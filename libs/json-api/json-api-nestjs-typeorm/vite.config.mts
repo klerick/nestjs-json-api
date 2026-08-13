@@ -35,7 +35,7 @@ export default defineConfig(() => ({
       shuffle: false,
     },
     maxWorkers: 1,
-    minWorkers: 1,
+
     name: 'json-api-nestjs-typeorm',
     watch: false,
     globals: true,
@@ -46,7 +46,8 @@ export default defineConfig(() => ({
     coverage: {
       enabled: true,
       reporter: ['json-summary'],
-      reportsDirectory: '../../../coverage/libs/json-api/json-api-nestjs-typeorm',
+      reportsDirectory:
+        '../../../coverage/libs/json-api/json-api-nestjs-typeorm',
       provider: 'v8' as const,
     },
   },

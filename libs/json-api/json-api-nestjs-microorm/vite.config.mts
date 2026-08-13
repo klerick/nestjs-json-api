@@ -35,7 +35,7 @@ export default defineConfig(() => ({
       shuffle: false,
     },
     maxWorkers: 1,
-    minWorkers: 1,
+
     name: 'json-api-nestjs-microorm',
     watch: false,
     globals: true,
