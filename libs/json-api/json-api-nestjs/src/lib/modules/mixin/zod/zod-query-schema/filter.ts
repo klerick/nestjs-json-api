@@ -244,15 +244,14 @@ export function zodFilterQuery<E extends object, IdKey extends string>(
     };
   }, {} as RelationFilterProps<E, IdKey>);
 
+  // Both keys are required: this schema guards what reaches the controller, and
+  // the input pipe always emits them -- its reducer starts from
+  // { relation: null, target: null }. A null value means "nothing filtered on
+  // this side"; a missing key means the query never went through the pipe.
   const targetShapeFilter = {
-    target: z
-      .strictObject(targetResult)
-      .optional()
-      .refine(nonEmptyObject())
-      .nullable(),
+    target: z.strictObject(targetResult).refine(nonEmptyObject()).nullable(),
     relation: z
       .strictObject(relationFilterProps)
-      .optional()
       .refine(nonEmptyObject())
       .nullable(),
   };
