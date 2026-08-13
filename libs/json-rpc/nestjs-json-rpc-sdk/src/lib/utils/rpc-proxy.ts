@@ -1,7 +1,7 @@
 import { lastValueFrom } from 'rxjs';
 
-import { LoopFunc, RpcReturnList, Transport } from '../types';
-import { WrapperCall } from './wrapper-call';
+import { LoopFunc, RpcReturnList, Transport } from '../types/index.js';
+import { WrapperCall } from './wrapper-call.js';
 
 export const rpcProxy = <T extends RpcReturnList<any, boolean>>(
   transport: Transport<LoopFunc>,

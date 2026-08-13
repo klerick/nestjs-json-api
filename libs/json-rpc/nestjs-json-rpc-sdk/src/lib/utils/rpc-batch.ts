@@ -4,9 +4,9 @@ import {
   RpcBatchPromise,
   RpcResult,
   Transport,
-} from '../types';
+} from '../types/index.js';
 import { map } from 'rxjs/operators';
-import { mapParseResponse, throwOrReturnError } from './pipe';
+import { mapParseResponse, throwOrReturnError } from './pipe.js';
 import { lastValueFrom } from 'rxjs';
 
 export function RpcBatchFactory<T extends LoopFunc>(

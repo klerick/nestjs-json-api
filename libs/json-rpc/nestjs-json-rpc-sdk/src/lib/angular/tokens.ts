@@ -5,13 +5,13 @@ import {
   RpcReturnList,
   Transport,
   JsonRpcAngularConfig,
-} from '../types';
+} from '../types/index.js';
 
 import {
   angularTransportFactory,
   rpcBatchFactory,
   rpcFactory,
-} from './factory';
+} from './factory.js';
 
 export const JSON_RPC_SDK_CONFIG = new InjectionToken<JsonRpcAngularConfig>(
   'Main config object for sdk'

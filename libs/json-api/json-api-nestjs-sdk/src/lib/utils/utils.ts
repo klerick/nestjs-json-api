@@ -1,7 +1,7 @@
 import { kebabCase } from 'change-case-commonjs';
 
-import { ID_KEY } from '../constants';
-import { JsonApiSdkConfig, JsonSdkConfig } from '../types';
+import { ID_KEY } from '../constants/index.js';
+import { JsonApiSdkConfig, JsonSdkConfig } from '../types/index.js';
 
 const NULL_REF = Symbol('null-ref');
 const EMPTY_ARRAY_REF = Symbol('empty-array-ref');

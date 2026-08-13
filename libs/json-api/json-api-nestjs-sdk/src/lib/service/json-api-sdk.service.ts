@@ -16,9 +16,9 @@ import {
   RelationBodyData,
   ReturnIfArray,
   EntityChain,
-} from '../types';
-import { EntityArray, getTypeForReq } from '../utils';
-import { JsonApiUtilsService } from './json-api-utils.service';
+} from '../types/index.js';
+import { EntityArray, getTypeForReq } from '../utils/index.js';
+import { JsonApiUtilsService } from './json-api-utils.service.js';
 
 const AS_PLAIN_RESULT = Symbol('asPlainResult');
 

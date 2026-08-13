@@ -3,8 +3,8 @@ import {
   RelationKeys,
   IsIterator,
   CastIteratorType,
-} from './entity-type';
-import { ValueOf } from './entity-type';
+} from './entity-type.js';
+import { ValueOf } from './entity-type.js';
 
 export type DebugMetaProps = Partial<{
   time: number;

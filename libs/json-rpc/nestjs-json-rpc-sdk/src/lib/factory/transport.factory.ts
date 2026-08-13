@@ -7,14 +7,14 @@ import {
   LoopFunc,
   PayloadRpc,
   RpcResult,
-} from '../types';
-import { fetchTransportFactory } from './fetch-transport.factory';
+} from '../types/index.js';
+import { fetchTransportFactory } from './fetch-transport.factory.js';
 import {
   webSocketFactory,
   WsResponse,
   wsTransportFactory,
-} from './ws-transport.factory';
-import { ioTransportFactory } from './io-transport.factory';
+} from './ws-transport.factory.js';
+import { ioTransportFactory } from './io-transport.factory.js';
 import { Subject } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/internal/observable/dom/WebSocketSubject';
 

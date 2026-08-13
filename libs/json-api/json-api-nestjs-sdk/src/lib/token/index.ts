@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 
-import { JsonApiSdkConfig, AtomicFactory as TypeAtomicFactory } from '../types';
+import { JsonApiSdkConfig, AtomicFactory as TypeAtomicFactory } from '../types/index.js';
 
 export const JSON_API_SDK_CONFIG = new InjectionToken<JsonApiSdkConfig>(
   'Main config object for sdk'

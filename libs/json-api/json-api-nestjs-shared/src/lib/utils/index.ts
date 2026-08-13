@@ -1,1 +1,1 @@
-export * from './object-utils';
+export * from './object-utils.js';

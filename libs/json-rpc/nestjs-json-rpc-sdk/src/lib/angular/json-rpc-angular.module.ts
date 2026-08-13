@@ -1,7 +1,7 @@
 import { makeEnvironmentProviders } from '@angular/core';
 
-import { JSON_RPC_SDK_CONFIG } from './tokens';
-import { JsonRpcAngularConfig } from '../types';
+import { JSON_RPC_SDK_CONFIG } from './tokens.js';
+import { JsonRpcAngularConfig } from '../types/index.js';
 
 export const provideJsonRpc = (config: JsonRpcAngularConfig) =>
   makeEnvironmentProviders([

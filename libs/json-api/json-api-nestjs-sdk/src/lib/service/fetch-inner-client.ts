@@ -5,7 +5,7 @@ import {
   RelationKeys,
   ResourceObjectRelationships,
 } from '@klerick/json-api-nestjs-shared';
-import { ParamObject, HttpParams } from '../utils';
+import { ParamObject, HttpParams } from '../utils/index.js';
 
 import {
   HttpInnerClient,
@@ -14,7 +14,7 @@ import {
   RelationBodyData,
   AtomicBody,
   AtomicResponse,
-} from '../types';
+} from '../types/index.js';
 
 export class FetchInnerClient implements HttpInnerClient {
   delete(

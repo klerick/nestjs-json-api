@@ -5,9 +5,9 @@ import {
   ResourceObjectRelationships,
 } from '@klerick/json-api-nestjs-shared';
 
-import { ParamObject } from '../utils';
-import { PostData, PatchData, RelationBodyData } from './http-request-params';
-import { AtomicBody, AtomicResponse } from './atomic-type';
+import { ParamObject } from '../utils/index.js';
+import { PostData, PatchData, RelationBodyData } from './http-request-params.js';
+import { AtomicBody, AtomicResponse } from './atomic-type.js';
 
 export interface HttpInnerClient {
   get<

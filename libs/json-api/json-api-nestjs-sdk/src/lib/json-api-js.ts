@@ -5,14 +5,14 @@ import {
   FunctionPropertyNames,
   JsonConfig,
   PromiseJsonApiSdkService,
-} from './types';
-import { resultConfig } from './utils';
+} from './types/index.js';
+import { resultConfig } from './utils/index.js';
 import {
   AtomicOperationsService,
   JsonApiSdkService,
   JsonApiUtilsService,
-} from './service';
-import { FetchInnerClient } from './service/fetch-inner-client';
+} from './service/index.js';
+import { FetchInnerClient } from './service/fetch-inner-client.js';
 import { lastValueFrom } from 'rxjs';
 
 export type JsonSdkPromise = {

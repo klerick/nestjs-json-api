@@ -1,4 +1,4 @@
-import { Transport } from './rpc';
+import { Transport } from './rpc.js';
 
 export type LoopFunc = (...args: any) => any;
 

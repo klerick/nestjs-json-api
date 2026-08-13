@@ -7,7 +7,7 @@ import {
   ReturnTransportCall,
   RpcError,
   RpcResult,
-} from '../types';
+} from '../types/index.js';
 
 export const mapParseResponse = <T extends LoopFunc>(r: RpcResult<T>) => {
   if ('error' in r) return r;

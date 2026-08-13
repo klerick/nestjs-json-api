@@ -1,4 +1,4 @@
-import { JsonRpcVersion } from './rpc';
+import { JsonRpcVersion } from './rpc.js';
 
 export enum ErrorCodeType {
   ParseError = 'Parse error',

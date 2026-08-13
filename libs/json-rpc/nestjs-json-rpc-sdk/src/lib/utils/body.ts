@@ -1,5 +1,5 @@
-import { LoopFunc, PayloadRpc } from '../types';
-import { JSON_RPC_VERSION } from '../constans';
+import { LoopFunc, PayloadRpc } from '../types/index.js';
+import { JSON_RPC_VERSION } from '../constans/index.js';
 
 export function generateBodyMethod(nameSpace: string, method: string): string {
   return `${nameSpace}.${method}`;

@@ -11,12 +11,12 @@ import {
   RpcReturnList,
   RpcConfig,
   TransportType,
-} from '../types';
-import { transportFactory } from '../factory';
-import { webSocketFactory, WsResponse } from '../factory/ws-transport.factory';
+} from '../types/index.js';
+import { transportFactory } from '../factory/index.js';
+import { webSocketFactory, WsResponse } from '../factory/ws-transport.factory.js';
 
-import { JSON_RPC_SDK_CONFIG, JSON_RPC_SDK_TRANSPORT } from './tokens';
-import { RpcBatchFactory, rpcProxy } from '../utils';
+import { JSON_RPC_SDK_CONFIG, JSON_RPC_SDK_TRANSPORT } from './tokens.js';
+import { RpcBatchFactory, rpcProxy } from '../utils/index.js';
 
 export function rpcBatchFactory() {
   return RpcBatchFactory(inject(JSON_RPC_SDK_TRANSPORT));

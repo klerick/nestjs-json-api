@@ -4,7 +4,7 @@ import {
   Operation,
   ResourceObject,
 } from '@klerick/json-api-nestjs-shared';
-import { AtomicMainOperations } from './atomic-operation';
+import { AtomicMainOperations } from './atomic-operation.js';
 
 export type BodyType = {
   op: Operation;

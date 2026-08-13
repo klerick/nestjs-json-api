@@ -1,5 +1,5 @@
-import { Transport } from './rpc';
-import { HttpAgentFactory, LoopFunc } from './utils';
+import { Transport } from './rpc.js';
+import { HttpAgentFactory, LoopFunc } from './utils.js';
 
 import type { Socket } from 'socket.io-client';
 import { Subject } from 'rxjs';

@@ -14,8 +14,8 @@ import {
 import { Subscriber } from 'rxjs/internal/Subscriber';
 import { TeardownLogic } from 'rxjs/internal/types';
 
-import { LoopFunc, PayloadRpc, RpcResult, Transport } from '../types';
-import { WS_EVENT_NAME } from '../constans';
+import { LoopFunc, PayloadRpc, RpcResult, Transport } from '../types/index.js';
+import { WS_EVENT_NAME } from '../constans/index.js';
 
 interface ServerToClientEvents<T extends LoopFunc> {
   rpc: (result: RpcResult<T>) => void;

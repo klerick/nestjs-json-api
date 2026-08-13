@@ -1,8 +1,8 @@
 import { Operation, RelationKeys } from '@klerick/json-api-nestjs-shared';
 
-import { AtomicMainOperations, JsonApiSdkConfig, BodyType } from '../types';
-import { getTypeForReq } from './utils';
-import { JsonApiUtilsService } from '../service';
+import { AtomicMainOperations, JsonApiSdkConfig, BodyType } from '../types/index.js';
+import { getTypeForReq } from './utils.js';
+import { JsonApiUtilsService } from '../service/index.js';
 
 export type AtomicVoidOperation = {
   [K in keyof AtomicMainOperations<[]>]: (...arg: any) => void;
