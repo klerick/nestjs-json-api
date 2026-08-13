@@ -1,4 +1,10 @@
-import { Entity, PrimaryKey, Property, Enum, ManyToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  Enum,
+  ManyToOne,
+} from '@mikro-orm/decorators/legacy';
 
 export enum CommentKind {
   Comment = 'COMMENT',

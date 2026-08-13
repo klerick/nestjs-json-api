@@ -1,11 +1,11 @@
+import { Opt } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   Enum,
   ManyToOne,
-  Opt,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 export enum CommentKind {
   Comment = 'COMMENT',
@@ -14,7 +14,10 @@ export enum CommentKind {
 }
 
 import { Users, IUsers } from '.';
-import { JsonApiReadOnly, JsonApiReadOnlyField } from '@klerick/json-api-nestjs';
+import {
+  JsonApiReadOnly,
+  JsonApiReadOnlyField,
+} from '@klerick/json-api-nestjs';
 import { truncateToSeconds } from '../utils/date';
 
 export type IComments = Comments;

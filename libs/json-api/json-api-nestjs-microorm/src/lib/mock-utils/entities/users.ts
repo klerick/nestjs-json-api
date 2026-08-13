@@ -1,15 +1,13 @@
+import { Collection, ArrayType, Type } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   OneToOne,
-  Collection,
   ManyToMany,
   OneToMany,
   ManyToOne,
-  ArrayType,
-  Type,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import {
   Addresses,

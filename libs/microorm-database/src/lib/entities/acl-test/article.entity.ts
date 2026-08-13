@@ -1,11 +1,11 @@
+import { ArrayType } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   ManyToOne,
   Enum,
-  ArrayType,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { UsersAcl, IUsersAcl } from './user.entity';
 import { truncateToSeconds } from '../../utils/date';
 

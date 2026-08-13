@@ -3,7 +3,7 @@ import {
   PrimaryKey,
   Property,
   ManyToOne,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { UsersAcl, IUsersAcl } from './user.entity';
 import { PostAcl } from './post.entity';
 import { truncateToSeconds } from '../../utils/date';

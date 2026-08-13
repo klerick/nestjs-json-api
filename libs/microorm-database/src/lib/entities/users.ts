@@ -1,12 +1,12 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   ManyToMany,
   OneToOne,
-  Collection,
   OneToMany,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import { Roles, Addresses, IAddresses, Comments, BookList } from './';
 import { truncateToSeconds } from '../utils/date';

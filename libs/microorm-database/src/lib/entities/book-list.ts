@@ -1,10 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import { IUsers, Users } from './users';
 import { truncateToSeconds } from '../utils/date';

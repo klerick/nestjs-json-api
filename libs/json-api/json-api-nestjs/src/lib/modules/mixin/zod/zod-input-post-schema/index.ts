@@ -6,8 +6,8 @@ import {
   ExtractJsonApiImmutableKeys,
 } from '../../../../types';
 import {
-  ZodId,
-  zodId,
+  ZodPrimaryKeyId,
+  zodPrimaryKeyId,
   ZodType,
   zodType,
   ZodAttributes,
@@ -24,7 +24,7 @@ import { EntityParamMapService } from '../../service';
 
 
 type ZodInputPostShape<E extends object, IdKey extends string> = {
-  id: ZodOptional<ZodId>;
+  id: ZodOptional<ZodPrimaryKeyId>;
   type: ZodType<string>;
   attributes: ZodAttributes<E, IdKey>;
   relationships: ZodOptional<ZodRelationships<E, IdKey>>;
@@ -46,7 +46,7 @@ function getShape<E extends object, IdKey extends string>(
   immutableProps: ExtractJsonApiImmutableKeys<E>[] = []
 ) {
   const shape = {
-    id: zodId(
+    id: zodPrimaryKeyId(
       entityParamMapService.entityParaMap.primaryColumnType as TypeForId
     ).optional(),
     type: zodType(entityParamMapService.entityParaMap.typeName),

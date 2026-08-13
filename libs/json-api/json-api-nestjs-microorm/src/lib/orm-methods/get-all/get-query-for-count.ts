@@ -1,15 +1,16 @@
 import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { Query } from '@klerick/json-api-nestjs';
-import type { QBQueryOrderMap, EntityKey } from '@mikro-orm/core';
+import type { QueryOrderMap, EntityKey } from '@mikro-orm/core';
 
 import { MicroOrmService } from '../../service';
+import { asOrderBy } from '../../runtime-query';
 
 export function getSortObject<E extends object, IdKey extends string>(
   query: Query<E, IdKey>
-): QBQueryOrderMap<E> {
+): QueryOrderMap<E> {
   const { sort } = query;
-  const sortObject: QBQueryOrderMap<E> = {};
-  if (!sort) return sortObject;
+  const sortObject: Record<string, unknown> = {};
+  if (!sort) return asOrderBy<E>(sortObject);
 
   const { target = {}, ...relation } = sort as any;
   for (const [filed, sortType] of ObjectTyped.entries(target)) {
@@ -19,13 +20,14 @@ export function getSortObject<E extends object, IdKey extends string>(
   for (const [relationName, orderConfig = {}] of ObjectTyped.entries(
     relation
   )) {
-    const name = relationName as unknown as EntityKey<E>;
-    sortObject[name] = {};
+    const name = String(relationName);
+    const nested: Record<string, unknown> = {};
     for (const [field, sortType] of ObjectTyped.entries(orderConfig)) {
-      sortObject[name][field] = sortType;
+      nested[String(field)] = sortType;
     }
+    sortObject[name] = nested;
   }
-  return sortObject;
+  return asOrderBy<E>(sortObject);
 }
 
 export function getQueryForCount<E extends object, IdKey extends string>(
@@ -37,9 +39,9 @@ export function getQueryForCount<E extends object, IdKey extends string>(
   querySelect.orderBy(
     Object.keys(sortObject).length > 0
       ? sortObject
-      : {
+      : asOrderBy<E>({
           [this.microOrmUtilService.currentPrimaryColumn]: 'ASC',
-        }
+        })
   );
 
   const expressionArrayForTarget =

@@ -1,3 +1,4 @@
+import { asFilter, asOrderBy } from '../../runtime-query';
 import { QueryFlag, wrap } from '@mikro-orm/core';
 import { Query } from '@klerick/json-api-nestjs';
 import { MicroOrmService } from '../../service';
@@ -20,7 +21,7 @@ export async function getAll<E extends object, IdKey extends string>(
   >(this, ...[query]);
 
   if (additionalQueryParams) {
-    countSubQuery.andWhere(additionalQueryParams);
+    countSubQuery.andWhere(asFilter(additionalQueryParams as Record<string, unknown>));
   }
 
   const skip = (page.number - 1) * page.size;
@@ -39,11 +40,10 @@ export async function getAll<E extends object, IdKey extends string>(
     .select(this.microOrmUtilService.currentPrimaryColumn)
     .join(paginationQuery, this.microOrmUtilService.currentAlias, {
       [`${collectIdsAlias}.${this.microOrmUtilService.currentPrimaryColumn}`]:
-        this.microOrmUtilService
-          .getKnex()
-          .ref(
-            `${this.microOrmUtilService.currentAlias}.${this.microOrmUtilService.currentPrimaryColumn}`
-          ),
+        this.microOrmUtilService.columnRef(
+          this.microOrmUtilService.currentAlias,
+          this.microOrmUtilService.currentPrimaryColumn
+        ),
     });
 
   const queryCount = this.microOrmUtilService
@@ -71,23 +71,26 @@ export async function getAll<E extends object, IdKey extends string>(
     .execute('all');
 
   const idsArray = resIds.map(
-    (r) => r[this.microOrmUtilService.currentPrimaryColumn]
+    (r) => (r as Record<string, unknown>)[this.microOrmUtilService.currentPrimaryColumn]
   );
-  const resultQueryBuilder = this.microOrmUtilService.queryBuilder().where({
-    [this.microOrmUtilService.currentPrimaryColumn]: {
-      $in: idsArray,
-    },
-  });
+  const resultQueryBuilder = this.microOrmUtilService.queryBuilder()
+    .where(
+      asFilter({
+        [this.microOrmUtilService.currentPrimaryColumn]: { $in: idsArray },
+      })
+    );
 
   const sortObject = getSortObject(query);
   const resultList = await this.microOrmUtilService
     .prePareQueryBuilder(resultQueryBuilder, query as any)
     .orderBy(
-      Object.keys(sortObject).length > 0
-        ? sortObject
-        : {
-            [this.microOrmUtilService.currentPrimaryColumn]: 'ASC',
-          }
+      asOrderBy(
+        Object.keys(sortObject).length > 0
+          ? sortObject
+          : {
+              [this.microOrmUtilService.currentPrimaryColumn]: 'ASC',
+            }
+      )
     )
     .getResult();
 

@@ -90,22 +90,22 @@ describe('MicroOrmUtilService', () => {
   it('queryBuilder', () => {
     const resultUserGroups = microOrmUtilsServiceUserGroups.queryBuilder();
     expect(resultUserGroups.mainAlias.aliasName).toBe('UserGroups');
-    expect(resultUserGroups.mainAlias.entityName).toBe('UserGroups');
+    expect(resultUserGroups.mainAlias.entityName).toBe(UserGroups);
 
     const resultUsers = microOrmUtilsServiceUserGroups.queryBuilder(Users);
     expect(resultUsers.mainAlias.aliasName).toBe('Users');
-    expect(resultUsers.mainAlias.entityName).toBe('Users');
+    expect(resultUsers.mainAlias.entityName).toBe(Users);
 
     const resultTestUsersAlias = microOrmUtilsServiceUserGroups.queryBuilder(
       Users,
       'TestUsers'
     );
-    expect(resultTestUsersAlias.mainAlias.entityName).toBe('Users');
+    expect(resultTestUsersAlias.mainAlias.entityName).toBe(Users);
     expect(resultTestUsersAlias.mainAlias.aliasName).toBe('TestUsers');
 
     const resultTestUsersOnlyAlias =
       microOrmUtilsServiceUserGroups.queryBuilder('TestUserGroups');
-    expect(resultTestUsersOnlyAlias.mainAlias.entityName).toBe('UserGroups');
+    expect(resultTestUsersOnlyAlias.mainAlias.entityName).toBe(UserGroups);
     expect(resultTestUsersOnlyAlias.mainAlias.aliasName).toBe('TestUserGroups');
   });
 
@@ -245,10 +245,10 @@ describe('MicroOrmUtilService', () => {
         throw new Error('Is not RawQueryFragment');
 
       expect(manyToManyEq.sql).toBe(
-        'not exists (select 1 from "public"."users_have_roles" as "users_have_roles" where "users_have_roles"."user_id" = "Users"."id")'
+        'not exists (select 1 from "users_have_roles" as "users_have_roles" where "users_have_roles"."user_id" = "Users"."id")'
       );
       expect(oneToManyEq.sql).toBe(
-        'not exists (select 1 from "public"."comments" as "Comments" where "Comments"."created_by" = "Users"."id")'
+        'not exists (select 1 from "comments" as "Comments" where "Comments"."created_by" = "Users"."id")'
       );
     });
     it('expression for target field with relation field exist', async () => {
@@ -300,10 +300,10 @@ describe('MicroOrmUtilService', () => {
         throw new Error('Is not RawQueryFragment');
 
       expect(manyToManyNe.sql).toBe(
-        'exists (select 1 from "public"."users_have_roles" as "users_have_roles" where "users_have_roles"."user_id" = "Users"."id")'
+        'exists (select 1 from "users_have_roles" as "users_have_roles" where "users_have_roles"."user_id" = "Users"."id")'
       );
       expect(oneToManyNe.sql).toBe(
-        'exists (select 1 from "public"."comments" as "Comments" where "Comments"."created_by" = "Users"."id")'
+        'exists (select 1 from "comments" as "Comments" where "Comments"."created_by" = "Users"."id")'
       );
     });
 
@@ -382,14 +382,14 @@ describe('MicroOrmUtilService', () => {
         throw new Error('Is not RawQueryFragment');
 
       expect(userGroup.sql).toBe(
-        `exists (select 1 from "public"."user_groups" as "UserGroups" where "UserGroups"."id" = "Users"."user_groups_id" and "UserGroups"."label" = 'test')`
+        `exists (select 1 from "user_groups" as "UserGroups" where "UserGroups"."id" = "Users"."user_groups_id" and "UserGroups"."label" = 'test')`
       );
 
       if (!(comments instanceof RawQueryFragment))
         throw new Error('Is not RawQueryFragment');
 
       expect(comments.sql).toBe(
-        `exists (select 1 from "public"."comments" as "Comments" where "Comments"."created_by" = "Users"."id" and "Comments"."kind" = 'test')`
+        `exists (select 1 from "comments" as "Comments" where "Comments"."created_by" = "Users"."id" and "Comments"."kind" = 'test')`
       );
     });
 
@@ -480,7 +480,7 @@ describe('MicroOrmUtilService', () => {
         throw new Error('Is not RawQueryFragment');
 
       expect(roles.sql).toBe(
-        `exists (select 1 from "public"."users_have_roles" as "users_have_roles" left join "public"."roles" as "r1" on "users_have_roles"."role_id" = "r1"."id" where "users_have_roles"."user_id" = "Users"."id" and "r1"."key" = 'test' and "r1"."key" != 'test2' and "r1"."is_default" = 'false')`
+        `exists (select 1 from "users_have_roles" as "users_have_roles" inner join "roles" as "r1" on "users_have_roles"."role_id" = "r1"."id" where "users_have_roles"."user_id" = "Users"."id" and "r1"."key" = 'test' and "r1"."key" != 'test2' and "r1"."is_default" = 'false')`
       );
 
       const [users] =
@@ -489,7 +489,7 @@ describe('MicroOrmUtilService', () => {
       if (!(users instanceof RawQueryFragment))
         throw new Error('Is not RawQueryFragment');
       expect(users.sql).toBe(
-        `exists (select 1 from "public"."users_have_roles" as "users_have_roles" left join "public"."users" as "u1" on "users_have_roles"."user_id" = "u1"."id" where "users_have_roles"."role_id" = "Roles"."id" and "u1"."login" = 'test' and "u1"."login" != 'test2' and "u1"."is_active" = 'false')`
+        `exists (select 1 from "users_have_roles" as "users_have_roles" inner join "users" as "u1" on "users_have_roles"."user_id" = "u1"."id" where "users_have_roles"."role_id" = "Roles"."id" and "u1"."login" = 'test' and "u1"."login" != 'test2' and "u1"."is_active" = 'false')`
       );
     });
 
@@ -630,7 +630,7 @@ describe('MicroOrmUtilService', () => {
 
       user.roles.add(role1, role2, role3);
 
-      await em.persistAndFlush([user, role1, role2, role3, role4]);
+      await em.persist([user, role1, role2, role3, role4]).flush();
       em.clear();
 
       // Load user with roles
@@ -690,7 +690,7 @@ describe('MicroOrmUtilService', () => {
 
       user.roles.add(roleA, roleB);
 
-      await em.persistAndFlush([user, roleA, roleB]);
+      await em.persist([user, roleA, roleB]).flush();
       em.clear();
 
       // Load user with roles
@@ -746,7 +746,7 @@ describe('MicroOrmUtilService', () => {
 
       user.roles.add(roleX, roleY);
 
-      await em.persistAndFlush([user, roleX, roleY]);
+      await em.persist([user, roleX, roleY]).flush();
       em.clear();
 
       // Load user with roles
@@ -790,7 +790,7 @@ describe('MicroOrmUtilService', () => {
       const roleNew1 = createTestRole(em, 'role-new-1', 'Role New 1');
       const roleNew2 = createTestRole(em, 'role-new-2', 'Role New 2');
 
-      await em.persistAndFlush([user, roleNew1, roleNew2]);
+      await em.persist([user, roleNew1, roleNew2]).flush();
       em.clear();
 
       // Load user (no roles)

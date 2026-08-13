@@ -1,3 +1,4 @@
+import { asFilter } from '../../runtime-query';
 import { NotFoundException } from '@nestjs/common';
 import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 import {
@@ -23,9 +24,9 @@ export async function deleteRelationship<
   );
   const currentEntityRef = await this.microOrmUtilService
     .queryBuilder()
-    .where({
-      [this.microOrmUtilService.currentPrimaryColumn]: id,
-    })
+    .where(
+      asFilter({ [this.microOrmUtilService.currentPrimaryColumn]: id })
+    )
     .getSingleResult();
 
   if (!currentEntityRef) {

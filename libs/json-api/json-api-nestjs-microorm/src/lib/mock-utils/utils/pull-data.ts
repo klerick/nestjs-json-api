@@ -106,7 +106,7 @@ export async function pullAllData(em: EntityManager) {
   managerUser.userGroup = userGroup3;
   managerUser.roles.add(role1, role2);
 
-  await em.persistAndFlush([
+  await em.persist([
     user,
     address1,
     address2,
@@ -127,7 +127,7 @@ export async function pullAllData(em: EntityManager) {
     roleX2,
     roleX3,
     managerUser,
-  ]);
+  ]).flush();
 
   await em.flush();
 

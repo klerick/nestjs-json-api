@@ -147,16 +147,26 @@ describe('postRelationship', () => {
     }
 
     expect(checkUserAfterPost.manager.id.toString()).toBe(managerData.id);
-    expect(checkUserAfterPost.roles.map((i) => i.id.toString())).toEqual([
-      ...checkUser.roles.map((i) => i.id.toString()),
-      ...rolesData.map((i) => i.id),
-    ]);
+    // The relation is fetched without an ORDER BY, so the row order is not
+    // defined -- what matters is which roles ended up attached.
+    expect(
+      checkUserAfterPost.roles.map((i) => i.id.toString()).sort()
+    ).toEqual(
+      [
+        ...checkUser.roles.map((i) => i.id.toString()),
+        ...rolesData.map((i) => i.id),
+      ].sort()
+    );
     expect(checkUserAfterPost.userGroup?.id.toString()).toBe(userGroupData.id);
 
     await typeormService.postRelationship(1, 'roles', [] as any);
-    expect(checkUserAfterPost?.roles.map((i) => i.id.toString())).toEqual([
-      ...checkUser.roles.map((i) => i.id.toString()),
-      ...rolesData.map((i) => i.id),
-    ]);
+    expect(
+      checkUserAfterPost?.roles.map((i) => i.id.toString()).sort()
+    ).toEqual(
+      [
+        ...checkUser.roles.map((i) => i.id.toString()),
+        ...rolesData.map((i) => i.id),
+      ].sort()
+    );
   });
 });

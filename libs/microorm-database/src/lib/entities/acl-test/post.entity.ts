@@ -1,3 +1,4 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
@@ -5,9 +6,8 @@ import {
   ManyToOne,
   OneToMany,
   ManyToMany,
-  Collection,
   Enum,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { UsersAcl, IUsersAcl } from './user.entity';
 import { CategoryAcl, ICategoryAcl } from './category.entity';
 import { TagAcl, ITagAcl } from './tag.entity';

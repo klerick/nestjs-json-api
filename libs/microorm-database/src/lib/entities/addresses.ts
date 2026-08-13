@@ -1,4 +1,9 @@
-import { Entity, PrimaryKey, Property, OneToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  OneToOne,
+} from '@mikro-orm/decorators/legacy';
 
 import { Users, IUsers } from '.';
 import { truncateToSeconds } from '../utils/date';

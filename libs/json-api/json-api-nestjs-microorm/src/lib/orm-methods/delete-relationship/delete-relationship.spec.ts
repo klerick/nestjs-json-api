@@ -84,7 +84,7 @@ describe('delete-relationship', () => {
     } as Users;
 
     addressForTest = await pullAddress();
-    await em.persistAndFlush(addressForTest);
+    await em.persist(addressForTest).flush();
   });
 
   afterEach(() => {

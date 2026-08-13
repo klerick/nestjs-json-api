@@ -1,11 +1,10 @@
+import { Ref, Opt } from '@mikro-orm/core';
 import {
   PrimaryKey,
   Property,
   Entity,
   ManyToOne,
-  Ref,
-  Opt,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import { Users, IUsers } from './index';
 

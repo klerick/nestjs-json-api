@@ -1,10 +1,10 @@
+import { ArrayType } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   OneToOne,
-  ArrayType,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import { Users, IUsers } from './index';
 

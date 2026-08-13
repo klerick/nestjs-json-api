@@ -48,7 +48,7 @@ describe('get-all', () => {
 
       const checkData = await queryBuilder.clone().limit(1).getResult();
 
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
       const query = getDefaultQuery<Users>();
 
       const { totalItems, items } = await getAll.call<
@@ -66,7 +66,7 @@ describe('get-all', () => {
         microOrmServiceUser.microOrmUtilService.queryBuilder();
 
       const checkData = await queryBuilder.clone().limit(5, 5).getResult();
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
       const query = getDefaultQuery<Users>();
       query.page = {
         size: 5,
@@ -94,7 +94,7 @@ describe('get-all', () => {
         })
         .limit(5, 5)
         .getResult();
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
 
       const query = getDefaultQuery<Users>();
       query.sort = {
@@ -135,7 +135,7 @@ describe('get-all', () => {
         .limit(5, 5)
         .getResult();
 
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
 
       const query = getDefaultQuery<Users>();
       query.fields = {
@@ -181,8 +181,7 @@ describe('get-all', () => {
       const count = await queryBuilder
         .clone()
         .leftJoin('Users.roles', 'Roles__roles')
-        .distinct()
-        .count();
+        .getCount(undefined, true);
 
       const query = getDefaultQuery<Users>();
       query.sort = {
@@ -211,7 +210,7 @@ describe('get-all', () => {
       const queryBuilder =
         microOrmServiceUser.microOrmUtilService.queryBuilder();
       const checkData = await queryBuilder.clone().limit(5).getResult();
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
       const query = getDefaultQuery<Users>();
       query.page = {
         size: 5,
@@ -240,7 +239,7 @@ describe('get-all', () => {
         .select(['id', ...select])
         .limit(5)
         .getResult();
-      const count = await queryBuilder.clone().count();
+      const count = await queryBuilder.clone().getCount();
       const query = getDefaultQuery<Users>();
       query.page = {
         size: 5,
@@ -274,7 +273,7 @@ describe('get-all', () => {
         ])
         .leftJoinAndSelect('Users.roles', 'Roles__roles', {}, ['name', 'key']);
       const checkData = await queryBuilder.clone().limit(5).getResult();
-      const count = await queryBuilder.clone().count().distinct();
+      const count = await queryBuilder.clone().getCount(undefined, true);
       const query = getDefaultQuery<Users>();
       query.page = {
         size: 5,
@@ -303,7 +302,7 @@ describe('get-all', () => {
         .leftJoinAndSelect('Users.roles', 'Roles__roles');
 
       const checkData = await queryBuilder.clone().limit(5).getResult();
-      const count = await queryBuilder.clone().count().distinct();
+      const count = await queryBuilder.clone().getCount(undefined, true);
 
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -332,7 +331,7 @@ describe('get-all', () => {
         ]);
 
       const checkData = await queryBuilder.clone().limit(5).getResult();
-      const count = await queryBuilder.clone().count().distinct();
+      const count = await queryBuilder.clone().getCount(undefined, true);
 
       const query = getDefaultQuery<Users>();
       query.page = {
@@ -397,7 +396,7 @@ describe('get-all', () => {
             login: 'DESC',
           })
           .getResult();
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -442,9 +441,10 @@ describe('get-all', () => {
             manager: {
               login: 'DESC',
             },
+            id: 'ASC',
           })
           .getResult();
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const queryBuilder2 = microOrmServiceUser.microOrmUtilService
           .queryBuilder('Users')
@@ -463,7 +463,7 @@ describe('get-all', () => {
             },
           })
           .getResult();
-        const count2 = await queryBuilder2.clone().count();
+        const count2 = await queryBuilder2.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -481,6 +481,7 @@ describe('get-all', () => {
           manager: {
             login: 'DESC',
           },
+          target: { id: 'ASC' },
         };
 
         const query2 = getDefaultQuery<Users>();
@@ -535,7 +536,7 @@ describe('get-all', () => {
             login: 'DESC',
           })
           .getResult();
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -574,7 +575,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count2 = await queryBuilder.clone().count();
+        const count2 = await queryBuilder.clone().getCount();
 
         const query2 = getDefaultQuery<Users>();
         query2.page = {
@@ -620,7 +621,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count3 = await queryBuilder2.clone().count().distinct();
+        const count3 = await queryBuilder2.clone().getCount(undefined, true);
 
         const query3 = getDefaultQuery<Users>();
         query3.page = {
@@ -653,7 +654,7 @@ describe('get-all', () => {
           .limit(5)
           .orderBy({ id: 'DESC' })
           .getResult();
-        const count4 = await queryBuilder2.clone().count().distinct();
+        const count4 = await queryBuilder2.clone().getCount(undefined, true);
 
         const query4 = getDefaultQuery<Users>();
         query4.page = {
@@ -700,7 +701,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -746,7 +747,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count1 = await queryBuilder1.clone().count().distinct();
+        const count1 = await queryBuilder1.clone().getCount(undefined, true);
 
         const query1 = getDefaultQuery<Users>();
         query1.page = {
@@ -801,7 +802,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {
@@ -860,7 +861,7 @@ describe('get-all', () => {
             },
           })
           .getResult();
-        const count = await quweryBuilder.clone().count('id', true);
+        const count = await quweryBuilder.clone().getCount('id', true);
         const query = getDefaultQuery<Users>();
         query.page = {
           size: 5,
@@ -916,7 +917,7 @@ describe('get-all', () => {
           })
           .getResult();
 
-        const count = await queryBuilder.clone().count();
+        const count = await queryBuilder.clone().getCount();
 
         const query = getDefaultQuery<Users>();
         query.page = {

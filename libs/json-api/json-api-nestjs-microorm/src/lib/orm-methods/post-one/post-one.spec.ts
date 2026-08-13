@@ -92,7 +92,7 @@ describe('post-one', () => {
     } as Users;
 
     addressForTest = await pullAddress();
-    await em.persistAndFlush(addressForTest);
+    await em.persist(addressForTest).flush();
   });
 
   afterEach(() => {
@@ -160,7 +160,7 @@ describe('post-one', () => {
       Parameters<typeof postOne<Users, 'id'>>,
       ReturnType<typeof postOne<Users, 'id'>>
     >(microOrmServiceUser, {
-      id: id.toString(),
+      id,
       attributes: otherAttr,
       type: 'users',
     });
@@ -180,7 +180,7 @@ describe('post-one', () => {
       .limit(1)
       .getSingleResult();
 
-    expect(newId).toBe(id.toString());
+    expect(newId).toBe(id);
     expect(result).toEqual(fromDb);
   });
 

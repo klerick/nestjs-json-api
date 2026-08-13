@@ -14,7 +14,7 @@ export async function deleteOne<E extends object, IdKey extends string>(
 
   if (!data) return void 0;
 
-  await this.microOrmUtilService.entityManager.removeAndFlush(data);
+  await this.microOrmUtilService.entityManager.remove(data).flush();
 
   return void 0;
 }
