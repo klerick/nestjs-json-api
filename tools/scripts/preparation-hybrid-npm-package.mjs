@@ -53,27 +53,45 @@ const angularModulePath = `./${angularModule}`;
 
 const angularPath = mjsJson.exports[angularModulePath];
 
+// tsc emits declarations only on the mjs side, so both subpaths take their
+// types from there. The cjs half has the ngModule .js but no .d.ts.
+const angularMjsPath = addTypeToPath(angularPath);
+const angularCjsPath = addTypeToPath(angularPath, 'cjs');
+const angularTypesPath = angularMjsPath.replace('.js', '.d.ts');
+
 mjsJson.module = addTypeToPath(mjsJson.main);
 mjsJson.main = addTypeToPath(mjsJson.main, 'cjs');
 mjsJson.es2015 = mjsJson.module;
 mjsJson.types = './mjs/src/index.d.ts';
-mjsJson.exports[angularModulePath] = addTypeToPath(angularPath);
+// Both subpaths get the full condition set, matching json-api-nestjs-sdk --
+// the sibling dual package, whose map is written by hand in its source
+// manifest rather than generated here. Node resolves to cjs under require and
+// under import alike; bundlers reach the ESM build through "module"/"default".
+// The subpath used to be a bare string pointing at mjs only, which handed
+// require() an ES module.
+mjsJson.exports[angularModulePath] = {
+  types: angularTypesPath,
+  node: angularCjsPath,
+  require: angularCjsPath,
+  module: angularMjsPath,
+  default: angularMjsPath,
+};
 mjsJson.exports['.'] = {
   types: mjsJson.types,
   node: mjsJson.main,
   require: mjsJson.main,
-  es2015: mjsJson.es2015,
+  module: mjsJson.es2015,
   default: mjsJson.es2015,
 };
 mjsJson.peerDependencies = {
   ...mjsJson.dependencies,
   ...mjsJson.peerDependencies,
 };
+// Kept for consumers still on node10 resolution, which ignores exports.
+// Reads the precomputed path -- the subpath entry above is now an object.
 mjsJson.typesVersions = {
   '*': {
-    [angularModule]: [
-      mjsJson.exports[angularModulePath].replace('.js', '.d.ts'),
-    ],
+    [angularModule]: [angularTypesPath],
   },
 };
 delete mjsJson.dependencies;
