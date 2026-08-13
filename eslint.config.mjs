@@ -1,14 +1,5 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import js from '@eslint/js';
 import baseConfig from './eslint.base.config.mjs';
 import jsoncEslintParser from 'jsonc-eslint-parser';
-
-const compat = new FlatCompat({
-  baseDirectory: dirname(fileURLToPath(import.meta.url)),
-  recommendedConfig: js.configs.recommended,
-});
 
 export default [
   ...baseConfig,
@@ -54,19 +45,6 @@ export default [
     // Override or add rules here
     rules: {},
   },
-  ...compat
-    .config({
-      env: {
-        jest: true,
-      },
-    })
-    .map((config) => ({
-      ...config,
-      files: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.spec.js', '**/*.spec.jsx'],
-      rules: {
-        ...config.rules,
-      },
-    })),
   {
     files: ['**/*.ts'],
     rules: {

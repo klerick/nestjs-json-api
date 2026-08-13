@@ -8,7 +8,6 @@
       "!{projectRoot}/eslint.config.js",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
@@ -79,12 +78,10 @@
     "@nx/angular:application": {
       "e2eTestRunner": "none",
       "linter": "eslint",
-      "style": "css",
-      "unitTestRunner": "jest"
+      "style": "css"
     },
     "@nx/angular:library": {
-      "linter": "eslint",
-      "unitTestRunner": "jest"
+      "linter": "eslint"
     },
     "@nx/angular:component": {
       "style": "css",

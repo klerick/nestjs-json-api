@@ -20,7 +20,7 @@ const coverage = JSON.parse(readFileSync('coverage-summary.json').toString())
 const percentage = coverage['total']['statements']['pct'];
 
 const filename = `${name}.json`
-const content = JSON.stringify({"schemaVersion":1,"label":"Test Coverage","message":`${percentage}%`,"color":"green","namedLogo":"jest"})
+const content = JSON.stringify({"schemaVersion":1,"label":"Test Coverage","message":`${percentage}%`,"color":"green","namedLogo":"vitest"})
 const body = JSON.stringify({ files: { [filename]: { content } } });
 //
 // process.env['GIST_SECRET'] =
