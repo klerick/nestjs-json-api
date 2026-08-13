@@ -59,7 +59,7 @@
     "@nestjs/platform-express": "^11.1.0",
     "@nestjs/platform-socket.io": "^11.1.0",
     "@nestjs/platform-ws": "^11.1.0",
-    "@nestjs/swagger": "11.2.0",
+    "@nestjs/swagger": "^11.4.6",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.0",
     "@nx/devkit": "23.1.1",
