@@ -1,3 +1,41 @@
+# 10.0.0 (2026-08-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** add `meta` support to all relevant operations and update tests and documentation for JSON:API compliance ([cd80b93](https://github.com/klerick/nestjs-json-api/commit/cd80b93))
+- **json-api-nestjs-sdk:** support client-generated IDs in create requests ([60bcb9f](https://github.com/klerick/nestjs-json-api/commit/60bcb9f))
+- **json-api-nestjs-sdk:** add emptyArrayRef for clearing to-many relationships and update SDK to handle id parsing and relationship markers ([58b2309](https://github.com/klerick/nestjs-json-api/commit/58b2309))
+- **json-api-nestjs-sdk:** add support for plain objects, dynamic factory config, and relationship id preservation ([295de3c](https://github.com/klerick/nestjs-json-api/commit/295de3c))
+- **json-api-nestjs-sdk:** remove unused `OutputEntity` generics for simplified and consistent typings ([69ce098](https://github.com/klerick/nestjs-json-api/commit/69ce098))
+- **json-api-nestjs-sdk:** add support for plain object entities, null relationship handling, and type-safe chaining ([97865ef](https://github.com/klerick/nestjs-json-api/commit/97865ef))
+- **json-api-nestjs-sdk:** extend adapter to accept AxiosInstance as well as AxiosStatic ([cfb119e](https://github.com/klerick/nestjs-json-api/commit/cfb119e))
+- **json-api-nestjs-sdk,nestjs-json-rpc-sdk:** update TS config for module and resolution, extend Angular peerDependency range ([58fbd8b](https://github.com/klerick/nestjs-json-api/commit/58fbd8b))
+- **json-api-nestjs-sdk:** expand types to include JsonConfig, Filter, Includes, Sort, Pagination, and Fields ([ea56805](https://github.com/klerick/nestjs-json-api/commit/ea56805))
+- **json-api-nestjs-sdk:** fix after update nx ([f11d5b8](https://github.com/klerick/nestjs-json-api/commit/f11d5b8))
+- **json-api-nestjs-sdk:** fix after update nx ([94aad23](https://github.com/klerick/nestjs-json-api/commit/94aad23))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([77c7bf4](https://github.com/klerick/nestjs-json-api/commit/77c7bf4))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([42b6b82](https://github.com/klerick/nestjs-json-api/commit/42b6b82))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([4c559e2](https://github.com/klerick/nestjs-json-api/commit/4c559e2))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm,json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk:** correct published manifests ([4078057](https://github.com/klerick/nestjs-json-api/commit/4078057))
+- **json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc-sdk:** emit spec-compliant ESM ([a962eeb](https://github.com/klerick/nestjs-json-api/commit/a962eeb))
+- **json-api-nestjs-sdk:** replace `tmpId` with `lid` in atomic operation logic and tests for JSON:API spec compliance ([fa7ad1d](https://github.com/klerick/nestjs-json-api/commit/fa7ad1d))
+- **json-api-nestjs-sdk:** ensure `id` is always a string in request body ([6d48bad](https://github.com/klerick/nestjs-json-api/commit/6d48bad))
+- **json-api-nestjs-sdk:** handle invalid date parsing in attribute processing ([cd8943f](https://github.com/klerick/nestjs-json-api/commit/cd8943f))
+- **json-api-nestjs-sdk:** update TS config and peerDependencies for compatibility improvements ([a0cd057](https://github.com/klerick/nestjs-json-api/commit/a0cd057))
+- **json-api-nestjs-sdk:** add id field in atomic body for add operation with tmpId if set Id should be use as id and tmpId. ([3d16bf7](https://github.com/klerick/nestjs-json-api/commit/3d16bf7))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.8
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 10.0.0-beta.15 (2026-02-16)
 
 ### 🚀 Features

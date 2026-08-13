@@ -1,3 +1,60 @@
+# 10.0.0 (2026-08-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-microorm:** migrate to MikroORM 7 ([85b3855](https://github.com/klerick/nestjs-json-api/commit/85b3855))
+- **json-api-nestjs:** add support for `meta` object in various operations ([3c09413](https://github.com/klerick/nestjs-json-api/commit/3c09413))
+- **json-api-nestjs:** enhance Zod schema definitions with metadata, refactor Swagger integration, and improve reusability of schema registrations ([9ecb739](https://github.com/klerick/nestjs-json-api/commit/9ecb739))
+- **json-api-nestjs:** refactor query parameter schemas with Zod, improve Swagger definitions, and add reusable transformers ([70e955f](https://github.com/klerick/nestjs-json-api/commit/70e955f))
+- **json-api-nestjs:** add primary key handling for relations and improve query schema generation ([7caea1a](https://github.com/klerick/nestjs-json-api/commit/7caea1a))
+- **json-api-nestjs-shared,json-api-nestjs:** im did mistake in commit msg ([56c483a](https://github.com/klerick/nestjs-json-api/commit/56c483a))
+- **json-api-nestjs:** enhance ZodIncludeQuery with improved type definitions and utility functions ([c4a5856](https://github.com/klerick/nestjs-json-api/commit/c4a5856))
+- **json-api-nestjs:** add JsonApiResponseFrom decorator for reusing response schemas across methods ([f1f49c1](https://github.com/klerick/nestjs-json-api/commit/f1f49c1))
+- **json-api-nestjs:** replace `errorSchema` with `JsonApiErrorResponseModel`, update response schema handling across Swagger methods ([4e7f481](https://github.com/klerick/nestjs-json-api/commit/4e7f481))
+- **json-api-nestjs:** add support for excluding controllers during module initialization ([5e2de06](https://github.com/klerick/nestjs-json-api/commit/5e2de06))
+- **json-api-nestjs:** optimize and memoize Zod schema generation ([611da19](https://github.com/klerick/nestjs-json-api/commit/611da19))
+- **json-api-nestjs:** enhance Patch and Post schema handling, add utility for merging patch data and refine type definitions for attributes and relationships ([2887603](https://github.com/klerick/nestjs-json-api/commit/2887603))
+- **json-api-nestjs:** add read-only and immutable field decorators with validation schema updates and inheritance support ([fccf757](https://github.com/klerick/nestjs-json-api/commit/fccf757))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-typeorm:** add support for automatic resource linkage in to-one relations, update FK field detection and handling ([0dd670d](https://github.com/klerick/nestjs-json-api/commit/0dd670d))
+- **json-api-nestjs:** add hooks support and enhance guards handling with `afterCreateController` hook and guards logic - prepare for acl libs ([5059530](https://github.com/klerick/nestjs-json-api/commit/5059530))
+- **json-api-nestjs:** add `allowSetId` option for enhanced control over entity ID assignment during POST operations ([ce269ad](https://github.com/klerick/nestjs-json-api/commit/ce269ad))
+- **json-api-nestjs:** fix after update nx ([e51f07c](https://github.com/klerick/nestjs-json-api/commit/e51f07c))
+- **json-api-nestjs:** bump zod to v4 ([19888e9](https://github.com/klerick/nestjs-json-api/commit/19888e9))
+- **json-api-nestjs:** Add JSON_API_DECORATOR_ENTITY metadata to controller ([d2deb39](https://github.com/klerick/nestjs-json-api/commit/d2deb39))
+- **json-api-nestjs:** fix after update nx ([5d87f95](https://github.com/klerick/nestjs-json-api/commit/5d87f95))
+- **json-api-nestjs:** bump zod to v4 ([23709bd](https://github.com/klerick/nestjs-json-api/commit/23709bd))
+- **json-api-nestjs:** Export `Params` type in index.ts ([bd509a5](https://github.com/klerick/nestjs-json-api/commit/bd509a5))
+- **json-api-nestjs:** Update package.json dep ([87519a0](https://github.com/klerick/nestjs-json-api/commit/87519a0))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([77c7bf4](https://github.com/klerick/nestjs-json-api/commit/77c7bf4))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([42b6b82](https://github.com/klerick/nestjs-json-api/commit/42b6b82))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([4c559e2](https://github.com/klerick/nestjs-json-api/commit/4c559e2))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([b590802](https://github.com/klerick/nestjs-json-api/commit/b590802))
+- ⚠️  **json-api-nestjs:** remove module and refactoring ([f202ebc](https://github.com/klerick/nestjs-json-api/commit/f202ebc))
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** replace `id` with `lid` in atomic operation references for JSON:API compliance ([579ed01](https://github.com/klerick/nestjs-json-api/commit/579ed01))
+- **json-api-nestjs:** replace `tmpIds` with `lids` for improved clarity in atomic operation logic and related tests ([81e7da9](https://github.com/klerick/nestjs-json-api/commit/81e7da9))
+- **json-api-nestjs:** replace deprecated faker methods, enhance zod schemas with transformations and update constants with METHOD_NAME. change name for method function ([e382bce](https://github.com/klerick/nestjs-json-api/commit/e382bce))
+- **json-api-nestjs:** use ErrorFormatService for format error in AtomicOperationModule fix work with tmpId ([6d166ba](https://github.com/klerick/nestjs-json-api/commit/6d166ba))
+- **json-api-nestjs:** Some fix for swagger ([9a0f190](https://github.com/klerick/nestjs-json-api/commit/9a0f190))
+- **json-api-nestjs:** Use correct options for check is debug or not ([e52cc92](https://github.com/klerick/nestjs-json-api/commit/e52cc92))
+- **json-api-nestjs:** fix type in some place ([61f45e6](https://github.com/klerick/nestjs-json-api/commit/61f45e6))
+
+### ⚠️  Breaking Changes
+
+- **json-api-nestjs:** remove module and refactoring  ([f202ebc](https://github.com/klerick/nestjs-json-api/commit/f202ebc))
+  Change type signature, rename npm package
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.8
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 10.0.0-beta.18 (2026-02-16)
 
 ### 🚀 Features

@@ -1,3 +1,24 @@
+## 0.1.0-beta.22 (2026-08-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-microorm:** migrate to MikroORM 7 ([85b3855](https://github.com/klerick/nestjs-json-api/commit/85b3855))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm,json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk:** correct published manifests ([4078057](https://github.com/klerick/nestjs-json-api/commit/4078057))
+- add files the previous two commits left untracked ([889bf53](https://github.com/klerick/nestjs-json-api/commit/889bf53))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.8
+- Updated json-api-nestjs to 10.0.0
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 0.1.0-beta.21 (2026-02-16)
 
 ### 🧱 Updated Dependencies

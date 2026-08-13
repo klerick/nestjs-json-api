@@ -1,3 +1,20 @@
+## 2.2.0 (2026-08-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk,nestjs-json-rpc-sdk:** update TS config for module and resolution, extend Angular peerDependency range ([58fbd8b](https://github.com/klerick/nestjs-json-api/commit/58fbd8b))
+
+### 🩹 Fixes
+
+- **nestjs-json-rpc-sdk:** emit real CommonJS from the cjs build ([59d9fdc](https://github.com/klerick/nestjs-json-api/commit/59d9fdc))
+- **json-api-nestjs-microorm,json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk:** correct published manifests ([4078057](https://github.com/klerick/nestjs-json-api/commit/4078057))
+- **json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc-sdk:** emit spec-compliant ESM ([a962eeb](https://github.com/klerick/nestjs-json-api/commit/a962eeb))
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 2.2.0-beta.0 (2025-12-26)
 
 ### 🚀 Features

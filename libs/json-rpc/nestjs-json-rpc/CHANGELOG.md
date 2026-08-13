@@ -1,3 +1,14 @@
+## 1.1.1 (2026-08-13)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm,json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk:** correct published manifests ([4078057](https://github.com/klerick/nestjs-json-api/commit/4078057))
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 1.1.0 (2025-11-13)
 
 ### 🚀 Features

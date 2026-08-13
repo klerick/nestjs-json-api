@@ -1,3 +1,19 @@
+## 0.1.0-beta.17 (2026-08-13)
+
+### 🚀 Features
+
+- **json-api-nestjs-microorm:** migrate to MikroORM 7 ([85b3855](https://github.com/klerick/nestjs-json-api/commit/85b3855))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0-beta.8
+- Updated json-api-nestjs to 10.0.0
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 0.1.0-beta.16 (2026-02-16)
 
 ### 🧱 Updated Dependencies
