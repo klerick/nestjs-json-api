@@ -13,6 +13,9 @@ const config = defineConfig({
     allOrNothing: true,
     dropTables: true,
     snapshot: true,
+    // Pinned because the default is derived from dbName, which now carries the
+    // PGlite cluster path rather than a symbolic database name.
+    snapshotName: '.snapshot-mikroorm-database',
     emit: 'ts',
     generator: TSMigrationGenerator,
   },
