@@ -76,7 +76,6 @@ mjsJson.typesVersions = {
     ],
   },
 };
-delete mjsJson.type;
 delete mjsJson.dependencies;
 
 writeFileSync(`package.json`, JSON.stringify(mjsJson, null, 2));
@@ -100,3 +99,10 @@ try {
 try {
   unlinkSync(join('cjs', 'CHANGELOG.md'));
 } catch (e) {}
+
+// The root manifest stays CommonJS while the mjs directory declares itself as
+// ESM -- the same layout the other dual packages assemble in their build target.
+// Written after the cleanup above, which removes the manifest tsc emitted there.
+// Dropping "type" from the root instead left Node guessing at the module kind of
+// the mjs files: MODULE_TYPELESS_PACKAGE_JSON, then a reparse.
+writeFileSync(join('mjs', 'package.json'), JSON.stringify({ type: 'module' }));
