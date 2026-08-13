@@ -15,10 +15,7 @@ describe('rpc-ws-error-exception.filter', () => {
     let getClient: () => WebSocket;
 
     beforeAll(async () => {
-      WebSocketInst = new WebSocket(
-        'wss://demo.piesocket.com/v3/channel_123',
-        {}
-      );
+      WebSocketInst = new WebSocket('wss://echo.websocket.org', {});
 
       await new Promise((resolve) => {
         WebSocketInst.addEventListener('open', (event) => resolve(void 0));
