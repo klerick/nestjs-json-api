@@ -9,5 +9,8 @@
     "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }

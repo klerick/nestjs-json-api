@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { JsonApiSdkService } from '@klerick/json-api-nestjs-sdk';
 import { AtomicFactory } from '@klerick/json-api-nestjs-sdk/ngModule';
@@ -20,6 +20,7 @@ type RpcMap = {
   selector: 'nestjs-json-api-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 export class AppComponent implements OnInit {

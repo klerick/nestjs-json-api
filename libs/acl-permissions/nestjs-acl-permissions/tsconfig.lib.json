@@ -3,9 +3,7 @@
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "target": "es2023",
     "strictNullChecks": true,
     "noImplicitAny": true,
@@ -13,12 +11,9 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "src/**/*.test-d.ts"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*.test-d.ts"],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }

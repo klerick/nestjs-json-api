@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 
 
 @Component({
@@ -902,6 +902,7 @@ nx affected:e2e</pre>
     </div>
   `,
   styles: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class NxWelcomeComponent {}
