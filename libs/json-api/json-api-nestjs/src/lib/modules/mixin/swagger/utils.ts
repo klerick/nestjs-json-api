@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import type { SchemaObject, ReferenceObject } from './open-api-types';
 import {
   ObjectTyped,
   EntityClass,
@@ -12,7 +12,6 @@ import { EntityParam, TypeField } from '../../../types';
 import { EntityParamMapService } from '../service';
 import { toJSONSchema, ZodType } from 'zod';
 import { mapTransformFunctionToJsonShema } from '../zod';
-import { ReferenceObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import {
   zodFieldSelectRule,
 } from '../zod/zod-input-query-schema/fields';
