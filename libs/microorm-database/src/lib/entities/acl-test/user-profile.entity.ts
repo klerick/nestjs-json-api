@@ -1,7 +1,12 @@
-import { Entity, PrimaryKey, Property, OneToOne, Enum } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  OneToOne,
+  Enum,
+} from '@mikro-orm/decorators/legacy';
 import { UsersAcl, IUsersAcl } from './user.entity';
 import { truncateToSeconds } from '../../utils/date';
-
 
 export type IUserProfileAcl = UserProfileAcl;
 

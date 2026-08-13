@@ -10,19 +10,21 @@ import {
   EntityKey,
   EntityProperty,
   EntityRepository,
-  type QBFilterQuery,
-  QBQueryOrderMap,
   raw,
   ReferenceKind,
   EntityData,
   Collection,
+  QueryOrderMap,
+  type RawQueryFragment,
+  type EntityName,
 } from '@mikro-orm/core';
 import {
-  type Knex,
   SqlEntityManager,
   QueryBuilder,
   type Field,
-} from '@mikro-orm/knex';
+  type QBFilterQuery,
+  BasePostgreSqlPlatform,
+} from '@mikro-orm/sql';
 import {
   ASC,
   CURRENT_ENTITY,
@@ -52,6 +54,17 @@ export type ValidateReturn<T> = T extends unknown[]
   : T extends null
   ? null
   : string;
+
+/**
+ * Filter conditions arrive as runtime strings from the JSON:API query, so they
+ * are assembled key by key. `QBFilterQuery` is an intersection of a mapped type
+ * whose values are unions, and TypeScript cannot build such a type through
+ * computed keys. The accumulators below carry the shape while it is being
+ * filled; the result is asserted once, where the finished filter leaves the
+ * method that built it.
+ */
+type FilterAccumulator = Record<string, Record<string, unknown>>;
+type NestedFilterAccumulator = Record<string, FilterAccumulator>;
 
 type RelationshipsResult<E extends object> = {
   [K in RelationKeys<E>]: E[K] extends object
@@ -154,10 +167,10 @@ export class MicroOrmUtilService<
     return this.metadata.getPrimaryProp().name;
   }
 
-  get defaultOrder(): QBQueryOrderMap<E> {
+  get defaultOrder(): QueryOrderMap<E> {
     return {
       [this.currentPrimaryColumn]: ASC,
-    };
+    } as QueryOrderMap<E>;
   }
 
   getAliasForEntity<T = E>(entity: EntityClass<T>) {
@@ -197,13 +210,13 @@ export class MicroOrmUtilService<
   queryBuilder<T extends object = E>(
     entity: EntityClass<T>,
     alias: string
-  ): QueryBuilder<T, typeof alias>;
+  ): QueryBuilder<T, string>;
   queryBuilder<T extends object = E>(
     entity: EntityClass<T>
   ): QueryBuilder<T, string>;
   queryBuilder<T extends object = E>(
     alias: string
-  ): QueryBuilder<T, typeof alias>;
+  ): QueryBuilder<T, string>;
   queryBuilder<T extends object = E>(): QueryBuilder<T, string>;
   queryBuilder<T extends object = E>(
     ...arg:
@@ -212,29 +225,27 @@ export class MicroOrmUtilService<
       | [alias: string]
       | [undefined, undefined]
   ): QueryBuilder<T, string> {
-    let [entity, alias] = arg;
+    const [first, second] = arg;
 
-    if (entity && !alias) {
-      if (typeof entity === 'string') {
-        alias = entity;
-        entity = this.entity;
-      } else {
-        alias = this.getAliasForEntity(entity);
-      }
-    }
-    if (!entity) {
+    // The alias-only and no-argument overloads mean "the entity this service was
+    // built for", where T is E; the cast carries that across the overload split.
+    const current = this.entity as unknown as EntityClass<T>;
+
+    let target: EntityClass<T>;
+    let alias: string;
+
+    if (typeof first === 'string') {
+      target = current;
+      alias = first;
+    } else if (first) {
+      target = first;
+      alias = second ?? this.getAliasForEntity(first);
+    } else {
+      target = current;
       alias = this.currentAlias;
-      entity = this.entity;
     }
 
-    if (!entity || !alias) {
-      throw new Error('entity or alias not found');
-    }
-
-    return this.entityManager.createQueryBuilder<T, typeof alias>(
-      entity,
-      alias
-    );
+    return this.entityManager.createQueryBuilder<T, string>(target, alias);
   }
 
   getFilterExpressionForTarget<T extends object = E>(
@@ -249,7 +260,7 @@ export class MicroOrmUtilService<
       const tmpField = fieldName as unknown as EntityKey<E, false>;
 
       if (filter === undefined) continue;
-      const filterObject: QBFilterQuery<T> = {
+      const filterObject: FilterAccumulator = {
         [tmpField]: {},
       };
       let subQueryExpression: QBFilterQuery<T> | undefined;
@@ -295,7 +306,11 @@ export class MicroOrmUtilService<
         }
       }
 
-      result.push(subQueryExpression ? subQueryExpression : filterObject);
+      result.push(
+        subQueryExpression
+          ? subQueryExpression
+          : (filterObject as QBFilterQuery<T>)
+      );
     }
 
     return result;
@@ -304,7 +319,7 @@ export class MicroOrmUtilService<
   getConditionalForJoin<T extends object = E>(
     query: Query<T, IdKey>,
     key: string
-  ): QBFilterQuery {
+  ): QBFilterQuery<T> {
     const filterRelation = this.getFilterObject(query, 'relation');
 
     if (!filterRelation) return {};
@@ -320,13 +335,16 @@ export class MicroOrmUtilService<
         reletionConditional
       )) {
         if (!conditional) continue;
-        return Object.entries(conditional).reduce((acum, [operand, value]) => {
-          acum[field.toString()] = {
-            ...(acum[field.toString()] || {}),
-            [this.extractedResultOperand(operand as FilterOperand)]: value,
-          };
-          return acum;
-        }, {} as QBFilterQuery);
+        return Object.entries(conditional).reduce<FilterAccumulator>(
+          (acum, [operand, value]) => {
+            acum[field.toString()] = {
+              ...(acum[field.toString()] || {}),
+              [this.extractedResultOperand(operand as FilterOperand)]: value,
+            };
+            return acum;
+          },
+          {}
+        ) as QBFilterQuery<T>;
       }
     }
 
@@ -334,10 +352,13 @@ export class MicroOrmUtilService<
   }
 
   private extractedResultOperand(operand: FilterOperand) {
+    // Case-insensitive LIKE is a PostgreSQL feature. The platform is asked
+    // rather than the driver's class name: the name differs between drivers
+    // speaking the same dialect (PostgreSqlDriver, PgliteDriver), and a rename
+    // would silently turn $ilike back into a case-sensitive $like.
     if (
       operand === FilterOperand.like &&
-      (this.entityManager.getDriver().constructor.name === 'PostgreSqlDriver' ||
-        this.entityManager.getDriver().constructor.name === 'PGliteDriver')
+      this.entityManager.getPlatform() instanceof BasePostgreSqlPlatform
     ) {
       return '$ilike';
     }
@@ -364,7 +385,7 @@ export class MicroOrmUtilService<
       const relationProps = this.getRelation(fieldName);
       if (!propsFilter) continue;
       if (!this.relationsName.includes(fieldName)) continue;
-      const filterObject: QBFilterQuery<T> = {
+      const filterObject: NestedFilterAccumulator = {
         [relationField]: {},
       };
       let subQueryExpression:
@@ -407,7 +428,7 @@ export class MicroOrmUtilService<
                             [this.extractedResultOperand(operand)]: value,
                           },
                         };
-                  subQueryExpression.where(expression, '$and');
+                  subQueryExpression.where(this.asFilter(expression), '$and');
                 }
               }
               break;
@@ -425,21 +446,57 @@ export class MicroOrmUtilService<
         result.push(raw(resultQuery));
         subQueryExpression = undefined;
       } else {
-        result.push(filterObject);
+        result.push(filterObject as QBFilterQuery<T>);
       }
     }
 
     return result;
   }
 
-  getKnex(): Knex<E, E[]> {
-    return this.entityManager.getKnex();
+  /**
+   * MikroORM 7 narrowed `EntityName` to classes and schemas -- a plain string
+   * entity name no longer satisfies the typed API, although the ORM still
+   * resolves one at runtime. Pivot tables and relation targets are only known
+   * to this service as names read from metadata, so they cross the boundary
+   * here rather than through casts scattered over the call sites.
+   */
+  private byName<T extends object = E>(name: string): EntityName<T> {
+    return name as unknown as EntityName<T>;
+  }
+
+  /**
+   * A one-off filter whose keys are computed at runtime. See the note on
+   * `FilterAccumulator` -- such an object cannot be built as `QBFilterQuery`
+   * directly, so it is asserted where it is handed to the query builder.
+   */
+  private asFilter<T extends object = E>(
+    condition: Record<string, unknown>
+  ): QBFilterQuery<T> {
+    return condition as QBFilterQuery<T>;
+  }
+
+  /**
+   * A `alias.relation` path assembled from runtime JSON:API input. v7 types
+   * these as literal unions derived from the entity; the parts are only known
+   * at runtime, so the path is asserted once, here.
+   */
+  private joinPath(alias: string, relation: string): never {
+    return `${alias}.${relation}` as never;
+  }
+
+  /**
+   * Quoted reference to a column of an aliased table, for correlated subqueries.
+   * Replaces knex's `.ref()`, which is gone in MikroORM 7 -- kysely took knex's
+   * place. `??` placeholders are quoted per dialect by the ORM itself.
+   */
+  columnRef(alias: string, column: string): RawQueryFragment {
+    return raw('??.??', [alias, column]);
   }
 
   prePareQueryBuilder(
-    queryBuilder: QueryBuilder<E>,
+    queryBuilder: QueryBuilder<E, string>,
     query: Query<E, IdKey> | QueryOne<E, IdKey>
-  ): QueryBuilder<E> {
+  ): QueryBuilder<E, string> {
     const { fields, include } = query;
     const relationFields: Record<string, []> = {};
 
@@ -465,7 +522,7 @@ export class MicroOrmUtilService<
       const relationAlias = this.getAliasForEntity(relationEntity);
       const mainAlias = this.currentAlias;
 
-      const condition: QBFilterQuery = this.getConditionalForJoin(
+      const condition = this.getConditionalForJoin(
         query as Query<E, IdKey>,
         item
       );
@@ -481,10 +538,10 @@ export class MicroOrmUtilService<
       }
 
       queryBuilder.leftJoinAndSelect(
-        `${mainAlias}.${item}`,
+        this.joinPath(mainAlias, item),
         `${relationAlias}__${item}`,
-        condition,
-        selectJoin
+        this.asFilter(condition as Record<string, unknown>),
+        selectJoin as never
       );
     }
     return queryBuilder;
@@ -530,21 +587,21 @@ export class MicroOrmUtilService<
       throw new Error('expressionColumnName not found');
 
     return this.entityManager
-      .createQueryBuilder(pivotTableName, pivotTableName)
+      .createQueryBuilder(this.byName(pivotTableName), pivotTableName)
       .select(raw('1'))
-      .from(pivotTableName)
-      .where({
-        [filedCheck]: this.entityManager
-          .getKnex()
-          .ref(`${this.currentAlias}.${expressionColumnName}`),
-      });
+      .from(this.byName(pivotTableName))
+      .where(
+        this.asFilter({
+          [filedCheck]: this.columnRef(this.currentAlias, expressionColumnName),
+        })
+      );
   }
 
   private getInverseFieldForManyToMany(propsName: EntityKey<E, false>) {
     const relation = this.getRelation(propsName);
     const pivotTableName = this.getAliasForPivotTable<E>(propsName);
 
-    const pivotMetaData = this.entityManager.getMetadata().get(pivotTableName);
+    const pivotMetaData = this.entityManager.getMetadata().get(this.byName(pivotTableName));
 
     const props = pivotMetaData.props.find(
       (prop) =>
@@ -650,7 +707,7 @@ export class MicroOrmUtilService<
         }
       }
     }
-    await this.entityManager.persistAndFlush(targetInstance);
+    await this.entityManager.persist(targetInstance).flush();
 
     return targetInstance;
   }
@@ -688,7 +745,7 @@ export class MicroOrmUtilService<
       }
     }
 
-    await this.entityManager.persistAndFlush(targetInstance);
+    await this.entityManager.persist(targetInstance).flush();
 
     return targetInstance;
   }
@@ -821,11 +878,13 @@ export class MicroOrmUtilService<
     }
 
     const checkResult = await this.queryBuilder(relationEntity as any)
-      .where({
-        [this.getPrimaryNameFor(rel)]: {
-          $in: prepareData.map((i) => i.id),
-        },
-      })
+      .where(
+        this.asFilter({
+          [this.getPrimaryNameFor(rel)]: {
+            $in: prepareData.map((i) => i.id),
+          },
+        })
+      )
       .getResult();
 
     if (checkResult.length === prepareData.length) {

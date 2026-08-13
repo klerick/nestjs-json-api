@@ -1,11 +1,11 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   ManyToOne,
   ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { UsersAcl, IUsersAcl } from './user.entity';
 import { PostAcl } from './post.entity';
 import { truncateToSeconds } from '../../utils/date';

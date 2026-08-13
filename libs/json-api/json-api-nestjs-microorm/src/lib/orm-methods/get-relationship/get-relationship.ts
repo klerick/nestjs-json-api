@@ -1,3 +1,4 @@
+import { asFilter, joinPath } from '../../runtime-query';
 import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 import { NotFoundException } from '@nestjs/common';
 import { ValidateQueryError } from '@klerick/json-api-nestjs';
@@ -13,14 +14,14 @@ export async function getRelationship<
   const result = await this.microOrmUtilService
     .queryBuilder()
     .leftJoinAndSelect(
-      `${this.microOrmUtilService.currentAlias}.${rel.toString()}`,
+      joinPath(this.microOrmUtilService.currentAlias, rel.toString()),
       rel.toString(),
       {},
-      [this.microOrmUtilService.getPrimaryNameFor(rel as any)]
+      [this.microOrmUtilService.getPrimaryNameFor(rel as any)] as never
     )
-    .where({
-      [this.microOrmUtilService.currentPrimaryColumn]: id,
-    })
+    .where(
+      asFilter({ [this.microOrmUtilService.currentPrimaryColumn]: id })
+    )
     .getSingleResult();
 
   if (!result) {

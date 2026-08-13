@@ -1,10 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
   PrimaryKey,
   OneToMany,
   Entity,
   Property,
-  Collection,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 import { Users } from './index';
 

@@ -1,11 +1,11 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   OneToOne,
-  Collection,
   OneToMany,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 
 //
 import { IUserProfileAcl, UserProfileAcl } from './user-profile.entity';

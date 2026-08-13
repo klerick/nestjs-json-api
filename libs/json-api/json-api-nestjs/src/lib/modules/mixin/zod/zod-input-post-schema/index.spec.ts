@@ -89,7 +89,8 @@ describe('zodPost', () => {
     };
     const checkResult3 = {
       data: {
-        id: '1',
+        // sent as a string per the spec, parsed into the primary-key type
+        id: 1,
         type: 'users',
         attributes: {
           ...attributes,

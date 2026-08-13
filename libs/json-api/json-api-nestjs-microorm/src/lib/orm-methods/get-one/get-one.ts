@@ -1,3 +1,4 @@
+import { asFilter } from '../../runtime-query';
 import { NotFoundException } from '@nestjs/common';
 import { QueryOne, ValidateQueryError } from '@klerick/json-api-nestjs';
 import { wrap } from '@mikro-orm/core';
@@ -26,9 +27,8 @@ export async function getOne<E extends object, IdKey extends string>(
       { populate: (include || []) as any }
     );
   } else {
-    const queryBuilder = this.microOrmUtilService.queryBuilder().where({
-      [primaryColumn]: id,
-    });
+    const queryBuilder = this.microOrmUtilService.queryBuilder()
+      .where(asFilter({ [primaryColumn]: id }));
 
     const resultQueryBuilder = this.microOrmUtilService.prePareQueryBuilder(
       queryBuilder,
@@ -36,7 +36,9 @@ export async function getOne<E extends object, IdKey extends string>(
     );
 
     if (additionalQueryParams) {
-      resultQueryBuilder.andWhere(additionalQueryParams);
+      resultQueryBuilder.andWhere(
+        asFilter(additionalQueryParams as Record<string, unknown>)
+      );
     }
 
     await resultQueryBuilder.applyFilters();

@@ -40,10 +40,14 @@ import {
   MAP_CONTROLLER_INTERCEPTORS,
 } from '../constants';
 import { IterateFactory } from '../factory';
-import { TypeFromType, ValidateQueryError } from '../../../types';
+import { TypeForId, TypeFromType, ValidateQueryError } from '../../../types';
 import { RunInTransaction } from '../../mixin/types';
-import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
-import { ErrorFormatService } from '../../mixin/service';
+import {
+  CURRENT_ENTITY,
+  RUN_IN_TRANSACTION_FUNCTION,
+} from '../../../constants';
+import { EntityParamMapService, ErrorFormatService } from '../../mixin/service';
+import { zodPrimaryKeyId } from '../../mixin/zod/zod-share';
 
 export function isZodError(
   param: string | unknown
@@ -153,7 +157,10 @@ export class ExecuteService {
               !Array.isArray(param) &&
               'attributes' in param
             ) {
-              param['id'] = `${currentLid}`;
+              param['id'] = this.castLidToPrimaryKey(
+                currentLid,
+                currentParams.module
+              );
               break;
             }
           }
@@ -422,6 +429,50 @@ export class ExecuteService {
       );
     }
     return modifiedParams;
+  }
+
+  /**
+   * A lid becomes the id of the resource being created. The operation body is
+   * already validated by the controller's pipes, but the lid is written in
+   * after them, so it is converted here with the very schema the post pipe uses
+   * for an id. The primary-key type comes from the same module the controller
+   * lives in, alongside the pipes resolved just below.
+   */
+  private castLidToPrimaryKey(lid: string | number, module: Module) {
+    // The param map is looked up by the entity of this very operation rather
+    // than through the service's own `entityParaMap`: that one is bound to the
+    // CURRENT_ENTITY of whichever module the instance came from, which is not
+    // necessarily this one.
+    const entity = this.getCurrentEntity(module);
+    const { primaryColumnType } =
+      this.getEntityParamMapService(module).getParamMap(entity);
+
+    return zodPrimaryKeyId(primaryColumnType as TypeForId).parse(`${lid}`);
+  }
+
+  private getCurrentEntity(module: Module) {
+    const instanceWrapper =
+      module.getProviderByKey<TypeFromType<object>>(CURRENT_ENTITY);
+
+    if (!instanceWrapper) {
+      throw new InternalServerErrorException(
+        'Current entity is not available for the operation module'
+      );
+    }
+
+    return instanceWrapper.instance;
+  }
+
+  private getEntityParamMapService(module: Module) {
+    const instanceWrapper = module.getProviderByKey<
+      EntityParamMapService<object, string>
+    >(EntityParamMapService);
+
+    if (!instanceWrapper) {
+      return this.moduleRef.get(EntityParamMapService, { strict: false });
+    }
+
+    return instanceWrapper.instance;
   }
 
   private getPipeInstance(

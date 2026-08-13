@@ -1,6 +1,6 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 
-export type IContextTestAcl = ContextTestAcl
+export type IContextTestAcl = ContextTestAcl;
 
 @Entity({
   tableName: 'acl_context_test',
@@ -15,16 +15,12 @@ export class ContextTestAcl {
     nullable: false,
     default: '{}',
   })
-  aclRules!: {rules: Record<string, unknown>[]}
+  aclRules!: { rules: Record<string, unknown>[] };
 
   @Property({
     type: 'json',
     nullable: false,
     default: '{}',
   })
-  context!: Record<string, unknown>
+  context!: Record<string, unknown>;
 }
-
-
-
-

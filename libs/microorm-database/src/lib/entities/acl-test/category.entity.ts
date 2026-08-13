@@ -1,11 +1,11 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   PrimaryKey,
   Property,
   ManyToOne,
   OneToMany,
-  Collection,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { truncateToSeconds } from '../../utils/date';
 
 export type ICategoryAcl = CategoryAcl;

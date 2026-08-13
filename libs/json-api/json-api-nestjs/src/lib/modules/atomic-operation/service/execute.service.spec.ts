@@ -17,9 +17,25 @@ import {
 } from '@nestjs/common';
 import { ParamsForExecute } from '../types';
 import { AsyncLocalStorage } from 'async_hooks';
-import { RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import { CURRENT_ENTITY, RUN_IN_TRANSACTION_FUNCTION } from '../../../constants';
+import { TypeField } from '../../../types';
 import { Mock } from 'vitest';
 import { ErrorFormatService } from '../../mixin/service';
+
+class BookEntityMock {}
+
+/**
+ * Stands in for the per-entity MixinModule the controller of an operation lives
+ * in. It carries CURRENT_ENTITY and EntityParamMapService, which is where the
+ * executor reads the primary-key type from when it converts a lid into an id.
+ */
+const moduleWithEntity = (primaryColumnType: TypeField = TypeField.string) =>
+  ({
+    getProviderByKey: (token: unknown) =>
+      token === CURRENT_ENTITY
+        ? { instance: BookEntityMock }
+        : { instance: { getParamMap: () => ({ primaryColumnType }) } },
+  } as unknown as ParamsForExecute['module']);
 
 describe('ExecuteService', () => {
   let service: ExecuteService;
@@ -189,17 +205,17 @@ describe('ExecuteService', () => {
         {
           controller: { name: 'BookController' },
           methodName: 'postOne', // add operation - должна получить lids[0]
-          module: {}
+          module: moduleWithEntity()
         },
         {
           controller: { name: 'UserController' },
           methodName: 'patchOne', // update operation - не должна получить lid
-          module: {}
+          module: moduleWithEntity()
         },
         {
           controller: { name: 'BookController' },
           methodName: 'postOne', // add operation - должна получить lids[1]
-          module: {}
+          module: moduleWithEntity()
         },
       ] as unknown as ParamsForExecute[];
 

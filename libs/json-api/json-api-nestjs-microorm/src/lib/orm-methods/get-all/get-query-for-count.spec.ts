@@ -66,7 +66,7 @@ describe('get-query-for-count', () => {
     >(microOrmServiceUser, ...[query]);
 
     expect(result.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" left join "public"."users_have_roles" as "u2" on "Users"."id" = "u2"."user_id" left join "public"."roles" as "u1" on "u2"."role_id" = "u1"."id" order by "Users"."id" asc, "Users"."last_name" desc, "Users"."user_groups_id" asc, "u1"."name" desc`
+      `select "Users".* from "users" as "Users" left join "users_have_roles" as "u2" on "Users"."id" = "u2"."user_id" left join "roles" as "u1" on "u2"."role_id" = "u1"."id" order by "Users"."id" asc, "Users"."last_name" desc, "Users"."user_groups_id" asc, "u1"."name" desc`
     );
   });
 
@@ -168,7 +168,7 @@ describe('get-query-for-count', () => {
     >(microOrmServiceUser, ...[query]);
 
     expect(result.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and "Users"."test_real" && '{test}' order by "Users"."id" asc`
+      `select "Users".* from "users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and "Users"."test_real" && '{test}' order by "Users"."id" asc`
     );
 
     const result1 = getQueryForCount.call<
@@ -178,7 +178,7 @@ describe('get-query-for-count', () => {
     >(microOrmServiceUser, ...[query1]);
 
     expect(result1.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and (exists (select 1 from "public"."comments" as "Comments" where "Comments"."created_by" = "Users"."id" and "Comments"."kind" = 'COMMENT')) and (exists (select 1 from "public"."user_groups" as "UserGroups" where "UserGroups"."id" = "Users"."user_groups_id" and "UserGroups"."label" = 'test')) order by "Users"."id" asc`
+      `select "Users".* from "users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and (exists (select 1 from "comments" as "Comments" where "Comments"."created_by" = "Users"."id" and "Comments"."kind" = 'COMMENT')) and (exists (select 1 from "user_groups" as "UserGroups" where "UserGroups"."id" = "Users"."user_groups_id" and "UserGroups"."label" = 'test')) order by "Users"."id" asc`
     );
 
     const result2 = getQueryForCount.call<
@@ -187,7 +187,7 @@ describe('get-query-for-count', () => {
       ReturnType<typeof getQueryForCount<Users, 'id'>>
     >(microOrmServiceUser, ...[query2]);
     expect(result2.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" left join "public"."users" as "u1" on "Users"."manager_id" = "u1"."id" left join "public"."addresses" as "a2" on "Users"."addresses_id" = "a2"."id" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and "u1"."login" = 'test' and "a2"."city" = 'test' order by "Users"."id" asc`
+      `select "Users".* from "users" as "Users" left join "users" as "u1" on "Users"."manager_id" = "u1"."id" left join "addresses" as "a2" on "Users"."addresses_id" = "a2"."id" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and "u1"."login" = 'test' and "a2"."city" = 'test' order by "Users"."id" asc`
     );
 
     const result3 = getQueryForCount.call<
@@ -196,7 +196,7 @@ describe('get-query-for-count', () => {
       ReturnType<typeof getQueryForCount<Users, 'id'>>
     >(microOrmServiceUser, ...[query3]);
     expect(result3.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and (exists (select 1 from "public"."users_have_roles" as "users_have_roles" left join "public"."roles" as "r1" on "users_have_roles"."role_id" = "r1"."id" where "users_have_roles"."user_id" = "Users"."id" and "r1"."key" = 'test' and "r1"."key" != 'test2' and "r1"."is_default" = 'false')) order by "Users"."id" asc`
+      `select "Users".* from "users" as "Users" where "Users"."login" = 'test' and "Users"."login" != 'test2' and "Users"."is_active" = 'false' and (exists (select 1 from "users_have_roles" as "users_have_roles" inner join "roles" as "r1" on "users_have_roles"."role_id" = "r1"."id" where "users_have_roles"."user_id" = "Users"."id" and "r1"."key" = 'test' and "r1"."key" != 'test2' and "r1"."is_default" = 'false')) order by "Users"."id" asc`
     );
   });
 
@@ -234,7 +234,7 @@ describe('get-query-for-count', () => {
       ReturnType<typeof getQueryForCount<Users, 'id'>>
     >(microOrmServiceUser, ...[query1]);
     expect(result1.getFormattedQuery()).toBe(
-      `select "Users".* from "public"."users" as "Users" left join "public"."users_have_roles" as "u2" on "Users"."id" = "u2"."user_id" left join "public"."roles" as "u1" on "u2"."role_id" = "u1"."id" where "u1"."key" = 'test' and "u1"."key" != 'test2' and "u1"."is_default" = 'false' order by "Users"."id" asc, "Users"."last_name" desc, "Users"."user_groups_id" asc, "u1"."name" desc`
+      `select "Users".* from "users" as "Users" left join "users_have_roles" as "u2" on "Users"."id" = "u2"."user_id" left join "roles" as "u1" on "u2"."role_id" = "u1"."id" where "u1"."key" = 'test' and "u1"."key" != 'test2' and "u1"."is_default" = 'false' order by "Users"."id" asc, "Users"."last_name" desc, "Users"."user_groups_id" asc, "u1"."name" desc`
     );
   });
 });

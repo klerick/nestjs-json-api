@@ -25,7 +25,11 @@ export async function patchOne<E extends object, IdKey extends string>(
     throw new UnprocessableEntityException([error]);
   }
 
-  const relationshipsPropsArray = Object.keys(relationships || {}) as unknown as Populate<E, string>;
+  // Relationship names come from the request body, so they cannot be narrowed
+  // to the literal union v7 derives from the entity.
+  const relationshipsPropsArray = Object.keys(
+    relationships || {}
+  ) as never;
   const existEntity = await this.microOrmUtilService.entityManager.findOne(
     this.microOrmUtilService.entity,
     {
