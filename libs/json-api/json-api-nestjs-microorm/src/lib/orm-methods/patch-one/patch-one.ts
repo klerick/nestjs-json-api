@@ -6,7 +6,7 @@ import { ObjectTyped } from '@klerick/json-api-nestjs-shared';
 import { PatchData, ValidateQueryError } from '@klerick/json-api-nestjs';
 import { MicroOrmService } from '../../service';
 import { FilterQuery } from '@mikro-orm/core';
-import { Populate } from '@mikro-orm/core/typings';
+import { Populate } from '@mikro-orm/core';
 
 export async function patchOne<E extends object, IdKey extends string>(
   this: MicroOrmService<E, IdKey>,

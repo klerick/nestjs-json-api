@@ -6,7 +6,7 @@
     "types": ["node"],
     "target": "es2021",
     "module": "commonjs",
-    "moduleResolution": "node10",
+    "moduleResolution": "bundler",
     "noCheck": true
   },
   "include": ["src/**/*.ts"],
