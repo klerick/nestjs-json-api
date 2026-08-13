@@ -79,7 +79,7 @@
     "tslib": "^2.3.0",
     "typeorm": "^0.3.20",
     "uuid": "^10.0.0",
-    "zod": "4.1.13",
+    "zod": "^4.4.3",
     "zod-validation-error": "^4.0.2",
     "zone.js": "0.16.2"
   },
