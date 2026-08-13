@@ -23,7 +23,11 @@ export async function initMikroOrm(testDbName: string) {
 
   const orm = await MikroORM.init<PostgreSqlDriver>({
     highlighter: new SqlHighlighter(),
-    driver: PGliteDriver,
+    // PGliteDriver is a drop-in for PostgreSqlDriver at runtime, but
+    // mikro-orm-pglite is built against @mikro-orm/postgresql ^6.5.6 while this
+    // workspace overrides it to 6.4.x, so their driver types no longer line up.
+    // moduleResolution: bundler made those types visible for the first time.
+    driver: PGliteDriver as unknown as typeof PostgreSqlDriver,
     dbName: testDbName,
     driverOptions: {
       connection: {
