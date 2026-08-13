@@ -8,7 +8,10 @@ import { join } from 'node:path';
 export async function setup() {
   // Start services that that the app needs to run (e.g. database, docker-compose, etc.).
 
-  const isNxRuner = !!process.env.NX_INVOKED_BY_RUNNER;
+  // NX_TASK_TARGET_TARGET is set by the Nx task runner itself and is absent
+  // when the suite is started straight from an IDE. Nx Cloud used to expose
+  // NX_INVOKED_BY_RUNNER for this, but it no longer reaches the task process.
+  const isNxRuner = !!process.env.NX_TASK_TARGET_TARGET;
 
   logger.info('\nSetting up...\n');
   if (isNxRuner) {
@@ -79,7 +82,7 @@ export async function setup() {
 export async function teardown() {
   const server = Reflect.get(globalThis, '__SERVER_PROCESS__');
   const serverPid = Reflect.get(globalThis, '__SERVER_PID__');
-  const isNxRuner = !!process.env.NX_INVOKED_BY_RUNNER;
+  const isNxRuner = !!process.env.NX_TASK_TARGET_TARGET;
   if (isNxRuner) {
     // @ts-ignore
     if (server && server instanceof ChildProcess && serverPid) {

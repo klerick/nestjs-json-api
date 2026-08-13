@@ -19,7 +19,7 @@
       "vitest"
     ],
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "include": [
     "vite.config.ts",
@@ -28,6 +28,6 @@
     "vitest.config.mts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/*.d.ts",
+    "src/**/*.d.ts"
   ]
 }

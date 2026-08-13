@@ -19,7 +19,7 @@
       "vitest"
     ],
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "include": [
     "vite.config.ts",
