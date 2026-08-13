@@ -2,7 +2,7 @@
   "name": "@klerick/nestjs-json-rpc-sdk",
   "version": "2.2.0-beta.0",
   "engines": {
-    "node": ">= 16.0.0"
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },
   "description": "Client for RPS server, which use @klerick/nestjs-json-rpc",
   "contributors": [
@@ -28,9 +28,10 @@
     "JSON-RPC"
   ],
   "peerDependencies": {
-    "@angular/common": "^19.0.0 || ^20.0.0 || ^21.0.0",
-    "@angular/core": "^19.0.0 || ^20.0.0 || ^21.0.0",
+    "@angular/common": "^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular/core": "^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0",
     "axios": "^1.1.0",
     "socket.io-client": "^4.7.0"
-  }
+  },
+  "type": "commonjs"
 }

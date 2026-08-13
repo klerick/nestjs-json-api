@@ -18,5 +18,15 @@
   "type": "commonjs",
   "main": "./cjs/src/index.js",
   "types": "./cjs/src/index.d.ts",
-  "module": "./mjs/src/index.js"
+  "module": "./mjs/src/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./mjs/src/index.d.ts",
+      "node": "./cjs/src/index.js",
+      "require": "./cjs/src/index.js",
+      "module": "./mjs/src/index.js",
+      "default": "./mjs/src/index.js"
+    }
+  }
 }
