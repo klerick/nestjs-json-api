@@ -6,8 +6,8 @@ import {
 } from '@klerick/json-api-nestjs-shared';
 import { map } from 'rxjs/operators';
 
-import { GenerateAtomicBody } from '../utils';
-import { JsonApiUtilsService } from './json-api-utils.service';
+import { GenerateAtomicBody } from '../utils/index.js';
+import { JsonApiUtilsService } from './json-api-utils.service.js';
 
 import {
   AtomicBody,
@@ -16,7 +16,7 @@ import {
   JsonApiSdkConfig,
   ReturnIfArray,
   AtomicVoidOperation,
-} from '../types';
+} from '../types/index.js';
 
 type GetTypeBody<T extends unknown[]> = {
   [K in keyof T[number]]: GenerateAtomicBody<T>;

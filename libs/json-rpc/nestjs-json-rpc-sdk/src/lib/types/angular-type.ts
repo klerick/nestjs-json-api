@@ -4,8 +4,8 @@ import {
   RpcNativeSocketFalse,
   RpcNativeSocketTrue,
   TransportType,
-} from './config';
-import { RpcReturnList } from './rpc';
+} from './config.js';
+import { RpcReturnList } from './rpc.js';
 
 type RpcWsMainConfig = {
   transport: TransportType.WS;

@@ -7,7 +7,7 @@ import {
   PayloadRpc,
   ReturnTransportCall,
   RpcResult,
-} from '../types';
+} from '../types/index.js';
 import { map } from 'rxjs/operators';
 
 export function axiosTransportFactory<T extends LoopFunc>(

@@ -1,6 +1,6 @@
-import { RpcConfig, RpcReturnList, RpcBatch, RpcBatchPromise } from '../types';
-import { transportFactory } from './transport.factory';
-import { RpcBatchFactory, rpcProxy, RpcBatchFactoryPromise } from '../utils';
+import { RpcConfig, RpcReturnList, RpcBatch, RpcBatchPromise } from '../types/index.js';
+import { transportFactory } from './transport.factory.js';
+import { RpcBatchFactory, rpcProxy, RpcBatchFactoryPromise } from '../utils/index.js';
 
 export type ResultRpcFactory<T extends object> = {
   rpc: RpcReturnList<T, false>;

@@ -5,7 +5,7 @@ import {
   TypeOfArray,
 } from '@klerick/json-api-nestjs-shared';
 
-import { Operands, OperandsRelation } from './filter-operand';
+import { Operands, OperandsRelation } from './filter-operand.js';
 export type SortType = 'ASC' | 'DESC';
 
 export type Includes<T> = RelationKeys<T>[];

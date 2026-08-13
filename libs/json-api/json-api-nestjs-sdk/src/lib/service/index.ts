@@ -1,3 +1,3 @@
-export * from './json-api-utils.service';
-export * from './atomic-operations.service';
-export * from './json-api-sdk.service';
+export * from './json-api-utils.service.js';
+export * from './atomic-operations.service.js';
+export * from './json-api-sdk.service.js';

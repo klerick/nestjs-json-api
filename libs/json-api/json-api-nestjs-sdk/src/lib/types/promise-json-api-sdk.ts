@@ -1,9 +1,9 @@
 import { EntityClass, RelationKeys } from '@klerick/json-api-nestjs-shared';
 
-import { QueryParams, QueryParamsForOneItem } from './query-params';
-import { EntityArray } from '../utils';
-import { ReturnIfArray } from './utils';
-import { PromiseEntityChain } from './entity-chain';
+import { QueryParams, QueryParamsForOneItem } from './query-params.js';
+import { EntityArray } from '../utils/index.js';
+import { ReturnIfArray } from './utils.js';
+import { PromiseEntityChain } from './entity-chain.js';
 
 /**
  * JsonApiSdkService with Promise return types

@@ -1,5 +1,5 @@
 import { fromFetch } from 'rxjs/fetch';
-import { LoopFunc, PayloadRpc, RpcResult, Transport } from '../types';
+import { LoopFunc, PayloadRpc, RpcResult, Transport } from '../types/index.js';
 
 export function fetchTransportFactory<T extends LoopFunc>(
   url: string

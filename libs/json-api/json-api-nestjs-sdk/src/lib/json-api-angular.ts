@@ -1,13 +1,13 @@
 import { inject, makeEnvironmentProviders } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { HttpInnerClient, JsonSdkConfig } from './types';
-import { AtomicFactory, JSON_API_SDK_CONFIG } from './token';
-import { resultConfig } from './utils';
+import { HttpInnerClient, JsonSdkConfig } from './types/index.js';
+import { AtomicFactory, JSON_API_SDK_CONFIG } from './token/index.js';
+import { resultConfig } from './utils/index.js';
 import {
   JsonApiUtilsService,
   JsonApiSdkService,
   AtomicOperationsService,
-} from './service';
+} from './service/index.js';
 
 export type JsonSdkConfigFactory = () => JsonSdkConfig;
 export type JsonSdkConfigOrFactory = JsonSdkConfig | JsonSdkConfigFactory;
@@ -57,4 +57,4 @@ export const getProviders = (configOrFactory: JsonSdkConfigOrFactory) => [
 export const provideJsonApi = (configOrFactory: JsonSdkConfigOrFactory) =>
   makeEnvironmentProviders(getProviders(configOrFactory));
 
-export { AtomicFactory, JSON_API_SDK_CONFIG } from './token';
+export { AtomicFactory, JSON_API_SDK_CONFIG } from './token/index.js';

@@ -15,10 +15,10 @@ import {
   QueryParams,
   Relationships,
   ReturnIfArray,
-} from '../types';
+} from '../types/index.js';
 
-import { getTypeForReq, HttpParams, isRelation, isNullRef, isEmptyArrayRef } from '../utils';
-import { ID_KEY } from '../constants';
+import { getTypeForReq, HttpParams, isRelation, isNullRef, isEmptyArrayRef } from '../utils/index.js';
+import { ID_KEY } from '../constants/index.js';
 
 type Attributes<E extends object> = BaseAttribute<E>['attributes'];
 type RelationData = MainData;

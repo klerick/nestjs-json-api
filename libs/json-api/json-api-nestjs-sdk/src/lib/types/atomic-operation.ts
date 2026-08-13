@@ -1,7 +1,7 @@
 import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 import { Observable } from 'rxjs';
 
-import { ReturnIfArray } from './utils';
+import { ReturnIfArray } from './utils.js';
 
 export interface AtomicRunGeneral<T extends unknown[]> {
   run(): Observable<T>;

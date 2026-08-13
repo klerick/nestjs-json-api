@@ -15,8 +15,8 @@ import {
   PatchData,
   PostData,
   RelationBodyData,
-} from '../types';
-import { ParamObject } from './http-params';
+} from '../types/index.js';
+import { ParamObject } from './http-params.js';
 
 class AxiosHttpClient implements HttpInnerClient {
   constructor(private axios: AxiosStatic | AxiosInstance) {}

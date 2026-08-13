@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
-import { RpcErrorObject } from './rpc-error-object';
-import { LoopFunc, ReturnGenericType } from './utils';
+import { RpcErrorObject } from './rpc-error-object.js';
+import { LoopFunc, ReturnGenericType } from './utils.js';
 
 export type JsonRpcVersion = '2.0';
 

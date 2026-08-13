@@ -1,8 +1,8 @@
 import { filter, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { map } from 'rxjs/operators';
-import { WS_EVENT_NAME } from '../constans';
-import { LoopFunc, PayloadRpc, RpcResult, Transport, WsEvent } from '../types';
+import { WS_EVENT_NAME } from '../constans/index.js';
+import { LoopFunc, PayloadRpc, RpcResult, Transport, WsEvent } from '../types/index.js';
 import { WebSocketSubject } from 'rxjs/internal/observable/dom/WebSocketSubject';
 
 export interface WsResponse<T = unknown> {

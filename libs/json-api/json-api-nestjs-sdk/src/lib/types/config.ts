@@ -1,5 +1,5 @@
-import { PartialByKeys } from './utils';
-import { HttpInnerClient } from './http-inner-client';
+import { PartialByKeys } from './utils.js';
+import { HttpInnerClient } from './http-inner-client.js';
 
 export type JsonApiSdkConfig = {
   apiHost: string;

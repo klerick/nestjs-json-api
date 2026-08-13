@@ -3,7 +3,7 @@ export {
   RpcFactory,
   ResultRpcFactoryPromise,
   ResultRpcFactory,
-} from './lib/factory';
+} from './lib/factory/index.js';
 export {
   RpcConfig,
   TransportType,
@@ -14,4 +14,4 @@ export {
   Transport,
   PayloadRpc,
   RpcResult,
-} from './lib/types';
+} from './lib/types/index.js';

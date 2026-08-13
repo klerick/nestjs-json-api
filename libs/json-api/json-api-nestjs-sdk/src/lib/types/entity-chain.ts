@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { RelationKeys } from '@klerick/json-api-nestjs-shared';
 
-import { ReturnIfArray } from './utils';
+import { ReturnIfArray } from './utils.js';
 
 /**
  * Chainable entity methods returning Observable
