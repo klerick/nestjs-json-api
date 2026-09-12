@@ -1,3 +1,45 @@
+## 0.1.0 (2026-09-12)
+
+### 🚀 Features
+
+- **json-api-nestjs:** let the date column decide whether a zone may be omitted ([0886790](https://github.com/klerick/nestjs-json-api/commit/0886790))
+- **json-api-nestjs-microorm:** migrate to MikroORM 7 ([85b3855](https://github.com/klerick/nestjs-json-api/commit/85b3855))
+- **json-api-nestjs-microorm:** optimize entity operations with `entityManager` over `queryBuilder` and implement diff-based relationship handling ([406ead6](https://github.com/klerick/nestjs-json-api/commit/406ead6))
+- **json-api-nestjs-microorm:** exclude primary key from props and update related tests ([c4cf0bb](https://github.com/klerick/nestjs-json-api/commit/c4cf0bb))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-typeorm:** add support for automatic resource linkage in to-one relations, update FK field detection and handling ([0dd670d](https://github.com/klerick/nestjs-json-api/commit/0dd670d))
+- **json-api-nestjs-microorm:** enhance `getOne` and `getAll` with transform toggles and additional query params, add relationship loading utility and improve logging ([bb808cd](https://github.com/klerick/nestjs-json-api/commit/bb808cd))
+- **json-api-nestjs-microorm:** fix after update nx ([03da82f](https://github.com/klerick/nestjs-json-api/commit/03da82f))
+- **json-api-nestjs-microorm:** fix after update nx ([5cdf997](https://github.com/klerick/nestjs-json-api/commit/5cdf997))
+- **json-api-nestjs-microorm:** improve type handling and simplify relation processing in utility service and `postOne` method ([1a47099](https://github.com/klerick/nestjs-json-api/commit/1a47099))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([77c7bf4](https://github.com/klerick/nestjs-json-api/commit/77c7bf4))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([42b6b82](https://github.com/klerick/nestjs-json-api/commit/42b6b82))
+- **json-api-nestjs,json-api-nestjs-microorm,json-api-nestjs-sdk,json-api-nestjs-shared,json-api-nestjs-typeorm:** up nestjs ([4c559e2](https://github.com/klerick/nestjs-json-api/commit/4c559e2))
+- **json-api-nestjs-microorm:** Adapter for microorm ([cd56636](https://github.com/klerick/nestjs-json-api/commit/cd56636))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-microorm,json-api-nestjs-typeorm:** allow a repeated id in a relationship payload ([a7526a2](https://github.com/klerick/nestjs-json-api/commit/a7526a2))
+- **json-api-nestjs-microorm,json-api-nestjs-shared,json-api-nestjs-sdk,nestjs-json-rpc,nestjs-json-rpc-sdk:** correct published manifests ([4078057](https://github.com/klerick/nestjs-json-api/commit/4078057))
+- add files the previous two commits left untracked ([889bf53](https://github.com/klerick/nestjs-json-api/commit/889bf53))
+- **json-api-nestjs-microorm:** exclude non-persistent properties from relation mapping ([8d373ba](https://github.com/klerick/nestjs-json-api/commit/8d373ba))
+- **json-api-nestjs-microorm:** update test to exclude primary key validation in properties ([8cfdf1d](https://github.com/klerick/nestjs-json-api/commit/8cfdf1d))
+- **json-api-nestjs-microorm:** replace deprecated faker methods and add PGlite compatibility in MikroORM setup ([1d0b83b](https://github.com/klerick/nestjs-json-api/commit/1d0b83b))
+- **json-api-nestjs-microorm:** add format for mikroorm error ([c1cafc2](https://github.com/klerick/nestjs-json-api/commit/c1cafc2))
+- **json-api-nestjs-microorm:** ensure `applyFilters` is invoked in query builders for consistency ([391f4bb](https://github.com/klerick/nestjs-json-api/commit/391f4bb))
+- **json-api-nestjs-microorm:** Handle defaultRaw in nullable props check and update entity properties ([6d7a24f](https://github.com/klerick/nestjs-json-api/commit/6d7a24f))
+- **json-api-nestjs-microorm:** Remove @mikro-orm/postgresql dependencies in package.json ([277f61c](https://github.com/klerick/nestjs-json-api/commit/277f61c))
+- **json-api-nestjs-typeorm, json-api-nestjs-microorm:** Fix mysql like error ([#104](https://github.com/klerick/nestjs-json-api/issues/104))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0
+- Updated json-api-nestjs to 10.1.0
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 0.1.0-beta.22 (2026-08-13)
 
 ### 🚀 Features

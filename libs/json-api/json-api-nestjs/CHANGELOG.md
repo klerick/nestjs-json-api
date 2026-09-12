@@ -1,3 +1,22 @@
+## 10.1.0 (2026-09-12)
+
+### 🚀 Features
+
+- **json-api-nestjs:** let the date column decide whether a zone may be omitted ([0886790](https://github.com/klerick/nestjs-json-api/commit/0886790))
+
+### 🩹 Fixes
+
+- **json-api-nestjs:** accept a UTC offset in date attributes ([#120](https://github.com/klerick/nestjs-json-api/issues/120))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.0.0
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 # 10.0.0 (2026-08-13)
 
 ### 🚀 Features
