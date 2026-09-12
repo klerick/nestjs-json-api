@@ -27,7 +27,7 @@
         },
         "co_author_ids": {
           "name": "co_author_ids",
-          "type": "int4[]",
+          "type": "integer[]",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -61,7 +61,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -95,7 +95,7 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -138,7 +138,7 @@
           "length": null,
           "precision": null,
           "scale": null,
-          "default": "'{\"premium\": false, \"featured\": false, \"readTime\": 0}'",
+          "default": "'{\"readTime\": 0, \"featured\": false, \"premium\": false}'",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -146,7 +146,7 @@
         },
         "published_at": {
           "name": "published_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -201,7 +201,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -275,8 +275,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         },
         "acl_articles_editor_id_foreign": {
           "columnNames": [
@@ -288,7 +287,6 @@
             "id"
           ],
           "referencedTableName": "public.acl_users",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
@@ -300,7 +298,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -436,7 +434,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -487,7 +485,6 @@
             "id"
           ],
           "referencedTableName": "public.acl_categories",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
@@ -533,7 +530,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -618,7 +615,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -658,8 +655,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         },
         "acl_comments_post_id_foreign": {
           "columnNames": [
@@ -670,8 +666,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_posts",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_posts"
         }
       },
       "comment": null
@@ -857,7 +852,7 @@
         },
         "shared_with": {
           "name": "shared_with",
-          "type": "int4[]",
+          "type": "integer[]",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -891,7 +886,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -908,7 +903,7 @@
         },
         "uploaded_at": {
           "name": "uploaded_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -948,8 +943,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         }
       },
       "comment": null
@@ -1011,7 +1005,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1079,7 +1073,7 @@
         },
         "published_at": {
           "name": "published_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1134,7 +1128,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1198,8 +1192,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         },
         "acl_posts_category_id_foreign": {
           "columnNames": [
@@ -1211,7 +1204,6 @@
             "id"
           ],
           "referencedTableName": "public.acl_categories",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
@@ -1307,7 +1299,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1426,7 +1418,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1476,8 +1468,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         }
       },
       "comment": null
@@ -1522,7 +1513,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1662,7 +1653,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1736,8 +1727,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.acl_users",
-          "updateRule": "cascade"
+          "referencedTableName": "public.acl_users"
         }
       },
       "comment": null
@@ -1748,7 +1738,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1850,7 +1840,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1933,7 +1923,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1984,7 +1974,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2023,7 +2013,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2074,7 +2064,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2113,7 +2103,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2181,7 +2171,7 @@
             "MESSAGE",
             "NOTE"
           ],
-          "mappedType": "unknown",
+          "mappedType": "enum",
           "nativeEnumName": "comment_kind_enum"
         },
         "text": {
@@ -2203,7 +2193,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2234,17 +2224,16 @@
       "checks": [],
       "triggers": [],
       "foreignKeys": {
-        "comments_created_by_foreign": {
+        "comments_created_by_id_foreign": {
           "columnNames": [
             "created_by_id"
           ],
-          "constraintName": "comments_created_by_foreign",
+          "constraintName": "comments_created_by_id_foreign",
           "localTableName": "public.comments",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.users",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
@@ -2256,7 +2245,7 @@
       "columns": {
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2341,7 +2330,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2407,7 +2396,7 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2524,9 +2513,26 @@
           "enumItems": [],
           "mappedType": "integer"
         },
+        "test_date_tz": {
+          "name": "test_date_tz",
+          "type": "timestamp(0) with time zone",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp(0)",
+          "type": "timestamp(0) without time zone",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2596,8 +2602,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.addresses",
-          "updateRule": "cascade"
+          "referencedTableName": "public.addresses"
         },
         "users_manager_id_foreign": {
           "columnNames": [
@@ -2609,7 +2614,6 @@
             "id"
           ],
           "referencedTableName": "public.users",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
