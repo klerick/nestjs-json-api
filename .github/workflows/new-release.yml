@@ -143,7 +143,10 @@ jobs:
       GIST_ID: ${{ secrets.GIST_ID }}
 
   bump-version:
-    needs: [build]
+    # compute-projects belongs here because its output is read below: a job not
+    # listed in `needs` is simply absent from the `needs` context, and the
+    # expression quietly yields an empty string rather than failing.
+    needs: [build, compute-projects]
     uses: ./.github/workflows/bump-version.yml
     with:
       projects: ${{ needs.compute-projects.outputs.finalProjects }}
