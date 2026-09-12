@@ -43,6 +43,11 @@ const entityParamUsers: EntityParam<Users, 'id'> = {
     testReal: TypeField.number,
     testArrayNull: TypeField.number,
   },
+  propsDateTimezone: {
+    testDate: false,
+    createdAt: true,
+    updatedAt: true,
+  },
   primaryColumnType: TypeField.number,
   propsNullable: ['testArrayNull', 'lastName', 'isActive'],
   typeName: 'users',

@@ -35,6 +35,7 @@ import {
   getRelationProperty,
   getArrayType,
   getRelationFkField,
+  getPropsDateTimezone,
 } from '../orm-helper';
 
 import {
@@ -119,6 +120,7 @@ export function EntityPropsMap<E extends object>(entities: EntityClass<E>[]) {
           primaryColumnName: getPrimaryColumnName(metadata),
           primaryColumnType: getPrimaryColumnType(metadata),
           propsArrayType: getArrayType(metadata, namingStrategy),
+          propsDateTimezone: getPropsDateTimezone(metadata),
           typeName: kebabCase(className),
           className: className,
           relations: getRelation(metadata),

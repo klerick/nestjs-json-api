@@ -7,12 +7,14 @@ export {
   excludeMethod,
   patchInputData,
 } from './lib/modules/mixin/helpers/utils';
+export { isTimezoneAwareColumnType } from './lib/utils';
 export {
   PrepareParams,
   NestProvider,
   ValidateQueryError,
   UnionToTuple,
   EntityParam,
+  DatePropertyTimezone,
   TypeField,
   Params,
   JsonApiReadOnlyField,

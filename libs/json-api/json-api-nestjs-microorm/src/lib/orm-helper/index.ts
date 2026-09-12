@@ -1,6 +1,11 @@
 import { EntityKey, EntityMetadata, NamingStrategy } from '@mikro-orm/core';
 import { Logger } from '@nestjs/common';
-import { EntityParam, PrepareParams, TypeField } from '@klerick/json-api-nestjs';
+import {
+  EntityParam,
+  PrepareParams,
+  TypeField,
+  isTimezoneAwareColumnType,
+} from '@klerick/json-api-nestjs';
 import { MicroOrmParam } from '../type';
 import { DEFAULT_ARRAY_TYPE } from '../constants';
 
@@ -72,6 +77,24 @@ export const getPropsType = <E extends object>(
   }
 
   return result;
+};
+
+export const getPropsDateTimezone = <E extends object>(
+  entityMetadata: EntityMetadata<E>
+): EntityParam<E>['propsDateTimezone'] => {
+  const result = {} as Record<string, boolean>;
+
+  for (const props of Object.values(entityMetadata.properties)) {
+    const prop = props as { name: string; runtimeType?: string; columnTypes?: string[] };
+
+    if (prop.runtimeType !== 'Date') {
+      continue;
+    }
+
+    result[prop.name] = isTimezoneAwareColumnType(prop.columnTypes?.[0]);
+  }
+
+  return result as EntityParam<E>['propsDateTimezone'];
 };
 
 export const getPropsNullable = <E extends object>(

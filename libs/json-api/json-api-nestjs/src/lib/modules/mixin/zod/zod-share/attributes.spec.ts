@@ -216,14 +216,51 @@ describe('attributes', () => {
       expect(parsed.testDate.toISOString()).toBe(instant);
     });
 
-    it('still rejects a datetime carrying no zone at all', () => {
-      // Deliberately unchanged: without a zone the instant depends on the
-      // server's own timezone, so the value is ambiguous.
+    it('still rejects a datetime carrying no zone on a timezone-aware column', () => {
+      // Accepting the offset form did not open the door to dropping the zone
+      // altogether. createdAt stores a timezone, so without one the instant
+      // would depend on the server's own and the value stays ambiguous.
       const schema = zodAttributes(usersEntityParamMapMockData, true);
 
-      expect(() => schema.parse({ testDate: '2026-09-11T10:20:30' } as never)).toThrow(
-        ZodError
-      );
+      expect(() =>
+        schema.parse({ createdAt: '2026-09-11T10:20:30' } as never)
+      ).toThrow(ZodError);
+    });
+  });
+
+  describe('Attributes for a date column without a timezone', () => {
+    const localDatetime = '2026-09-11T10:20:30';
+
+    it('accepts a zone-less datetime where the column stores no timezone', () => {
+      // testDate is marked as a column without a timezone, so a wall-clock
+      // reading is what it holds anyway and the zone adds nothing.
+      const schema = zodAttributes(usersEntityParamMapMockData, true);
+
+      const parsed = schema.parse({ testDate: localDatetime } as never) as {
+        testDate: Date;
+      };
+
+      expect(parsed.testDate).toBeInstanceOf(Date);
+    });
+
+    it('rejects a zone-less datetime where the column stores a timezone', () => {
+      // createdAt is marked the other way. Here the missing zone would be
+      // filled in from whichever timezone the server runs in, so the same
+      // request would name different instants on different machines.
+      const schema = zodAttributes(usersEntityParamMapMockData, true);
+
+      expect(() =>
+        schema.parse({ createdAt: localDatetime } as never)
+      ).toThrow(ZodError);
+    });
+
+    it('still accepts an explicit zone on either kind of column', () => {
+      const schema = zodAttributes(usersEntityParamMapMockData, true);
+
+      for (const value of ['2026-09-11T10:20:30Z', '2026-09-11T12:20:30+02:00']) {
+        expect(() => schema.parse({ testDate: value } as never)).not.toThrow();
+        expect(() => schema.parse({ createdAt: value } as never)).not.toThrow();
+      }
     });
   });
 

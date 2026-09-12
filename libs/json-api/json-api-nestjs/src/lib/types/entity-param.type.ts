@@ -83,6 +83,26 @@ export type ArrayPropertyType<E extends object, IdKey extends string = 'id'> = {
   [K in ArrayProperty<E, IdKey>]: TypeProps<CastArrayType<Exclude<E[K], null | undefined>>>;
 };
 
+export type DateProperty<E extends object, IdKey extends string = 'id'> = {
+  [K in AttrKeys<E, IdKey>]: Exclude<E[K], null | undefined> extends Date
+    ? K
+    : never;
+}[AttrKeys<E, IdKey>];
+
+/**
+ * Whether a date column carries a timezone, keyed by property. True for types
+ * like `timestamptz`, false for `timestamp without time zone`.
+ *
+ * Only the runtime metadata knows this -- both column kinds surface as `Date`
+ * in TypeScript -- so a property is absent whenever the adapter could not read
+ * a column type. Absent is read as "carries a timezone", the stricter of the
+ * two, which keeps a zone mandatory for anything not positively identified.
+ */
+export type DatePropertyTimezone<
+  E extends object,
+  IdKey extends string = 'id'
+> = Partial<Record<DateProperty<E, IdKey>, boolean>>;
+
 export type NullableProperty<
   E extends object,
   IdKey extends string = 'id'
@@ -113,6 +133,7 @@ export type EntityParam<E extends object, IdKey extends string = 'id'> = {
   props: UnionToTuple<AttrKeys<E, IdKey>>;
   propsType: PropertyWithType<E, IdKey>;
   propsArrayType: ArrayPropertyType<E, IdKey>;
+  propsDateTimezone?: DatePropertyTimezone<E, IdKey>;
   propsNullable: UnionToTuple<NullableProperty<E, IdKey>>;
   primaryColumnName: IdKey;
   primaryColumnType: PrimaryType<E, IdKey>;
