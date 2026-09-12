@@ -887,9 +887,11 @@ export class MicroOrmUtilService<
       )
       .getResult();
 
-    if (checkResult.length === prepareData.length) {
+    const distinctRequestedIds = new Set(prepareData.map((i) => i.id));
+
+    if (checkResult.length === distinctRequestedIds.size) {
       return (
-        isArray ? inputData.map((i) => i.id) : inputData.id
+        isArray ? [...distinctRequestedIds] : inputData.id
       ) as ValidateReturn<In>;
     }
 
