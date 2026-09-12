@@ -74,6 +74,11 @@ on:
           - json-api-nestjs-shared
           - json-api-nestjs-typeorm
           - nestjs-acl-permissions
+      specifier:
+        description: "Version bump: patch/minor/major or an exact version. Leave empty to derive it from the commits. Required to graduate a package out of a prerelease -- conventional commits never leave one on their own."
+        required: false
+        default: ""
+        type: string
       beta-release:
         description: 'Is beta release?'
         required: false
@@ -142,6 +147,7 @@ jobs:
     uses: ./.github/workflows/bump-version.yml
     with:
       projects: ${{ needs.compute-projects.outputs.finalProjects }}
+      specifier: ${{ github.event.inputs.specifier }}
       beta-release: ${{ fromJSON(github.event.inputs.beta-release) }}
       dry-run: ${{ fromJSON(github.event.inputs.dry-run) }}
     secrets:

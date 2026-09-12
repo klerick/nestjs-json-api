@@ -7,6 +7,11 @@ on:
         description: "Project list"
         required: true
         type: string
+      specifier:
+        description: "Version bump: patch/minor/major or an exact version. Empty derives it from the commits."
+        required: false
+        type: string
+        default: ""
       beta-release:
         description: 'Is beta release?'
         required: false
@@ -61,11 +66,19 @@ jobs:
       - name: Npm install
         uses: ./.github/actions
       - name: Bump version
+        env:
+          # Through the environment rather than straight into the script, so the
+          # value cannot run as shell.
+          SPECIFIER: ${{ inputs.specifier }}
         run: |
+          # Deliberately unquoted: an empty specifier has to disappear, not
+          # arrive as an empty argument. Supplying one is the only way a package
+          # leaves a prerelease -- conventional commits keep bumping the
+          # prerelease counter forever on their own.
           if [ "${{ inputs.beta-release }}" = "true" ]; then
-            npx nx release --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }} --preid=beta
+            npx nx release $SPECIFIER --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }} --preid=beta
           else
-            npx nx release --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }}
+            npx nx release $SPECIFIER --skip-publish --projects=${{ inputs.projects }} --dry-run=${{ inputs.dry-run }}
           fi
         shell: bash
 
