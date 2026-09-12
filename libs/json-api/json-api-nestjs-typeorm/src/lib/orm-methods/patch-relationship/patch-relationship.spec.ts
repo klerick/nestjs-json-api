@@ -204,4 +204,21 @@ describe('patchRelationship', () => {
     expect(checkUserAfterPatch.manager).toBe(null);
     expect(checkUserAfterPatch.roles).toEqual([]);
   });
+
+  it('accepts the same relation id more than once', async () => {
+    const [role] = await rolesRepository.find({ take: 1 });
+
+    await typeormService.patchRelationship(1, 'roles', [
+      { type: 'roles', id: role.id.toString() },
+      { type: 'roles', id: role.id.toString() },
+    ] as any);
+
+    const checkUser = await userRepository.findOne({
+      select: { id: true, roles: { id: true } },
+      where: { id: 1 },
+      relations: { roles: true },
+    });
+
+    expect(checkUser?.roles.map((i) => i.id)).toEqual([role.id]);
+  });
 });

@@ -86,9 +86,9 @@ describe('patch-relationship', () => {
   });
 
   it('should be ok', async () => {
-    const roles1 = faker.helpers.arrayElement(roles);
-    const roles2 = faker.helpers.arrayElement(roles);
-    const roles3 = faker.helpers.arrayElement(roles);
+    // arrayElements samples without replacement; arrayElement called three
+    // times does not, and the assertions below count on three distinct roles.
+    const [roles1, roles2, roles3] = faker.helpers.arrayElements(roles, 3);
     const userGroup1 = faker.helpers.arrayElement(userGroup);
     const saveIdUserGroup = userGroup1.id;
     await patchRelationship.call<
@@ -135,5 +135,30 @@ describe('patch-relationship', () => {
       [roles1.id, roles2.id, roles3.id].length
     );
     expect(checkData?.userGroup?.id).toBe(saveIdUserGroup);
+  });
+
+  it('accepts the same relation id more than once', async () => {
+    const role = roles[0];
+
+    await patchRelationship.call<
+      MicroOrmService<Users, 'id'>,
+      Parameters<
+        typeof patchRelationship<Users, 'id', RelationKeys<Users, 'id'>>
+      >,
+      ReturnType<
+        typeof patchRelationship<Users, 'id', RelationKeys<Users, 'id'>>
+      >
+    >(microOrmServiceUser, userObject.id, 'roles', [
+      { type: 'roles', id: role.id.toString() },
+      { type: 'roles', id: role.id.toString() },
+    ]);
+
+    const checkData = await microOrmServiceUser.microOrmUtilService
+      .queryBuilder()
+      .leftJoinAndSelect('Users.roles', 'Roles__roles', {}, ['id'])
+      .where({ id: userObject.id })
+      .getSingleResult();
+
+    expect(checkData?.roles.map((i) => i.id)).toEqual([role.id]);
   });
 });
