@@ -61,9 +61,18 @@ jobs:
         id: select_projects
         if: ${{ inputs.tagChoice == '' }}
         shell: bash
+        env:
+          PROJECT_1: ${{ inputs.project1 }}
+          PROJECT_2: ${{ inputs.project2 }}
+          PROJECT_3: ${{ inputs.project3 }}
+          PROJECT_4: ${{ inputs.project4 }}
         run: |
+          # The loop read projectList1..3, which are not inputs of this workflow.
+          # They expanded to nothing, so picking projects in the form always
+          # ended in "no projects selected" -- and the fourth slot was never
+          # read at all.
           final=""
-          for var in "${{ inputs.projectList1 }}" "${{ inputs.projectList2 }}" "${{ inputs.projectList3 }}"; do
+          for var in "$PROJECT_1" "$PROJECT_2" "$PROJECT_3" "$PROJECT_4"; do
             if [ ! -z "$var" ]; then
               if [ -z "$final" ]; then
                 final="$var"
