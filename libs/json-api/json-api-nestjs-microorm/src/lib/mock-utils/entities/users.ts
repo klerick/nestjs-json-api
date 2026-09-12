@@ -90,6 +90,14 @@ export class Users {
   public testDate!: Date;
 
   @Property({
+    name: 'test_date_tz',
+    type: Date,
+    nullable: true,
+    columnType: 'timestamp(0) with time zone',
+  })
+  public testDateTz?: Date;
+
+  @Property({
     length: 0,
     name: 'created_at',
     nullable: true,

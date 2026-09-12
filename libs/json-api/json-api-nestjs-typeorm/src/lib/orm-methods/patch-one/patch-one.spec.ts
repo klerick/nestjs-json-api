@@ -37,7 +37,7 @@ describe('patchOne', () => {
 
   let firstName: string;
   let isActive: boolean;
-  let testDate: Date;
+  let testDateTz: Date;
   let login: string;
 
   let inputData: PostData<Users, 'id'>;
@@ -56,7 +56,7 @@ describe('patchOne', () => {
       lastName: firstName,
       firstName: faker.person.lastName(),
     });
-    testDate = new Date();
+    testDateTz = new Date();
 
     const module: TestingModule = await getModuleForPgLite(
       Users,
@@ -101,7 +101,7 @@ describe('patchOne', () => {
       attributes: {
         firstName,
         isActive,
-        testDate,
+        testDateTz,
         login,
       },
       relationships: {
@@ -160,7 +160,11 @@ describe('patchOne', () => {
         ...{
           login: newLogin,
           isActive: newIsActive,
-          testDate: new Date(),
+          // Asserted against a re-read of the row, so it has to be a column
+          // that stores an instant. test_date has no timezone and holds a
+          // wall-clock reading, which only survives the round trip when the
+          // process itself runs in UTC.
+          testDateTz: new Date(),
         },
       },
     };
