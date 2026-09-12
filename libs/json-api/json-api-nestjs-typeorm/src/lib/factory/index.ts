@@ -38,6 +38,7 @@ import {
   getRelationProperty,
   getArrayType,
   getRelationFkField,
+  getPropsDateTimezone,
 } from '../orm-helper';
 import { EntityClass } from '@mikro-orm/core';
 
@@ -88,6 +89,7 @@ export function EntityPropsMap<E extends object>(entities: EntityClass<E>[]) {
           primaryColumnName: getPrimaryColumnName(entityRepo),
           primaryColumnType: getPrimaryColumnType(entityRepo),
           propsArrayType: getArrayType(entityRepo),
+          propsDateTimezone: getPropsDateTimezone(entityRepo),
           typeName: kebabCase(className),
           className: className,
           relations: getRelation(entityRepo),

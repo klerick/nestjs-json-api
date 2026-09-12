@@ -29,13 +29,22 @@ const getZodRulesForString = memoize(getZodRulesForStringFunc);
 function getZodRulesForDateFunc<
   Null extends true | false,
   isPatch extends true | false
->(isNullable: Null, isPatch: isPatch) {
+>(isNullable: Null, isPatch: isPatch, hasTimezone = true) {
   // An explicit offset (2026-09-11T12:20:30+02:00) names an instant just as
   // unambiguously as a trailing Z, so both are accepted. Bare z.iso.datetime()
   // takes only Z, which silently narrowed this field when it moved off
-  // z.coerce.date(). A zone of some kind stays mandatory: without one the
-  // instant would depend on the timezone the server happens to run in.
-  return setOptionalOrNot(z.iso.datetime({ offset: true }), isNullable, isPatch).transform(transformDateString<Null, isPatch>);
+  // z.coerce.date().
+  //
+  // Whether a zone may be left out follows the column. One that stores no
+  // timezone holds a wall-clock reading, so a zone-less datetime says exactly
+  // what will be stored. One that does store a timezone would have to fill the
+  // missing zone in from wherever the server runs, making the same request mean
+  // different instants on different machines -- so there a zone stays required.
+  return setOptionalOrNot(
+    z.iso.datetime({ offset: true, local: !hasTimezone }),
+    isNullable,
+    isPatch
+  ).transform(transformDateString<Null, isPatch>);
 }
 const getZodRulesForDate = memoize(getZodRulesForDateFunc);
 
@@ -70,7 +79,8 @@ function getZodRulesForArrayFunc<
 >(
   propsField: T,
   isNullable: Null,
-  isPatch: isPatch
+  isPatch: isPatch,
+  hasTimezone = true
 ): ZodRulesResultArray<T, Null, isPatch> {
   let schema: ZodType;
   switch (propsField) {
@@ -78,7 +88,7 @@ function getZodRulesForArrayFunc<
       schema = getZodRulesForNumber(false, false);
       break;
     case TypeField.date:
-      schema = getZodRulesForDate(false, false);
+      schema = getZodRulesForDate(false, false, hasTimezone);
       break;
     case TypeField.boolean:
       schema = getZodRulesForBoolean(false, false);
@@ -190,10 +200,20 @@ function buildSchema<
 ): ZodRules<E, IdKey, K, IsTypeArray<Props<E, IdKey>[K]>, isPatch> {
   // @ts-expect-error need check in tuple
   const isNullable = paramMap.propsNullable.includes(propsName);
+  // Absent means the adapter could not read a column type, and the stricter
+  // reading -- a zone is required -- is what that falls back to.
+  const hasTimezone =
+    Reflect.get(paramMap.propsDateTimezone ?? {}, propsName as PropertyKey) ??
+    true;
   if (assertPropsIsarrayProps(paramMap, propsName)) {
     const arrayPropsType = paramMap.propsArrayType[propsName];
 
-    return getZodRulesForArray(arrayPropsType, isNullable, isPatch) as ZodRules<
+    return getZodRulesForArray(
+      arrayPropsType,
+      isNullable,
+      isPatch,
+      hasTimezone
+    ) as ZodRules<
       E,
       IdKey,
       K,
@@ -205,7 +225,7 @@ function buildSchema<
   const propsType = paramMap.propsType[propsName];
   switch (propsType) {
     case TypeField.date:
-      return getZodRulesForDate(isNullable, isPatch) as ZodRules<
+      return getZodRulesForDate(isNullable, isPatch, hasTimezone) as ZodRules<
         E,
         IdKey,
         K,

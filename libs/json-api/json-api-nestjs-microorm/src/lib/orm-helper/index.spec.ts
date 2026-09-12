@@ -24,6 +24,7 @@ import { TypeField } from '@klerick/json-api-nestjs';
 import {
   getProps,
   getPropsType,
+  getPropsDateTimezone,
   getPropsNullable,
   getPrimaryColumnName,
   getPrimaryColumnType,
@@ -90,6 +91,19 @@ describe('microorm-orm-helper-for-map', () => {
 
     expect(result.includes('createdBy' as any)).toBe(false);
     expect(result.includes('createdById' as any)).toBe(false);
+  });
+
+  it('getPropsDateTimezone', () => {
+    const result = getPropsDateTimezone(entityMetadataToken.get(Users));
+
+    // Only the column type separates these -- every one of them is a Date on
+    // the TypeScript side.
+    expect(result).toEqual({
+      testDate: false,
+      createdAt: false,
+      updatedAt: false,
+      testDateTz: true,
+    });
   });
 
   it('getPropsType', () => {

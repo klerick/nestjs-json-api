@@ -16,6 +16,7 @@ import {
   getProps,
   getRelation,
   getPropsType,
+  getPropsDateTimezone,
   getPropsNullable,
   getPrimaryColumnName,
   getPrimaryColumnType,
@@ -71,6 +72,19 @@ describe('typeorm-orm-helper-for-map', () => {
       testDateTz: 'date',
       testReal: 'array',
       updatedAt: 'date',
+    });
+  });
+
+  it('getPropsDateTimezone', () => {
+    const result = getPropsDateTimezone(userRepository);
+
+    // Only the column type separates these -- every one of them is a Date on
+    // the TypeScript side.
+    expect(result).toEqual({
+      testDate: false,
+      createdAt: false,
+      updatedAt: false,
+      testDateTz: true,
     });
   });
 

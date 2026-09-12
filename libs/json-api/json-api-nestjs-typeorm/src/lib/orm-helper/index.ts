@@ -1,4 +1,8 @@
-import { EntityParam, TypeField } from '@klerick/json-api-nestjs';
+import {
+  EntityParam,
+  TypeField,
+  isTimezoneAwareColumnType,
+} from '@klerick/json-api-nestjs';
 import { Repository } from 'typeorm';
 
 export * from './acl-rules-to-typeorm';
@@ -74,6 +78,30 @@ export const getPropsType = <E extends object>(
   }
 
   return result;
+};
+
+export const getPropsDateTimezone = <E extends object>(
+  repository: Repository<E>
+): EntityParam<E>['propsDateTimezone'] => {
+  const result = {} as Record<string, boolean>;
+
+  for (const column of repository.metadata.columns) {
+    // Reflect metadata is what marks a property as a date -- column.type is a
+    // dialect string and says nothing about the runtime type on its own.
+    const designType = Reflect.getMetadata(
+      'design:type',
+      (repository.target as { prototype: object })['prototype'],
+      column.propertyName
+    );
+
+    if (designType !== Date) {
+      continue;
+    }
+
+    result[column.propertyName] = isTimezoneAwareColumnType(column.type);
+  }
+
+  return result as EntityParam<E>['propsDateTimezone'];
 };
 
 export const getPropsNullable = <E extends object>(
