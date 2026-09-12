@@ -176,6 +176,57 @@ describe('attributes', () => {
     });
   });
 
+  describe('Attributes for date with a UTC offset', () => {
+    // A date attribute used to accept anything new Date() could parse, because
+    // the schema was z.coerce.date(). Moving to z.iso.datetime() on the zod v4
+    // bump narrowed it to UTC-only: a offset such as +02:00 is rejected, even
+    // though it names an unambiguous instant. Reported as #120.
+    const instant = '2026-09-11T10:20:30.000Z';
+    const sameInstantWithOffset = '2026-09-11T12:20:30.000+02:00';
+    const sameInstantBehindUtc = '2026-09-11T04:50:30.000-05:30';
+
+    it('accepts an offset in POST and resolves it to the same instant as Z', () => {
+      const schema = zodAttributes(usersEntityParamMapMockData, false);
+      const base = {
+        login: 'login',
+        lastName: 'lastName',
+        testReal: [123.123],
+        testArrayNull: [],
+        firstName: '',
+        createdAt: instant,
+        updatedAt: instant,
+      };
+
+      for (const testDate of [sameInstantWithOffset, sameInstantBehindUtc]) {
+        const parsed = schema.parse({ ...base, testDate } as never) as {
+          testDate: Date;
+        };
+        expect(parsed.testDate).toBeInstanceOf(Date);
+        expect(parsed.testDate.toISOString()).toBe(instant);
+      }
+    });
+
+    it('accepts an offset in PATCH', () => {
+      const schema = zodAttributes(usersEntityParamMapMockData, true);
+
+      const parsed = schema.parse({
+        testDate: sameInstantWithOffset,
+      } as never) as { testDate: Date };
+
+      expect(parsed.testDate.toISOString()).toBe(instant);
+    });
+
+    it('still rejects a datetime carrying no zone at all', () => {
+      // Deliberately unchanged: without a zone the instant depends on the
+      // server's own timezone, so the value is ambiguous.
+      const schema = zodAttributes(usersEntityParamMapMockData, true);
+
+      expect(() => schema.parse({ testDate: '2026-09-11T10:20:30' } as never)).toThrow(
+        ZodError
+      );
+    });
+  });
+
   describe('Attributes with readOnlyProps', () => {
     it('should exclude read-only fields from schema', () => {
       const readOnlyProps = ['createdAt', 'updatedAt'] as ExtractJsonApiReadOnlyKeys<Users>[];

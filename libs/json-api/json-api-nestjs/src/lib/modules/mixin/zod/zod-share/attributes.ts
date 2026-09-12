@@ -30,7 +30,12 @@ function getZodRulesForDateFunc<
   Null extends true | false,
   isPatch extends true | false
 >(isNullable: Null, isPatch: isPatch) {
-  return setOptionalOrNot(z.iso.datetime(), isNullable, isPatch).transform(transformDateString<Null, isPatch>);
+  // An explicit offset (2026-09-11T12:20:30+02:00) names an instant just as
+  // unambiguously as a trailing Z, so both are accepted. Bare z.iso.datetime()
+  // takes only Z, which silently narrowed this field when it moved off
+  // z.coerce.date(). A zone of some kind stays mandatory: without one the
+  // instant would depend on the timezone the server happens to run in.
+  return setOptionalOrNot(z.iso.datetime({ offset: true }), isNullable, isPatch).transform(transformDateString<Null, isPatch>);
 }
 const getZodRulesForDate = memoize(getZodRulesForDateFunc);
 
