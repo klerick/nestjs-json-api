@@ -68,6 +68,7 @@ describe('typeorm-orm-helper-for-map', () => {
       login: 'string',
       testArrayNull: 'array',
       testDate: 'date',
+      testDateTz: 'date',
       testReal: 'array',
       updatedAt: 'date',
     });
@@ -92,6 +93,7 @@ describe('typeorm-orm-helper-for-map', () => {
       'testDate',
       'createdAt',
       'updatedAt',
+      'testDateTz',
     ]);
   });
 

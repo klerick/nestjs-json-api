@@ -73,7 +73,7 @@ export class Users {
 
   @Column({
     name: 'test_date',
-    type: 'timestamp with time zone',
+    type: 'timestamp',
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP(0)',
   })
@@ -81,7 +81,7 @@ export class Users {
 
   @Column({
     name: 'created_at',
-    type: 'timestamp with time zone',
+    type: 'timestamp',
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP(0)',
   })
@@ -89,11 +89,18 @@ export class Users {
 
   @UpdateDateColumn({
     name: 'updated_at',
-    type: 'timestamp with time zone',
+    type: 'timestamp',
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP(0)',
   })
   public updatedAt!: Date;
+
+  @Column({
+    name: 'test_date_tz',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
+  public testDateTz!: Date;
 
   @OneToOne(() => Addresses, (item) => item.id)
   @JoinColumn({

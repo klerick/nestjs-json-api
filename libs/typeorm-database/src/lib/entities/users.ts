@@ -79,6 +79,13 @@ export class Users {
   })
   public updatedAt!: Date;
 
+  @Column({
+    name: 'test_date_tz',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
+  public testDateTz!: Date;
+
   @OneToOne(() => Addresses, (item) => item.id)
   @JoinColumn({
     name: 'addresses_id',

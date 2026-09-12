@@ -76,6 +76,15 @@ export class Users {
   })
   updatedAt: Date = truncateToSeconds();
 
+  @Property({
+    length: 0,
+    name: 'test_date_tz',
+    nullable: true,
+    columnType: 'timestamp(0) with time zone',
+    type: 'timestamp',
+  })
+  public testDateTz?: Date;
+
   @Property({ persist: false, type: 'string' })
   get displayName(): string {
     if (this.firstName || this.lastName) {

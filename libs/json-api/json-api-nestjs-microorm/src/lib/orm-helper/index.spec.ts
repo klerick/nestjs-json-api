@@ -104,6 +104,7 @@ describe('microorm-orm-helper-for-map', () => {
       login: 'string',
       testArrayNull: 'array',
       testDate: 'date',
+      testDateTz: 'date',
       testReal: 'array',
       updatedAt: 'date',
     });
@@ -119,6 +120,7 @@ describe('microorm-orm-helper-for-map', () => {
       'lastName',
       'isActive',
       'testDate',
+      'testDateTz',
       'createdAt',
       'updatedAt',
     ]);

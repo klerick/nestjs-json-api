@@ -98,6 +98,9 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     } = userAfterSave;
     // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
     delete (newUser as Record<string, unknown>)['displayName'];
+    // Not set by these tests, so it comes back null and has no counterpart in
+    // the input being compared against.
+    delete (newUser as Record<string, unknown>)['testDateTz'];
     const { addresses, ...userWithoutAddress } = user;
 
     expect(id).toBeDefined();
@@ -119,6 +122,7 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     } = usersFromSerer;
     // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
     delete (fromUser as Record<string, unknown>)['displayName'];
+    delete (fromUser as Record<string, unknown>)['testDateTz'];
 
     expect(id).toBe(fromId);
     expect(user).toEqual(fromUser);
@@ -148,6 +152,9 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     } = userAfterSave;
     // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
     delete (newUser as Record<string, unknown>)['displayName'];
+    // Not set by these tests, so it comes back null and has no counterpart in
+    // the input being compared against.
+    delete (newUser as Record<string, unknown>)['testDateTz'];
     const {
       addresses,
       comments: commentsFromUser,
@@ -176,6 +183,7 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     } = usersFromSerer;
     // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
     delete (fromUser as Record<string, unknown>)['displayName'];
+    delete (fromUser as Record<string, unknown>)['testDateTz'];
 
     expect(id).toBe(fromId);
     user.comments[0].updatedAt = fromUser.comments[0].updatedAt;
@@ -205,6 +213,9 @@ describe('Creating Resources (POST Operations) with entity() and plain structure
     const { id, createdAt, updatedAt, addresses: savedAddresses, ...newUser } = userAfterSave;
     // MikroORM exposes virtual (persist:false) props in response, TypeORM does not
     delete (newUser as Record<string, unknown>)['displayName'];
+    // Not set by these tests, so it comes back null and has no counterpart in
+    // the input being compared against.
+    delete (newUser as Record<string, unknown>)['testDateTz'];
 
     // Verify firstName has prefix applied
     expect(userAfterSave.firstName).toBe(`${prefix}${originalFirstName}`);
