@@ -1,3 +1,14 @@
+## 10.1.1 (2026-10-10)
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** take the meta symbols from the global registry and export the readers for Angular ([97a21c6](https://github.com/klerick/nestjs-json-api/commit/97a21c6))
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 10.1.0 (2026-10-10)
 
 ### 🚀 Features
