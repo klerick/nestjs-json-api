@@ -7,6 +7,8 @@ export {
   getProviders,
   JsonSdkConfigFactory,
   JsonSdkConfigOrFactory,
+  JsonSdkAngularConfig,
+  createHttpInnerClient,
 } from './lib/json-api-angular.js';
 export { JsonApiUtilsService, JsonApiSdkService } from './lib/service/index.js';
 export { AtomicOperations, JsonSdkConfig } from './lib/types/index.js';
