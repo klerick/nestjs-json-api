@@ -1,3 +1,23 @@
+## 10.1.0 (2026-10-10)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk:** let the Angular config carry an HttpContext ([9a5f504](https://github.com/klerick/nestjs-json-api/commit/9a5f504))
+- **json-api-nestjs-sdk,json-api-nestjs-shared:** surface the meta a response carries ([2a5be7d](https://github.com/klerick/nestjs-json-api/commit/2a5be7d))
+
+### 🩹 Fixes
+
+- **json-api-nestjs-sdk:** translate between HttpClient and HttpInnerClient in the Angular providers ([ee704ae](https://github.com/klerick/nestjs-json-api/commit/ee704ae))
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.1.0
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 ## 10.0.1 (2026-09-12)
 
 ### 🧱 Updated Dependencies

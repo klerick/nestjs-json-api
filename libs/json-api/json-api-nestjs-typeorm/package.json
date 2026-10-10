@@ -1,6 +1,6 @@
 {
   "name": "@klerick/json-api-nestjs-typeorm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "commonjs",
   "main": "./src/index.js",
   "typings": "./src/index.d.ts",
@@ -15,7 +15,7 @@
     "CRUD"
   ],
   "peerDependencies": {
-    "@klerick/json-api-nestjs": "10.1.0",
+    "@klerick/json-api-nestjs": "10.1.1",
     "@nestjs/typeorm": "^11.0.0"
   },
   "dependencies": {}

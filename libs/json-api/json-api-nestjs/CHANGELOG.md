@@ -1,3 +1,9 @@
+## 10.1.1 (2026-10-10)
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.1.0
+
 ## 10.1.0 (2026-09-12)
 
 ### 🚀 Features

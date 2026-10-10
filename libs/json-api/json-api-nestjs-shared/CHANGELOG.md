@@ -1,3 +1,14 @@
+## 1.1.0 (2026-10-10)
+
+### 🚀 Features
+
+- **json-api-nestjs-sdk,json-api-nestjs-shared:** surface the meta a response carries ([2a5be7d](https://github.com/klerick/nestjs-json-api/commit/2a5be7d))
+
+### ❤️ Thank You
+
+- Alex H
+- Claude Opus 5 (1M context)
+
 # 1.0.0 (2026-09-12)
 
 ### 🚀 Features

@@ -1,3 +1,10 @@
+## 0.1.3 (2026-10-10)
+
+### 🧱 Updated Dependencies
+
+- Updated json-api-nestjs-shared to 1.1.0
+- Updated json-api-nestjs to 10.1.1
+
 ## 0.1.2 (2026-09-12)
 
 ### 🧱 Updated Dependencies
