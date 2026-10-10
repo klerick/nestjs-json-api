@@ -18,8 +18,18 @@
  * `EntityArray` of a list -- and to the entity itself where there is not, which
  * is every single-resource response.
  */
-const RESOURCE_META = Symbol('json-api-resource-meta');
-const DOCUMENT_META = Symbol('json-api-document-meta');
+// From the global registry rather than module-local: the package ships two
+// entry points, and nothing guarantees a bundler gives them the same copy of
+// this module -- cjs and mjs can resolve apart, or one can be inlined while
+// the other stays external. Two copies would write under one symbol and read
+// under another, and the readers below would answer undefined with nothing to
+// show for it. The keys are package-scoped so they cannot collide.
+const RESOURCE_META = Symbol.for(
+  '@klerick/json-api-nestjs-sdk/resource-meta'
+);
+const DOCUMENT_META = Symbol.for(
+  '@klerick/json-api-nestjs-sdk/document-meta'
+);
 
 /** The shape assumed when the caller names none. */
 export type ResourceMeta = Record<string, unknown>;
