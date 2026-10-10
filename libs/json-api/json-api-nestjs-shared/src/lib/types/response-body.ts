@@ -108,12 +108,23 @@ export type BaseIncluded<Entity extends object, IdKey extends string = 'id'> = {
   included?: Include<Entity, IdKey>[];
 };
 
+/**
+ * A resource object MAY carry its own `meta` (JSON:API 1.1 section 7.2),
+ * describing that one resource rather than the response. Optional, so a
+ * document without it is unchanged.
+ */
+export type BaseResourceMeta<ResourceMetaType = Record<string, unknown>> = {
+  meta?: ResourceMetaType;
+};
+
 export type ResourceData<
   Entity extends object,
-  IdKey extends string = 'id'
+  IdKey extends string = 'id',
+  ResourceMetaType = Record<string, unknown>
 > = MainData &
   BaseAttribute<Entity, IdKey> &
   BaseRelationships<Entity, IdKey> &
+  BaseResourceMeta<ResourceMetaType> &
   BaseLinks;
 
 export type ResourceObject<

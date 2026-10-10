@@ -17,7 +17,11 @@ import {
   ReturnIfArray,
   EntityChain,
 } from '../types/index.js';
-import { EntityArray, getTypeForReq } from '../utils/index.js';
+import {
+  EntityArray,
+  getTypeForReq,
+  setDocumentMeta,
+} from '../utils/index.js';
 import { JsonApiUtilsService } from './json-api-utils.service.js';
 
 const AS_PLAIN_RESULT = Symbol('asPlainResult');
@@ -104,11 +108,18 @@ export class JsonApiSdkService {
               result.meta
             );
 
-            return new EntityArray<Entity>(resource, {
-              totalItems,
-              pageNumber,
-              pageSize,
-            });
+            // The three pagination fields are read off the document meta and
+            // exposed as getters; the rest of it -- anything the server adds
+            // through the response type's extension slot -- is kept whole
+            // beside the container.
+            return setDocumentMeta(
+              new EntityArray<Entity>(resource, {
+                totalItems,
+                pageNumber,
+                pageSize,
+              }),
+              result.meta
+            );
           }
         )
       );
@@ -157,6 +168,10 @@ export class JsonApiSdkService {
           return acum;
         }),
         map(
+          // Deliberately without document meta: this container is stitched
+          // from several documents, so no single one speaks for it -- which is
+          // why the page numbers here are synthetic too. Callers that need it
+          // take getAll's paged form, where each emission is one document.
           (r) =>
             new EntityArray<Entity>(r, {
               pageSize: r.length,
