@@ -468,6 +468,22 @@ describe('JsonApiUtilsService', () => {
       expect(meta?.asleepSince).toBeNull();
     });
 
+    it('stores under a globally registered symbol', () => {
+      // The symbol has to come from the global registry, not from this module.
+      // Two copies of resource-meta in one bundle -- the cjs and mjs entry
+      // points resolving apart, or one inlined while the other stays external
+      // -- would otherwise write under one symbol and read under another, and
+      // getResourceMeta would quietly answer undefined.
+      const [entity] = service['convertResponseData'](listBody(), []) as any[];
+
+      const key = Symbol.for('@klerick/json-api-nestjs-sdk/resource-meta');
+
+      expect(Reflect.get(entity, key)).toEqual({
+        resetsAt: '2026-10-11T09:00:00Z',
+        asleepSince: null,
+      });
+    });
+
     it('reports nothing for an entity that never came from a response', () => {
       expect(getResourceMeta({ id: 1 })).toBeUndefined();
       expect(getDocumentMeta({ id: 1 })).toBeUndefined();
