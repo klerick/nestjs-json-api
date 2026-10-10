@@ -17,7 +17,15 @@ import {
   ReturnIfArray,
 } from '../types/index.js';
 
-import { getTypeForReq, HttpParams, isRelation, isNullRef, isEmptyArrayRef } from '../utils/index.js';
+import {
+  getTypeForReq,
+  HttpParams,
+  isRelation,
+  isNullRef,
+  isEmptyArrayRef,
+  setResourceMeta,
+  setDocumentMeta,
+} from '../utils/index.js';
 import { ID_KEY } from '../constants/index.js';
 
 type Attributes<E extends object> = BaseAttribute<E>['attributes'];
@@ -295,11 +303,21 @@ export class JsonApiUtilsService {
           }
         }
       }
+      // Beside the entity, never among its attributes: the entity may own an
+      // attribute called `meta`, and anything merged in here would be sent
+      // back on the next write.
+      setResourceMeta(itemEntity, (dataItem as { meta?: unknown }).meta);
+
       result.push(itemEntity);
     }
     if (!isArray) {
       const firstItem = result[0];
-      if (firstItem) return firstItem;
+      if (firstItem) {
+        // A single-resource document has no container to carry its own meta,
+        // so it rides on the entity. Lists get it on the EntityArray instead.
+        setDocumentMeta(firstItem, (body as { meta?: unknown }).meta);
+        return firstItem;
+      }
     }
     return result;
   }

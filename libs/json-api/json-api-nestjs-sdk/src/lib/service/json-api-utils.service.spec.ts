@@ -1,6 +1,6 @@
 import { JsonApiUtilsService } from './json-api-utils.service';
 import { JsonApiSdkConfig, QueryParams } from '../types';
-import { HttpParams } from '../utils';
+import { HttpParams, getResourceMeta, getDocumentMeta } from '../utils';
 
 describe('JsonApiUtilsService', () => {
   let service: JsonApiUtilsService;
@@ -366,6 +366,111 @@ describe('JsonApiUtilsService', () => {
       expect(result[mockJsonApiSdkConfig.idKey]).toBe(1);
       expect(result.attr1).toBe('value1');
       expect(result.attr2).toBe('value2');
+    });
+  });
+
+
+  describe('meta of the resource object and of the document', () => {
+    const listBody = () =>
+      ({
+        data: [
+          {
+            type: 'type1',
+            id: '1',
+            attributes: { attr1: 'a' },
+            meta: { resetsAt: '2026-10-11T09:00:00Z', asleepSince: null },
+          },
+          { type: 'type1', id: '2', attributes: { attr1: 'b' } },
+        ],
+        meta: { totalItems: 2, pageNumber: 1, pageSize: 10, time: 7 },
+      } as any);
+
+    const oneBody = () =>
+      ({
+        data: {
+          type: 'type1',
+          id: '1',
+          attributes: { attr1: 'a' },
+          meta: { resetsAt: '2026-10-11T09:00:00Z' },
+        },
+        meta: { time: 7, requestId: 'r-1' },
+      } as any);
+
+    it('keeps the meta of each resource in a list, per entity', () => {
+      const [first, second] = service['convertResponseData'](listBody(), []) as any[];
+
+      expect(getResourceMeta(first)).toEqual({
+        resetsAt: '2026-10-11T09:00:00Z',
+        asleepSince: null,
+      });
+      // The second resource carries none, and absent must read as absent
+      // rather than borrowing its neighbour's.
+      expect(getResourceMeta(second)).toBeUndefined();
+    });
+
+    it('keeps the meta of a single resource', () => {
+      const entity = service['convertResponseData'](oneBody(), []) as any;
+
+      expect(getResourceMeta(entity)).toEqual({ resetsAt: '2026-10-11T09:00:00Z' });
+    });
+
+    it('keeps the meta of the document on a single-resource response', () => {
+      // There is no container to hang it on when the document holds one
+      // resource, so it goes on the entity itself.
+      const entity = service['convertResponseData'](oneBody(), []) as any;
+
+      expect(getDocumentMeta(entity)).toEqual({ time: 7, requestId: 'r-1' });
+    });
+
+    it('does not mix the resource meta into the attributes', () => {
+      const [first] = service['convertResponseData'](listBody(), []) as any[];
+
+      expect(first.meta).toBeUndefined();
+      expect(Object.keys(first)).toEqual(['id', 'attr1']);
+      expect(JSON.parse(JSON.stringify(first))).toEqual({ id: 1, attr1: 'a' });
+    });
+
+    it('leaves an attribute of its own named meta alone', () => {
+      const body = {
+        data: [
+          {
+            type: 'type1',
+            id: '1',
+            attributes: { meta: 'an attribute, not the resource meta' },
+            meta: { resetsAt: 'x' },
+          },
+        ],
+        meta: {},
+      } as any;
+
+      const [entity] = service['convertResponseData'](body, []) as any[];
+
+      expect(entity.meta).toBe('an attribute, not the resource meta');
+      expect(getResourceMeta(entity)).toEqual({ resetsAt: 'x' });
+    });
+
+    it('reads the same whether the entity is plain or an instance', () => {
+      const asPlain = service['convertResponseData'](listBody(), [], true) as any[];
+      const asInstance = service['convertResponseData'](listBody(), [], false) as any[];
+
+      expect(getResourceMeta(asPlain[0])).toEqual(getResourceMeta(asInstance[0]));
+    });
+
+    it('hands back the shape the caller names', () => {
+      type ProjectInternals = { resetsAt: string; asleepSince: string | null };
+
+      const [first] = service['convertResponseData'](listBody(), []) as any[];
+      const meta = getResourceMeta<ProjectInternals>(first);
+
+      // Typed, so `meta.resetsAt` is a string here rather than unknown; the
+      // assertion below is what proves it at runtime.
+      expect(meta?.resetsAt).toBe('2026-10-11T09:00:00Z');
+      expect(meta?.asleepSince).toBeNull();
+    });
+
+    it('reports nothing for an entity that never came from a response', () => {
+      expect(getResourceMeta({ id: 1 })).toBeUndefined();
+      expect(getDocumentMeta({ id: 1 })).toBeUndefined();
     });
   });
 

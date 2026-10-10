@@ -2,7 +2,7 @@ import { BehaviorSubject, lastValueFrom, of, take } from 'rxjs';
 import { JsonApiSdkService } from './json-api-sdk.service';
 import { HttpInnerClient, JsonApiSdkConfig } from '../types';
 import { JsonApiUtilsService } from './index';
-import { EntityArray } from '../utils';
+import { EntityArray, getDocumentMeta } from '../utils';
 import { FetchInnerClient } from './fetch-inner-client';
 
 function mockResults(mock: any, pageNumber: number) {
@@ -177,6 +177,40 @@ describe('JsonApiSdkService', () => {
       });
     });
     expect(service.getList).toHaveBeenCalledTimes(2);
+  });
+
+
+  describe('meta of the document on a list', () => {
+    it('keeps the whole document meta on the returned EntityArray', async () => {
+      // getList reads totalItems, pageSize and pageNumber off the document
+      // meta and used to drop the rest, although the response type carries an
+      // extension slot precisely so a server can add its own fields.
+      const mockResult = {
+        data: [{ id: 1, type: 'test-class', attributes: { a: '1' } }],
+        meta: {
+          totalItems: 1,
+          pageSize: 10,
+          pageNumber: 1,
+          time: 7,
+          requestId: 'r-1',
+        },
+      };
+      vi.spyOn(http, 'get').mockImplementation(
+        () => new BehaviorSubject(mockResult).pipe(take(1)) as any
+      );
+      vi.spyOn(jsonApiUtilsService, 'convertResponseData').mockReturnValue(
+        mockResult.data as any
+      );
+
+      class TestKlass {}
+      const result = await lastValueFrom(service.getList(TestKlass));
+
+      expect(getDocumentMeta(result)).toEqual(mockResult.meta);
+      // The pagination getters keep working off the same data.
+      expect(result.totalItems).toBe(1);
+      expect(result.pageSize).toBe(10);
+      expect(result.pageNumber).toBe(1);
+    });
   });
 
   describe('meta support', () => {

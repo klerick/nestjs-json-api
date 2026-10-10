@@ -6,5 +6,12 @@ export {
 
 export { JsonApiUtilsService, JsonApiSdkService } from './lib/service/index.js';
 export * from './lib/json-api-js.js';
-export { adapterForAxios, nullRef, emptyArrayRef } from './lib/utils/index.js';
+export {
+  adapterForAxios,
+  nullRef,
+  emptyArrayRef,
+  getResourceMeta,
+  getDocumentMeta,
+} from './lib/utils/index.js';
+export type { ResourceMeta } from './lib/utils/index.js';
 export { AtomicOperations, Operands, QueryParams, JsonConfig, Filter, Includes, Sort, Pagination, Fields, EntityChain, PromiseEntityChain } from './lib/types/index.js';
